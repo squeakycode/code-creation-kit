@@ -1,0 +1,36 @@
+[COMMENT] test inline macros and unprocessed text stay in right order and tick removal ok
+start1[MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]end1 <[ENTRY.....]["row2"]> start4[MACRO_BEGIN]<[ENTRY]["row2"]>[MACRO_END]end4
+
+[COMMENT] test after expansions of first macro a new macro is created with the rest of line
+start5[MACRO_BEGIN][MACRO_BEGIN.]<[ENTRY]["row1"]>[MACRO_END]end5start6<[ENTRY.]["row2"]>[MACRO_END.]end6
+
+[COMMENT] first inline macro expansion then line expansion, whole line must be expanded in second step
+start7[MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]end7start8<[ENTRY.]["row3"]>end8
+
+[COMMENT] test recursive expansion
+start2
+[MACRO_BEGIN]
+    start3
+[MACRO_BEGIN.]
+    <[ENTRY.]["row3"]>
+[MACRO_END.]
+    end3
+[MACRO_END]
+end2
+
+[COMMENT] test recursive expansion 2
+start12
+[MACRO_BEGIN.]
+    start11
+[MACRO_BEGIN]
+    <[ENTRY.]["row3"]>
+[MACRO_END]
+    end11
+[MACRO_END.]
+end12
+
+[COMMENT] rest of multiline macro and rest of line form new line based macro
+start9
+[MACRO_BEGIN]
+->[MACRO_END]start10<[ENTRY.]["row3"]>end10
+end9

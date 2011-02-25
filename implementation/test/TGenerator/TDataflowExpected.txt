@@ -1,0 +1,40 @@
+start1<1>end1 <2> start4<2>end4
+
+start5<1>end5start6<2>end6
+
+start7<1>end7start8<3>end8
+start7<1>end7start8<3>end8
+
+start2
+
+    start3
+
+    <3>
+
+    <3>
+
+    end3
+
+end2
+
+start12
+
+    start11
+
+    <3>
+
+    end11
+
+    start11
+
+    <3>
+
+    end11
+
+end12
+
+start9
+
+->start10<3>end10
+->start10<3>end10
+end9

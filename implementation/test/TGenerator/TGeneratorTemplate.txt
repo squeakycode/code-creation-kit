@@ -1,0 +1,3 @@
+start
+[INCLUDE]["TIncluded.tpl.txt"][TRIM]
+end

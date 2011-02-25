@@ -1,0 +1,265 @@
+//   Copyright (C) 2011 Andreas Gau
+//
+//   This file is part of the code-creation-kit.
+//
+//   The code-creation-kit is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   The code-creation-kit is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef INCLUDED_CMACROPROCESSOR_H_5484125
+#define INCLUDED_CMACROPROCESSOR_H_5484125
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+#include <list>
+#include "CTableIndex.h"
+#include "CVerticalTableRotator.h"
+#include "CMacro.h"
+#include "CMacroExpander.h"
+
+///defines exceptions thrown by CMacroProcessor for template argument independent access
+class CMacroProcessorExceptions
+{
+public:
+    class ExTableNotFound : public std::runtime_error 
+    { public: ExTableNotFound() : std::runtime_error( "A table with the specified label does not exist") {}};
+
+    class ExRowHeaderIndexOutOfBounds : public std::overflow_error 
+    { public: ExRowHeaderIndexOutOfBounds() : std::overflow_error( "Row header index exceeds bounds") {}};
+
+    class ExColumnHeaderIndexOutOfBounds : public std::overflow_error 
+    { public: ExColumnHeaderIndexOutOfBounds() : std::overflow_error( "Column header index exceeds bounds") {}};
+};
+
+///processes macro expression text and ouputs expansion result
+template <typename TableT, typename OutputStreamT>
+class CMacroProcessor : public CMacroProcessorExceptions, public boost::noncopyable
+{
+    //types used:
+    typedef typename TableT::value_type::value_type StringT;
+    typedef std::size_t SizeT;
+    typedef SizeT IndexT;
+
+    typedef CVerticalTableRotator<TableT> TableRotatorT;
+    typedef CTableIndex<TableT, ExColumnHeaderIndexOutOfBounds> TableIndexT;
+    typedef CTableIndex<TableRotatorT, ExRowHeaderIndexOutOfBounds> RotatedTableIndexT;
+
+    ///represents a table internally
+    struct Table
+    {
+        Table()
+            : table(0)
+            , rotatedTable(0)
+        {
+        }
+
+        bool operator == ( const TableT* rhs) const
+        {
+            return table == rhs;
+        }
+
+        bool operator == ( const StringT& rhs) const
+        {
+            return label == rhs;
+        }
+
+        void connectTable( const TableT* connectedTable, const StringT& theLabel, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+        {
+            label = theLabel;
+
+            table = topDown ? connectedTable : 0;
+            tableIndex.connectTable( table);
+            tableIndex.readTable( columnHeaderIndex);
+
+            rotatedTable = leftToRight ? new TableRotatorT( connectedTable) : 0;
+            rotatedTableIndex.connectTable( rotatedTable);
+            rotatedTableIndex.readTable( rowHeaderIndex);
+        }
+
+        ~Table()
+        {
+            delete rotatedTable;
+        }
+
+        TableIndexT tableIndex;
+        RotatedTableIndexT rotatedTableIndex;
+        const TableT* table;
+        TableRotatorT* rotatedTable;
+    private:
+        StringT label; ///<label identifying the table
+    };
+
+    //types used:
+    typedef std::list<Table> TableListT;
+    typedef CMacro<StringT> MacroT;
+
+public:
+    CMacroProcessor()
+        : m_outputStream(0)
+    {
+    }
+
+    ///attaches a table, does not take ownership of the table
+    void connectTable( const TableT* table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    {
+        if ( table )
+        {
+            m_tableList.push_back( Table());
+            m_tableList.back().connectTable( table, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+        }
+    }
+
+    ///detaches a table, returns true if the table is not used by the processor anymore, returns pointer to table removed
+    bool disconnectTable( const StringT& label, const TableT*& table /*out*/)
+    {
+        table = 0;
+        typename TableListT::reverse_iterator pos = std::find( m_tableList.rbegin(), m_tableList.rend(), label);
+        if ( pos != m_tableList.rend())
+        {
+            table = pos->table;
+            m_tableList.erase( --pos.base());
+        }
+        else
+        {
+            throw ExTableNotFound();
+        }
+        pos = std::find( m_tableList.rbegin(), m_tableList.rend(), table);
+        bool tableNotUsedAnymore = pos == m_tableList.rend();
+        return tableNotUsedAnymore;
+    }
+
+    ///attaches output stream as sink for expanded macros
+    void connectOutputStream( OutputStreamT* stream)
+    {
+        m_outputStream = stream;
+    }
+
+    ///forward text of a line surrounding a macro, see definition of macro
+    CMacroProcessor<TableT, OutputStreamT>& operator <<( const StringT& text)
+    {
+        *m_outputStream << text;
+        return *this;
+    }
+
+    ///process macro and ouput expansion result
+    CMacroProcessor<TableT, OutputStreamT>& operator <<( const MacroT& macro)
+    {
+        SizeT count = 0;
+        StringT expandedMacro;
+        StringT expandedLastTime;
+        bool lastTime = macro.lastTime();
+        bool lastTimeExpanded = false;
+
+        if ( !macro.noLookUp()) //if something to look up in tables
+        {
+            BOOST_FOREACH( const Table& table, m_tableList)
+            {
+                if( table.table )
+                {
+                    processMacro( *table.table, table.tableIndex, macro, true, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
+                }
+                if( table.rotatedTable)
+                {
+                    processMacro( *table.rotatedTable, table.rotatedTableIndex, macro, false, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
+                }
+            }
+
+            if ( count != 0 ) //somthing has been expanded
+            {
+                if ( lastTime && lastTimeExpanded ) //last time keyword and expansion ok
+                {
+                    if ( !expandedLastTime.empty())
+                    {
+                        *m_outputStream << expandedLastTime;
+                    }
+                }
+                else if ( !expandedMacro.empty()) //macro expanded or no output any way
+                {
+                    *m_outputStream << expandedMacro;
+                }
+            }
+        }
+        else
+        {
+            //try to expand to maybe text only alternative
+            typedef CMacroExpander< MacroT, TableIndexT, TableT> ExpanderT;
+            if ( ExpanderT( macro, TableT()).expand( 0, expandedMacro, count, true))
+            {
+                if ( !expandedMacro.empty()) //macro expanded
+                {
+                    *m_outputStream << expandedMacro;
+                }
+            }
+        }
+
+        return *this;
+    }
+
+    ///reset state
+    void reset()
+    {
+        m_tableList.clear();
+    }
+
+private:
+    //processes macro expression and ouput expansion result for a table
+    template <typename LocalTableT, typename LocalTableIndexT>
+    void processMacro( 
+        const LocalTableT& table, 
+        const LocalTableIndexT& tableIndex, 
+        const MacroT macro, 
+        bool topDown, 
+        SizeT& count,
+        StringT& expandedMacro,
+        StringT& expandedLastTime,
+        bool lastTime,
+        bool& lastTimeExpanded
+        )
+    {
+        typedef CMacroExpander< MacroT, LocalTableIndexT, LocalTableT> ExpanderT;
+        ExpanderT expander( tableIndex, macro, table, topDown);
+
+        if ( expander.canExpand() && table.size() > 0)
+        {
+            IndexT max = table[ 0 ].size();
+            IndexT lastRow = max;
+            StringT expandedMacroLocal;
+
+            for ( IndexT i = tableIndex.getHeaderIndex(); i < max; ++i)
+            {
+                if ( expander.expand( i, expandedMacroLocal, count, false))
+                {
+                    if ( !expandedMacro.empty())
+                    {
+                        *m_outputStream << expandedMacro;
+                    }
+                    expandedMacro.swap( expandedMacroLocal);
+
+                    lastRow = i;
+                    count++;
+                }
+            }
+            if ( lastTime && lastRow != max)
+            {
+                lastTimeExpanded = expander.expand( lastRow, expandedLastTime, count - 1, true);
+            }
+        }
+    }
+
+private:
+    OutputStreamT* m_outputStream; ///<sink for expanded macros
+    TableListT m_tableList; ///<list of attached tables
+};
+
+#endif /* INCLUDED_CMACROPROCESSOR_H_5484125 */
