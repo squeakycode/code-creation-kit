@@ -3,11 +3,12 @@ Licenses
 
 The text compiler source code is licensed under the GNU General Public License
 (GPL) Version 2 or later.
-Other parts of the code-creation-kit are licensed using different
-licenses. This is because templates and Add-Ins should be freely adaptable
-to the user's needs without the strong copy-left of the GPL. Some resources of
-the documentation are copied from boost(see www.boost.org). For these parts the
-Boost Software License applies.
+Other parts of the code-creation-kit are licensed using the modified
+Berkeley Software Distribution (BSD) license.
+This is because templates and add-ins should be freely adaptable
+to the user's needs without the strong copyleft of the GPL.
+Some resources of the documentation are copied from boostbook(see www.boost.org).
+For these parts the Boost Software License applies.
 
 Part                                License
 -------------------------           ----------------------
