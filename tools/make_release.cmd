@@ -17,7 +17,7 @@ rem   You should have received a copy of the GNU General Public License
 rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 rem set root to tools folder to use defined text compiler
-set CCK_ROOT=%~dp0
+rem set CCK_ROOT=%~dp0
 
 echo Creating version info
 call create_version_info.cmd nowait
