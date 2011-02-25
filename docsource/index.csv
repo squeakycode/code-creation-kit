@@ -1,0 +1,17 @@
+Item Type;Text
+heading 1;Introduction 
+paragraph;The code-creation-kit is a tool that can be used to generate code for any text based programming language. The data model stored in table format is combined with the text of a template file to achieve this.  The whole process is controlled by powerful multistage macro expressions in the template file. The getting started section shows in more detail how this works. 
+heading 1;Benefits 
+list_start;
+list_item;Productivity is increased when generating code. 
+list_item;Less Testing is required. 
+list_item;Multistage macro expressions allow accomplishing complex generation tasks. 
+list_item;Once the table layout is defined and a template is written for a common coding problem the implementation effort is cut down to a minimum for the future. 
+list_item;The kit can be used for any text based language. 
+list_item;The text compiler can be integrated into many development environments. 
+list_item;The text based table format allows the tracking of changes in a version control system. 
+list_item;The text compiler is very stable due to high unit test coverage. 
+list_end;
+heading 1;Overview 
+include;overview.table.gen.html
+paragraph; 

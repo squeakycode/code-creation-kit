@@ -1,0 +1,4 @@
+Item Type;Text
+heading 2;Command Files 
+paragraph; 
+paragraph;Command files are text files that list a number of commands for the text compiler. A command file is processed line by line. Every line contains one command for the text compiler using command line style syntax. Paths and file names are taken relative to the location of the command file. Empty lines are allowed. Lines starting with the pound sign '#' are treated as comments. The available command options are listed in the command reference. 

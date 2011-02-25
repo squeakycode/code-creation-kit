@@ -1,0 +1,81 @@
+Item Type;Text
+heading 2;Getting Started 
+paragraph; 
+table_of_contents;
+heading 3;How the Text Compiler Works 
+paragraph; 
+paragraph;The text compiler can be used to generate any form of text output. To accomplish this it first loads a data model represented as one or more tables, which could be for instance a list of parameters of an application. 
+paragraph; In a second step a template file is processed. On the one hand it contains from the viewpoint of the text compiler simply text, maybe the statements of the target language to produce. This text is passed unchanged to the produced output file. On the other hand the template file contains special tags that form macro expressions. These macro expressions instruct the compiler on how to insert the text fragments from the data tables into the output text stream. 
+paragraph;To accomplish various generation tasks it is possible to generate macro expressions while processing a template file. It works as if the text compiler would process a template file, generate another template file as output, and process this output file again and again until no macro expressions are contained in the output anymore. The only difference to the described processing is that this is done recursively. 
+paragraph;A command file is used to collect all the commands needed for generating, e.g. the instruction to load or unload a table. 
+image;overview.png
+heading 3; 
+heading 3;A Simple Example 
+paragraph;This section gives an example of the file types processed by the text compiler.  Furthermore it shows how the macro expressions look like and how the table data is inserted into the text stream that is written to the output file. 
+paragraph;The table data loaded by the text compiler is stored in the CSV-file format. 
+include;temp\examples\getting_started_simple\simple.csv
+paragraph; 
+paragraph;CSV-files can be easily created using a spreadsheet application. This example uses a list of parameters to generate a C++ data class. 
+include;temp\examples\getting_started_simple\simple.table.gen.html
+paragraph;The template file below contains two macros. The first one is located in the declaration section. It consists of the line containing three ENTRY tags and one ANY tag. A tag is surrounded by additional markup characters to avoid name clashes with the target language. The default markup uses box brackets to improve the readability of the template files. The Parameter following the entry tags denotes the heading of the column to read. 
+paragraph;In this case the text compiler finds a line containing tags. It takes the full line including the new line character and processes it as a macro. Then it looks for loaded tables containing the given column headings. A table containing the headings is read row by row, the ENTRY tags are substituted with content the corresponding table entries and the produced line is written to the output file. It is also possible to read a table from left to right passing the row headings as parameter. 
+paragraph;The substitution fails if a table entry is empty. That’s why the incomplete table entry produces no output. This default behavior can be changed by inserting additional tags after the ENTRY tag. This is  done for the parameter description using the ANY tag which causes the entry to be substituted successfully no matter what the content of the table looks like. 
+paragraph;The second macro uses the macro marking tags MACRO_BEGIN and MACRO_END to define the position of the macro. They are used to create macros that span multiple lines or for macros that are inserted into a single line as in this example. 
+paragraph;Additionally the block marking tags BEGIN and END are used. Block marking tags can be nested. They form an inner block using the OR tag to define multiple alternatives. The text compiler inserts the first alternative that is expandable. In this example alternatives are used together with the FIRST_TIME tag that can only be substituted successfully with an empty string the first time the macro expands. This way it is possible to create the syntax for the C++ class initializer list.  
+paragraph; 
+include;temp\examples\getting_started_simple\CDataClass.tpl.h.rtf
+paragraph; 
+paragraph;The output file contains the compilation of the text fragments from the table and the template file. 
+include;temp\examples\getting_started_simple\CDataClass.gen.h.rtf
+paragraph; 
+paragraph;The command file is processed line by line. Every line contains a command for the text compiler using command line style syntax. 
+include;temp\examples\getting_started_simple\simple.tccmd.rtf
+paragraph; 
+heading 3;The Simple Example Extended 
+paragraph; 
+paragraph;This example extends the previous one by the use of multiple data tables, recursive macro processing, the use of multi line macros and the use of additional parameters from the command file to generate a C++ and a Visual Basic .NET data class. 
+paragraph;The list of parameters from the previous example is extended by minimum and maximum values to generate a method for clipping the class data members. 
+include;temp\examples\getting_started_simple_extended\simple_extended.table.gen.html
+paragraph;Two additional tables are added to map the listed general types to the corresponding types of the generated language. 
+include;temp\examples\getting_started_simple_extended\simple_extended.map_cpp.table.gen.html
+include;temp\examples\getting_started_simple_extended\simple_extended.map_vbnet.table.gen.html
+paragraph;The template from the previous example is extended by using a parameter passed from the command file that is used for the class name, the mapping of the general type to the corresponding C++ type, and a clipping method using multi line macros. 
+paragraph; 
+paragraph;For customizing a template it is possible to pass additional parameters from the command files. The parameters are collected in another table so that they can be accessed like loaded tables using the ENTRY tags. This allows using the shown template to generate several different classes. 
+paragraph; 
+paragraph;The declaration section shows a tag with a dot as infix. This dot denotes a delayed processing of the tag.  When the macro is processed the first time the marked ENTRY tag is treated as normal text. The macro is expanded and afterwards the dot is removed activating the tag. This will cause the generated line to be detected as macro and it will be processed. Since the general type has been entered by the previous generation step as column heading the C++ type can be looked up in a second step. It is possible to add as many delay dots as needed to a tag. In every processing step one dot is removed allowing cascading of multiple macros. 
+paragraph; 
+paragraph;The clip method shows the use of multi line macros. There are two different ways of using the MACRO_BEGIN and MACRO_END tags. The if-statement for checking the maximum shows one possibility. All enclosed text and new line characters are reproduced each time the macro is expanded. But using this style makes it hard to keep track of the indentation. The second possibility uses the build in preprocessor to achieve the same result making it easier to produce the correct indentation. The preprocessor trims all surrounding white space including the new line character from a line if it finds a trailing TRIM tag. 
+paragraph; 
+include;temp\examples\getting_started_simple_extended\CDataClass.tpl.h.rtf
+paragraph; 
+paragraph;This is the generated C++ data class. 
+include;temp\examples\getting_started_simple_extended\CMyData.gen.h.rtf
+paragraph; 
+paragraph;This is the template for the Visual Basic .NET data class. 
+include;temp\examples\getting_started_simple_extended\CDataClass.tpl.vb.rtf
+paragraph; 
+paragraph;This is the generated Visual Basic .NET data class. 
+include;temp\examples\getting_started_simple_extended\MyData.gen.vb.rtf
+paragraph; 
+paragraph;The command file shows the usage of the option for specifying the reading direction of a table to top down. This is used to avoid reading the tables from left to right because only one ENTRY tag is used to map the types and can be found as row heading in multiple places making it impossible for the text compiler to automatically find the correct table to read. 
+paragraph; 
+paragraph;The template processing command is written using short option names in this command file. The parameter option p is used to pass the class names. It is possible to pass multiple strings using the first equal sign as delimiter to separate column header from table entry. Multiple table entries are entered in a column if parameters with the same column name are provided. This is done in the order they are listed in the command. 
+paragraph; 
+paragraph;After the C++ data class is generated the C++ mapping table is unloaded and the Visual Basic mapping table is loaded to generate the Visual Basic class.  
+paragraph; 
+include;temp\examples\getting_started_simple_extended\simple_extended.tccmd.rtf
+paragraph; 
+heading 3;An Advanced Example – Generating a State Machine with Graph 
+paragraph; 
+paragraph;This example shows a how to describe a state machine using a matrix. The matrix is used to generate a C++ state machine class. The state machine class is designed to derive another class from it that reacts to the state changes. 
+paragraph;The doxygen documentation tool (see www.doxygen.org) is used together with the dot tool (see www.graphviz.org) to create the documentation for the state machine including a graph of the states. The dot graph description that is generated causes doxygen to produce a graph of the states and transitions when it is run. The example folder contains a template to generate code for a console application used for testing the state machine. 
+include;temp\examples\documented_state_machine\advanced.table.gen.html
+paragraph;This is the graph of showing the states and transitions. 
+image;state_graph.png
+paragraph; 
+paragraph;This is the template for creating a C++ state machine. The macros are commented in the code using the COMMENT tag.  
+include;temp\examples\documented_state_machine\DocumentedStatemachine.tpl.h.rtf
+paragraph;This is the generated C++ state machine code. It contains only a few states to not get to large for an example, but it can be extended to any size by extending the matrix. The example folder contains another matrix having more states.  
+include;temp\examples\documented_state_machine\cd_player\CDPlayerStatemachine.gen.h.rtf
+paragraph; 

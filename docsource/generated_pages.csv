@@ -1,0 +1,12 @@
+csv file;target file;title;title;
+index.csv;index.html;;The code-creation-kit;
+getting_started.csv;getting_started.gen.html;code-creation-kit - ;Getting Started;
+available_examples.csv;available_examples.gen.html;code-creation-kit - ;Examples;
+share.csv;share.gen.html;code-creation-kit - ;Share;
+full_tag_reference.csv;full_tag_reference.gen.html;code-creation-kit - ;Full Tag Reference;
+table_creation.csv;table_creation.gen.html;code-creation-kit - ;Data Table Creation;
+template_creation.csv;template_creation.gen.html;code-creation-kit - ;Template Creation;
+command_line.csv;command_line.gen.html;code-creation-kit - ;Command Line;
+command_file.csv;command_file.gen.html;code-creation-kit - ;Command File;
+command_reference.csv;command_reference.gen.html;code-creation-kit - ;Command Reference;
+ide_integration.csv;ide_integration.gen.html;code-creation-kit - ;IDE Integration;

@@ -1,0 +1,17 @@
+<div class="informaltable">
+<table class="table">
+  <tbody>
+    <tr>
+      <th>[ENTRY]["Names:"][ENTRY]["Links:"][EQUALS][""]</th>
+    </tr>
+    [MACRO_BEGIN][BEGIN][MACRO_BEGIN.][IF][FIRST_TIME][TRIM]
+    <tr>
+      [COMMENT] first insert column names (but not for link columns) then read top down
+      [OR][END][BEGIN][TRIM]
+      <td>[BEGIN.]<a href="[ENTRY.]["[ENTRY]["Names:"] Link"]">[ENTRY.]["[ENTRY]["Names:"]"]</a>[OR.][END.][ENTRY.]["Names:"][EQUALS.][""]</td>[ENTRY]["Links:"][EQUALS][""]
+      [END][BEGIN][TRIM]
+    </tr>
+    [IF][LAST_TIME][MACRO_END.][OR][END][MACRO_END][TRIM]    
+  </tbody>
+</table>
+<div>

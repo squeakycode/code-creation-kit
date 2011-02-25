@@ -1,0 +1,12 @@
+digraph overview {
+	TableFile [shape=box;label="Table File(s)\n\nThe data model"];
+	TemplateFile [shape=box;label="Template File(s)\n\nControl the conversion\n of the data model into\n the target language"];
+	CommandFile [shape=box;label="Command File\n\nLists commands for the text compiler"];
+	Generator [shape=box;label="Code-Creation-Kit Text Compiler"];
+	GeneratedFile [shape=box;label="Generated File(s)"];
+
+	CommandFile -> Generator;
+	TableFile -> Generator;
+	TemplateFile -> Generator;
+	Generator -> GeneratedFile;
+}
