@@ -1,0 +1,5 @@
+--load-table commands.csv
+-s pspad_tccmd.tpl.ini -o "CCK TC-Commands.INI"
+--reset
+--load-table tags.csv
+-s pspad_template.tpl.ini -o "CCK Template.INI" -m !

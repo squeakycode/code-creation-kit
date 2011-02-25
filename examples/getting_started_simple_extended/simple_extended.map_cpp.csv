@@ -1,0 +1,2 @@
+integer;double;string;boolean
+int;double;std::string;bool
