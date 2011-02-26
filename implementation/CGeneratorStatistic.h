@@ -187,7 +187,7 @@ public:
     unsigned int getLastColumnWithFailure() { return 1;}
     unsigned int getLastLineWithFailure() { return 1;}
     static int getMaxNumberOfRecursionLevels() { return 1; }
-
+    static int getMaxMacroTextSizeBytes() { return 1; }
 private:
     ///set default markup
     void setDefaultMarkup()

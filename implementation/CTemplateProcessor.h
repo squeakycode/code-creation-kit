@@ -164,6 +164,11 @@ public:
         return ProcessingLevelControl::getMaxNumberOfRecursionLevels();
     }
 
+    ///return maximum text size of macro
+    static size_t getMaxMacroTextSizeBytes()
+    {
+        return ParserT::getMaxMacroTextSizeBytes();
+    }
 
 private:
     ///set default markup

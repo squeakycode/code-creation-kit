@@ -77,6 +77,9 @@ public:
 
     class ExSubstitutionRequiresIf : public std::runtime_error 
     { public: ExSubstitutionRequiresIf() : std::runtime_error( "Substitution requires if.") {}};
+
+    class ExMacroTooLarge : public std::runtime_error 
+    { public: ExMacroTooLarge() : std::runtime_error( "The macro exceeds the maximum allowed size.") {}};
 };
 
 #include "ParserExtensions.gen.h"
@@ -98,6 +101,7 @@ public:
 
     CParser()
         : m_outputStream( 0)
+        , m_currentMacroTextSize( 0)
     {
     }
 
@@ -124,18 +128,26 @@ public:
     ///clear items on the stack
     void open()
     {
-        m_stack.clear();
+        reset();
     }
 
     ///clear items on the stack
     void reset()
     {
+        m_currentMacroTextSize = 0;
         m_stack.clear();
     }
 
     ///process tokens, pass on unprocessed text, pass on macros
     CParser<OutputStreamT, TokenT, StringT>& operator <<( const TokenT& token)
     {
+        //monitor macro size
+        m_currentMacroTextSize += token.getTextSize();
+        if ( m_currentMacroTextSize > cMaxAllowedMacroSize)
+        {
+            throw ExMacroTooLarge();
+        }
+
         if ( token == TokenT::eMacroBegin)
         {
             parseStack();
@@ -162,6 +174,12 @@ public:
         return *this;
     }
 
+    ///return maximum text size of macro
+    static size_t getMaxMacroTextSizeBytes()
+    {
+        return cMaxAllowedMacroSize;
+    }
+
 private:
     ///parses the tokens on the stack
     void parseStack()
@@ -172,6 +190,7 @@ private:
             {
                 outputText( m_stack, m_outputStream);
                 m_stack.clear();
+                m_currentMacroTextSize = 0;
             }
             else
             {
@@ -179,6 +198,7 @@ private:
                 MacroT macro;
                 parseMacro( macro);
                 m_stack.clear();
+                m_currentMacroTextSize = 0;
                 *m_outputStream << macro;
             }
         }
@@ -354,6 +374,8 @@ private:
 
     OutputStreamT* m_outputStream; ///<sink for macros, also excepts text around macros
     StackT m_stack;
+    size_t m_currentMacroTextSize;
+    static const size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
 };
 
 #endif /* INCLUDED_CPARSER_H_1584436 */

@@ -518,6 +518,18 @@ public:
             toErrorStream( formatter.str());
             throw CErrorPrinted();
         }
+        catch( CParserExceptions::ExMacroTooLarge&)
+        {
+            //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+#else
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+#endif
+            formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % (m_generator.getMaxMacroTextSizeBytes() / 1024);
+            toErrorStream( formatter.str());
+            throw CErrorPrinted();
+        }
     }
 
     void reset()

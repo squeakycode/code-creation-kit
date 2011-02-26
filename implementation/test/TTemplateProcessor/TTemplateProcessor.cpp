@@ -126,6 +126,13 @@ void testMacroProcessing()
 
     ProcessorT processor;
 
+    //check too large macro check is working
+    if ( processor.getMaxMacroTextSizeBytes() < 20 * 1024 * 1024)
+    {
+        StringT largeString( processor.getMaxMacroTextSizeBytes() + 1, 'a');
+        BOOST_CHECK_THROW( test( processor, largeString, ""), CParserExceptions::ExMacroTooLarge);
+    }
+
     processor.connectTable( &table, "label A", true, true, 1, 1);
 
     //error handling    

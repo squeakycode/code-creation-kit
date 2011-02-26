@@ -405,6 +405,12 @@ public:
         return TemplateProcessorT::getMaxNumberOfRecursionLevels();
     }
 
+    ///return maximum text size of macro
+    static size_t getMaxMacroTextSizeBytes()
+    {
+        return TemplateProcessorT::getMaxMacroTextSizeBytes();
+    }
+
 private:
 
     ///deletes file specified by name and returns true if the file has been deleted

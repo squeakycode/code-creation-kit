@@ -112,6 +112,21 @@ public:
         return m_stringList;
     }
 
+    size_t getTextSize() const
+    {
+        if ( m_stringList)
+        {
+            size_t result = 0;
+            const StringListT& textList = *m_stringList;
+            BOOST_FOREACH( const StringT& text, textList)
+            {
+                result += text.size();
+            }
+            return result;
+        }
+        return 0;
+    }
+
     template <typename StreamT>
     void toStream( StreamT& stream) const
     {
