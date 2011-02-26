@@ -57,6 +57,8 @@ Name: support; Description: Support Files; Types: full custom
 ;Name: pspad; Description: PSPad Syntax Highlighter; Types: full custom
 
 [Files]
+;license
+Source: ..\..\license\gpl\gpl-2.0.txt; DestDir: {app}; Flags: ignoreversion uninsremovereadonly; DestName: LICENSE.TXT; Components: program
 ;bin
 Source: ..\..\output\bin\ccktc.exe; DestDir: {app}\bin; Flags: ignoreversion overwritereadonly uninsremovereadonly; Components: program
 Source: ..\..\icons\explosion.ico; DestDir: {app}\bin; Flags: ignoreversion uninsremovereadonly; DestName: tccmd.ico; Components: program
