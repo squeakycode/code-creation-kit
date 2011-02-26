@@ -1,3 +1,4 @@
+@echo off
 rem   Copyright (C) 2011, Andreas Gau
 rem
 rem   This file is part of the code-creation-kit.
@@ -15,7 +16,6 @@ rem
 rem   You should have received a copy of the GNU General Public License
 rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
-@echo off
 setlocal enableextensions
 setlocal enabledelayedexpansion
 
