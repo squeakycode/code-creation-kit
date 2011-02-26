@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
+#include "System.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -83,10 +84,10 @@ public:
                 generator.setMarkup( m_parser.getMarkupPrefix(), m_parser.getMarkupPostfix());
             }
             generator.generate( 
-                relativeTo( m_parser.getTemplateFile(), commandFileName),
-                relativeTo( m_parser.getOutputFile(), commandFileName), 
+                prepareFileName( m_parser.getTemplateFile(), commandFileName),
+                prepareFileName( m_parser.getOutputFile(), commandFileName), 
                 m_parser.getUseIntermediateOutputFile(),
-                relativeTo( m_parser.getOutputFile() + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                prepareFileName( m_parser.getOutputFile() + m_parser.getIntermediateOutputFileExtension(), commandFileName),
                 m_parser.getParameters());
         }
         else if ( command == ParserT::eLoadTable )
@@ -95,7 +96,7 @@ public:
             bool noDirectionSet = !m_parser.getTopDown() && !m_parser.getLeftToRight();
 
             generator.loadTable( 
-                relativeTo( m_parser.getTableFile(), commandFileName)
+                prepareFileName( m_parser.getTableFile(), commandFileName)
                 , m_parser.hasLabel() ? m_parser.getLabel() : m_parser.getTableFile()
                 , m_parser.getTopDown() || noDirectionSet
                 , m_parser.getLeftToRight() || noDirectionSet
@@ -123,7 +124,7 @@ public:
             std::vector<StringT> includeDirectories = m_parser.getIncludeDirectories();
             BOOST_FOREACH( const StringT& directory, includeDirectories)
             {
-                generator.addIncludeDirectory( relativeTo( directory, commandFileName));
+                generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
             }
         }
         else if ( command == ParserT::eCsvDelimiter )
@@ -166,8 +167,13 @@ public:
     }
 
 private:
+    ///expand environment variables and determine location relative to command file if command file and not std stream
+    static StringT prepareFileName( const StringT& filename, const StringT& base)
+    {
+        return relativeTo( System::expandEnvironmentVariables( filename), base);
+    }
 
-    ///determine loaction relative to command file if command file and not std stream
+    ///determine location relative to command file if command file and not std stream
     static StringT relativeTo( const StringT& filename, const StringT& base)
     {
         //std stream specified return filename
