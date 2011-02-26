@@ -19,12 +19,12 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 setlocal enableextensions
 setlocal enabledelayedexpansion
 
-if not defined CCK_ROOT echo Environment variable CCK_ROOT is not set
-if not defined CCK_ROOT exit /b 1
-
 set PROJECT_DIRECTORY=%~1
 set PROJECT_NAME=%~2
 set USE_GENERATOR=%~3
+
+if defined USE_GENERATOR if not defined CCK_ROOT echo Environment variable CCK_ROOT is not set
+if defined USE_GENERATOR if not defined CCK_ROOT exit /b 1
 
 call :CreateFile[] > "%PROJECT_DIRECTORY%\%PROJECT_NAME%.mpc"
 exit /b %ERRORLEVEL%
