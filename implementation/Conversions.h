@@ -15,8 +15,8 @@
 //   You should have received a copy of the GNU General Public License
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef INCLUDED_MODIFICATIONS_H_02711993
-#define INCLUDED_MODIFICATIONS_H_02711993
+#ifndef INCLUDED_CONVERSIONS_H_8639185
+#define INCLUDED_CONVERSIONS_H_8639185
 
 #if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
@@ -335,4 +335,4 @@ public:
     }
 };
 
-#endif /* INCLUDED_MODIFICATIONS_H_02711993 */
+#endif /* INCLUDED_CONVERSIONS_H_8639185 */

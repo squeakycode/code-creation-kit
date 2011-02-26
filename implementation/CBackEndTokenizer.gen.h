@@ -19,8 +19,8 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_CBackEndTokenizer_TPL_H_6955377
-#define INCLUDED_CBackEndTokenizer_TPL_H_6955377
+#ifndef INCLUDED_CBACKENDTOKENIZER_TPL_H_6955377
+#define INCLUDED_CBACKENDTOKENIZER_TPL_H_6955377
 
 #if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
@@ -531,4 +531,4 @@ private:
     StringT m_commentKeyword; ///keyword for comment lines    
 };
 
-#endif /* INCLUDED_CBackEndTokenizer_TPL_H_6955377 */
+#endif /* INCLUDED_CBACKENDTOKENIZER_TPL_H_6955377 */
