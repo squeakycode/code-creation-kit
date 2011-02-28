@@ -24,7 +24,7 @@ call create_version_info.cmd nowait
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Creating workspace
-call create_workspace.cmd nowait
+call create_workspace.cmd "" nowait
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Building solution
@@ -32,6 +32,11 @@ call build_solution.cmd ..\cck.sln
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Creating and installing syntax highlighter language definition
+rem The subfolders themes and langDefs of %ProgramFiles%\WinHighlight
+rem (see highlight above) need to writable under Vista and Windows 7, because
+rem the syntax definitions of the text compiler need to be placed there.
+rem This is a problem with activated User Account Control (UAC).
+rem A possible solution for this is to change the access rights to these folders.
 call create_and_install_sytaxhighlighter_langdef.cmd nowait
 if %errorlevel% neq 0 goto :exit_failure
 
