@@ -27,12 +27,6 @@ if %errorlevel% neq 0 goto :exit_failure
 copy ..\output\examples\documented_state_machine\cd_player\run_doxygen.cmd ..\output\examples\documented_state_machine\cd_player_extended
 if %errorlevel% neq 0 goto :exit_failure
 
-echo Copying table files
-copy ..\output\tables\commands.csv ..\output\examples\create_syntax_highlighter
-if %errorlevel% neq 0 goto :exit_failure
-copy ..\output\tables\tags.csv ..\output\examples\create_syntax_highlighter
-if %errorlevel% neq 0 goto :exit_failure
-
 
 echo Removing everything from output mpc folder
 if not exist ..\output\mpc mkdir ..\output\mpc
@@ -43,6 +37,14 @@ if %errorlevel% neq 0 goto :exit_failure
 
 echo Triggering generation of examples
 call run_example_generation.cmd ..\output\examples 
+if %errorlevel% neq 0 goto :exit_failure
+
+echo Remove syntax highlighter output
+if not exist "..\output\examples\create_syntax_highlighter\CCK TC-Commands.INI" goto :exit_failure
+del "..\output\examples\create_syntax_highlighter\CCK TC-Commands.INI"
+if %errorlevel% neq 0 goto :exit_failure
+if not exist "..\output\examples\create_syntax_highlighter\CCK Template.INI" goto :exit_failure
+del "..\output\examples\create_syntax_highlighter\CCK Template.INI"
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Creating workspace
