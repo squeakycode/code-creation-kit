@@ -66,8 +66,8 @@ public:
             return;
         }
 
-        //check index out of bounds
-        if ( headerIndex > m_table->size())
+        //check index out of bounds, > used due to one based index
+        if ( !m_table->empty() && headerIndex > (*m_table)[0].size())
         {
             throw IndexOutOfBoundsExceptionT();
         }

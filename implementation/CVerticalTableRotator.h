@@ -78,6 +78,15 @@ public:
         return 0;
     }
 
+    bool empty() const
+    {
+        if ( !m_table->empty())
+        {
+            return (*m_table)[0].empty();
+        }
+        return true;
+    }
+
     typedef CVerticalTableRotatorColumn value_type;
 private:
     const TableT* m_table; ///<the original table

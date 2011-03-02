@@ -297,6 +297,10 @@ void testMacroProcessing()
     disconnectedTable = 0;
     BOOST_CHECK( processor.disconnectTable( "label C", disconnectedTable));
     BOOST_CHECK( disconnectedTable == &anotherTableA);
+
+    BOOST_CHECK_NO_THROW( processor.connectTable( &table, "label B", true, true, 7, 5));
+    BOOST_CHECK_THROW( processor.connectTable( &table, "label B", true, true, 2, 6), CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds);
+    BOOST_CHECK_THROW( processor.connectTable( &table, "label B", true, true, 8, 4), CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds);
 }
 
 
