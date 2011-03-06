@@ -68,10 +68,10 @@ include;temp\examples\getting_started_simple_extended\simple_extended.tccmd.rtf
 paragraph; 
 heading 3;An Advanced Example – Generating a State Machine with Graph 
 paragraph; 
-paragraph;This example shows a how to describe a state machine using a matrix. The matrix is used to generate a C++ state machine class. The state machine class is designed to derive another class from it that reacts to the state changes. 
-paragraph;The doxygen documentation tool (see www.doxygen.org) is used together with the dot tool (see www.graphviz.org) to create the documentation for the state machine including a graph of the states. The dot graph description that is generated causes doxygen to produce a graph of the states and transitions when it is run. The example folder contains a template to generate code for a console application used for testing the state machine. 
+paragraph;This example shows how to describe a state machine using a matrix. The matrix is used to generate a C++ state machine class. The state machine class is designed to derive another class from it that reacts to the state changes. 
+paragraph;"The <a href=""http://www.doxygen.org"">doxygen</a> documentation tool is used together with the <a href=""http://www.graphviz.org"">graphviz dot</a> graph visualization software to create the documentation for the state machine including a graph of the states. The dot graph description that is generated causes doxygen to produce a graph of the states and transitions when it is run. The example folder contains a template to generate code for a console application used for testing the state machine. "
 include;temp\examples\documented_state_machine\advanced.table.gen.html
-paragraph;This is the graph of showing the states and transitions. 
+paragraph;This is the produced graph showing the states and transitions. 
 image;state_graph.png
 paragraph; 
 paragraph;This is the template for creating a C++ state machine. The macros are commented in the code using the COMMENT tag.  
