@@ -37,6 +37,11 @@ the project and solution files for building. The used Visual Studio type can be
 passed as first paramter (vc71,vc8,vc9,vc10). Some Visual Studio versions are
 detected automatically, see the batch file for details.
 
+There are two ways the solution can be created. If a text compiler is already
+available (CCK_ROOT is set) then the projects use the text compiler to
+generate code otherwise pregenerated code is used to build the first text
+compiler.
+
 The build text compiler can be found in the output folder.
 
 Creating the Documentation:
