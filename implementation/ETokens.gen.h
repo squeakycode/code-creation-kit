@@ -46,6 +46,7 @@ public:
         eEndsWith,
         eEntry,
         eMatches,
+        eError_,
         eFirstTime,
         eFlush,
         eForAll,

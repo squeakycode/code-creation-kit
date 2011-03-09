@@ -271,6 +271,17 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int2+><double><bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool+><bool+>"));
+    //error tag
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
+    BOOST_CHECK_THROW( test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    try
+    {
+        test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
+    }
+    catch( CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
+    {
+        BOOST_CHECK_EQUAL( e.getMessage(), "Error Message 1234.");
+    }
 
 
     //connect more tables for testing unloading

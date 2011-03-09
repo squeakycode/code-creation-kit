@@ -133,6 +133,7 @@ bool isSubstitution( PosT& pos)
     if (
            *pos == PosT::value_type::eCount
         || *pos == PosT::value_type::eEntry
+        || *pos == PosT::value_type::eError_
         || *pos == PosT::value_type::eFirstTime
         || *pos == PosT::value_type::eIndex
         || *pos == PosT::value_type::eLastTime
@@ -737,6 +738,25 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
         case TokenT::eEntry:
             {
                 item = ItemT( ItemT::eEntry, pos->getStringList());
+                ItemT& newItem = item;
+                if ( if_ ) newItem.if_( if_);
+                if_ = false;
+                if ( not_ ) newItem.not_( not_);
+                not_ = false;
+                
+                
+                
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
+                parseConstraint( pos, end, newItem, newParentItem->getToken());
+                parseConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
+        case TokenT::eError_:
+            {
+                item = ItemT( ItemT::eError_, pos->getStringList());
                 ItemT& newItem = item;
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;

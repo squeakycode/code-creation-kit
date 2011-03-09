@@ -147,6 +147,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//ERROR
+        result.clear();
+        tokenizer << STRING_LITERAL("start%ERROR%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eError_, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//FIRST_TIME
         result.clear();
         tokenizer << STRING_LITERAL("start%FIRST_TIME%end");        
@@ -434,6 +442,14 @@ void testRemoveDelayMarks()
         result.clear();
         tokenizer << STRING_LITERAL("start%EQUALS..%end");
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%EQUALS"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//ERROR
+
+        result.clear();
+        tokenizer << STRING_LITERAL("start%ERROR..%end");
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%ERROR"));
         BOOST_CHECK( expected == result);
     }
 

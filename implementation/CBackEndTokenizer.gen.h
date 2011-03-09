@@ -103,6 +103,7 @@ public:
         expression += front + STRING_LITERAL("ENDS_WITH") + back;
         expression += front + STRING_LITERAL("ENTRY") + back;
         expression += front + STRING_LITERAL("EQUALS") + back;
+        expression += front + STRING_LITERAL("ERROR") + back;
         expression += front + STRING_LITERAL("FIRST_TIME") + back;
         expression += front + STRING_LITERAL("FLUSH") + back;
         expression += front + STRING_LITERAL("FOR_ALL") + back;
@@ -326,6 +327,17 @@ public:
                 list->resize( 1);
                 KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 *m_outputStream << TokenT( TokenT::eMatches, list);
+            }
+            else if ( what[ (TokenT::eError_-1)*2 ].matched )
+            {
+                if ( RemoveTick( what, (TokenT::eError_ * 2) - 1))
+                {
+                    continue;
+                }
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                list->resize( 1);
+                KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
+                *m_outputStream << TokenT( TokenT::eError_, list);
             }
             else if ( what[ (TokenT::eFirstTime-1)*2 ].matched )
             {
