@@ -205,11 +205,11 @@ private:
         }
         else if ( substitutionData == MacroT::SubstitutionT::eFirstTime)
         {
-            success = count == 0;
+            success = (count == 0) != substitutionData.not_();
         }
         else if ( substitutionData == MacroT::SubstitutionT::eLastTime)
         {
-            success = lastTime;
+            success = lastTime != substitutionData.not_();
         }
         else if (  substitutionData == MacroT::SubstitutionT::eCount)
         {

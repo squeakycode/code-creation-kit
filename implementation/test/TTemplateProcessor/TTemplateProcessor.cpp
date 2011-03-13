@@ -175,6 +175,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><descriptionmore><><>"));
     //last time
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
     //last time empty
     BOOST_CHECK( test( processor, "[BEGIN][IF][LAST_TIME][OR]<[ENTRY][\"Type\"]>[END]", "<int><double><bool>"));
     //count
@@ -193,6 +194,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[IF][NOT][ENTRY][\"Array Maximum\"][ENTRY][\"Type\"]>", "<int><bool><bool>"));
     //first time
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
+    BOOST_CHECK( test( processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
     //text correctly sorted
     BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[more]§"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
