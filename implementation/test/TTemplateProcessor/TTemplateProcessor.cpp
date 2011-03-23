@@ -284,7 +284,12 @@ void testMacroProcessing()
     {
         BOOST_CHECK_EQUAL( e.getMessage(), "Error Message 1234.");
     }
-
+    //trim
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
+    //comment
+    BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
+    BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
 
     //connect more tables for testing unloading
     TableT anotherTableA;

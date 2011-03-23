@@ -79,6 +79,7 @@ public:
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
         m_[ENTRY]["Tag Name Small"]Keyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Small"][EQUALS]["trim"][EQUALS]["comment"]") + postfix;
+        m_[ENTRY]["Tag Name Small"]DotKeyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Small"][EQUALS]["trim"][EQUALS]["comment"].") + postfix;[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -130,6 +131,7 @@ public:
     ///tokenize input line
     [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
     {
+        bool trimmed = false;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
@@ -138,14 +140,26 @@ public:
         //check if the line needs to be trimmed or is comment
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() &&  boost::starts_with( range, m_commentKeyword)) //is comment, drop line
+            if ( !m_commentKeyword.empty() )
             {
-                return *this;
-            }
-            if ( !m_trimKeyword.empty() && boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
-            {
-                start = range.begin();
-                end = range.end() - m_trimKeyword.size();
+                if ( boost::starts_with( range, m_commentKeyword)[MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"] || boost::starts_with( range, m_commentDotKeyword)[MACRO_END]) //is comment, drop line
+                {
+                    return *this;
+                }
+                if ( boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
+                {
+                    start = range.begin();
+                    end = range.end() - m_trimKeyword.size();
+                    trimmed = true;
+                }
+                [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
+                else if ( boost::ends_with( range, m_trimDotKeyword)) //trim keyword, trim line
+                {
+                    start = range.begin();
+                    end = range.end() - m_trimDotKeyword.size();
+                    trimmed = true;
+                }
+                [MACRO_END][TRIM]
             }
         }
 
@@ -216,6 +230,11 @@ public:
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( start, end));
             [MACRO_END][TRIM]
         }
+        if ( trimmed)
+        {
+            //a trimmed line is treated as line macro
+            *m_outputStream << TokenT( TokenT::eNewLine);
+        }
         return *this;
     }
 private:
@@ -223,7 +242,9 @@ private:
     OutputStreamT* m_outputStream; ///<sink for tokens
     bool m_closing;[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
     StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines    
+    StringT m_commentKeyword; ///keyword for comment lines
+    StringT m_trimDotKeyword; ///keyword for trimming lines[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    StringT m_commentDotKeyword; ///keyword for comment lines[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
 };
 
 #endif /* INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377 */

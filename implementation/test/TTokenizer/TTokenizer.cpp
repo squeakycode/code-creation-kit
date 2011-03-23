@@ -68,8 +68,9 @@ void test()
     {//trim
         result.clear();
         tokenizer << STRING_LITERAL( " text%TRIM% \n");
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")));        
+        BOOST_REQUIRE( result.size() == 2);
+        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")));
+        BOOST_CHECK( result[1] == TokenT( TokenT::eNewLine));
     }
 
     {//new line
