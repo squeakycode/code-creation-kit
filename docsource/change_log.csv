@@ -1,0 +1,8 @@
+Change Type;ID;Description;Release Version
+;;;
+New Feature;;Added simple command line parser example.;
+Bugfix;3238280;Fixed trim. and comment. do no work;
+Bugfix;3238276;Fixed trim extends line macro to next line.;
+Bugfix;3208956;Fixed if not first time and if not last time do not work.;
+New Feature;;Added error tag that can be used to report errors in text compiler input.;
+Release;;Initial release.;0.1.0.40
