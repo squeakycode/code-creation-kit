@@ -17,6 +17,7 @@ call :create_project_mpc getting_started_simple getting_started_simple ""
 call :create_project_mpc getting_started_simple_extended getting_started_simple_extended "" VB
 call :create_project_mpc documented_state_machine\cd_player cd_player ..
 call :create_project_mpc documented_state_machine\cd_player_extended cd_player_extended ..
+call :create_project_mpc command_line_parser command_line_parser ""
 
 %MPC_ROOT%\mwc.pl -type vc9 -include ../mpc -static examples.mwc
 
