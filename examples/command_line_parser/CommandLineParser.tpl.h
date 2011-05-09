@@ -51,16 +51,19 @@ public:
             //get current argument
             const char* arg = argv[ i ];
             [MACRO_BEGIN][TRIM]
-            [BEGIN][IF][FIRST_TIME][OR]else [END]if ( isEqual( arg, "--[ENTRY]["Option Name"]")[BEGIN] || isEqual( arg, "-[ENTRY]["Short Option Name"]")[OR][END])
+            [BEGIN][IF][FIRST_TIME][OR]else [END]if ( [BEGIN]isEqual( arg, "--[ENTRY]["Option Name"]") || isEqual( arg, "-[ENTRY]["Short Option Name"]")[OR]isEqual( arg, "--[ENTRY]["Option Name"]")[OR]isEqual( arg, "-[ENTRY]["Short Option Name"]")[END])
             {
                 m_[ENTRY]["Option Name Identifier"]Passed = true;
                 [BEGIN][IF][ENTRY]["Data Type"][TRIM]
                 ++i;
                 if ( i >= argc )
                 {
-                    throw std::runtime_error( "Option '[ENTRY]["Option Name"]' requires a value.");
+                    throw std::runtime_error( "Option '[BEGIN][ENTRY]["Option Name"][OR][ENTRY]["Short Option Name"][END]' requires a value.");
                 }
-                convertTo( m_[ENTRY]["Option Name Identifier"]Value, argv[ i ]);
+                if ( !convertTo( m_[ENTRY]["Option Name Identifier"]Value, argv[ i ]))
+                {
+                    throw std::runtime_error( "Error parsing value of option '[BEGIN][ENTRY]["Option Name"][OR][ENTRY]["Short Option Name"][END]'.");
+                }
                 [OR][END][TRIM]
             }
             [MACRO_END][TRIM]
@@ -90,23 +93,20 @@ public:
     [MACRO_END][TRIM]
 private:
     ///helper function for converting parameters
-    void convertTo( std::string& value, const char* arg)
+    bool convertTo( std::string& value, const char* arg)
     {
         value = arg;
+        return true;
     }
 
     ///helper function for converting parameters
     template <typename T>
-    void convertTo( T& value, const char* arg)
+    bool convertTo( T& value, const char* arg)
     {
         std::stringstream s;
         s << arg;
         s >> value;
-
-        if ( !s.str().empty())
-        {
-            throw std::runtime_error( "Error parsing program option value.");
-        }
+        return s.eof();
     }
 
     ///helper function for comparing strings
