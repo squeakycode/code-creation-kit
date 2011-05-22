@@ -1,0 +1,62 @@
+[COMMENT] <!-- begin toc -->
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor"></a>[ENTRY.]["heading"]</h2></div></div></div>
+    <p>
+    </p>
+    <div class="toc">
+        <dl>
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor">[ENTRY.]["heading"]</a></span></dt>
+        <dd><dl>
+[MACRO_BEGIN][TRIM]
+[BEGIN][IF][FIRST_TIME][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Development Snapshot</a></span></dt>
+[OR][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Release [BEGIN][ENTRY]["Release Version"][OR][ERROR]["Error missing release version."][END]</a></span></dt>
+[END][TRIM]
+[MACRO_END][TRIM]
+        </dl></dd>
+        </dl>
+     </div>
+[COMMENT] <!-- end toc -->
+[MACRO_BEGIN][TRIM]
+[COMMENT] <!-- begin if first time, is release -->
+[BEGIN][IF][FIRST_TIME][TRIM]
+[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
+    <p>
+    [ENTRY]["Description"][REPLACE]["\n","</p><p>"]
+    </p>
+[INCLUDE]["change_log_table_header.tpl.html"]
+[COMMENT] <!-- is first time, not a release -->
+[OR][TRIM]
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Development Snapshot</h3></div></div></div>
+    <p>
+    This is a development snapshot.
+    </p>
+[INCLUDE]["change_log_table_header.tpl.html"]
+[END][TRIM]
+[COMMENT] <!-- end if first time -->
+[END][TRIM]
+[OR]
+[COMMENT] <!-- start document body, release entry -->
+[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
+    <p>
+    [ENTRY]["Description"][REPLACE]["\n","</p><p>"]
+    </p>
+[INCLUDE]["change_log_table_header.tpl.html"]
+[COMMENT] <!-- document body, bugfix or feature entry -->
+[OR][TRIM]
+            <tr>
+                <td>[ENTRY]["Change Type"]</td>
+                <td>[BEGIN][ENTRY]["Tracker ID"][OR] [END]</td>
+                <td>[ENTRY]["Description"]</td>
+            </tr>
+[COMMENT] <!-- end document body -->
+[END][TRIM]
+[MACRO_END]
+        </tbody>
+    </table>
+    </div>
