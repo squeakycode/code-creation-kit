@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDED_COMMANDLINEPARSER_TPL_H_3787958
+#define INCLUDED_COMMANDLINEPARSER_TPL_H_3787958
 
 #include <iostream>
 #include <sstream>
@@ -36,7 +37,8 @@ public:
         [OR][TRIM]
         std::cerr << "--" << "[ENTRY]["Option Name"]" << std::endl;
         [END][TRIM]
-        printBlock( 39, 40, "[ENTRY]["Description"][TO_CSTRING]");
+        [COMMENT]//                         [tabs to spaces      ][block format->   |buffer end?   |string ends \n |string with ' '| text no ' '| line start spaces for formatting       insert match][remove last new line     ][to cstring][replace \n for formatting generated code                  ]
+        std::cerr << "[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,39})\''|([^\n]{0,39})\n|([^\n]{0,39}) +|([^\n]{39})','                                        $1$2$3$4\n'][REGEX_REPLACE]['\n\''',''][TO_CSTRING][REPLACE]["\\n","\" << std::endl;\n        std::cerr << \""]" << std::endl;
         
         [MACRO_END][TRIM]
     }
@@ -55,21 +57,21 @@ public:
             {
                 m_[ENTRY]["Option Name Identifier"]Passed = true;
                 [BEGIN][IF][ENTRY]["Data Type"][TRIM]
-                ++i;
-                if ( i >= argc )
+                const char* value = argv[ ++i ];
+                if ( i >= argc || isOption( value))
                 {
-                    throw std::runtime_error( "Option '[BEGIN][ENTRY]["Option Name"][OR][ENTRY]["Short Option Name"][END]' requires a value.");
+                    throw std::runtime_error( std::string("Option '") + arg + "' requires a value.");
                 }
-                if ( !convertTo( m_[ENTRY]["Option Name Identifier"]Value, argv[ i ]))
+                if ( !convertTo( m_[ENTRY]["Option Name Identifier"]Value, value))
                 {
-                    throw std::runtime_error( "Error parsing value of option '[BEGIN][ENTRY]["Option Name"][OR][ENTRY]["Short Option Name"][END]'.");
+                    throw std::runtime_error( std::string("Error parsing value '") + value + "' of option '" + arg + "'.");
                 }
                 [OR][END][TRIM]
             }
             [MACRO_END][TRIM]
             else
             {
-                throw std::runtime_error( "Error parsing program options.");
+                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
             }
         }
     }
@@ -119,38 +121,17 @@ private:
 #endif
     }
 
-    ///helper function for printing a formatted block of text
-    void printBlock( unsigned int offset, unsigned int width, const char* text)
+    ///can be used to check whether a string is a valid option
+    bool isOption( const char* arg)
     {
-        for( unsigned int i = 0, start = 0, lastSpace = 0; text[ i ]; ++i)
-        {
-            if ( text[ i ] == ' ' )
-            {
-                lastSpace = i;
-            }
-            else if ( text[ i ] == '\n')
-            {
-                std::cerr << std::string(offset, ' ');
-                std::cerr << std::string(&text[ start], &text[ i ]) << std::endl;
-                start = i + 1;
-                lastSpace = 0;
-            }
-            else if ( text[ i + 1 ] == '\0')
-            {
-                std::cerr << std::string(offset, ' ');
-                std::cerr << &text[ start] << std::endl;
-            }
-            else if ( (i - start + 1) >= width )
-            {
-                std::cerr << std::string(offset, ' ');
-                std::cerr << std::string(&text[ start], &text[ lastSpace ? lastSpace : i + 1]) << std::endl;
-                start = (lastSpace ? lastSpace : i) + 1;
-                lastSpace = 0;
-            }
-        }
+        if( isEqual( arg, "-[ENTRY]["Short Option Name"][READ_TOP_DOWN]")) return true;
+        if( isEqual( arg, "--[ENTRY]["Option Name"][READ_TOP_DOWN]")) return true;
+        return false;
     }
 
     bool m_[ENTRY]["Option Name Identifier"]Passed;
 
     [ENTRY]["Data Type"] m_[ENTRY]["Option Name Identifier"]Value;
 };
+
+#endif /* INCLUDED_COMMANDLINEPARSER_TPL_H_3787958 */
