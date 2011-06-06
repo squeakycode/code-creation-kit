@@ -58,6 +58,7 @@ public:
     CBackEndTokenizer()
         : m_outputStream(0)
         , m_closing(false)
+        , m_bypassMode(false)
     {
     }
 
@@ -65,12 +66,19 @@ public:
     void open()
     {
         m_closing = false;
+        m_bypassMode = false;
     }
 
     ///open
     void close()
     {
         m_closing = true;
+    }
+
+    ///<used when limiting recursion level, forces text output with tick removal
+    void setBypassMode( bool enable)
+    {
+        m_bypassMode = enable;
     }
 
     ///sets up regex search expression; 
@@ -96,6 +104,8 @@ public:
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
         expression += front + STRING_LITERAL("AS_VOLATILE") + back;
         expression += front + STRING_LITERAL("BEGIN") + back;
@@ -153,12 +163,18 @@ public:
     template <typename WhatT>
     bool RemoveTick( WhatT& what, int pos)
     {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
+        if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
         {
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
+            return true;
         }
+        else if ( m_bypassMode)
+        {
+            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos - 1 ].second));
+            return true;
+        }
+
         return false;
     }
 
@@ -172,6 +188,7 @@ public:
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        if ( !m_bypassMode)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
             if ( !m_commentKeyword.empty() )
@@ -256,6 +273,22 @@ public:
                     continue;
                 }
                 *m_outputStream << TokenT( TokenT::eTrim);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimit-1)*2 ].matched )
+            {
+                if ( RemoveTick( what, (TokenT::eSetRecursionLevelLimit * 2) - 1))
+                {
+                    continue;
+                }
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimitOff-1)*2 ].matched )
+            {
+                if ( RemoveTick( what, (TokenT::eSetRecursionLevelLimitOff * 2) - 1))
+                {
+                    continue;
+                }
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
             }
             else if ( what[ (TokenT::eAny-1)*2 ].matched )
             {
@@ -556,7 +589,8 @@ public:
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    bool m_closing;
+    bool m_closing;///<output line fragments as full line if closing to force flush
+    bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal
     StringT m_trimKeyword; ///keyword for trimming lines
     StringT m_commentKeyword; ///keyword for comment lines
     StringT m_trimDotKeyword; ///keyword for trimming lines

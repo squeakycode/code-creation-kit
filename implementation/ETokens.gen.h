@@ -37,6 +37,8 @@ public:
         eInclude,
         eMarkup,
         eTrim,
+        eSetRecursionLevelLimit,
+        eSetRecursionLevelLimitOff,
         eAny,
         eVolatil,
         eBegin,

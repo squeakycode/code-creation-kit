@@ -260,6 +260,20 @@ public:
             toErrorStream( formatter.str());
             throw CErrorPrinted();
         }
+        catch( CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit& e)
+        {
+            (void) e;
+            
+            //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1251: The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+#else
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1251: The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+#endif
+            formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+            toErrorStream( formatter.str());
+            throw CErrorPrinted();
+        }
         catch( CTemplateLoaderExceptions::ExCyclicInclusion& e)
         {
             (void) e;

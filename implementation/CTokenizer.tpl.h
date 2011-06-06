@@ -58,6 +58,7 @@ public:
     [ENTRY]["Tokenizer"]()
         : m_outputStream(0)
         , m_closing(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+        , m_bypassMode(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
     {
     }
 
@@ -66,12 +67,19 @@ public:
     void open()
     {
         m_closing = false;
+        m_bypassMode = false;
     }
 
     ///open
     void close()
     {
         m_closing = true;
+    }
+
+    ///<used when limiting recursion level, forces text output with tick removal
+    void setBypassMode( bool enable)
+    {
+        m_bypassMode = enable;
     }
 
     [MACRO_END][TRIM]
@@ -115,19 +123,27 @@ public:
         return RangeT( start, end);
     }
 
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
     ///removes a delay mark if needed
     template <typename WhatT>
     bool RemoveTick( WhatT& what, int pos)
     {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
+        if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
         {
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
+            return true;
         }
+        else if ( m_bypassMode)
+        {
+            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos - 1 ].second));
+            return true;
+        }
+
         return false;
     }
 
+    [MACRO_END][TRIM]
     ///tokenize input line
     [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
     {
@@ -138,6 +154,7 @@ public:
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        if ( !m_bypassMode)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
             if ( !m_commentKeyword.empty() )
@@ -207,6 +224,11 @@ public:
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
             {
                 [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM]
+[COMMENT]                [BEGIN][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimit"][TRIM]
+[COMMENT]                //turn limit of to make sure that the new limit gets processed
+[COMMENT]                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+[COMMENT]
+[COMMENT]                [END][TRIM]
                 if ( RemoveTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
                 {
                     continue;
@@ -240,7 +262,8 @@ public:
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    bool m_closing;[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    bool m_closing;///<output line fragments as full line if closing to force flush[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
     StringT m_trimKeyword; ///keyword for trimming lines
     StringT m_commentKeyword; ///keyword for comment lines
     StringT m_trimDotKeyword; ///keyword for trimming lines[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]

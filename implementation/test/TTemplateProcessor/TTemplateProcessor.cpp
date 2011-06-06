@@ -152,6 +152,14 @@ void testMacroProcessing()
     BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
     BOOST_CHECK_THROW( test( processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
 
+    //something still in parser
+    BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    //something still in line collector
+    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    //something still in next level
+    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+
+
     class ExCannotApplyConversionToSubstitution : public std::runtime_error 
     { public: ExCannotApplyConversionToSubstitution() : std::runtime_error( "Conversion cannot be applied to this substitution.") {}};
 
@@ -290,6 +298,10 @@ void testMacroProcessing()
     //comment
     BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
     BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
+    //set recursion level limit
+    BOOST_CHECK( test( processor, "[SET_RECURSION_LEVEL_LIMIT][MACRO_BEGIN]<[ENTRY][\"Type\"]>[MACRO_END]<[ENTRY.][\"Type\"]>", "<int><double><bool><bool><[ENTRY][\"Type\"]>"));
+    //check limit is reseted properly
+    BOOST_CHECK( test( processor, "<[ENTRY.][\"Type\"]>", "<int><double><bool><bool>")); 
 
     //connect more tables for testing unloading
     TableT anotherTableA;

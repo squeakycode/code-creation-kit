@@ -80,6 +80,8 @@ public:
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
         expression += front + STRING_LITERAL("AS_VOLATILE") + back;
         expression += front + STRING_LITERAL("BEGIN") + back;
@@ -131,19 +133,6 @@ public:
         while( start != end && isSpace( *--end));
         if ( end != line.end()) ++end;
         return RangeT( start, end);
-    }
-
-    ///removes a delay mark if needed
-    template <typename WhatT>
-    bool RemoveTick( WhatT& what, int pos)
-    {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
-        {
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
-        }
-        return false;
     }
 
     ///tokenize input line
@@ -211,6 +200,14 @@ public:
             else if ( what[ (TokenT::eTrim) ].matched )
             {
                 *m_outputStream << TokenT( TokenT::eTrim);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimit) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimitOff) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
             }
             else if ( what[ (TokenT::eAny) ].matched )
             {

@@ -30,7 +30,10 @@ class CProcessingLevelControlExceptions
 {
 public:
     class ExPossibleInfiniteLoop : public std::runtime_error
-    { public: ExPossibleInfiniteLoop() : std::runtime_error( "Possible infinite loop detected while expanding macro") {}};
+    { public: ExPossibleInfiniteLoop() : std::runtime_error( "Possible infinite loop detected while expanding macro.") {}};
+
+    class ExCannotSetRecursionLevelLimit : public std::runtime_error
+    { public: ExCannotSetRecursionLevelLimit() : std::runtime_error( "The set recursion level limit directive can only be used at the beginning of a line and outside of a macro.") {}};
 };
 
 
@@ -49,7 +52,7 @@ class CProcessingLevelControl : public CProcessingLevelControlExceptions
         bool isProcessing()
         {
             return
-                parser.processingInProgress()
+                    parser.processingInProgress()
                 ||  lineCollector.processingInProgress()
                 ||  nextLevelIsProcessing;
         }
@@ -63,10 +66,13 @@ public:
     typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT> ThisT;
     typedef typename ParserT::ParserTokenT TokenT;
     typedef typename ParserT::ParserStringT StringT;
+    typedef typename StringT::value_type CharT;
 
     CProcessingLevelControl()
         : m_level( m_levelBlocks)
+        , m_levelLimit( m_levelBlocks + m_cMaxNumLevel)
         , m_finalOutputStream(0)
+        , m_outputStream(0)
     {
 
     }
@@ -80,6 +86,7 @@ public:
     ///attaches output stream
     void connectOutputStream( OutputStreamT* stream)
     {
+        m_outputStream = stream;
         BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
         {
             levelBlock.lineCollector.connectOutputStream( stream);
@@ -98,11 +105,35 @@ public:
     ///receives token input
     ThisT& operator <<( const TokenT& token)
     {
-        //check if line without any tokens
-        //if no processing in this or in upper levels is in progress
-        //the line needs no further processing and can be put into the final output stream
-        if ( token == TokenT::eFullLineWithoutTags && !m_level->isProcessing())
+        //check for recursion level limitation directive
+        if ( token == TokenT::eSetRecursionLevelLimit || token == TokenT::eSetRecursionLevelLimitOff)
         {
+            //can set limit now?
+            if ( m_level->isProcessing())
+            {
+                throw ExCannotSetRecursionLevelLimit();
+            }
+            
+            if ( token == TokenT::eSetRecursionLevelLimit)
+            {
+                m_levelLimit = m_level;
+            }
+            else
+            {
+                m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+            }
+        }
+        else if ( 
+            //check if line without any tokens
+            //if no processing in this or in upper levels is in progress
+            //the line needs no further processing and can be put into the final output stream
+            ( token == TokenT::eFullLineWithoutTags && !m_level->isProcessing() )
+            //check whether recursion level limit has been reached
+            //if so output the text tokens
+            || ( m_level > m_levelLimit)
+            )
+        {
+            assert(  token == TokenT::eFullLineWithoutTags || token == TokenT::eTextFragment || token == TokenT::eNewLine);
             token.toStream( *m_finalOutputStream);
         }
         else
@@ -124,8 +155,23 @@ public:
             throw ExPossibleInfiniteLoop();
         }
 
-        //pass on text fragment
-        localLevel->lineCollector << text;
+        if ( m_level > m_levelLimit)
+        {
+            //limit the processing by treating tokens as text
+            //output stream is the macro processor
+            m_outputStream->setBypassMode( true);
+
+            //pass on text fragment
+            localLevel->lineCollector << text;
+
+            //process tokens normally
+            m_outputStream->setBypassMode( false);
+        }
+        else
+        {
+            //pass on text fragment
+            localLevel->lineCollector << text;
+        }
 
         //store upper stages are processing
         localLevel->nextLevelIsProcessing = m_level->isProcessing();
@@ -140,6 +186,7 @@ public:
     void reset()
     {
         m_level = m_levelBlocks;
+        m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
 
         BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
         {
@@ -179,9 +226,21 @@ public:
             m_level = &levelBlock;
             levelBlock.parser.close();
             ++m_level;
+
+            //recursion level limit reached?
+            if ( m_level > m_levelLimit)
+            {
+                //limit the processing by treating tokens as text
+                //output stream is the macro processor
+                m_outputStream->setBypassMode( true);
+            }
+
+            //close
             levelBlock.lineCollector.close();
         }
+        m_outputStream->setBypassMode( false);
         m_level = m_levelBlocks;
+        m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
     }
 
     ///return maximum number of recursion levels
@@ -191,10 +250,12 @@ public:
     }
 
 private:
-    static const int m_cMaxNumLevel = 32;
+    static const unsigned int m_cMaxNumLevel = 32;
 
     ProcessingLevelBlocks* m_level;
+    ProcessingLevelBlocks* m_levelLimit;
     FinalOutputStreamT* m_finalOutputStream;
+    OutputStreamT* m_outputStream;
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
 };

@@ -78,5 +78,6 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
     BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
     BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
 }
 

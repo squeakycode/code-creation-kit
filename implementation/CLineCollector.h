@@ -71,13 +71,13 @@ public:
         return !m_line.empty();
     }
 
-    ///flushes the last line to the output, returns true if something has beed flushed
+    ///flushes the last line to the output, returns true if something has been flushed
     bool close()
     {
         return flush();
     }
 
-    ///flushes the last line to the output, returns true if something has beed flushed
+    ///flushes the last line to the output, returns true if something has been flushed
     bool flush()
     {
         if ( !m_line.empty())

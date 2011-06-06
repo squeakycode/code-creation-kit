@@ -1,11 +1,12 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.;;
 Improvement;;Added change log to documentation.;;
 New Feature;;Added simple command line parser example.;;
 Bugfix;3238280;Fixed trim. and comment. do no work.;;
 Bugfix;3238276;Fixed trim extends line macro to next line.;;
 Bugfix;3208956;Fixed if not first time and if not last time do not work.;;
-New Feature;;Added error tag that can be used to report errors in text compiler input.;;
+New Feature;;Added ERROR tag that can be used to report errors in text compiler input.;;
 Release;;"This is the first release of the code-creation-kit. The main purpose of the kit is to be used as code generator.
 Please note that it is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.1.0.40;06.03.2011
 New Feature;;Initial release.;;

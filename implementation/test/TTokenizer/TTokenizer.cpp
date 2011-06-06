@@ -97,7 +97,7 @@ void testBackEndFeatures()
     tokenizer.connectOutputStream( &helper); 
     std::vector<TokenT>& result = helper.result;
 
-    {//BEGIN. handle one dot as not dot
+    {//BEGIN. handle one dot as no dot
         std::vector<TokenT> expected;
 
         expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
@@ -109,6 +109,46 @@ void testBackEndFeatures()
         expected[1] = TokenT( TokenT::eBegin);
         BOOST_REQUIRE( result.size() == 3);
         BOOST_CHECK( expected == result);
+    }
+
+    {//comment and bypass mode
+        tokenizer.setBypassMode( true);
+        result.clear();
+        tokenizer << STRING_LITERAL( " %COMMENT%text \n");
+        BOOST_REQUIRE( result.size() == 4);
+        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT%")));
+        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
+        BOOST_CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        result.clear();
+        tokenizer << STRING_LITERAL( " %COMMENT.%text \n");
+        BOOST_REQUIRE( result.size() == 5);
+        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT")));
+        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
+        BOOST_CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
+        BOOST_CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        tokenizer.setBypassMode( false);
+    }
+
+    {//trim and bypass mode
+        tokenizer.setBypassMode( true);
+        result.clear();
+        tokenizer << STRING_LITERAL( " text%TRIM% \n");
+        BOOST_REQUIRE( result.size() == 4);
+        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
+        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM%")));
+        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        BOOST_CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        result.clear();
+        tokenizer << STRING_LITERAL( " text%TRIM.% \n");
+        BOOST_REQUIRE( result.size() == 5);
+        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
+        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM")));
+        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
+        BOOST_CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        BOOST_CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        tokenizer.setBypassMode( false);
     }
 
     //full line without tags, no new line when end of file stream
@@ -150,7 +190,17 @@ void testBackEndFeatures()
     }
 
     //generated tests
-    testRemoveDelayMarks<TokenizerT, OutputT, TokenT, StringT>();
+    {
+        TokenizerT tokenizer;
+        testRemoveDelayMarks<TokenizerT, OutputT, TokenT, StringT>(tokenizer, false);
+    }
+
+    //generated tests
+    {
+        TokenizerT tokenizer;
+        tokenizer.setBypassMode( true);
+        testRemoveDelayMarks<TokenizerT, OutputT, TokenT, StringT>(tokenizer, true);
+    }
 }
 
 

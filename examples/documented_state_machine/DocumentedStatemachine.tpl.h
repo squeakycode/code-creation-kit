@@ -18,6 +18,12 @@
 #pragma once
 #endif
 
+[COMMENT] The SET_RECURSION_LEVEL_LIMIT directive can be used to view and
+[COMMENT] debug intermediate generation steps.
+[COMMENT] Remove the trailing _OFF in the following directive to see
+[COMMENT] the first level of processing after the generation is run again.
+[SET_RECURSION_LEVEL_LIMIT_OFF][TRIM]
+
 //--------------------------------------------------------------------
 /**
 \class [ENTRY]["Machine Name"]
