@@ -220,15 +220,20 @@ public:
                 KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy>( start, end, *list);
                 *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], list);
             }
+            [OR][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimitOff"][TRIM]
+            else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+            }
             [OR][TRIM]
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
             {
                 [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM]
-[COMMENT]                [BEGIN][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimit"][TRIM]
-[COMMENT]                //turn limit of to make sure that the new limit gets processed
-[COMMENT]                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
-[COMMENT]
-[COMMENT]                [END][TRIM]
+                [BEGIN][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimit"][TRIM]
+                //turn limit off to make sure that the new limit gets processed
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+
+                [OR][END][TRIM]
                 if ( RemoveTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
                 {
                     continue;

@@ -75,22 +75,6 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
-    {//SET_RECURSION_LEVEL_LIMIT
-        result.clear();
-        tokenizer << STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT%end");        
-        expected[1] = TokenT( TokenT::eSetRecursionLevelLimit);
-        BOOST_CHECK( result.size() == 3);
-        BOOST_CHECK( expected == result);
-    }
-
-    {//SET_RECURSION_LEVEL_LIMIT_OFF
-        result.clear();
-        tokenizer << STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT_OFF%end");        
-        expected[1] = TokenT( TokenT::eSetRecursionLevelLimitOff);
-        BOOST_CHECK( result.size() == 3);
-        BOOST_CHECK( expected == result);
-    }
-
     {//ANY
         result.clear();
         tokenizer << STRING_LITERAL("start%ANY%end");        
@@ -385,22 +369,6 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%TRIM.%end") : STRING_LITERAL("start%TRIM..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM"));
-        BOOST_CHECK( expected == result);
-    }
-
-    {//SET_RECURSION_LEVEL_LIMIT
-
-        result.clear();
-        tokenizer << (bypassMode ? STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT.%end") : STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT..%end"));
-        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%SET_RECURSION_LEVEL_LIMIT"));
-        BOOST_CHECK( expected == result);
-    }
-
-    {//SET_RECURSION_LEVEL_LIMIT_OFF
-
-        result.clear();
-        tokenizer << (bypassMode ? STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT_OFF.%end") : STRING_LITERAL("start%SET_RECURSION_LEVEL_LIMIT_OFF..%end"));
-        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%SET_RECURSION_LEVEL_LIMIT_OFF"));
         BOOST_CHECK( expected == result);
     }
 

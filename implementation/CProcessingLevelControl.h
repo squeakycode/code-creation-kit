@@ -121,6 +121,8 @@ public:
             else
             {
                 m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+                //process tokens normally
+                m_outputStream->setBypassMode( false);
             }
         }
         else if ( 

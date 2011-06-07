@@ -276,6 +276,9 @@ public:
             }
             else if ( what[ (TokenT::eSetRecursionLevelLimit-1)*2 ].matched )
             {
+                //turn limit off to make sure that the new limit gets processed
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+
                 if ( RemoveTick( what, (TokenT::eSetRecursionLevelLimit * 2) - 1))
                 {
                     continue;
@@ -284,10 +287,6 @@ public:
             }
             else if ( what[ (TokenT::eSetRecursionLevelLimitOff-1)*2 ].matched )
             {
-                if ( RemoveTick( what, (TokenT::eSetRecursionLevelLimitOff * 2) - 1))
-                {
-                    continue;
-                }
                 *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
             }
             else if ( what[ (TokenT::eAny-1)*2 ].matched )

@@ -44,7 +44,7 @@ void testSingleTokens()
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
 
     [MACRO_BEGIN][TRIM]
-    {//[ENTRY]["Tag Name"]
+    {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]
         result.clear();
         [BEGIN][IF][ENTRY]["Parameter Count"][EQUALS]["1"][IF][ENTRY]["Parameter Format"][EQUALS]["Regex"][TRIM]
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%['parameter1']end");
@@ -85,7 +85,7 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
 
     [MACRO_BEGIN][TRIM]
-    {//[ENTRY]["Tag Name"][READ_TOP_DOWN]
+    {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]
 
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%[ENTRY]["Tag Name"].%end") : STRING_LITERAL("start%[ENTRY]["Tag Name"]..%end"));
