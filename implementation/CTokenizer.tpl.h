@@ -86,8 +86,10 @@ public:
     ///sets up regex search expression; 
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
-        m_[ENTRY]["Tag Name Small"]Keyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Small"][EQUALS]["trim"][EQUALS]["comment"]") + postfix;
-        m_[ENTRY]["Tag Name Small"]DotKeyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Small"][EQUALS]["trim"][EQUALS]["comment"].") + postfix;[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
+        [MACRO_BEGIN][IF][ENTRY]["Tokenizer Preprocessor Action"][TRIM]
+        m_[ENTRY]["Tag Name Small"]Keyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"]") + postfix;
+        m_[ENTRY]["Tag Name Small"]DotKeyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"].") + postfix;[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
+        [MACRO_END][TRIM]
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -154,30 +156,28 @@ public:
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
-        if ( !m_bypassMode)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+        for (;[MACRO_BEGIN]!m_bypassMode[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][MACRO_END];)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() )
+            [MACRO_BEGIN][TRIM]
+            if ( boost::[ENTRY]["Tokenizer Preprocessor Check"]( range, m_[ENTRY]["Tag Name Small"]Keyword))
             {
-                if ( boost::starts_with( range, m_commentKeyword)[MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"] || boost::starts_with( range, m_commentDotKeyword)[MACRO_END]) //is comment, drop line
-                {
-                    return *this;
-                }
-                if ( boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
-                {
-                    start = range.begin();
-                    end = range.end() - m_trimKeyword.size();
-                    trimmed = true;
-                }
-                [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
-                else if ( boost::ends_with( range, m_trimDotKeyword)) //trim keyword, trim line
-                {
-                    start = range.begin();
-                    end = range.end() - m_trimDotKeyword.size();
-                    trimmed = true;
-                }
-                [MACRO_END][TRIM]
+                [BEGIN][TRIM]
+                size_t keywordSize = m_[ENTRY]["Tag Name Small"][STARTS_WITH]["trim"]Keyword.size();
+                [OR][END][TRIM]
+                [ENTRY]["Tokenizer Preprocessor Action"][REPLACE]["\n","\n                "]
             }
+            [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM.]
+            if ( boost::[ENTRY]["Tokenizer Preprocessor Check"]( range, m_[ENTRY]["Tag Name Small"]DotKeyword))
+            {
+                [BEGIN][TRIM]
+                size_t keywordSize = m_[ENTRY]["Tag Name Small"][STARTS_WITH]["trim"]DotKeyword.size();
+                [OR][END][TRIM]
+                [ENTRY]["Tokenizer Preprocessor Action"][REPLACE]["\n","\n                "]
+            }
+            [MACRO_END.][TRIM.]
+            [MACRO_END][TRIM]
+            break;
         }
 
         while( regex_search(start, end, what, m_searchExpression)) 
@@ -269,10 +269,10 @@ private:
     OutputStreamT* m_outputStream; ///<sink for tokens
     bool m_closing;///<output line fragments as full line if closing to force flush[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
     bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
-    StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines
-    StringT m_trimDotKeyword; ///keyword for trimming lines[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
-    StringT m_commentDotKeyword; ///keyword for comment lines[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer Preprocessor Action"][TRIM]
+    StringT m_[ENTRY]["Tag Name Small"]Keyword; ///<used for special preprocessing action
+    StringT m_[ENTRY]["Tag Name Small"]DotKeyword; ///<used for special preprocessing action[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
+    [MACRO_END][TRIM]
 };
 
 #endif /* INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377 */

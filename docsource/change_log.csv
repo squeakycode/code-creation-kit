@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added TRIM_LEFT tag.;;
 New Feature;;Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.;;
 Improvement;;Added change log to documentation.;;
 New Feature;;Added simple command line parser example.;;

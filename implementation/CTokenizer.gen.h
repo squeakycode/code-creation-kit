@@ -65,6 +65,7 @@ public:
     {
         m_commentKeyword = prefix + STRING_LITERAL("COMMENT") + postfix;
         m_trimKeyword = prefix + STRING_LITERAL("TRIM") + postfix;
+        m_trimLeftKeyword = prefix + STRING_LITERAL("TRIM_LEFT") + postfix;
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -80,6 +81,7 @@ public:
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
+        expression += front + STRING_LITERAL("TRIM_LEFT") + back;
         expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
         expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
@@ -145,21 +147,29 @@ public:
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        for (;;)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() )
+            if ( boost::starts_with( range, m_commentKeyword))
             {
-                if ( boost::starts_with( range, m_commentKeyword)) //is comment, drop line
-                {
-                    return *this;
-                }
-                if ( boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
-                {
-                    start = range.begin();
-                    end = range.end() - m_trimKeyword.size();
-                    trimmed = true;
-                }
+                return *this;
             }
+            if ( boost::ends_with( range, m_trimKeyword))
+            {
+                size_t keywordSize = m_trimKeyword.size();
+                start = range.begin();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            if ( boost::ends_with( range, m_trimLeftKeyword))
+            {
+                size_t keywordSize = m_trimLeftKeyword.size();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            break;
         }
 
         while( regex_search(start, end, what, m_searchExpression)) 
@@ -200,6 +210,10 @@ public:
             else if ( what[ (TokenT::eTrim) ].matched )
             {
                 *m_outputStream << TokenT( TokenT::eTrim);
+            }
+            else if ( what[ (TokenT::eTrimLeft) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eTrimLeft);
             }
             else if ( what[ (TokenT::eSetRecursionLevelLimit) ].matched )
             {
@@ -383,8 +397,9 @@ public:
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines
+    StringT m_commentKeyword; ///<used for special preprocessing action
+    StringT m_trimKeyword; ///<used for special preprocessing action
+    StringT m_trimLeftKeyword; ///<used for special preprocessing action
 };
 
 #endif /* INCLUDED_CTOKENIZER_TPL_H_6955377 */
