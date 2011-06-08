@@ -1,0 +1,43 @@
+[MACRO_BEGIN][TRIM]
+[COMMENT] <!-- begin if first time, is release -->
+[BEGIN][IF][FIRST_TIME][TRIM]
+[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]
+================================================================================
+
+[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,79})\''|([^\n]{0,79})\n|([^\n]{0,79}) +|([^\n]{79})','$1$2$3$4\n']
+
+Change      Tracker ID Description
+----------- ---------- ---------------------------------------------------------
+[COMMENT] <!-- is first time, not a release -->
+[OR][TRIM]
+Development Snapshot
+================================================================================
+
+This is a development snapshot.
+
+Change      Tracker ID Description
+----------- ---------- ---------------------------------------------------------
+[COMMENT] <!-- release or development snapshot -->
+[END][TRIM]
+[COMMENT] <!-- end if first time -->
+[END][TRIM]
+[OR][TRIM]
+[COMMENT] <!-- start document body, release entry -->
+[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+
+Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]
+================================================================================
+
+[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,79})\''|([^\n]{0,79})\n|([^\n]{0,79}) +|([^\n]{79})','$1$2$3$4\n']
+
+Change      Tracker ID Description
+----------- ---------- ---------------------------------------------------------
+[COMMENT] <!-- document body, bugfix or feature entry -->
+[OR][TRIM]
+[ENTRY]["Change Type"][REGEX_REPLACE]['\''','               '][REGEX_REPLACE]['(.{12}).*','$1'][TRIM]
+[BEGIN][ENTRY]["Tracker ID"][REGEX_REPLACE]['\`','               '][REGEX_REPLACE]['.*(.{10})\''','$1'] [OR]           [END][TRIM]
+[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,56})\''|([^\n]{0,56})\n|([^\n]{0,56}) +|([^\n]{56})','                       $1$2$3$4\n'][REGEX_REPLACE]['\` *','']
+[COMMENT] <!-- end document body -->
+[END][TRIM]
+[MACRO_END][TRIM]
