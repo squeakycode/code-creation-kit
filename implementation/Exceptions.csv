@@ -34,7 +34,7 @@ generate;CRegexMatchesConstraintExceptions;ExRegexSyntaxError;%1%(%2%);1500;Synt
 generate;CRegexReplaceConversionExceptions;ExRegexSyntaxError;%1%(%2%);1500;Syntax error in regular expression.; The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.;addPath( getCurrentFileName());getCurrentLineNumber();;
 generate;CTemplatePreprocessorExceptions;ExPrefixLeadingWhiteSpace;%1%(%2%);1602;Leading white space for markup prefix is not allowed.;;addPath( getCurrentFileName());getCurrentLineNumber();;
 generate;CTemplatePreprocessorExceptions;ExPostfixTrailingWhiteSpace;%1%(%2%);1603;Trailing white space for markup postfix is not allowed.;;addPath( getCurrentFileName());getCurrentLineNumber();;
-generate;CTemplatePreprocessorExceptions;ExBadlyPlacedTrim;%1%(%2%);1604;TRIM is expected at the end of a line. Trailing whitespace is allowed.;;addPath( getCurrentFileName());getCurrentLineNumber();;
+generate;CTemplatePreprocessorExceptions;ExBadlyPlacedTrim;%1%(%2%);1604;Trim directives are expected at the end of a line. Trailing whitespace is allowed.;;addPath( getCurrentFileName());getCurrentLineNumber();;
 generate;CTemplatePreprocessorExceptions;ExBadlyPlacedComment;%1%(%2%);1605;COMMENT is expected at the beginning of a line. Leading whitespace is allowed.;;addPath( getCurrentFileName());getCurrentLineNumber();;
 unloadTable;CGeneratorExceptions;ExFailedToUnloadTable;;1700;A table entry with the specified label '%1%' does not exist.;;label;;;
 unloadTable;CMacroProcessorExceptions;ExTableNotFound;;1701;A table entry with the specified label '%1%' does not exist.;;label;;;

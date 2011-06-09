@@ -364,9 +364,9 @@ public:
             
             //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
-            FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1604: TRIM is expected at the end of a line. Trailing whitespace is allowed.\n"));
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1604: Trim directives are expected at the end of a line. Trailing whitespace is allowed.\n"));
 #else
-            FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1604: TRIM is expected at the end of a line. Trailing whitespace is allowed.\n"));
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1604: Trim directives are expected at the end of a line. Trailing whitespace is allowed.\n"));
 #endif
             formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
             toErrorStream( formatter.str());
