@@ -136,6 +136,7 @@ void testMacroProcessing()
     processor.connectTable( &table, "label A", true, true, 1, 1);
 
     //error handling    
+    BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
     BOOST_CHECK_THROW( test( processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
     BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
     BOOST_CHECK_THROW( test( processor, "a[BEGIN][MACRO_END]", ""), CParserExceptions::ExMissingBlockEnd);
