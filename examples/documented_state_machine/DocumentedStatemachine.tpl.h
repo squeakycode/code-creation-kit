@@ -79,7 +79,7 @@ public:
             [COMMENT] go from left to right through all states 
             [COMMENT] and add a transition case handler 
             [COMMENT] if a transition target state is entered
-            [MACRO_BEGIN.][TRIM]
+            [MACRO_BEGIN.][TRIM.]
             case e[ENTRY.]["State Name"]:
                 exit[ENTRY.]["State Name"]();
                 [COMMENT] [ENTRY]["Actions\\States"] expands to 
@@ -87,7 +87,7 @@ public:
                 enter[ENTRY.]["[ENTRY]["Actions\\States"]"]();
                 m_currentState = e[ENTRY.]["[ENTRY]["Actions\\States"]"];                
                 break;
-            [MACRO_END.][TRIM]
+            [MACRO_END.][TRIM.]
 
             default:
             actionIgnored();
