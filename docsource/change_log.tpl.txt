@@ -1,6 +1,6 @@
 [MACRO_BEGIN][TRIM]
 [COMMENT] <!-- begin if first time, is release -->
-[BEGIN][IF][FIRST_TIME][TRIM]
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][TRIM]
 [BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
 Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]
 ================================================================================

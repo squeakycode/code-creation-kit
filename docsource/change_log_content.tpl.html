@@ -7,7 +7,7 @@
         <dt><span class="section"><a href="[ENTRY.]["file"]#anchor">[ENTRY.]["heading"]</a></span></dt>
         <dd><dl>
 [MACRO_BEGIN][TRIM]
-[BEGIN][IF][FIRST_TIME][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
         <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Development Snapshot</a></span></dt>
 [OR][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
         <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Release [BEGIN][ENTRY]["Release Version"][OR][ERROR]["Error missing release version."][END]</a></span></dt>
@@ -19,7 +19,7 @@
 [COMMENT] <!-- end toc -->
 [MACRO_BEGIN][TRIM]
 [COMMENT] <!-- begin if first time, is release -->
-[BEGIN][IF][FIRST_TIME][TRIM]
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][TRIM]
 [BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
     <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
     <p>
