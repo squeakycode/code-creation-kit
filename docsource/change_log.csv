@@ -2,7 +2,7 @@ Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
 Release;;"The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.
 
-Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.2.0.65;2011-06-19
+Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.2.0.67;2011-06-19
 Improvement;;Modified the PSPad syntax highlighter example to highlight preprocessor tags with delay marks.;;
 Improvement;;Examples use the Visual Studio 2003 solution format instead of the Visual Studio 2008 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
 Bugfix;;Fixed handling of NOT for constraints. The parsing was not correct when NOT has been used together with a constraint that is not the first constraint.;;
