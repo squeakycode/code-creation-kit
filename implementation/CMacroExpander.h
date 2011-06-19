@@ -54,6 +54,9 @@ public:
             , m_message( message)
         {
         }
+        ~ExErrorTagExpanded() throw()
+        {
+        }
         const StringT& getMessage()
         {
             return m_message;
