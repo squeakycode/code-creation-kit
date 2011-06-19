@@ -18,6 +18,7 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 
 echo Removing everything from output examples folder
 if exist ..\output\examples rmdir /s /q ..\output\examples
+if exist ..\output\examples rmdir /s /q ..\output\examples_build_test
 if not exist ..\output mkdir ..\output
 if not exist ..\output\examples mkdir ..\output\examples
 
@@ -47,13 +48,22 @@ if not exist "..\output\examples\create_syntax_highlighter\CCK Template.INI" got
 del "..\output\examples\create_syntax_highlighter\CCK Template.INI"
 if %errorlevel% neq 0 goto :exit_failure
 
-echo Creating workspace
+echo Copying example files for test build
+xcopy /s /e /q ..\output\examples ..\output\examples_build_test\
+
+echo Creating workspace vc71
 pushd ..\output\examples\mpc_integration
-call create_workspace.cmd nowait
+call create_workspace.cmd vc71 nowait
 popd
 if %errorlevel% neq 0 goto :exit_failure
 
-echo Examples successfully created... 
+echo Creating workspace for test build
+pushd ..\output\examples_build_test\mpc_integration
+call create_workspace.cmd vc9 nowait
+popd
+if %errorlevel% neq 0 goto :exit_failure
+
+echo Examples successfully created...
 exit /b 0
 
 :exit_failure

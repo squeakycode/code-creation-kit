@@ -4,13 +4,18 @@ rem It demonstrates the use of the Makefile, Project and Workspace Creator - MPC
 rem together with the code-creation-kit text compiler 
 rem and is used to create the example solution and projects.
 rem See http://www.ociweb.com/products/mpc for more information on MPC
- 
-if not defined MPC_ROOT ( 
+
+if not defined MPC_ROOT (
     echo Requires MPC - The Makefile, Project and Workspace Creator
     pause
     exit /b 1
 )
- 
+
+set IDE_TYPE=%~1
+
+if not defined IDE_TYPE if exist "%ProgramFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
+if not defined IDE_TYPE if exist "%ProgramFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8
+
 pushd ..
  
 call :create_project_mpc getting_started_simple getting_started_simple ""
@@ -19,7 +24,7 @@ call :create_project_mpc documented_state_machine\cd_player cd_player ..
 call :create_project_mpc documented_state_machine\cd_player_extended cd_player_extended ..
 call :create_project_mpc command_line_parser command_line_parser ""
 
-%MPC_ROOT%\mwc.pl -type vc9 -include ../mpc -static examples.mwc
+%MPC_ROOT%\mwc.pl -type %IDE_TYPE% -include ../mpc examples.mwc
 
 popd
 if "%1" equ "" pause

@@ -59,7 +59,7 @@ call make_setup.cmd
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Building examples to check for errors
-call build_solution.cmd ..\output\examples\examples.sln
+call build_solution.cmd ..\output\examples_build_test\examples.sln
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Make Release successful...
