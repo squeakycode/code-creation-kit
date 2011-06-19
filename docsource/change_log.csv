@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Bugfix;;Handle NOT for constraints correctly. The parsing was not correct when NOT has been used together with a constraint that is not the first constraint.;;
 Bugfix;;Show a correct error message when BEGIN is missing before END inside a macro block.;;
 New Feature;;Added TRIM_LEFT tag.;;
 New Feature;;Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.;;

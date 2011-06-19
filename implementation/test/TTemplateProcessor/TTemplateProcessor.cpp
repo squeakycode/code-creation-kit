@@ -269,9 +269,11 @@ void testMacroProcessing()
     //ends with
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"ol\"]>", "<bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"OL\"][IGNORE_CASE]>", "<bool><bool>"));
-    //starts with
+    //contains
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"oo\"]>", "<bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"OO\"][IGNORE_CASE]>", "<bool><bool>"));
+    //not contains x 2
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][CONTAINS][\"o\"][NOT][CONTAINS][\"u\"]>", "<int><bool><bool>"));
     //to cstring
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][TO_UPPER][REPLACE][\"I\",\"\\n\"][TO_CSTRING]>", "<\\nNT><DOUBLE><BOOL><BOOL>"));
     //if count and constraints
