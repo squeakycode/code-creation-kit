@@ -18,7 +18,7 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 
 echo Removing everything from output examples folder
 if exist ..\output\examples rmdir /s /q ..\output\examples
-if exist ..\output\examples rmdir /s /q ..\output\examples_build_test
+if exist ..\output\examples_build_test rmdir /s /q ..\output\examples_build_test
 if not exist ..\output mkdir ..\output
 if not exist ..\output\examples mkdir ..\output\examples
 
