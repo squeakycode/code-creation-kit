@@ -16,9 +16,6 @@ rem
 rem   You should have received a copy of the GNU General Public License
 rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
-rem set root to tools folder to use defined text compiler
-rem set CCK_ROOT=%~dp0
-
 echo Creating version info
 call create_version_info.cmd nowait
 if %errorlevel% neq 0 goto :exit_failure
@@ -30,6 +27,9 @@ if %errorlevel% neq 0 goto :exit_failure
 echo Building solution
 call build_solution.cmd ..\cck.sln
 if %errorlevel% neq 0 goto :exit_failure
+
+rem set root to tools folder to use defined text compiler
+set CCK_ROOT=%~dp0\..\output
 
 echo Creating and installing syntax highlighter language definition
 rem The subfolders themes and langDefs of %ProgramFiles%\WinHighlight
