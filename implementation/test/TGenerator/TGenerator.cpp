@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         parameterList.push_back("b=5");
 
         //generate the output
-        generator.generate( "../TGenerator/TGeneratorTemplate.txt", "TGeneratorOut.txt", parameterList);
+        generator.generate( "../TGenerator/TGeneratorTemplate.txt", "TGeneratorOut.txt", false, parameterList);
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOut.txt", "TGeneratorOutExpected.txt"));
 
         //generate the output using intermediate file
-        generator.generate( "TGeneratorTemplate.txt", "TGeneratorOutIntermediateUsed.txt", true, "TGeneratorOutIntermediateUsed.txt.intermediate", parameterList);
+        generator.generate( "TGeneratorTemplate.txt", "TGeneratorOutIntermediateUsed.txt", true, "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOutIntermediateUsed.txt", "TGeneratorOutExpected.txt"));
@@ -61,4 +61,19 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TDataflow.gen.txt", "TDataflowExpected.txt"));
     }
+
+    //test append
+    {
+        CGenerator<std::string> generator;
+        //load a table
+        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1);
+
+        //generate the output
+        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TAppend.gen.txt", false);
+        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TAppend.gen.txt", true);
+
+        //check output is as expected
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "TAppend.gen.txt", "TAppendExpected.txt"));
+    }
+
 }

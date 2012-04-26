@@ -61,12 +61,13 @@ public:
         , m_delimiter(0)
         , m_rowHeaderIndex(0)
         , m_columnHeaderIndex(0)
+        , m_append(false)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
     }
 
-    void generate( const StringT& templateFile, const StringT& targetFile, bool useIntermediateFile, const StringT& intermediateFile, const ParameterListT& parameters)
+    void generate( const StringT& templateFile, const StringT& targetFile, bool useIntermediateFile, const StringT& intermediateFile, bool append, const ParameterListT& parameters)
     {
         BOOST_CHECK( m_generate);
         BOOST_CHECK( m_templateFile == templateFile);
@@ -74,6 +75,7 @@ public:
         BOOST_CHECK( m_useIntermediateFile == useIntermediateFile);
         BOOST_CHECK( m_intermediateFileName == intermediateFile);
         BOOST_CHECK( m_parameters == parameters);
+        BOOST_CHECK( m_append == append);
     }
 
     void reset()
@@ -137,6 +139,8 @@ public:
 
     unsigned int m_rowHeaderIndex;
     unsigned int m_columnHeaderIndex;
+
+    bool m_append;
 
     void setTemplateFile( const char* text)
     {
@@ -362,6 +366,20 @@ void runTest()
         generator.m_generate = true;
         std::vector<std::string> args;
         args += "-c", "-s a.txt -o b.txt";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test generate with append
+        GeneratorT generator;
+        generator.setTemplateFile( "a.txt");
+        generator.setTargetFile( "b.txt");
+        generator.m_useIntermediateFile = false;
+        generator.m_append = true;
+        generator.setIntermediateFileName( "b.txt.intermediate");
+        generator.m_generate = true;
+        std::vector<std::string> args;
+        args += "-c", "-s a.txt -o b.txt --append-to-file";
         process<StringT>( args, generator);
     }
 

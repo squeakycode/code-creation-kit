@@ -88,6 +88,7 @@ public:
                 prepareFileName( m_parser.getOutputFile(), commandFileName), 
                 m_parser.getUseIntermediateOutputFile(),
                 prepareFileName( m_parser.getOutputFile() + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                m_parser.getAppendToFile(),
                 m_parser.getParameters());
         }
         else if ( command == ParserT::eLoadTable )

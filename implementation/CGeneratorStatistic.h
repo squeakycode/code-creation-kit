@@ -117,7 +117,7 @@ public:
 
     ///generates output by processing a template file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool, const StringT&, const ParameterListT&)
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool, const StringT&, bool, const ParameterListT&)
     {
         m_templateLoader.resetInclusionHierarchy();
 

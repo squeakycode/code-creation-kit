@@ -49,35 +49,35 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.unloadTable( "not there"), CErrorPrinted);
 
     //cannot open template file
-    BOOST_CHECK_THROW( generator.generate( "NotThere.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "NotThere.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open target file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open intermediate output file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", true, "BadDir/TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", true, "BadDir/TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //failed to move intermediate file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", true, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", true, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //bad parameter
     {
         ParameterListT parameterList;
         parameterList.push_back("a=4");
         parameterList.push_back("b-5");
-        BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
     }
 
-    BOOST_CHECK_THROW( generator.generate( "CyclicInclusion.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "CyclicInclusion.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //infinite loop
     {
         ParameterListT parameterList;
         parameterList.push_back("loop=[ENTRY][\"loop\"]");
-        BOOST_CHECK_THROW( generator.generate( "InfiniteLoop.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( "InfiniteLoop.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
         generator.reset();
     }
 
-    BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 }
 

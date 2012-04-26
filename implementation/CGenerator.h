@@ -236,21 +236,21 @@ public:
     }
 
     ///generates output by processing a template file, no parameters, no intermediate file
-    void generate( const StringT& templateFileName, const StringT& targetFileName)
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool append = false)
     {
-        generate( templateFileName, targetFileName, std::vector<StringT>());
+        generate( templateFileName, targetFileName, append, std::vector<StringT>());
     }
 
     ///generates output by processing a template file, no intermediate file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, const ParameterListT& parameters)
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool append, const ParameterListT& parameters)
     {
-        generate( templateFileName, targetFileName, false, StringT(), parameters);
+        generate( templateFileName, targetFileName, false, StringT(), append, parameters);
     }
 
     ///generates output by processing a template file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, const ParameterListT& parameters)
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, bool append, const ParameterListT& parameters)
     {
         //create parameter table
         TableT parameterTable;
@@ -275,7 +275,7 @@ public:
         }
         else
         {
-            generatedFile.open( targetFileName, useCoutInstead);
+            generatedFile.open( targetFileName, useCoutInstead, append);
         }
 
         //reset the loader

@@ -85,6 +85,7 @@ public:
             ("markup-prefix", value<StringT >(), "Sets the initial tag markup prefix.")
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
+            ("append-to-file", value<bool >()->zero_tokens(), "The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -157,6 +158,7 @@ public:
         bool providedMarkupPrefix = hasMarkupPrefix();
         bool providedMarkupPostfix = hasMarkupPostfix();
         bool providedMarkup = hasMarkup();
+        bool providedAppendToFile = hasAppendToFile();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
@@ -194,6 +196,7 @@ public:
             && providedTemplateFile == true
             && providedOutputFile == true
             && providedUseIntermediateOutputFile == true
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -219,6 +222,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == true
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -244,6 +248,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -264,6 +269,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -289,6 +295,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == true
             && providedDelimiter == false
@@ -314,6 +321,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == true
@@ -339,6 +347,7 @@ public:
             && providedMarkupPrefix == false
             && providedMarkupPostfix == false
             && providedMarkup == false
+            && providedAppendToFile == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -365,6 +374,7 @@ public:
             && !providedMarkupPrefix
             && !providedMarkupPostfix
             && !providedMarkup
+            && !providedAppendToFile
             && !providedReset
             && !providedIncludeDirectories
             && !providedDelimiter
@@ -503,6 +513,16 @@ public:
         return m_vmap["markup"].as<StringT >();
     }
     
+    ///returns the provided value or false as default
+    bool getAppendToFile() const
+    {
+        if ( hasAppendToFile())
+        {
+            return m_vmap["append-to-file"].as<bool >();
+        }
+        return false;
+    }
+    
     ///returns the provided value
     bool getReset() const
     {
@@ -616,6 +636,12 @@ public:
     bool hasMarkup() const
     {
         return m_vmap.count( "markup") != 0;
+    }
+    
+    ///indicates that the option append-to-file has been provided
+    bool hasAppendToFile() const
+    {
+        return m_vmap.count( "append-to-file") != 0;
     }
     
     ///indicates that the option reset has been provided

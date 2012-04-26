@@ -44,11 +44,11 @@ public:
     CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, const ParameterListT& parameters)
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, bool append, const ParameterListT& parameters)
     {
         try
         {
-            m_generator.generate( templateFileName, targetFileName, useIntermediateFile, intermediateFileName, parameters);
+            m_generator.generate( templateFileName, targetFileName, useIntermediateFile, intermediateFileName, append, parameters);
         }
         [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]        
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
