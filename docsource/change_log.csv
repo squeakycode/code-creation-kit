@@ -1,5 +1,7 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Improvement;;CGenerator can process streams.;;
+Bugfix;;Fixed --csv-comment-chars has no effect.;;
 Bugfix;;Fixed test_base.mpc file to fix a problem when using Microsoft Visual Studio 2010.;;
 New Feature;;Added the append-to-file option for creating a file in multiple generation steps.;;
 Release;;"The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.

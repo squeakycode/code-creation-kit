@@ -19,12 +19,16 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <sstream>
 #include "CGenerator.h"
 
 BOOST_AUTO_TEST_CASE( TGenerator)
 {
     {
         CGenerator<std::string> generator;
+
+        generator.setCsvCommentChars("#");
+
         //load a table
         generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1);
 
@@ -76,4 +80,40 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TAppend.gen.txt", "TAppendExpected.txt"));
     }
 
+    //test streams
+    {
+        typedef std::vector<std::vector<std::string> > TableT;
+        std::stringstream in;
+        std::stringstream out;
+        std::stringstream csv, csv2;
+        boost::shared_ptr<TableT> psTable( new TableT(2));
+
+        (*psTable)[0].push_back("b");
+        (*psTable)[0].push_back("7");
+        (*psTable)[1].push_back("a");
+        (*psTable)[1].push_back("0");
+
+        csv << "a;b;\n1;1;\n2;;\n3;3;\n;4;\n";
+
+        in << "start" << std::endl;
+        in << "[ENTRY][\"a\"][ENTRY][\"b\"]" << std::endl;
+        in << "end";
+
+        CGenerator<std::string> generator;
+
+        //load a table
+        generator.loadTable( csv, "LabelA", true, true, 1, 1);
+
+        csv2  << "a;b;\n1;6;\n8;;\n3;3;\n;4;\n";
+
+        //test unload feature
+        generator.loadTable( csv2, "LabelB", true, true, 1, 1);
+        generator.unloadTable( "LabelB");
+
+        generator.loadTable( psTable, "LabelB", true, true, 1, 1);
+
+        generator.generate( in, out);
+
+        BOOST_CHECK_EQUAL( out.str(), "start\n11\n33\n07\nend");
+    }
 }

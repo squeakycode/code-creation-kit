@@ -75,6 +75,9 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
     typedef CTemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoader> TemplateProcessorT;
     typedef CTemplateLoader<TemplateProcessorT, StringT> TemplateLoaderT;
 
+    typedef typename TargetFileT::OutputStreamT OutputStreamT;
+    typedef typename TemplateLoaderT::InputStreamT InputStreamT;
+
     ///holds the properties and the data of currently loaded tables
     class TableData
     {
@@ -84,13 +87,15 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
         {
             TableProperties()
                 : csvDelimiter(0)
+                , neverEquals(true)
             {
             }
 
-            TableProperties( const StringT& aFileName, CharT aCsvDelimiter, const StringT& aCsvCommentChars)
+            TableProperties( const StringT& aFileName, CharT aCsvDelimiter, const StringT& aCsvCommentChars, bool setNeverEquals)
                 : csvDelimiter( aCsvDelimiter)    
                 , filename( aFileName)
                 , csvComment( aCsvCommentChars)
+                , neverEquals( setNeverEquals)
             {
             }
 
@@ -98,7 +103,10 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
             {
                 bool equal = csvDelimiter == rhs.csvDelimiter 
                     && filename == rhs.filename
-                    && csvComment == rhs.csvComment;
+                    && csvComment == rhs.csvComment
+                    && !neverEquals
+                    && !rhs.neverEquals
+                    ;
 
                 return equal;
             }
@@ -106,6 +114,7 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
             CharT csvDelimiter; ///<used when loading
             StringT filename; ///<used when loading
             StringT csvComment; ///<used when loading
+            bool neverEquals;  ///<used when loading
         };
 
         TableData(){}
@@ -115,6 +124,11 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
             ) 
             : properties(theProperties)
             , table(aTable)
+        {
+        }
+
+        TableData( boost::shared_ptr<const TableT> aTable)
+            : table(aTable)
         {
         }
 
@@ -144,7 +158,7 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
 
     private:
         TableProperties properties; ///<properties used when loading
-        boost::shared_ptr<TableT> table; ///<the loaded table data
+        boost::shared_ptr<const TableT> table; ///<the loaded table data
     };
 
 
@@ -197,8 +211,9 @@ public:
     ///load another table for generation, see also unloadTable
     void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
     {
+        bool useCinAsInput = tableFileName == STRING_LITERAL("-");
         //assemble the properties of the table
-        typename TableData::TableProperties properties( tableFileName, getCsvDelimiter(), getCsvCommentChars());
+        typename TableData::TableProperties properties( tableFileName, getCsvDelimiter(), getCsvCommentChars(), useCinAsInput);
 
         //try to find the table among the already loaded tables
         typename TableListT::iterator pos = std::find( m_tableList.begin(), m_tableList.end(), properties);
@@ -222,7 +237,7 @@ public:
                 //open table file
                 CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
                 //parse the table file
-                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, STRING_LITERAL(""), m_positionTracker);
+                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
                 m_tableList.push_back( tableData);
@@ -235,6 +250,41 @@ public:
         }
     }
 
+    ///load another table for generation, see also unloadTable
+    void loadTable( InputStreamT& inputStream, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    {
+        m_lastRowNumberWithFailure = 0;
+
+        //create table and table builder
+        typedef CVerticalTableBuilder<TableT> TableBuilderT;
+        TableT* tableToLoad = new TableT;
+        TableBuilderT tableBuidler( *tableToLoad);
+        boost::shared_ptr<const TableT> psTableToLoad( tableToLoad);
+        typename TableListT::value_type tableData( psTableToLoad);
+
+        try
+        {
+            //parse the table file
+            CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_positionTracker);
+            //connect table to processor and keep reference in list
+            m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+            m_tableList.push_back( tableData);
+        }
+        catch(...)
+        {
+            m_lastRowNumberWithFailure = tableData.getTable()->size() ? (*tableData.getTable())[0].size() : 1;
+            throw;
+        }
+    }
+
+    ///load another table for generation, see also unloadTable
+    void loadTable( boost::shared_ptr<const TableT> table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    {
+        typename TableListT::value_type tableData( table);
+        m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+        m_tableList.push_back( tableData);
+    }
+        
     ///generates output by processing a template file, no parameters, no intermediate file
     void generate( const StringT& templateFileName, const StringT& targetFileName, bool append = false)
     {
@@ -336,6 +386,24 @@ public:
                 }
             }
         }
+    }
+
+    void generate( InputStreamT& inputStream, OutputStreamT& outputStream)
+    {
+        //reset the loader
+        m_templateLoader.resetInclusionHierarchy();
+        //open the template processor
+        m_templateProcessor.open();
+        //connect the objects
+        m_templateLoader.connectOutputStream( &m_templateProcessor);
+        m_templateProcessor.connectOutputStream( &outputStream);
+        m_templateProcessor.connectTemplateLoader( &m_templateLoader);
+        //start processing the template file
+        m_templateLoader.loadTemplateStream( inputStream);
+        //close everything
+        m_templateProcessor.close();
+        //clean up
+        m_templateProcessor.connectOutputStream(0);
     }
 
     //resets the generator building blocks

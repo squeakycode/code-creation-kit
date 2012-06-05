@@ -43,9 +43,11 @@ template <typename OutputStreamT, typename StringT>
 class CTemplateLoader : public CTemplateLoaderExceptions
 {
     typedef typename StringT::value_type CharT;
-    typedef CSourceFile<StringT,TemplateFileT> InputFileT;
     typedef std::list<StringT> IncludeDirectoryListT;
 public:
+    typedef CSourceFile<StringT,TemplateFileT> InputFileT;
+    typedef typename InputFileT::InputStreamT InputStreamT;
+
     ///holds the data of currently processed file
     struct FileData
     {
@@ -56,7 +58,7 @@ public:
 
         StringT name;
         unsigned int line;
-        bool usingCin;
+        bool canResolveFileName;
     };
 
     typedef std::list<FileData> FileDataListT;
@@ -77,7 +79,7 @@ public:
     {
         StringT resolvedName = filename;
 
-        if ( !m_openedFiles.empty() && !m_openedFiles.back().usingCin)
+        if ( !m_openedFiles.empty() && m_openedFiles.back().canResolveFileName)
         {
             resolvedName = FileSystem::determineDependentLocation( m_openedFiles.back().name, filename);
         }
@@ -98,10 +100,25 @@ public:
         return resolvedName;
     }
 
+    void loadTemplateStream( InputStreamT& inputStream)
+    {
+        //add data for error information
+        FileData filedata = { STRING_LITERAL("Input Stream"), 0, true};
+        m_openedFiles.push_back( filedata);
+        unsigned int& lineNumber = m_openedFiles.back().line;    
+    
+        //read the stream
+        InputFileT::feedLineSink( inputStream, *m_outputStream, true, lineNumber);
+
+        //remove data
+        m_openedFiles.pop_back();
+    }
+
+
     ///reads the template file forwards the data, checks for cyclic inclusion
     void loadTemplateFile( const StringT& filename, bool useCinInstead = false)
     {
-        FileData filedata = { useCinInstead ? filename : resolveFileName( filename), 0, useCinInstead};
+        FileData filedata = { useCinInstead ? STRING_LITERAL("stdin") : resolveFileName( filename), 0, !useCinInstead};
 
         //check if already loading the file
         if ( std::find( m_openedFiles.begin(), m_openedFiles.end(), filedata.name) != m_openedFiles.end())
@@ -114,7 +131,7 @@ public:
         unsigned int& lineNumber = m_openedFiles.back().line;
 
         //open the file
-        InputFileT file( filedata.name, filedata.usingCin);
+        InputFileT file( filedata.name, useCinInstead);
 
         //read file line by line
         file.feedLineSink( *m_outputStream, true, lineNumber);

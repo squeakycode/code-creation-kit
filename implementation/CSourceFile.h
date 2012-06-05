@@ -117,11 +117,9 @@ public:
         checkEofReached( get());
     }
 
-private:
-
-    ///read file line by line implementation
+    ///read stream line by line implementation
     template <typename StreamT, typename SinkT, typename CounterT>
-    void feedLineSink( StreamT& stream, SinkT& sink, bool includeNewLine, CounterT& counter)
+    static void feedLineSink( StreamT& stream, SinkT& sink, bool includeNewLine, CounterT& counter)
     {
         //read file line by line
         StringT line;
@@ -139,9 +137,10 @@ private:
         checkEofReached( stream);
     }
 
+private:
     ///check if read was ended by end of file, otherwise an error occured
     template <typename StreamT>
-    void checkEofReached( StreamT& stream)
+    static void checkEofReached( StreamT& stream)
     {
         if ( stream.bad() || (stream.fail() && !stream.eof()) )
         {

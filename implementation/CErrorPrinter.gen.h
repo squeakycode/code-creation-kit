@@ -949,10 +949,7 @@ private:
         {
             return STRING_LITERAL("???");
         }
-        if ( list.back().usingCin)
-        {
-            return STRING_LITERAL("stdin");
-        }
+
         return list.back().name;
     }
 
