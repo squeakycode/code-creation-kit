@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <string>
 #include "CGenerator.h"

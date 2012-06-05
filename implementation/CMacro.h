@@ -25,7 +25,7 @@
 #include "CMacroExpression.h"
 #include "CSubstitution.h"
 #include <vector>
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 
 ///data structure representing a macro, created from parsed macro
 template <typename StringT>

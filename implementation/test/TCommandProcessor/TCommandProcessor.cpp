@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <vector>
@@ -32,7 +32,7 @@
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
-#include <boost\foreach.hpp>
+#include <boost/foreach.hpp>
 
 ///externally provided exception class showing that an error has been printed
 class CErrorPrinted{};

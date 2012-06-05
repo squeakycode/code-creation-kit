@@ -24,7 +24,7 @@
 
 #include "CMacro.h"
 #include <vector>
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 
 ///defines exceptions thrown by CParser for template argument independent access
 class CParserExceptions

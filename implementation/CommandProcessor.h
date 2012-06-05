@@ -24,7 +24,7 @@
 
 #include <string>
 #include "CCommandLineParser.gen.h"
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "CSourceFile.h"
 #include "FileSystem.h"

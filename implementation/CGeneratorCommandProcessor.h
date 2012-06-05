@@ -23,7 +23,7 @@
 #endif
 
 #include "CCommandFileLineParser.gen.h"
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
