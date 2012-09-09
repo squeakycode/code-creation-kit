@@ -44,11 +44,26 @@ public:
     CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, bool append, const ParameterListT& parameters)
+    void generate(
+        const StringT& templateFileName,
+        const StringT& targetFileName,
+        bool useIntermediateFile,
+        const StringT& intermediateFileName,
+        bool append,
+        const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+    )
     {
         try
         {
-            m_generator.generate( templateFileName, targetFileName, useIntermediateFile, intermediateFileName, append, parameters);
+            m_generator.generate( 
+                templateFileName,
+                targetFileName,
+                useIntermediateFile,
+                intermediateFileName,
+                append,
+                parameters,
+                inlineTemplateParameters);
         }
         catch( CSourceFileExceptions<TemplateFileT>::ExCannotOpenFile& e)
         {

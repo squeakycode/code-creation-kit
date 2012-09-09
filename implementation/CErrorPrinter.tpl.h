@@ -44,13 +44,28 @@ public:
     CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, bool append, const ParameterListT& parameters)
+    void generate(
+        const StringT& templateFileName,
+        const StringT& targetFileName,
+        bool useIntermediateFile,
+        const StringT& intermediateFileName,
+        bool append,
+        const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+    )
     {
         try
         {
-            m_generator.generate( templateFileName, targetFileName, useIntermediateFile, intermediateFileName, append, parameters);
+            m_generator.generate( 
+                templateFileName,
+                targetFileName,
+                useIntermediateFile,
+                intermediateFileName,
+                append,
+                parameters,
+                inlineTemplateParameters);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -67,7 +82,7 @@ public:
         {
             m_generator.setCsvDelimiter( delimiter);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -79,7 +94,7 @@ public:
         {
             m_generator.setCsvCommentChars( commentChars);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -90,7 +105,7 @@ public:
         {
             m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -101,7 +116,7 @@ public:
         {
             m_generator.unloadTable( label);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }

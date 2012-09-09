@@ -60,7 +60,11 @@ public:
 
     class ExFailedToUnloadTable : public std::runtime_error 
     { public: ExFailedToUnloadTable() : std::runtime_error( "Cannot find table to unload.") {}};
+
+    class ExIntermediateFileRequired : public std::runtime_error  //not in error printer table
+    { public: ExIntermediateFileRequired() : std::runtime_error( "Use of an intermediate file is required for in place inline processing.") {}};
 };
+
 
 ///sets up and operates all building blocks needed for generating
 template <typename StringT>
@@ -300,8 +304,27 @@ public:
 
     ///generates output by processing a template file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, bool append, const ParameterListT& parameters)
+    void generate( 
+        const StringT& templateFileName, 
+        const StringT& targetFileName, 
+        bool useIntermediateFile, 
+        const StringT& intermediateFileName, 
+        bool append, 
+        const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+        )
     {
+        // An intermediate file is automatically used when processing files with inline templates
+        // if no output file is provided.
+        if (   templateFileName == targetFileName
+            && targetFileName != STRING_LITERAL("-") //std streams not used
+            && inlineTemplateParameters.enabled 
+            && !useIntermediateFile
+            )
+        {
+            throw ExIntermediateFileRequired();
+        }
+
         //create parameter table
         TableT parameterTable;
         ParameterParser::parse( parameters, parameterTable, m_indexOfLastProcessedParameter, STRING_LITERAL('='));
@@ -336,6 +359,7 @@ public:
         m_templateLoader.connectOutputStream( &m_templateProcessor);
         m_templateProcessor.connectOutputStream( useIntermediateFile ? &intermediateFile.get() : &generatedFile.get());
         m_templateProcessor.connectTemplateLoader( &m_templateLoader);
+        m_templateProcessor.setInlineTemplateParameters( inlineTemplateParameters);
         //start processing the template file
         m_templateLoader.loadTemplateFile( templateFileName, templateFileName == STRING_LITERAL("-"));
         //close everything
@@ -428,7 +452,7 @@ public:
             if ( pos != m_tableList.end())
             {
                 //if fully disconnected discard the table
-                m_tableList.erase( pos);            
+                m_tableList.erase( pos);
             }
             else
             {

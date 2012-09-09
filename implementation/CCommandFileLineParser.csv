@@ -1,29 +1,33 @@
-Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiter;CsvCommentChars
-Combination;;;;;;;;;;;;;yes;yes;yes;yes;yes;yes;yes;yes
-Example Description;;;;;;;;;;;;;;;;;;;;
-Example;;;;;;;;;;;;;;;;;;;;
-;LoadTable;Load Table;top-down;t;yes;;;;false;bool;TopDown;Indicates that the table is to be read top down. If no direction is explicitly specified all directions will be read by default.;no;no;no;no;don't care;no;no;no
-;;;left-to-right;l;yes;;;;false;bool;LeftToRight;Indicates that the table is to be read from left to right. If no direction is explicitly specified all directions will be read by default.;no;no;no;no;don't care;no;no;no
-;;;row-header-index;w;;;;;1;unsigned int;RowHeaderIndex;Specifies the one based index of the column containing the row names. If zero is passed the one based index of the row is used as row name.;no;no;no;no;don't care;no;no;no
-;;;column-header-index;n;;;;;1;unsigned int;ColumnHeaderIndex;Specifies the one based index of the row containing the column names. If zero is passed the one based index of the column is used as column name.;no;no;no;no;don't care;no;no;no
-;;;label;a;;;;;;StringT;Label;Specifies the label used for identifying the table when unloading. The label defaults to the name of the table passed.;no;no;no;no;don't care;no;no;no
-;;;load-table;;;;yes;1;;StringT;TableFile;Name of the table file to load. Default when the option name is omitted.;no;no;no;no;yes;no;no;no
-;;;;;;;;;;;;;;;;;;;;
-;UnloadTable;Unload Table;unload-table;x;;yes;;;;std::vector<StringT>;LabelsOfTableFilesToUnload;Unload table file identified by its label. This option accepts multiple parameters for ubloading more than one table. Tables having the same label are unloaded in the reverse order they are loaded.;no;no;no;yes;no;no;no;no
-;;;;;;;;;;;;;;;;;;;;
-;GenerateFile;Generate File;template-source-file;s;;;;;;StringT;TemplateFile;Specifies the file containing the template.;yes;yes;no;no;no;no;no;no
-;;;output-file;o;;;;;;StringT;OutputFile;Specifies the file to output to.;yes;yes;no;no;no;no;no;no
-;;;parameter;p;;yes;;;std::vector<StringT>();std::vector<StringT>;Parameters;Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.;don't care;don't care;no;no;no;no;no;no
-;;;use-intermediate-output-file;u;yes;;;;false;bool;UseIntermediateOutputFile;Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.;no;yes;no;no;no;no;no;no
-;;;intermediate-file-extension;e;;;;;"boost::lexical_cast<StringT>("".intermediate"")";StringT;IntermediateOutputFileExtension;The name of the intermediate is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.;no;don't care;no;no;no;no;no;no
-;;;markup-prefix;;;;;;"boost::lexical_cast<StringT>(""["")";StringT;MarkupPrefix;Sets the initial tag markup prefix.;don't care;don't care;no;no;no;no;no;no
-;;;markup-postfix;;;;;;"boost::lexical_cast<StringT>(""]"")";StringT;MarkupPostfix;Sets the initial tag markup postfix.;don't care;don't care;no;no;no;no;no;no
-;;;markup;m;;;;;;StringT;Markup;Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.;don't care;don't care;no;no;no;no;no;no
-;;;append-to-file;;yes;;;;false;bool;AppendToFile;The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.;don't care;no;no;no;no;no;no;no
-;;;;;;;;;;;;;;;;;;;;
-;ResetGenerator;Reset Generator;reset;r;yes;;;;;bool;Reset;Reset the generator to defaults.;no;no;yes;no;no;no;no;no
-;;;;;;;;;;;;;;;;;;;;
-;AddIncludeDirectories;Add Include Directories;add-include-directory;i;;yes;;;;std::vector<StringT>;IncludeDirectories;Adds an include directory. This option accepts multiple parameters.;no;no;no;no;no;yes;no;no
-;;;;;;;;;;;;;;;;;;;;
-;CsvTableProperties;CSV Table Properties;csv-delimiter;;;;;;;StringT;Delimiter;Specifies the delimiter for the next csv files to load. Use 'tab' for tab separated items.;no;no;no;no;no;no;yes;no
-;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.;no;no;no;no;no;no;no;yes
+Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ProcessInlineTemplateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiter;CsvCommentChars
+Combination;;;;;;;;;;;;;yes;yes;yes;yes;yes;yes;yes;yes;yes
+Example Description;;;;;;;;;;;;;;;;;;;;;
+Example;;;;;;;;;;;;;;;;;;;;;
+;LoadTable;Load Table;top-down;t;yes;;;;false;bool;TopDown;Indicates that the table is to be read top down. If no direction is explicitly specified all directions will be read by default.;no;no;no;no;no;don't care;no;no;no
+;;;left-to-right;l;yes;;;;false;bool;LeftToRight;Indicates that the table is to be read from left to right. If no direction is explicitly specified all directions will be read by default.;no;no;no;no;no;don't care;no;no;no
+;;;row-header-index;w;;;;;1;unsigned int;RowHeaderIndex;Specifies the one based index of the column containing the row names. If zero is passed the one based index of the row is used as row name.;no;no;no;no;no;don't care;no;no;no
+;;;column-header-index;n;;;;;1;unsigned int;ColumnHeaderIndex;Specifies the one based index of the row containing the column names. If zero is passed the one based index of the column is used as column name.;no;no;no;no;no;don't care;no;no;no
+;;;label;a;;;;;;StringT;Label;Specifies the label used for identifying the table when unloading. The label defaults to the name of the table passed.;no;no;no;no;no;don't care;no;no;no
+;;;load-table;;;;yes;1;;StringT;TableFile;Name of the table file to load. Default when the option name is omitted.;no;no;no;no;no;yes;no;no;no
+;;;;;;;;;;;;;;;;;;;;;
+;UnloadTable;Unload Table;unload-table;x;;yes;;;;std::vector<StringT>;LabelsOfTableFilesToUnload;Unload table file identified by its label. This option accepts multiple parameters for ubloading more than one table. Tables having the same label are unloaded in the reverse order they are loaded.;no;no;no;no;yes;no;no;no;no
+;;;;;;;;;;;;;;;;;;;;;
+;GenerateFile;Generate File;template-source-file;s;;;;;;StringT;TemplateFile;Specifies the file containing the template.;yes;yes;yes;no;no;no;no;no;no
+;;;output-file;o;;;;;"boost::lexical_cast<StringT>("""")";StringT;OutputFile;Specifies the file to output to.;yes;yes;don't care;no;no;no;no;no;no
+;;;parameter;p;;yes;;;std::vector<StringT>();std::vector<StringT>;Parameters;Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.;don't care;don't care;don't care;no;no;no;no;no;no
+;;;use-intermediate-output-file;u;yes;;;;false;bool;UseIntermediateOutputFile;Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.;no;yes;don't care;no;no;no;no;no;no
+;;;intermediate-file-extension;e;;;;;"boost::lexical_cast<StringT>("".intermediate"")";StringT;IntermediateOutputFileExtension;The name of the intermediate is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.;no;don't care;don't care;no;no;no;no;no;no
+;;;markup-prefix;;;;;;"boost::lexical_cast<StringT>(""["")";StringT;MarkupPrefix;Sets the initial tag markup prefix.;don't care;don't care;don't care;no;no;no;no;no;no
+;;;markup-postfix;;;;;;"boost::lexical_cast<StringT>(""]"")";StringT;MarkupPostfix;Sets the initial tag markup postfix.;don't care;don't care;don't care;no;no;no;no;no;no
+;;;markup;m;;;;;;StringT;Markup;Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.;don't care;don't care;don't care;no;no;no;no;no;no
+;;;append-to-file;;yes;;;;false;bool;AppendToFile;The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.;don't care;no;don't care;no;no;no;no;no;no
+;;;inlined;;yes;;;;;bool;Inline;Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided.;no;no;yes;no;no;no;no;no;no
+;;;inline-prefix;b;;;;;"boost::lexical_cast<StringT>(""//<>"")";StringT;InlinePrefix;A prefix that marks a line of an inline template file as template content. This string cannot be empty.;no;no;don't care;no;no;no;no;no;no
+;;;inline-postfix;c;;;;;"boost::lexical_cast<StringT>("""")";StringT;InlinePostfix;A postfix that marks a line of an inline template file as template content. This string can be empty.;no;no;don't care;no;no;no;no;no;no
+;;;inline-generated-postfix;d;;;;;"boost::lexical_cast<StringT>(""//$"")";StringT;InlineGeneratedPostfix;A postfix that marks a line of an inline template file as generated content. This string cannot be empty.;no;no;don't care;no;no;no;no;no;no
+;;;;;;;;;;;;;;;;;;;;;
+;ResetGenerator;Reset Generator;reset;r;yes;;;;;bool;Reset;Reset the generator to defaults.;no;no;no;yes;no;no;no;no;no
+;;;;;;;;;;;;;;;;;;;;;
+;AddIncludeDirectories;Add Include Directories;add-include-directory;i;;yes;;;;std::vector<StringT>;IncludeDirectories;Adds an include directory. This option accepts multiple parameters.;no;no;no;no;no;no;yes;no;no
+;;;;;;;;;;;;;;;;;;;;;
+;CsvTableProperties;CSV Table Properties;csv-delimiter;;;;;;;StringT;Delimiter;Specifies the delimiter for the next csv files to load. Use 'tab' for tab separated items.;no;no;no;no;no;no;no;yes;no
+;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.;no;no;no;no;no;no;no;no;yes

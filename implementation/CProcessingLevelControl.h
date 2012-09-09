@@ -73,6 +73,7 @@ public:
         , m_levelLimit( m_levelBlocks + m_cMaxNumLevel)
         , m_finalOutputStream(0)
         , m_outputStream(0)
+        , m_inlineTemplateMode(false)
     {
 
     }
@@ -135,8 +136,35 @@ public:
             || ( m_level > m_levelLimit)
             )
         {
-            assert(  token == TokenT::eFullLineWithoutTags || token == TokenT::eTextFragment || token == TokenT::eNewLine);
-            token.toStream( *m_finalOutputStream);
+            if ( !m_inlineTemplateMode)
+            {
+                token.toStream( *m_finalOutputStream);
+            }
+            else
+            {
+                //insert inline generated postfix
+                typename TokenT::ConstSharedStringListT stringList = token.getStringList();
+                if ( stringList)
+                {
+                    const typename TokenT::StringListT& strings = *stringList;
+                    BOOST_FOREACH( const StringT& text, strings)
+                    {
+                        if ( !text.empty())
+                        {
+                            StringT::const_iterator last = --text.end();
+                            if ( *last == STRING_LITERAL('\n'))
+                            {
+                                *m_finalOutputStream << StringT(text.begin(), last);
+                                *m_finalOutputStream << m_inlineGeneratedPostfixAndNewLine;
+                            }
+                            else
+                            {
+                                *m_finalOutputStream << text;
+                            }
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -251,6 +279,13 @@ public:
         return m_cMaxNumLevel;
     }
 
+    ///set inline template processing parameters
+    void setInlineTemplateParameters( bool enabled, const StringT& inlineGeneratedPostfix)
+    {
+        m_inlineTemplateMode = enabled;
+        m_inlineGeneratedPostfixAndNewLine = inlineGeneratedPostfix + STRING_LITERAL('\n');
+    }
+
 private:
     static const unsigned int m_cMaxNumLevel = 32;
 
@@ -258,6 +293,8 @@ private:
     ProcessingLevelBlocks* m_levelLimit;
     FinalOutputStreamT* m_finalOutputStream;
     OutputStreamT* m_outputStream;
+    bool m_inlineTemplateMode; ///<toggles inline template processing
+    StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
 };

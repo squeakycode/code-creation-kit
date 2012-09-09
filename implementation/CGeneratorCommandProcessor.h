@@ -28,6 +28,7 @@
 #include "FileSystem.h"
 #include "StringLiteral.h"
 #include "System.h"
+#include "CInlineTemplateParameters.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -73,8 +74,29 @@ public:
         const typename ParserT::ECommand command = m_parser.getCommand();
 
         if ( command == ParserT::eGenerate 
-            || command == ParserT::eGenerateUsingIntermediateFile)
+            || command == ParserT::eGenerateUsingIntermediateFile
+            || command == ParserT::eProcessInlineTemplateFile)
         {
+            CInlineTemplateParameters<StringT> inlineTemplateParameters;
+            StringT outputFileName( m_parser.getOutputFile());
+            bool useIntermediateFile = m_parser.getUseIntermediateOutputFile();
+
+            if ( command == ParserT::eProcessInlineTemplateFile)
+            {
+                //pass inline template processing parameters
+                inlineTemplateParameters.enabled = true;
+                inlineTemplateParameters.inlinePrefix = m_parser.getInlinePrefix();
+                inlineTemplateParameters.inlinePostfix = m_parser.getInlinePostfix();
+                inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
+
+                //if no output file name has been passed source is also target
+                if ( outputFileName.empty())
+                {
+                    outputFileName = m_parser.getTemplateFile();
+                    useIntermediateFile = true;
+                }
+            }
+
             if ( m_parser.hasMarkup()) //switch for setting prefix and postfix at once
             {
                 generator.setMarkup( m_parser.getMarkup(), m_parser.getMarkup());
@@ -85,11 +107,12 @@ public:
             }
             generator.generate( 
                 prepareFileName( m_parser.getTemplateFile(), commandFileName),
-                prepareFileName( m_parser.getOutputFile(), commandFileName), 
-                m_parser.getUseIntermediateOutputFile(),
-                prepareFileName( m_parser.getOutputFile() + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                prepareFileName( outputFileName, commandFileName), 
+                useIntermediateFile,
+                prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
                 m_parser.getAppendToFile(),
-                m_parser.getParameters());
+                m_parser.getParameters(),
+                inlineTemplateParameters);
         }
         else if ( command == ParserT::eLoadTable )
         {

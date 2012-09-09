@@ -45,8 +45,25 @@
 
 #include "StringLiteral.h"
 
+///defines exceptions thrown by CTokenizer for template argument independent access
+class CTokenizerExceptions
+{
+public:
+    class ExInlinePrefixEmpty : public std::runtime_error //not in error printer table
+    { public: ExInlinePrefixEmpty() : std::runtime_error( "An empty string is not allowed for inline template prefix.") {}};
+
+    class ExInlineGeneratedPostfixEmpty : public std::runtime_error //not in error printer table
+    { public: ExInlineGeneratedPostfixEmpty() : std::runtime_error( "An empty string is not allowed for inline template generated postfix.") {}};
+
+    class ExInlineMarkupWhiteSpace : public std::runtime_error  //collides with TRIM  //not in error printer table
+    { public: ExInlineMarkupWhiteSpace() : std::runtime_error( "Trailing or leading white space for inline template markup is not allowed.") {}};
+
+    class ExBadInlineGeneratedPostfix : public std::runtime_error  //not in error printer table
+    { public: ExBadInlineGeneratedPostfix() : std::runtime_error( "No combination of inline prefix and inline postfix must end with the inline generated postfix") {}};
+};
+
 ///Removes one tick from keywords in input
-template <typename TokenT, typename StringT, typename OutputStreamT>
+template <typename TokenT, typename StringT, typename OutputStreamT, typename FinalOutputStreamT>
 class CTokenizer
 {
 public:
@@ -57,7 +74,80 @@ public:
 
     CTokenizer()
         : m_outputStream(0)
+        , m_finalOutputStream(0)
+        , m_inlineTemplateMode(false)
     {
+    }
+
+
+    class CAutoLineClear
+    {
+    public:
+        CAutoLineClear()
+            : m_pLine(0)
+        {
+        }
+
+        ~CAutoLineClear()
+        {
+            if ( m_pLine)
+            {
+                m_pLine->clear();
+            }
+        }
+
+        void set( StringT* p)
+        {
+            m_pLine = p;
+        }
+    private:
+        StringT* m_pLine;
+    };
+
+    ///reset state information
+    void reset()
+    {
+        m_temporaryInlineTemplateLine.clear();
+    }
+
+    ///set inline markup
+    void setInlineTemplateMarkup( const StringT& prefix, const StringT& postfix,  const StringT& generatedPostfix)
+    {
+        if (   prefix != boost::trim_copy( prefix)
+            || postfix != boost::trim_copy( postfix)
+            || generatedPostfix != boost::trim_copy( generatedPostfix)
+        )
+        {
+            throw CTokenizerExceptions::ExInlineMarkupWhiteSpace();
+        }
+        if ( prefix.empty())
+        {
+            throw CTokenizerExceptions::ExInlinePrefixEmpty();
+        }
+        if ( generatedPostfix.empty())
+        {
+            throw CTokenizerExceptions::ExInlineGeneratedPostfixEmpty();
+        }
+        if ( boost::ends_with( prefix+postfix, generatedPostfix))
+        {
+            throw CTokenizerExceptions::ExBadInlineGeneratedPostfix();
+        }
+
+        m_inlinePrefix = prefix;
+        m_inlinePostfix = postfix;
+        m_inlineGeneratedPostfix = generatedPostfix;
+    }
+
+    ///connect output file stream
+    void connectFinalOutputStream( FinalOutputStreamT* stream)
+    {
+        m_finalOutputStream = stream;
+    }
+
+    ///switches inline template mode
+    void setInlineTemplateMode( bool enable)
+    {
+        m_inlineTemplateMode = enable;
     }
 
     ///sets up regex search expression; 
@@ -138,9 +228,10 @@ public:
     }
 
     ///tokenize input line
-    CTokenizer<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
+    CTokenizer<TokenT, StringT, OutputStreamT, FinalOutputStreamT>& operator <<( const StringT& line)
     {
         bool trimmed = false;
+        CAutoLineClear autoClear;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
@@ -150,6 +241,50 @@ public:
         for (;;)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
+            //if in inline processing Mode
+            if ( m_inlineTemplateMode && m_temporaryInlineTemplateLine.empty())
+            {
+                //check whether the line contains generated content
+                if ( boost::ends_with( range, m_inlineGeneratedPostfix))
+                {
+                    //generated content is ignored/removed
+                    return *this;
+                }
+
+                //write the line to the output file
+                *m_finalOutputStream << line;
+
+                //check whether the line contains template content
+                if (    boost::starts_with( range, m_inlinePrefix) // must start with prefix
+                    &&  (m_inlinePostfix.empty() // either no postfix
+                        || 
+                        (boost::ends_with( range, m_inlinePostfix) // or ends with postfix
+                        &&
+                        static_cast<size_t>(range.size()) >= ( m_inlinePostfix.size() + m_inlinePrefix.size())) //and no overlap
+                        )
+                )
+                {
+                    //remove markup and create a new line used for processing
+                    m_temporaryInlineTemplateLine.clear();
+                    m_temporaryInlineTemplateLine.append( start, range.begin());
+                    m_temporaryInlineTemplateLine.append( range.begin() + m_inlinePrefix.size(), range.end() - m_inlinePostfix.size());
+                    m_temporaryInlineTemplateLine.append( range.end(), end);
+                    
+                    //switch to processing of this line
+                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n"));
+                    start = m_temporaryInlineTemplateLine.begin();
+                    fullLineStart = m_temporaryInlineTemplateLine.begin();
+                    end = m_temporaryInlineTemplateLine.end(); 
+
+                    autoClear.set( &m_temporaryInlineTemplateLine);
+                }
+                else
+                {
+                    //not template content, we are done 
+                    return *this;
+                }
+            }
+
             if ( boost::starts_with( range, m_commentKeyword))
             {
                 return *this;
@@ -400,6 +535,12 @@ private:
     StringT m_commentKeyword; ///<used for special preprocessing action
     StringT m_trimKeyword; ///<used for special preprocessing action
     StringT m_trimLeftKeyword; ///<used for special preprocessing action
+    StringT m_inlinePrefix; ///< markup for inline template line
+    StringT m_inlinePostfix; ///< markup for inline template line
+    StringT m_inlineGeneratedPostfix; ///< marks a generated line
+    StringT m_temporaryInlineTemplateLine; ///< stores a line; recursion level is greater than 1 when not empty
+    FinalOutputStreamT* m_finalOutputStream; ///<the final ouput file
+    bool m_inlineTemplateMode; ///<toggles inline template processing
 };
 
 #endif /* INCLUDED_CTOKENIZER_TPL_H_6955377 */

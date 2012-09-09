@@ -67,7 +67,14 @@ public:
         setMarkupPostfix( "]");
     }
 
-    void generate( const StringT& templateFile, const StringT& targetFile, bool useIntermediateFile, const StringT& intermediateFile, bool append, const ParameterListT& parameters)
+    void generate( 
+        const StringT& templateFile,
+        const StringT& targetFile,
+        bool useIntermediateFile,
+        const StringT& intermediateFile,
+        bool append, const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters
+        )
     {
         BOOST_CHECK( m_generate);
         BOOST_CHECK( m_templateFile == templateFile);
@@ -76,6 +83,7 @@ public:
         BOOST_CHECK( m_intermediateFileName == intermediateFile);
         BOOST_CHECK( m_parameters == parameters);
         BOOST_CHECK( m_append == append);
+        BOOST_CHECK( m_inlineTemplateParameters == inlineTemplateParameters);
     }
 
     void reset()
@@ -139,6 +147,8 @@ public:
 
     unsigned int m_rowHeaderIndex;
     unsigned int m_columnHeaderIndex;
+
+    CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
 
     bool m_append;
 
@@ -257,6 +267,7 @@ void runTest()
 {
     using namespace boost::assign;
     typedef TTestGenerator<StringT> GeneratorT;
+    typedef typename StringT::value_type CharT;
 
     {
         //test help
@@ -380,6 +391,21 @@ void runTest()
         generator.m_generate = true;
         std::vector<std::string> args;
         args += "-c", "-s a.txt -o b.txt --append-to-file";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test generate inline
+        GeneratorT generator;
+        generator.setTemplateFile( "a.txt");
+        generator.setTargetFile( "a.txt");
+        generator.m_useIntermediateFile = true;
+        generator.m_append = false;
+        generator.setIntermediateFileName( "a.txt.intermediate");
+        generator.m_generate = true;
+        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"));
+        std::vector<std::string> args;
+        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<<";
         process<StringT>( args, generator);
     }
 

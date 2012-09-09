@@ -116,4 +116,45 @@ BOOST_AUTO_TEST_CASE( TGenerator)
 
         BOOST_CHECK_EQUAL( out.str(), "start\n11\n33\n07\nend");
     }
+
+    //test inline
+    {
+        CGenerator<std::string> generator;
+        std::vector<std::string> parameterList;
+        CInlineTemplateParameters<std::string> itp( true, "//<>", "//>", "//$");
+
+        generator.setCsvCommentChars("#");
+
+        //load a table
+        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1);
+
+        //generate the output
+        generator.generate(
+            "../TGenerator/TGeneratorTemplateInline.txt",
+            "../TGenerator/TGeneratorTemplateInline.txt",
+            true,
+            "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
+            false,
+            parameterList,
+            itp);
+
+        //check output is as expected
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/TGeneratorTemplateInline.txt", "TGeneratorOutInlineExpected.txt"));
+
+        parameterList.push_back("a=4");
+        parameterList.push_back("b=5");
+
+        //generate the output
+        generator.generate(
+            "../TGenerator/TGeneratorTemplateInline.txt",
+            "../TGenerator/TGeneratorTemplateInline.txt",
+            true,
+            "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
+            false,
+            parameterList,
+            itp);
+
+        //check output is as expected
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/TGeneratorTemplateInline.txt", "TGeneratorOutInlineExpected2.txt"));
+    }
 }

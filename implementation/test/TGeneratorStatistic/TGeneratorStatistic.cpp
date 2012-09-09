@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
     generator.loadTable( "a", "LabelA", true, true, 1, 1);
     generator.loadTable( "a", "LabelB", true, true, 1, 1);
     generator.addIncludeDirectory("IncludeDirectory");
-    generator.generate( "test1.tpl.txt", "out.txt", false, "dummy", false, dummy);
+    generator.generate( "test1.tpl.txt", "out.txt", false, "dummy", false, dummy, CInlineTemplateParameters<StringT>());
 
     BOOST_REQUIRE( generator.getTableFiles().size() == 1);
     BOOST_REQUIRE( generator.getGeneratedFiles().size() == 1);

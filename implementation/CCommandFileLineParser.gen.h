@@ -42,6 +42,7 @@ public:
     {
         eGenerate,
         eGenerateUsingIntermediateFile,
+        eProcessInlineTemplateFile,
         eResetGenerator,
         eUnloadTable,
         eLoadTable,
@@ -86,6 +87,10 @@ public:
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
             ("append-to-file", value<bool >()->zero_tokens(), "The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.")
+            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided.")
+            ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string cannot be empty.")
+            ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
+            ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string cannot be empty.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -159,6 +164,10 @@ public:
         bool providedMarkupPostfix = hasMarkupPostfix();
         bool providedMarkup = hasMarkup();
         bool providedAppendToFile = hasAppendToFile();
+        bool providedInline = hasInline();
+        bool providedInlinePrefix = hasInlinePrefix();
+        bool providedInlinePostfix = hasInlinePostfix();
+        bool providedInlineGeneratedPostfix = hasInlineGeneratedPostfix();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
@@ -176,6 +185,10 @@ public:
             && providedOutputFile == true
             && providedUseIntermediateOutputFile == false
             && providedIntermediateOutputFileExtension == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -197,6 +210,10 @@ public:
             && providedOutputFile == true
             && providedUseIntermediateOutputFile == true
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -204,6 +221,25 @@ public:
         )
         {
             return eGenerateUsingIntermediateFile;
+        }
+        
+        if (
+               providedTopDown == false
+            && providedLeftToRight == false
+            && providedRowHeaderIndex == false
+            && providedColumnHeaderIndex == false
+            && providedLabel == false
+            && providedTableFile == false
+            && providedLabelsOfTableFilesToUnload == false
+            && providedTemplateFile == true
+            && providedInline == true
+            && providedReset == false
+            && providedIncludeDirectories == false
+            && providedDelimiter == false
+            && providedCsvCommentChars == false
+        )
+        {
+            return eProcessInlineTemplateFile;
         }
         
         if (
@@ -223,6 +259,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == true
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -249,6 +289,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -270,6 +314,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -296,6 +344,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == true
             && providedDelimiter == false
@@ -322,6 +374,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == true
@@ -348,6 +404,10 @@ public:
             && providedMarkupPostfix == false
             && providedMarkup == false
             && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -375,6 +435,10 @@ public:
             && !providedMarkupPostfix
             && !providedMarkup
             && !providedAppendToFile
+            && !providedInline
+            && !providedInlinePrefix
+            && !providedInlinePostfix
+            && !providedInlineGeneratedPostfix
             && !providedReset
             && !providedIncludeDirectories
             && !providedDelimiter
@@ -451,10 +515,14 @@ public:
         return m_vmap["template-source-file"].as<StringT >();
     }
     
-    ///returns the provided value
+    ///returns the provided value or boost::lexical_cast<StringT>("") as default
     StringT getOutputFile() const
     {
-        return m_vmap["output-file"].as<StringT >();
+        if ( hasOutputFile())
+        {
+            return m_vmap["output-file"].as<StringT >();
+        }
+        return boost::lexical_cast<StringT>("");
     }
     
     ///returns the provided value or std::vector<StringT>() as default
@@ -521,6 +589,42 @@ public:
             return m_vmap["append-to-file"].as<bool >();
         }
         return false;
+    }
+    
+    ///returns the provided value
+    bool getInline() const
+    {
+        return m_vmap["inlined"].as<bool >();
+    }
+    
+    ///returns the provided value or boost::lexical_cast<StringT>("//<>") as default
+    StringT getInlinePrefix() const
+    {
+        if ( hasInlinePrefix())
+        {
+            return m_vmap["inline-prefix"].as<StringT >();
+        }
+        return boost::lexical_cast<StringT>("//<>");
+    }
+    
+    ///returns the provided value or boost::lexical_cast<StringT>("") as default
+    StringT getInlinePostfix() const
+    {
+        if ( hasInlinePostfix())
+        {
+            return m_vmap["inline-postfix"].as<StringT >();
+        }
+        return boost::lexical_cast<StringT>("");
+    }
+    
+    ///returns the provided value or boost::lexical_cast<StringT>("//$") as default
+    StringT getInlineGeneratedPostfix() const
+    {
+        if ( hasInlineGeneratedPostfix())
+        {
+            return m_vmap["inline-generated-postfix"].as<StringT >();
+        }
+        return boost::lexical_cast<StringT>("//$");
     }
     
     ///returns the provided value
@@ -642,6 +746,30 @@ public:
     bool hasAppendToFile() const
     {
         return m_vmap.count( "append-to-file") != 0;
+    }
+    
+    ///indicates that the option inlined has been provided
+    bool hasInline() const
+    {
+        return m_vmap.count( "inlined") != 0;
+    }
+    
+    ///indicates that the option inline-prefix has been provided
+    bool hasInlinePrefix() const
+    {
+        return m_vmap.count( "inline-prefix") != 0;
+    }
+    
+    ///indicates that the option inline-postfix has been provided
+    bool hasInlinePostfix() const
+    {
+        return m_vmap.count( "inline-postfix") != 0;
+    }
+    
+    ///indicates that the option inline-generated-postfix has been provided
+    bool hasInlineGeneratedPostfix() const
+    {
+        return m_vmap.count( "inline-generated-postfix") != 0;
     }
     
     ///indicates that the option reset has been provided

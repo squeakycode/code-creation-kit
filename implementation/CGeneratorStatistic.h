@@ -30,6 +30,7 @@
 #include "CTokenizer.gen.h"
 #include "CTemplatePreprocessor.h"
 #include "StringLiteral.h"
+#include "CInlineTemplateParameters.h"
 
 ///defines exceptions thrown by CGenerator for template argument independent access
 class CGeneratorStatisticExceptions
@@ -51,7 +52,7 @@ class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisti
     typedef CGeneratorStatistic<StringT> ThisT;
     typedef CToken<Tokens, StringT> TokenT;
     typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
-    typedef CTokenizer<TokenT, StringT, PreprocessorT> TokenizerT;
+    typedef CTokenizer<TokenT, StringT, PreprocessorT, CNul> TokenizerT;
     typedef CTemplateLoader<TokenizerT, StringT> TemplateLoaderT;
 
 public:
@@ -117,7 +118,15 @@ public:
 
     ///generates output by processing a template file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool, const StringT&, bool, const ParameterListT&)
+    void generate( 
+        const StringT& templateFileName, 
+        const StringT& targetFileName, 
+        bool , 
+        const StringT& , 
+        bool , 
+        const ParameterListT& ,
+        const CInlineTemplateParameters<StringT>&
+        )
     {
         m_templateLoader.resetInclusionHierarchy();
 
