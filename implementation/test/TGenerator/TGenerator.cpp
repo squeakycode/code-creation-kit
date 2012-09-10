@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
     {
         CGenerator<std::string> generator;
         std::vector<std::string> parameterList;
-        CInlineTemplateParameters<std::string> itp( true, "//<>", "//>", "//$");
+        CInlineTemplateParameters<std::string> itp( true, "//<>", "//>", "//$", 3);
 
         generator.setCsvCommentChars("#");
 

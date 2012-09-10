@@ -74,6 +74,7 @@ public:
         , m_finalOutputStream(0)
         , m_outputStream(0)
         , m_inlineTemplateMode(false)
+        , m_numInlinePad(0)
     {
 
     }
@@ -154,7 +155,13 @@ public:
                             StringT::const_iterator last = --text.end();
                             if ( *last == STRING_LITERAL('\n'))
                             {
-                                *m_finalOutputStream << StringT(text.begin(), last);
+                                StringT temp;
+                                temp.assign(text.begin(), last);
+                                if ( temp.size() < m_numInlinePad)
+                                {
+                                    temp.resize( m_numInlinePad, STRING_LITERAL(' '));
+                                }
+                                *m_finalOutputStream << temp;
                                 *m_finalOutputStream << m_inlineGeneratedPostfixAndNewLine;
                             }
                             else
@@ -280,10 +287,11 @@ public:
     }
 
     ///set inline template processing parameters
-    void setInlineTemplateParameters( bool enabled, const StringT& inlineGeneratedPostfix)
+    void setInlineTemplateParameters( bool enabled, const StringT& inlineGeneratedPostfix, size_t numInlinePad)
     {
         m_inlineTemplateMode = enabled;
         m_inlineGeneratedPostfixAndNewLine = inlineGeneratedPostfix + STRING_LITERAL('\n');
+        m_numInlinePad = numInlinePad > 64*1024 ? 64*1024 : numInlinePad; //clip value
     }
 
 private:
@@ -295,6 +303,7 @@ private:
     OutputStreamT* m_outputStream;
     bool m_inlineTemplateMode; ///<toggles inline template processing
     StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
+    size_t m_numInlinePad; ///< if a line has less chars than this value then pad with spaces
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
 };

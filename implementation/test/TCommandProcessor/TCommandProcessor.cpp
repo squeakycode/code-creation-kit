@@ -403,9 +403,9 @@ void runTest()
         generator.m_append = false;
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
-        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"));
+        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args;
-        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<<";
+        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56";
         process<StringT>( args, generator);
     }
 

@@ -24,6 +24,7 @@ Example;;;;;;;;;;;;;;;;;;;;;
 ;;;inline-prefix;b;;;;;"boost::lexical_cast<StringT>(""//<>"")";StringT;InlinePrefix;A prefix that marks a line of an inline template file as template content. This string cannot be empty.;no;no;don't care;no;no;no;no;no;no
 ;;;inline-postfix;c;;;;;"boost::lexical_cast<StringT>("""")";StringT;InlinePostfix;A postfix that marks a line of an inline template file as template content. This string can be empty.;no;no;don't care;no;no;no;no;no;no
 ;;;inline-generated-postfix;d;;;;;"boost::lexical_cast<StringT>(""//$"")";StringT;InlineGeneratedPostfix;A postfix that marks a line of an inline template file as generated content. This string cannot be empty.;no;no;don't care;no;no;no;no;no;no
+;;;inline-pad;;;;;;0;size_t;InlinePad;The number of characters a generated line is padded up to with spaces before the generated postfix is appended.;no;no;don't care;no;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;
 ;ResetGenerator;Reset Generator;reset;r;yes;;;;;bool;Reset;Reset the generator to defaults.;no;no;no;yes;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;

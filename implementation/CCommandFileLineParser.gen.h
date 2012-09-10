@@ -91,6 +91,7 @@ public:
             ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string cannot be empty.")
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
             ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string cannot be empty.")
+            ("inline-pad", value<size_t >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -168,6 +169,7 @@ public:
         bool providedInlinePrefix = hasInlinePrefix();
         bool providedInlinePostfix = hasInlinePostfix();
         bool providedInlineGeneratedPostfix = hasInlineGeneratedPostfix();
+        bool providedInlinePad = hasInlinePad();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
@@ -189,6 +191,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -214,6 +217,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -263,6 +267,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == true
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -293,6 +298,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -318,6 +324,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -348,6 +355,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == true
             && providedDelimiter == false
@@ -378,6 +386,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == true
@@ -408,6 +417,7 @@ public:
             && providedInlinePrefix == false
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -439,6 +449,7 @@ public:
             && !providedInlinePrefix
             && !providedInlinePostfix
             && !providedInlineGeneratedPostfix
+            && !providedInlinePad
             && !providedReset
             && !providedIncludeDirectories
             && !providedDelimiter
@@ -627,6 +638,16 @@ public:
         return boost::lexical_cast<StringT>("//$");
     }
     
+    ///returns the provided value or 0 as default
+    size_t getInlinePad() const
+    {
+        if ( hasInlinePad())
+        {
+            return m_vmap["inline-pad"].as<size_t >();
+        }
+        return 0;
+    }
+    
     ///returns the provided value
     bool getReset() const
     {
@@ -770,6 +791,12 @@ public:
     bool hasInlineGeneratedPostfix() const
     {
         return m_vmap.count( "inline-generated-postfix") != 0;
+    }
+    
+    ///indicates that the option inline-pad has been provided
+    bool hasInlinePad() const
+    {
+        return m_vmap.count( "inline-pad") != 0;
     }
     
     ///indicates that the option reset has been provided

@@ -28,14 +28,16 @@ struct CInlineTemplateParameters
 {
     CInlineTemplateParameters()
         : enabled(false)
+        , inlinePad( 0)
     {
     }
 
-    CInlineTemplateParameters( bool enable, StringT prefix, StringT postfix, StringT generatedPostfix)
+    CInlineTemplateParameters( bool enable, StringT prefix, StringT postfix, StringT generatedPostfix, size_t numInlinePad)
         : enabled( enable)
         , inlinePrefix( prefix)
         , inlinePostfix( postfix)
         , inlineGeneratedPostfix( generatedPostfix)
+        , inlinePad( numInlinePad)
     {
     }
 
@@ -45,6 +47,7 @@ struct CInlineTemplateParameters
         if ( inlinePrefix != rhs.inlinePrefix) return false;
         if ( inlinePostfix != rhs.inlinePostfix) return false;
         if ( inlineGeneratedPostfix != rhs.inlineGeneratedPostfix) return false;
+        if ( inlinePad != rhs.inlinePad) return false;
         return true;
     }
 
@@ -52,6 +55,7 @@ struct CInlineTemplateParameters
     StringT inlinePrefix;
     StringT inlinePostfix;
     StringT inlineGeneratedPostfix;
+    size_t  inlinePad;
 };
 
 #endif /* INCLUDED_CINLINETEMPLATEPARAMETERS_H_3727686 */

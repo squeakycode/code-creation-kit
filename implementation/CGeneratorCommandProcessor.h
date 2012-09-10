@@ -88,6 +88,7 @@ public:
                 inlineTemplateParameters.inlinePrefix = m_parser.getInlinePrefix();
                 inlineTemplateParameters.inlinePostfix = m_parser.getInlinePostfix();
                 inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
+                inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
 
                 //if no output file name has been passed source is also target
                 if ( outputFileName.empty())

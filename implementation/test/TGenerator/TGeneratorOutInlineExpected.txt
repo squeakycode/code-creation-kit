@@ -1,8 +1,8 @@
 start
     //<>[COMMENT] this is comment//>
 //<>[INCLUDE]["TIncluded.tpl.txt"][TRIM]//>
-11//$
-33//$
+11 //$
+33 //$
 //<>[ENTRY]["a"][ENTRY]["b"]//>    
 11    //$
 33    //$
