@@ -1,0 +1,3 @@
+--load-table advanced.csv
+-s CDPlayerStatemachine.h --inlined -b //<> -d //$ --inline-pad 90
+-s main.cpp --inlined -b //<> -d //$ --inline-pad 90
