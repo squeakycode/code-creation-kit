@@ -125,11 +125,24 @@ public:
         const StringT& , 
         bool , 
         const ParameterListT& ,
-        const CInlineTemplateParameters<StringT>&
+        const CInlineTemplateParameters<StringT>& p
         )
     {
+        //setup tokenizer
+        m_tokenizer.reset();
+        m_tokenizer.setInlineTemplateMode( p.enabled);
+        if ( p.enabled)
+        {
+            m_tokenizer.setInlineTemplateMarkup(
+                p.inlinePrefix,
+                p.inlinePostfix,
+                p.inlineGeneratedPostfix);
+        }
+
+        //reset
         m_templateLoader.resetInclusionHierarchy();
 
+        //add to statistic
         if ( targetFileName != STRING_LITERAL("-")) //if not use cout
         {
             m_generatedFiles.insert( targetFileName);
@@ -143,6 +156,7 @@ public:
     void reset()
     {
         m_templateLoader.reset();
+        m_tokenizer.reset();
         m_tables.clear();
         m_generatedFiles.clear();
         m_templateFiles.clear();

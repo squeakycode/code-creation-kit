@@ -149,8 +149,8 @@ public:
     ///sets inline template processing parameters
     void setInlineTemplateParameters( const CInlineTemplateParameters<StringT>& p)
     {
-       m_processingLevelControl.setInlineTemplateParameters( p.enabled, p.inlineGeneratedPostfix, p.inlinePad);
-       m_tokenizer.setInlineTemplateMode( p.enabled);
+        m_processingLevelControl.setInlineTemplateParameters( p.enabled, p.inlineGeneratedPostfix, p.inlinePad);
+        m_tokenizer.setInlineTemplateMode( p.enabled);
 
         if ( p.enabled)
         {
