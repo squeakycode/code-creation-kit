@@ -126,7 +126,8 @@ public:
                 , m_parser.getTopDown() || noDirectionSet
                 , m_parser.getLeftToRight() || noDirectionSet
                 , m_parser.getRowHeaderIndex()
-                , m_parser.getColumnHeaderIndex());
+                , m_parser.getColumnHeaderIndex()
+                , m_parser.getPadRows());
         }
         else if ( command == ParserT::eUnloadTable)
         {

@@ -35,15 +35,15 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.setCsvDelimiter( '\"'), CErrorPrinted);
     generator.setCsvDelimiter( ';');
     //require delimiting char
-    BOOST_CHECK_THROW( generator.loadTable( "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //unexpected quote
-    BOOST_CHECK_THROW( generator.loadTable( "UnexpectedQuote.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "UnexpectedQuote.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //cannot open table file
-    BOOST_CHECK_THROW( generator.loadTable( "NotThere.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "NotThere.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row overflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowOverflow.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RowOverflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row underflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowUnderflow.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RowUnderflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
 
     //unloaded file not found
     BOOST_CHECK_THROW( generator.unloadTable( "not there"), CErrorPrinted);

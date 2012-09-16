@@ -101,7 +101,7 @@ public:
     }
 
     ///load another table for generation, see also unloadTable
-    void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int)
+    void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int, bool)
     {
         m_tables.insert( tableFileName);
     }

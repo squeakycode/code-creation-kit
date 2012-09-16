@@ -67,15 +67,16 @@ public:
         
         ;
         m_descriptionLoadTable.add_options() //("Load Table")
+            ("load-table", value<StringT >(), "Name of the table file to load. Default when the option name is omitted.")
+            ("label,a", value<StringT >(), "Specifies the label used for identifying the table when unloading. The label defaults to the name of the table passed.")
             ("top-down,t", value<bool >()->zero_tokens(), "Indicates that the table is to be read top down. If no direction is explicitly specified all directions will be read by default.")
             ("left-to-right,l", value<bool >()->zero_tokens(), "Indicates that the table is to be read from left to right. If no direction is explicitly specified all directions will be read by default.")
             ("row-header-index,w", value<unsigned int >(), "Specifies the one based index of the column containing the row names. If zero is passed the one based index of the row is used as row name.")
             ("column-header-index,n", value<unsigned int >(), "Specifies the one based index of the row containing the column names. If zero is passed the one based index of the column is used as column name.")
-            ("label,a", value<StringT >(), "Specifies the label used for identifying the table when unloading. The label defaults to the name of the table passed.")
-            ("load-table", value<StringT >(), "Name of the table file to load. Default when the option name is omitted.")
+            ("pad-rows", value<bool >()->zero_tokens(), "Automatically fills missing row items at the end of a row with an empty string.")
         ;
         m_descriptionUnloadTable.add_options() //("Unload Table")
-            ("unload-table,x", value<std::vector<StringT> >()->multitoken(), "Unload table file identified by its label. This option accepts multiple parameters for ubloading more than one table. Tables having the same label are unloaded in the reverse order they are loaded.")
+            ("unload-table,x", value<std::vector<StringT> >()->multitoken(), "Unload table file identified by its label. This option accepts multiple parameters for unloading more than one table. Tables having the same label are unloaded in the reverse order they are loaded.")
         ;
         m_descriptionGenerateFile.add_options() //("Generate File")
             ("template-source-file,s", value<StringT >(), "Specifies the file containing the template.")
@@ -100,7 +101,7 @@ public:
             ("add-include-directory,i", value<std::vector<StringT> >()->multitoken(), "Adds an include directory. This option accepts multiple parameters.")
         ;
         m_descriptionCsvTableProperties.add_options() //("CSV Table Properties")
-            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next csv files to load. Use 'tab' for tab separated items.")
+            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items.")
             ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
             ;
         // Add the positional descriptions
@@ -149,12 +150,13 @@ public:
     ///determines the command by checking the combination of parameters provided
     ECommand getCommand() const
     {
+        bool providedTableFile = hasTableFile();
+        bool providedLabel = hasLabel();
         bool providedTopDown = hasTopDown();
         bool providedLeftToRight = hasLeftToRight();
         bool providedRowHeaderIndex = hasRowHeaderIndex();
         bool providedColumnHeaderIndex = hasColumnHeaderIndex();
-        bool providedLabel = hasLabel();
-        bool providedTableFile = hasTableFile();
+        bool providedPadRows = hasPadRows();
         bool providedLabelsOfTableFilesToUnload = hasLabelsOfTableFilesToUnload();
         bool providedTemplateFile = hasTemplateFile();
         bool providedOutputFile = hasOutputFile();
@@ -176,12 +178,13 @@ public:
         bool providedCsvCommentChars = hasCsvCommentChars();
     
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == true
             && providedOutputFile == true
@@ -202,12 +205,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == true
             && providedOutputFile == true
@@ -228,12 +232,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == true
             && providedInline == true
@@ -247,12 +252,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == false
             && providedOutputFile == false
@@ -278,12 +284,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == true
             && providedTemplateFile == false
             && providedOutputFile == false
@@ -335,12 +342,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == false
             && providedOutputFile == false
@@ -366,12 +374,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == false
             && providedOutputFile == false
@@ -397,12 +406,13 @@ public:
         }
         
         if (
-               providedTopDown == false
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
             && providedLeftToRight == false
             && providedRowHeaderIndex == false
             && providedColumnHeaderIndex == false
-            && providedLabel == false
-            && providedTableFile == false
+            && providedPadRows == false
             && providedLabelsOfTableFilesToUnload == false
             && providedTemplateFile == false
             && providedOutputFile == false
@@ -429,12 +439,13 @@ public:
         
         
         if (
-               !providedTopDown
+               !providedTableFile
+            && !providedLabel
+            && !providedTopDown
             && !providedLeftToRight
             && !providedRowHeaderIndex
             && !providedColumnHeaderIndex
-            && !providedLabel
-            && !providedTableFile
+            && !providedPadRows
             && !providedLabelsOfTableFilesToUnload
             && !providedTemplateFile
             && !providedOutputFile
@@ -462,6 +473,18 @@ public:
         return eOptionsInvalid;
     }
 
+    ///returns the provided value
+    StringT getTableFile() const
+    {
+        return m_vmap["load-table"].as<StringT >();
+    }
+    
+    ///returns the provided value
+    StringT getLabel() const
+    {
+        return m_vmap["label"].as<StringT >();
+    }
+    
     ///returns the provided value or false as default
     bool getTopDown() const
     {
@@ -502,16 +525,14 @@ public:
         return 1;
     }
     
-    ///returns the provided value
-    StringT getLabel() const
+    ///returns the provided value or false as default
+    bool getPadRows() const
     {
-        return m_vmap["label"].as<StringT >();
-    }
-    
-    ///returns the provided value
-    StringT getTableFile() const
-    {
-        return m_vmap["load-table"].as<StringT >();
+        if ( hasPadRows())
+        {
+            return m_vmap["pad-rows"].as<bool >();
+        }
+        return false;
     }
     
     ///returns the provided value
@@ -673,6 +694,18 @@ public:
     }
     
 
+    ///indicates that the option load-table has been provided
+    bool hasTableFile() const
+    {
+        return m_vmap.count( "load-table") != 0;
+    }
+    
+    ///indicates that the option label has been provided
+    bool hasLabel() const
+    {
+        return m_vmap.count( "label") != 0;
+    }
+    
     ///indicates that the option top-down has been provided
     bool hasTopDown() const
     {
@@ -697,16 +730,10 @@ public:
         return m_vmap.count( "column-header-index") != 0;
     }
     
-    ///indicates that the option label has been provided
-    bool hasLabel() const
+    ///indicates that the option pad-rows has been provided
+    bool hasPadRows() const
     {
-        return m_vmap.count( "label") != 0;
-    }
-    
-    ///indicates that the option load-table has been provided
-    bool hasTableFile() const
-    {
-        return m_vmap.count( "load-table") != 0;
+        return m_vmap.count( "pad-rows") != 0;
     }
     
     ///indicates that the option unload-table has been provided

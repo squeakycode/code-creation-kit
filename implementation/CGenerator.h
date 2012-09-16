@@ -213,7 +213,7 @@ public:
     }
 
     ///load another table for generation, see also unloadTable
-    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         bool useCinAsInput = tableFileName == STRING_LITERAL("-");
         //assemble the properties of the table
@@ -233,7 +233,7 @@ public:
             //create table and table builder
             typedef CVerticalTableBuilder<TableT> TableBuilderT;
             TableT* tableToLoad = new TableT;
-            TableBuilderT tableBuidler( *tableToLoad);
+            TableBuilderT tableBuidler( *tableToLoad, padRows);
             typename TableListT::value_type tableData( properties, tableToLoad);
 
             try
@@ -255,14 +255,14 @@ public:
     }
 
     ///load another table for generation, see also unloadTable
-    void loadTable( InputStreamT& inputStream, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    void loadTable( InputStreamT& inputStream, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         m_lastRowNumberWithFailure = 0;
 
         //create table and table builder
         typedef CVerticalTableBuilder<TableT> TableBuilderT;
         TableT* tableToLoad = new TableT;
-        TableBuilderT tableBuidler( *tableToLoad);
+        TableBuilderT tableBuidler( *tableToLoad, padRows);
         boost::shared_ptr<const TableT> psTableToLoad( tableToLoad);
         typename TableListT::value_type tableData( psTableToLoad);
 

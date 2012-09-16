@@ -30,10 +30,10 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.setCsvCommentChars("#");
 
         //load a table
-        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1);
+        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
 
         //test unload feature
-        generator.loadTable( "TGenerator.xls.csv", "LabelB", true, true, 1, 1);
+        generator.loadTable( "TGenerator.xls.csv", "LabelB", true, true, 1, 1, false);
         generator.unloadTable( "LabelB");
 
         //create parameter list
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
     {
         CGenerator<std::string> generator;
         //load a table
-        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1);
+        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
         generator.generate( "../TGenerator/TDataflow.tpl.txt", "TDataflow.gen.txt");
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
     {
         CGenerator<std::string> generator;
         //load a table
-        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1);
+        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
         generator.generate( "../TGenerator/TDataflow.tpl.txt", "TAppend.gen.txt", false);
@@ -102,12 +102,12 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         CGenerator<std::string> generator;
 
         //load a table
-        generator.loadTable( csv, "LabelA", true, true, 1, 1);
+        generator.loadTable( csv, "LabelA", true, true, 1, 1, false);
 
         csv2  << "a;b;\n1;6;\n8;;\n3;3;\n;4;\n";
 
         //test unload feature
-        generator.loadTable( csv2, "LabelB", true, true, 1, 1);
+        generator.loadTable( csv2, "LabelB", true, true, 1, 1, false);
         generator.unloadTable( "LabelB");
 
         generator.loadTable( psTable, "LabelB", true, true, 1, 1);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.setCsvCommentChars("#");
 
         //load a table
-        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1);
+        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
         generator.generate(
@@ -156,5 +156,18 @@ BOOST_AUTO_TEST_CASE( TGenerator)
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/TGeneratorTemplateInline.txt", "TGeneratorOutInlineExpected2.txt"));
+    }
+
+    //table with padding test
+    {
+        CGenerator<std::string> generator;
+        //load a table
+        generator.loadTable( "NeedsPadding.csv", "LabelA", true, true, 0, 0, true);
+
+        //generate the output
+        generator.generate( "../TGenerator/NeedsPaddingDuplicate.tpl", "NeedsPadding.gen.csv");
+
+        //check output is as expected
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "NeedsPadding.csv", "NeedsPadding.gen.csv"));
     }
 }

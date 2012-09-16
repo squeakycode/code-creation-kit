@@ -61,6 +61,7 @@ public:
         , m_delimiter(0)
         , m_rowHeaderIndex(0)
         , m_columnHeaderIndex(0)
+        , m_padRows(false)
         , m_append(false)
     {
         setMarkupPrefix( "[");
@@ -91,7 +92,7 @@ public:
         BOOST_CHECK( m_reset);
     }
 
-    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         BOOST_CHECK( m_loadTable);
         BOOST_CHECK( m_tableFileName == tableFileName);
@@ -100,6 +101,7 @@ public:
         BOOST_CHECK( m_leftToRight == leftToRight);
         BOOST_CHECK( m_rowHeaderIndex == rowHeaderIndex);
         BOOST_CHECK( m_columnHeaderIndex == columnHeaderIndex);
+        BOOST_CHECK( m_padRows == padRows);
     }
 
     void unloadTable( const StringT& label)
@@ -147,6 +149,7 @@ public:
 
     unsigned int m_rowHeaderIndex;
     unsigned int m_columnHeaderIndex;
+    bool m_padRows;
 
     CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
 
@@ -311,16 +314,17 @@ void runTest()
     }
 
     {
-        //test load table space in name, top down, column
+        //test load table space in name, top down, column, pad rows
         GeneratorT generator;
         generator.setTableFileName( "tab le.csv");
         generator.setLabel( "tab le.csv");
         generator.m_topDown = true;
         generator.m_loadTable = true;
+        generator.m_padRows = true;
         generator.m_columnHeaderIndex = 6;
         generator.m_rowHeaderIndex = 1;
         std::vector<std::string> args;
-        args += "-c", "-n 6 -t \"tab le.csv\"";
+        args += "-c", "-n 6 -t \"tab le.csv\" --pad-rows";
         process<StringT>( args, generator);
     }
     {
