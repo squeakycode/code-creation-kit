@@ -153,6 +153,12 @@ public:
         return m_generator.getTemplateFiles();
     }
 
+    ///connect log output stream
+    template <typename LogOutputStreamT>
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_generator.connectLogOutputStream( stream);
+    }
 private:
     void toErrorStream( std::string text)
     {

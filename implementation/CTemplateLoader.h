@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include "FileSystem.h"
 #include "CSourceFile.h"
+#include "CNul.h"
 #include <boost/foreach.hpp>
 
 class TemplateFileT;
@@ -39,7 +40,7 @@ public:
 };
 
 ///handles the line based loading of template files and the inclusion of other files
-template <typename OutputStreamT, typename StringT>
+template <typename OutputStreamT, typename StringT, typename LogOutputStreamT = CNul >
 class CTemplateLoader : public CTemplateLoaderExceptions
 {
     typedef typename StringT::value_type CharT;
@@ -65,6 +66,7 @@ public:
 
     CTemplateLoader()
         : m_outputStream(0)
+        , m_logOutputStream(0)
     {
     }
 
@@ -72,6 +74,12 @@ public:
     void connectOutputStream( OutputStreamT* stream)
     {
         m_outputStream = stream;
+    }
+
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_logOutputStream = stream;
     }
 
     ///resolve file name
@@ -102,6 +110,12 @@ public:
 
     void loadTemplateStream( InputStreamT& inputStream)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Reading template stream.\n";
+        }
+
         //add data for error information
         FileData filedata = { STRING_LITERAL("Input Stream"), 0, true};
         m_openedFiles.push_back( filedata);
@@ -130,11 +144,25 @@ public:
         m_openedFiles.push_back( filedata);
         unsigned int& lineNumber = m_openedFiles.back().line;
 
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Starting to read template file:\n";
+            *m_logOutputStream << "Name=" << filedata.name << "\n";
+        }
+
         //open the file
         InputFileT file( filedata.name, useCinInstead);
 
         //read file line by line
         file.feedLineSink( *m_outputStream, true, lineNumber);
+
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Finished reading of template file:\n";
+            *m_logOutputStream << "Name=" << filedata.name << "\n";
+        }
 
         //remove file from check list
         m_openedFiles.erase( std::find( m_openedFiles.begin(), m_openedFiles.end(), filedata.name));
@@ -167,8 +195,9 @@ public:
 
 private:
     OutputStreamT* m_outputStream; ///<data sink
-    FileDataListT m_openedFiles; ///list of currently open files
-    IncludeDirectoryListT m_includeDirectories; ///list
+    FileDataListT m_openedFiles; ///<list of currently open files
+    IncludeDirectoryListT m_includeDirectories; ///<list
+    LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 
 #endif /* INCLUDED_CTEMPLATELOADER_H_3935205 */

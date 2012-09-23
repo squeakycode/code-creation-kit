@@ -22,6 +22,8 @@
 #include <sstream>
 #include "CGenerator.h"
 
+class LogFileT;
+
 BOOST_AUTO_TEST_CASE( TGenerator)
 {
     {
@@ -53,9 +55,11 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOutIntermediateUsed.txt", "TGeneratorOutExpected.txt"));
     }
+
     //data flow test
     {
-        CGenerator<std::string> generator;
+        CGenerator<std::string, std::ostream> generator;
+
         //load a table
         generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
@@ -169,5 +173,47 @@ BOOST_AUTO_TEST_CASE( TGenerator)
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "NeedsPadding.csv", "NeedsPadding.gen.csv"));
+    }
+
+    //log test
+    {
+        CGenerator<std::string, std::ostream> generator;
+        CTargetFile<std::string, LogFileT> logFile("LogOutput.txt", false);
+
+        //connecting log stream
+        generator.connectLogOutputStream( &logFile.get());
+        generator.connectLogOutputStream( NULL);
+        generator.connectLogOutputStream( &std::cout);
+        generator.connectLogOutputStream( &logFile.get());
+
+        //reset
+        generator.reset();
+
+        //include
+        generator.addIncludeDirectory("IncludeDirectoryThatDoesNotExist");
+
+        //set markup
+        generator.setMarkup( "&", "&");
+        generator.setMarkup( "[", "]");
+
+        //load a table
+        generator.loadTable( "TDataflow.csv", "LabelB", true, true, 1, 1, false);
+        generator.unloadTable( "LabelB");
+        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
+
+        //generate the output
+        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TDataflow.gen.txt");
+        //check output is as expected
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "TDataflow.gen.txt", "TDataflowExpected.txt"));
+
+        //check extended error output
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest1.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
+        CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest2.tpl", "../TGenerator/LogTest2.tpl", true, "../TGenerator/LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest3.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
+
+        generator.connectLogOutputStream( NULL);
+        logFile.close();
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "LogOutput.txt", "LogOutputExpected.txt"));
     }
 }

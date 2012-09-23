@@ -52,31 +52,47 @@ public:
     {
     }
 
+    CToken( ETokenT token, SharedStringListT stringList, SharedStringListT sourceText)
+        : m_token( token)
+        , m_stringList( stringList)
+        , m_sourceText( sourceText)
+    {
+    }
+
     CToken( ETokenT token, const StringT& textA)
         : m_token( token)
-        , m_stringList( new StringListT)
+        , m_stringList( new StringListT(1))
     {
-        m_stringList->push_back( textA);
+        m_stringList->front() = textA;
+    }
+
+    CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
+        : m_token( token)
+        , m_stringList( new StringListT(1))
+    {
+        m_stringList->back().assign( start, end);
     }
 
     CToken( ETokenT token, const StringT& textA, const StringT& textB)
         : m_token( token)
-        , m_stringList( new StringListT)
+        , m_stringList( new StringListT(2))
     {
-        m_stringList->push_back( textA);
-        m_stringList->push_back( textB);        
+        m_stringList->front() = textA;
+        m_stringList->back() = textB;
     }
 
     CToken( const CToken<ETokenHolderT, StringT>& rhs)
+        : m_token( rhs.m_token)
+        , m_stringList( rhs.m_stringList)
+        , m_sourceText( rhs.m_sourceText)
     {
-        m_token = rhs.m_token;
-        m_stringList = rhs.m_stringList;
     }
 
     CToken<ETokenHolderT, StringT>& operator = ( const CToken<ETokenHolderT, StringT>& rhs)
     {
         m_token = rhs.m_token;
         m_stringList = rhs.m_stringList;
+        m_sourceText = rhs.m_sourceText;
         return *this;
     }
 
@@ -140,9 +156,23 @@ public:
         }
     }
 
+    template <typename StreamT>
+    void sourceTextToStream( StreamT& stream) const
+    {
+        if ( m_sourceText || m_stringList)
+        {
+            const StringListT& textList = *(m_sourceText ? m_sourceText : m_stringList);
+            BOOST_FOREACH( const StringT& text, textList)
+            {
+                stream << text;
+            }
+        }
+    }
+
 public:
     ETokenT m_token;
     CComparableSharedObject<StringListT> m_stringList;
+    CComparableSharedObject<StringListT> m_sourceText;
 };
 
 #endif /* INCLUDED_CTOKEN_H_3732416 */

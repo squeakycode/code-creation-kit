@@ -43,7 +43,7 @@ public:
 };
 
 ///processes macro expression text and ouputs expansion result
-template <typename TableT, typename OutputStreamT>
+template <typename TableT, typename OutputStreamT, typename LogOutputStreamT = CNul >
 class CMacroProcessor : public CMacroProcessorExceptions, public boost::noncopyable
 {
     //types used:
@@ -92,6 +92,11 @@ class CMacroProcessor : public CMacroProcessorExceptions, public boost::noncopya
             delete rotatedTable;
         }
 
+        const StringT& getLabel() const
+        {
+            return label;
+        }
+
         TableIndexT tableIndex;
         RotatedTableIndexT rotatedTableIndex;
         const TableT* table;
@@ -107,6 +112,7 @@ class CMacroProcessor : public CMacroProcessorExceptions, public boost::noncopya
 public:
     CMacroProcessor()
         : m_outputStream(0)
+        , m_logOutputStream(0)
     {
     }
 
@@ -145,15 +151,21 @@ public:
         m_outputStream = stream;
     }
 
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_logOutputStream = stream;
+    }
+
     ///forward text of a line surrounding a macro, see definition of macro
-    CMacroProcessor<TableT, OutputStreamT>& operator <<( const StringT& text)
+    CMacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const StringT& text)
     {
         *m_outputStream << text;
         return *this;
     }
 
     ///process macro and ouput expansion result
-    CMacroProcessor<TableT, OutputStreamT>& operator <<( const MacroT& macro)
+    CMacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const MacroT& macro)
     {
         SizeT count = 0;
         StringT expandedMacro;
@@ -167,18 +179,36 @@ public:
             {
                 if( table.table )
                 {
+                    //log
+                    if ( m_logOutputStream)
+                    {
+                        *m_logOutputStream << "Start reading table top down:\n";
+                        *m_logOutputStream << "Label=" << table.getLabel() << "\n";
+                    }
                     processMacro( *table.table, table.tableIndex, macro, true, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
                 }
                 if( table.rotatedTable)
                 {
+                    //log
+                    if ( m_logOutputStream)
+                    {
+                        *m_logOutputStream << "Start reading table left to right:\n";
+                        *m_logOutputStream << "Label=" << table.getLabel() << "\n";
+                    }
                     processMacro( *table.rotatedTable, table.rotatedTableIndex, macro, false, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
                 }
             }
 
-            if ( count != 0 ) //somthing has been expanded
+            if ( count != 0 ) //something has been expanded
             {
                 if ( lastTime && lastTimeExpanded ) //last time keyword and expansion ok
                 {
+                    //log
+                    if ( m_logOutputStream)
+                    {
+                        *m_logOutputStream << "Expanding with last time option (replaces previous expansion):\n";
+                        *m_logOutputStream << expandedLastTime << "\n";
+                    }
                     if ( !expandedLastTime.empty())
                     {
                         *m_outputStream << expandedLastTime;
@@ -198,6 +228,12 @@ public:
             {
                 if ( !expandedMacro.empty()) //macro expanded
                 {
+                    //log
+                    if ( m_logOutputStream)
+                    {
+                        *m_logOutputStream << "Expanding:\n";
+                        *m_logOutputStream << expandedMacro << "\n";
+                    }
                     *m_outputStream << expandedMacro;
                 }
             }
@@ -240,6 +276,12 @@ private:
             {
                 if ( expander.expand( i, expandedMacroLocal, count, false))
                 {
+                    //log
+                    if ( m_logOutputStream)
+                    {
+                        *m_logOutputStream << "Expanding at index " << (i + 1) << ":\n";
+                        *m_logOutputStream << expandedMacroLocal << "\n";
+                    }
                     if ( !expandedMacro.empty())
                     {
                         *m_outputStream << expandedMacro;
@@ -259,6 +301,7 @@ private:
 
 private:
     OutputStreamT* m_outputStream; ///<sink for expanded macros
+    LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
     TableListT m_tableList; ///<list of attached tables
 };
 

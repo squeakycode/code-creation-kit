@@ -67,7 +67,7 @@ public:
 
 
 ///sets up and operates all building blocks needed for generating
-template <typename StringT>
+template <typename StringT, typename LogOutputStreamT = CNul >
 class CGenerator : public boost::noncopyable, public CGeneratorExceptions
 {
     class TemplateLoader;
@@ -76,8 +76,8 @@ class CGenerator : public boost::noncopyable, public CGeneratorExceptions
     typedef CTargetFile< StringT, IntermediateFileT> IntermediateTargetFileT;
     typedef std::vector<std::vector<StringT> > TableT;
     typedef typename TableT::size_type SizeT;
-    typedef CTemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoader> TemplateProcessorT;
-    typedef CTemplateLoader<TemplateProcessorT, StringT> TemplateLoaderT;
+    typedef CTemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoader, LogOutputStreamT> TemplateProcessorT;
+    typedef CTemplateLoader<TemplateProcessorT, StringT, LogOutputStreamT> TemplateLoaderT;
 
     typedef typename TargetFileT::OutputStreamT OutputStreamT;
     typedef typename TemplateLoaderT::InputStreamT InputStreamT;
@@ -176,6 +176,7 @@ public:
         : m_lastRowNumberWithFailure(1)
         , m_indexOfLastProcessedParameter(0)
         , m_csvDelimiter( STRING_LITERAL(';'))
+        , m_logOutputStream(0)
     {
     }
 
@@ -215,6 +216,19 @@ public:
     ///load another table for generation, see also unloadTable
     void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Loading table:\n";
+            *m_logOutputStream << "Table file=" << tableFileName << "\n";
+            *m_logOutputStream << "Label=" << label << "\n";
+            *m_logOutputStream << "Read top down=" << topDown << "\n";
+            *m_logOutputStream << "Read left to right=" << leftRight << "\n";
+            *m_logOutputStream << "Row header index=" << rowHeaderIndex << "\n";
+            *m_logOutputStream << "Column header index=" << columnHeaderIndex << "\n";
+            *m_logOutputStream << "Pad rows=" << padRows << "\n";
+        }
+
         bool useCinAsInput = tableFileName == STRING_LITERAL("-");
         //assemble the properties of the table
         typename TableData::TableProperties properties( tableFileName, getCsvDelimiter(), getCsvCommentChars(), useCinAsInput);
@@ -257,6 +271,18 @@ public:
     ///load another table for generation, see also unloadTable
     void loadTable( InputStreamT& inputStream, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Loading table from stream:\n";
+            *m_logOutputStream << "Label=" << label << "\n";
+            *m_logOutputStream << "Read top down=" << topDown << "\n";
+            *m_logOutputStream << "Read left to right=" << leftRight << "\n";
+            *m_logOutputStream << "Row header index=" << rowHeaderIndex << "\n";
+            *m_logOutputStream << "Column header index=" << columnHeaderIndex << "\n";
+            *m_logOutputStream << "Pad rows=" << padRows << "\n";
+        }
+
         m_lastRowNumberWithFailure = 0;
 
         //create table and table builder
@@ -284,6 +310,17 @@ public:
     ///load another table for generation, see also unloadTable
     void loadTable( boost::shared_ptr<const TableT> table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Loading provided table:\n";
+            *m_logOutputStream << "Label=" << label << "\n";
+            *m_logOutputStream << "Read top down=" << topDown << "\n";
+            *m_logOutputStream << "Read left to right=" << leftRight << "\n";
+            *m_logOutputStream << "Row header index=" << rowHeaderIndex << "\n";
+            *m_logOutputStream << "Column header index=" << columnHeaderIndex << "\n";
+        }
+
         typename TableListT::value_type tableData( table);
         m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
         m_tableList.push_back( tableData);
@@ -314,6 +351,25 @@ public:
         const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
         )
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Processing file:\n";
+            *m_logOutputStream << "Template file=" << templateFileName << "\n";
+            *m_logOutputStream << "Target file=" << targetFileName << "\n";
+            *m_logOutputStream << "Use intermediate file=" << useIntermediateFile << "\n";
+            *m_logOutputStream << "Intermediate file=" << intermediateFileName << "\n";
+            *m_logOutputStream << "Append=" << append << "\n";
+
+            if ( inlineTemplateParameters.enabled)
+            {
+                *m_logOutputStream << "Inline prefix=" << inlineTemplateParameters.inlinePrefix << "\n";
+                *m_logOutputStream << "Inline postfix=" << inlineTemplateParameters.inlinePostfix << "\n";
+                *m_logOutputStream << "Inline generated postfix=" << inlineTemplateParameters.inlineGeneratedPostfix << "\n";
+                *m_logOutputStream << "Inline pad=" << inlineTemplateParameters.inlinePad << "\n";
+            }
+        }
+
         // An intermediate file is automatically used when processing files with inline templates
         // if no output file is provided.
         if (   templateFileName == targetFileName
@@ -331,7 +387,7 @@ public:
         //connect parameter table if not empty
         if ( !parameterTable.empty())
         {
-            m_templateProcessor.connectTable( &parameterTable, "Internal Parameter Table", true, false, 1, 1);
+            m_templateProcessor.connectTable( &parameterTable, STRING_LITERAL("Internal Parameter Table"), true, false, 1, 1);
         }
 
         //create output file
@@ -381,7 +437,7 @@ public:
         if ( !parameterTable.empty())
         {
             const TableT* disconnectedTable = 0;
-            if ( !m_templateProcessor.disconnectTable( "Internal Parameter Table", disconnectedTable))
+            if ( !m_templateProcessor.disconnectTable( STRING_LITERAL("Internal Parameter Table"), disconnectedTable))
             {
                 throw std::runtime_error("Cannot disconnect temporary parameter table");
             }
@@ -414,6 +470,12 @@ public:
 
     void generate( InputStreamT& inputStream, OutputStreamT& outputStream)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Processing stream.\n";
+        }
+        
         //reset the loader
         m_templateLoader.resetInclusionHierarchy();
         //open the template processor
@@ -433,6 +495,12 @@ public:
     //resets the generator building blocks
     void reset()
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Reset.\n";
+        }
+
         m_templateProcessor.reset();
         m_tableList.clear();
         m_templateLoader.reset();
@@ -445,6 +513,13 @@ public:
     ///unloads a table, see also loadTable
     void unloadTable( const StringT& label)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Unloading table:\n";
+            *m_logOutputStream << "Label=" << label << "\n";
+        }
+
         const TableT* disconnectedTable = 0;
         if ( m_templateProcessor.disconnectTable( label, disconnectedTable) )
         {
@@ -464,12 +539,27 @@ public:
     ///sets new tag markup
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Setting markup:\n";
+            *m_logOutputStream << "Prefix=" << prefix << "\n";
+            *m_logOutputStream << "Postfix=" << postfix << "\n";
+        }
+
         m_templateProcessor.setMarkup( prefix, postfix);
     }
 
     ///adds an include directory to the list
     void addIncludeDirectory( const StringT& directory)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Adding include directory:\n";
+            *m_logOutputStream << "Include directory=" << directory << "\n";
+        }
+
         m_templateLoader.addIncludeDirectory( directory);
     }
 
@@ -503,6 +593,29 @@ public:
         return TemplateProcessorT::getMaxMacroTextSizeBytes();
     }
 
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        //log
+        if ( m_logOutputStream && !stream)
+        {
+            *m_logOutputStream << "Disabling log.\n";
+        }
+        if ( !m_logOutputStream && stream)
+        {
+            *stream << "Enabling log.\n";
+        }
+        if ( m_logOutputStream && stream && m_logOutputStream != stream)
+        {
+            *m_logOutputStream << "Switching log stream.\n";
+            *stream  << "Switching log stream.\n";
+        }
+
+        m_logOutputStream = stream;
+        m_templateProcessor.connectLogOutputStream( stream);
+        m_templateLoader.connectLogOutputStream( stream);
+    }
+
 private:
 
     ///deletes file specified by name and returns true if the file has been deleted
@@ -516,7 +629,7 @@ private:
     }
 
     ///moves a file
-    bool moveFile( const std::string& from, const std::string& to)
+    bool moveFile( const StringT& from, const StringT& to)
     {
         try
         {
@@ -539,6 +652,7 @@ private:
     SizeT m_indexOfLastProcessedParameter; ///<for error output
     CharT m_csvDelimiter; ///<delimiter used by csv files to load
     StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
+    LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 
 #endif /* INCLUDED_CGENERATOR_H_3620111 */

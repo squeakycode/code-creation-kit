@@ -176,6 +176,21 @@ public:
         {
             generator.setCsvCommentChars( m_parser.getCsvCommentChars());
         }
+        else if ( command == ParserT::eSetLogStream )
+        {
+            switch( m_parser.getLogStream())
+            {
+            case 1:
+                generator.connectLogOutputStream( &FileSystem::getCout<CharT>());
+                break;
+            case 2:
+                generator.connectLogOutputStream( &FileSystem::getCerr<CharT>());
+                break;
+            default:
+                generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
+                break;
+            }
+        }
         else if ( command == ParserT::eNoOptionsGiven)
         {
             //empty lines are OK

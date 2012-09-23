@@ -63,6 +63,7 @@ public:
         , m_columnHeaderIndex(0)
         , m_padRows(false)
         , m_append(false)
+        , m_logStream(false)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
@@ -135,6 +136,11 @@ public:
         BOOST_CHECK( m_csvCommentChars == commentChars);
     }
 
+    void connectLogOutputStream( const void* stream)
+    {
+        BOOST_CHECK( m_logStream == (stream != NULL));
+    }
+
     bool m_reset;
     bool m_loadTable;
     bool m_unloadTable;
@@ -154,6 +160,7 @@ public:
     CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
 
     bool m_append;
+    bool m_logStream;
 
     void setTemplateFile( const char* text)
     {
@@ -295,6 +302,24 @@ void runTest()
         generator.m_reset = true;
         std::vector<std::string> args;
         args += "-c", "";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test logging off
+        GeneratorT generator;
+        generator.m_logStream = false;
+        std::vector<std::string> args;
+        args += "-c", "--log-stream 0";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test logging on
+        GeneratorT generator;
+        generator.m_logStream = true;
+        std::vector<std::string> args;
+        args += "-c", "-g 1";
         process<StringT>( args, generator);
     }
 

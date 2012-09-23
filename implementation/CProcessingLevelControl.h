@@ -37,7 +37,7 @@ public:
 };
 
 
-template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT>
+template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
 class CProcessingLevelControl : public CProcessingLevelControlExceptions
 {
     ///represents a processing stage in the processing spiral
@@ -63,7 +63,7 @@ class CProcessingLevelControl : public CProcessingLevelControlExceptions
     };
 
 public:
-    typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT> ThisT;
+    typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
     typedef typename ParserT::ParserTokenT TokenT;
     typedef typename ParserT::ParserStringT StringT;
     typedef typename StringT::value_type CharT;
@@ -101,6 +101,15 @@ public:
         BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
         {
             levelBlock.parser.connectOutputStream( processor);
+        }
+    }
+
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+        {
+            levelBlock.parser.connectLogOutputStream( stream, &levelBlock - m_levelBlocks);
         }
     }
 

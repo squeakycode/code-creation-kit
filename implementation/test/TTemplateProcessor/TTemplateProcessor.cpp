@@ -118,7 +118,7 @@ void testMacroProcessing()
     for ( unsigned int col = 0; col < columns; ++col)
     {
         table[col].resize( rows);
-        for ( unsigned int row = 0; row < rows; ++row)	
+        for ( unsigned int row = 0; row < rows; ++row)
         {
             table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
         }
@@ -355,7 +355,7 @@ void testTemplateProcessor()
     for ( unsigned int col = 0; col < columns; ++col)
     {
         table[col].resize( rows);
-        for ( unsigned int row = 0; row < rows; ++row)	
+        for ( unsigned int row = 0; row < rows; ++row)
         {
             table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
         }

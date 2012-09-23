@@ -36,6 +36,8 @@
 #pragma warning( pop ) 
 #endif
 
+#include <iostream>
+
 namespace FileSystem
 {
     namespace detail
@@ -207,7 +209,33 @@ namespace FileSystem
         boost::filesystem::rename( from, to);
     }
 
+    ///helper function for getting the right output stream
+    template <typename CharT> 
+    std::basic_ostream<CharT, std::char_traits<CharT> >& getCout()
+    {
+        return std::cout;
+    }
 
+    ///helper function for getting the right output stream
+    template <>
+    std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCout()
+    {
+        return std::wcout;
+    }
+
+    ///helper function for getting the right output stream
+    template <typename CharT> 
+    std::basic_ostream<CharT, std::char_traits<CharT> >& getCerr()
+    {
+        return std::cerr;
+    }
+
+    ///helper function for getting the right output stream
+    template <>
+    std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCerr()
+    {
+        return std::wcerr;
+    }
 }
 
 #endif /* INCLUDED_FILESYSTEM_H_7536737 */

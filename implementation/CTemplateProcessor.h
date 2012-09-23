@@ -45,22 +45,22 @@ public:
 };
 
 ///sets up und operates the building blocks needed for processing a template to produce generated output
-template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader>
+template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader, typename LogOutputStreamT = CNul >
 class CTemplateProcessor
 {
-    typedef CTemplateProcessor<TableT, OutputStreamT, TemplateLoaderT> ThisT;
+    typedef CTemplateProcessor<TableT, OutputStreamT, TemplateLoaderT, LogOutputStreamT> ThisT;
     typedef typename TableT::value_type::value_type StringT;
 
     class BackEndTokenizer;
     class ProcessingLevelControl;
     typedef CLineCollector< StringT, BackEndTokenizer> LineCollectorT;
-    typedef CMacroProcessor<TableT, ProcessingLevelControl> ProcessorT;
+    typedef CMacroProcessor<TableT, ProcessingLevelControl, LogOutputStreamT> ProcessorT;
     typedef CToken<Tokens, StringT> TokenT;
-    typedef CParser<ProcessorT, TokenT, StringT> ParserT;
-    typedef CProcessingLevelControl<ParserT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT> ProcessingLevelControlT;
+    typedef CParser<ProcessorT, TokenT, StringT, LogOutputStreamT> ParserT;
+    typedef CProcessingLevelControl<ParserT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT, LogOutputStreamT> ProcessingLevelControlT;
     typedef CTemplatePreprocessor<ProcessingLevelControl, ThisT, TemplateLoaderT, TokenT, StringT> PreprocessorT;
-    typedef CTokenizer<TokenT, StringT, PreprocessorT, OutputStreamT> TokenizerT;
-    typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT> BackEndTokenizerT;
+    typedef CTokenizer<TokenT, StringT, PreprocessorT, OutputStreamT, LogOutputStreamT> TokenizerT;
+    typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT, LogOutputStreamT> BackEndTokenizerT;
     class BackEndTokenizer : public BackEndTokenizerT {};
     class ProcessingLevelControl : public ProcessingLevelControlT {};
 
@@ -116,6 +116,15 @@ public:
         m_preprocessor.connectTemplateLoader( loader);
     }
 
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_tokenizer.connectLogOutputStream( stream);
+        m_backEndTokenizer.connectLogOutputStream( stream);
+        m_processingLevelControl.connectLogOutputStream( stream);
+        m_processor.connectLogOutputStream( stream);
+    }
+
     ///resets the processor for next input stream, added for symmetry to close
     void open()
     {
@@ -125,7 +134,7 @@ public:
     }
 
     ///processes a line of the input stream
-    CTemplateProcessor< TableT, OutputStreamT, TemplateLoaderT>& operator <<( const StringT& line)
+    ThisT& operator <<( const StringT& line)
     {
         m_tokenizer << line;
         return *this;

@@ -100,7 +100,7 @@ public:
     }
 
     ///check file ok
-    void checkGood()    
+    void checkGood()
     {
         if ( !get() )
         {

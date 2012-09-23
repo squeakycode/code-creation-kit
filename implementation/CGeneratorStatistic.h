@@ -42,13 +42,6 @@ public:
 template <typename StringT>
 class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisticExceptions
 {
-    class CNul
-    {
-    public:
-        template <typename T>
-        CNul& operator<<( const T&) { return *this; }
-    };
-
     typedef CGeneratorStatistic<StringT> ThisT;
     typedef CToken<Tokens, StringT> TokenT;
     typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
@@ -211,6 +204,9 @@ public:
     unsigned int getLastLineWithFailure() { return 1;}
     static int getMaxNumberOfRecursionLevels() { return 1; }
     static int getMaxMacroTextSizeBytes() { return 1; }
+    template <typename LogOutputStreamT>
+    void connectLogOutputStream( LogOutputStreamT*){}
+
 private:
     ///set default markup
     void setDefaultMarkup()

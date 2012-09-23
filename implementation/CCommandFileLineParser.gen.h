@@ -49,6 +49,7 @@ public:
         eAddIncludeDirectory,
         eCsvDelimiter,
         eCsvCommentChars,
+        eSetLogStream,
         eNoOptionsGiven,
         eOptionsInvalid
     };
@@ -62,6 +63,7 @@ public:
       , m_descriptionResetGenerator("Reset Generator")
       , m_descriptionAddIncludeDirectories("Add Include Directories")
       , m_descriptionCsvTableProperties("CSV Table Properties")
+      , m_descriptionLogging("Logging")
     {
         // Declare the supported options.
         
@@ -92,7 +94,7 @@ public:
             ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string cannot be empty.")
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
             ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string cannot be empty.")
-            ("inline-pad", value<size_t >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
+            ("inline-pad", value<unsigned int >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -103,6 +105,9 @@ public:
         m_descriptionCsvTableProperties.add_options() //("CSV Table Properties")
             ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items.")
             ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
+        ;
+        m_descriptionLogging.add_options() //("Logging")
+            ("log-stream,g", value<unsigned int >(), "Switches logging; 0 is off, 1 is log to stdout, and 2 is log to stderr.")
             ;
         // Add the positional descriptions
         m_positionalDescription.add( "load-table", 1);
@@ -114,6 +119,7 @@ public:
         m_description.add( m_descriptionResetGenerator);
         m_description.add( m_descriptionAddIncludeDirectories);
         m_description.add( m_descriptionCsvTableProperties);
+        m_description.add( m_descriptionLogging);
     }
 
     ///parses standard command line parameters
@@ -176,6 +182,7 @@ public:
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
         bool providedCsvCommentChars = hasCsvCommentChars();
+        bool providedLogStream = hasLogStream();
     
         if (
                providedTableFile == false
@@ -199,6 +206,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eGenerate;
@@ -226,6 +234,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eGenerateUsingIntermediateFile;
@@ -246,6 +255,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eProcessInlineTemplateFile;
@@ -278,6 +288,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eResetGenerator;
@@ -310,6 +321,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eUnloadTable;
@@ -336,6 +348,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eLoadTable;
@@ -368,6 +381,7 @@ public:
             && providedIncludeDirectories == true
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eAddIncludeDirectory;
@@ -400,6 +414,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == true
             && providedCsvCommentChars == false
+            && providedLogStream == false
         )
         {
             return eCsvDelimiter;
@@ -432,9 +447,43 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == true
+            && providedLogStream == false
         )
         {
             return eCsvCommentChars;
+        }
+        
+        if (
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
+            && providedLeftToRight == false
+            && providedRowHeaderIndex == false
+            && providedColumnHeaderIndex == false
+            && providedPadRows == false
+            && providedLabelsOfTableFilesToUnload == false
+            && providedTemplateFile == false
+            && providedOutputFile == false
+            && providedParameters == false
+            && providedUseIntermediateOutputFile == false
+            && providedIntermediateOutputFileExtension == false
+            && providedMarkupPrefix == false
+            && providedMarkupPostfix == false
+            && providedMarkup == false
+            && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
+            && providedReset == false
+            && providedIncludeDirectories == false
+            && providedDelimiter == false
+            && providedCsvCommentChars == false
+            && providedLogStream == true
+        )
+        {
+            return eSetLogStream;
         }
         
         
@@ -465,6 +514,7 @@ public:
             && !providedIncludeDirectories
             && !providedDelimiter
             && !providedCsvCommentChars
+            && !providedLogStream
         )
         {
             return eNoOptionsGiven;
@@ -660,11 +710,11 @@ public:
     }
     
     ///returns the provided value or 0 as default
-    size_t getInlinePad() const
+    unsigned int getInlinePad() const
     {
         if ( hasInlinePad())
         {
-            return m_vmap["inline-pad"].as<size_t >();
+            return m_vmap["inline-pad"].as<unsigned int >();
         }
         return 0;
     }
@@ -691,6 +741,12 @@ public:
     StringT getCsvCommentChars() const
     {
         return m_vmap["csv-comment-chars"].as<StringT >();
+    }
+    
+    ///returns the provided value
+    unsigned int getLogStream() const
+    {
+        return m_vmap["log-stream"].as<unsigned int >();
     }
     
 
@@ -850,6 +906,12 @@ public:
         return m_vmap.count( "csv-comment-chars") != 0;
     }
     
+    ///indicates that the option log-stream has been provided
+    bool hasLogStream() const
+    {
+        return m_vmap.count( "log-stream") != 0;
+    }
+    
     
 private:
     ///assignment not supported
@@ -872,6 +934,7 @@ private:
     boost::program_options::options_description m_descriptionResetGenerator; ///<the option description of group: Reset Generator
     boost::program_options::options_description m_descriptionAddIncludeDirectories; ///<the option description of group: Add Include Directories
     boost::program_options::options_description m_descriptionCsvTableProperties; ///<the option description of group: CSV Table Properties
+    boost::program_options::options_description m_descriptionLogging; ///<the option description of group: Logging
     boost::program_options::positional_options_description m_positionalDescription; ///<description of positional options 
 };
 
