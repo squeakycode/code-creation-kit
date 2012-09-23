@@ -336,7 +336,7 @@ public:
     template <typename ParameterListT>
     void generate( const StringT& templateFileName, const StringT& targetFileName, bool append, const ParameterListT& parameters)
     {
-        generate( templateFileName, targetFileName, false, StringT(), append, parameters);
+        generate( templateFileName, targetFileName, false, false, StringT(), append, parameters);
     }
 
     ///generates output by processing a template file
@@ -345,6 +345,7 @@ public:
         const StringT& templateFileName, 
         const StringT& targetFileName, 
         bool useIntermediateFile, 
+        bool recycle,
         const StringT& intermediateFileName, 
         bool append, 
         const ParameterListT& parameters,
@@ -358,6 +359,7 @@ public:
             *m_logOutputStream << "Template file=" << templateFileName << "\n";
             *m_logOutputStream << "Target file=" << targetFileName << "\n";
             *m_logOutputStream << "Use intermediate file=" << useIntermediateFile << "\n";
+            *m_logOutputStream << "Recycle=" << recycle << "\n";
             *m_logOutputStream << "Intermediate file=" << intermediateFileName << "\n";
             *m_logOutputStream << "Append=" << append << "\n";
 
@@ -456,7 +458,12 @@ public:
             }
             else //replace target file
             {
-                if ( !removeFile( targetFileName))
+                //recycle target file if possible
+                if ( recycle && FileSystem::isRegularFile( targetFileName) && FileSystem::recycleFile( targetFileName))
+                {
+                    // moved file to system recycle bin
+                }
+                else if ( !removeFile( targetFileName))
                 {
                     throw ExFailedToDeleteOldTargetFile();
                 }

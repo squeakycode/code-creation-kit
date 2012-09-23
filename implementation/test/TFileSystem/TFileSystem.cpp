@@ -81,5 +81,13 @@ BOOST_AUTO_TEST_CASE( TFileSystem)
     BOOST_CHECK_NO_THROW( FileSystem::removeFile( std::string("_does_not_exist_.txt")));
     BOOST_CHECK( FileSystem::removeFile( std::string("_temp_test_file_moved_.txt")));
     BOOST_CHECK( !FileSystem::isRegularFile( std::string("_temp_test_file_moved_.txt")));
+
+    ////create test file
+    //{
+    //    std::ofstream("_temp_test_file_.txt");
+    //}
+    //FileSystem::recycleFile( std::string("_temp_test_file_.txt"));
+
+
 }
 

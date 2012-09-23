@@ -64,6 +64,7 @@ public:
         , m_padRows(false)
         , m_append(false)
         , m_logStream(false)
+        , m_recycle(false)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
@@ -73,6 +74,7 @@ public:
         const StringT& templateFile,
         const StringT& targetFile,
         bool useIntermediateFile,
+        bool recycle,
         const StringT& intermediateFile,
         bool append, const ParameterListT& parameters,
         const CInlineTemplateParameters<StringT>& inlineTemplateParameters
@@ -82,6 +84,7 @@ public:
         BOOST_CHECK( m_templateFile == templateFile);
         BOOST_CHECK( m_targetFile == targetFile);
         BOOST_CHECK( m_useIntermediateFile == useIntermediateFile);
+        BOOST_CHECK( m_recycle == recycle);
         BOOST_CHECK( m_intermediateFileName == intermediateFile);
         BOOST_CHECK( m_parameters == parameters);
         BOOST_CHECK( m_append == append);
@@ -161,6 +164,7 @@ public:
 
     bool m_append;
     bool m_logStream;
+    bool m_recycle;
 
     void setTemplateFile( const char* text)
     {
@@ -432,9 +436,10 @@ void runTest()
         generator.m_append = false;
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
+        generator.m_recycle = true;
         generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args;
-        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56";
+        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56 -y";
         process<StringT>( args, generator);
     }
 

@@ -115,6 +115,7 @@ public:
         const StringT& templateFileName, 
         const StringT& targetFileName, 
         bool , 
+        bool , 
         const StringT& , 
         bool , 
         const ParameterListT& ,

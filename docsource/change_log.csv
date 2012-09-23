@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added recycle option. Used together with inline templates.;;
 New Feature;;Added logging to support debugging of  templates.;;
 New Feature;;Added support for in-place generation using inline templates.;;
 New Feature;;Added auto padding of rows of a CSV-file with empty strings This supports the use of hand-written CSV-files.;;

@@ -32,6 +32,7 @@ Processing file:
 Template file=../TGenerator/TDataflow.tpl.txt
 Target file=TDataflow.gen.txt
 Use intermediate file=0
+Recycle=0
 Intermediate file=
 Append=0
 Starting to read template file:
@@ -215,6 +216,7 @@ Processing file:
 Template file=../TGenerator/LogTest1.tpl
 Target file=../TGenerator/LogTest1.gen.txt
 Use intermediate file=0
+Recycle=0
 Intermediate file=
 Append=0
 Starting to read template file:
@@ -233,6 +235,7 @@ Processing file:
 Template file=../TGenerator/LogTest2.tpl
 Target file=../TGenerator/LogTest2.tpl
 Use intermediate file=1
+Recycle=0
 Intermediate file=../TGenerator/LogTest2.tpl.intermediate
 Append=0
 Inline prefix=$
@@ -248,6 +251,7 @@ Processing file:
 Template file=../TGenerator/LogTest3.tpl
 Target file=../TGenerator/LogTest1.gen.txt
 Use intermediate file=0
+Recycle=0
 Intermediate file=
 Append=0
 Starting to read template file:

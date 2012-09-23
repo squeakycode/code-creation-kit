@@ -110,6 +110,7 @@ public:
                 prepareFileName( m_parser.getTemplateFile(), commandFileName),
                 prepareFileName( outputFileName, commandFileName), 
                 useIntermediateFile,
+                m_parser.getRecycle(),
                 prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
                 m_parser.getAppendToFile(),
                 m_parser.getParameters(),

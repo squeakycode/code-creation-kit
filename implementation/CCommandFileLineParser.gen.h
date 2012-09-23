@@ -85,16 +85,17 @@ public:
             ("output-file,o", value<StringT >(), "Specifies the file to output to.")
             ("parameter,p", value<std::vector<StringT> >()->multitoken(), "Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.")
             ("use-intermediate-output-file,u", value<bool >()->zero_tokens(), "Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.")
-            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.")
+            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.")
             ("markup-prefix", value<StringT >(), "Sets the initial tag markup prefix.")
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
             ("append-to-file", value<bool >()->zero_tokens(), "The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.")
-            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided.")
-            ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string cannot be empty.")
+            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. WARNING: Use this option carefully to prevent data loss. Consider using the recycle option.")
+            ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string must not be empty.")
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
-            ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string cannot be empty.")
+            ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string must not be empty.")
             ("inline-pad", value<unsigned int >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
+            ("recycle,y", value<bool >()->zero_tokens(), "Used together with inlined option. Moves the target file to the recycle bin of the system if possible before it is replaced by the intermediate file.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -178,6 +179,7 @@ public:
         bool providedInlinePostfix = hasInlinePostfix();
         bool providedInlineGeneratedPostfix = hasInlineGeneratedPostfix();
         bool providedInlinePad = hasInlinePad();
+        bool providedRecycle = hasRecycle();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
@@ -202,6 +204,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -230,6 +233,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -284,6 +288,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == true
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -317,6 +322,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -344,6 +350,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -377,6 +384,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == true
             && providedDelimiter == false
@@ -410,6 +418,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == true
@@ -443,6 +452,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -476,6 +486,7 @@ public:
             && providedInlinePostfix == false
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
+            && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -510,6 +521,7 @@ public:
             && !providedInlinePostfix
             && !providedInlineGeneratedPostfix
             && !providedInlinePad
+            && !providedRecycle
             && !providedReset
             && !providedIncludeDirectories
             && !providedDelimiter
@@ -719,6 +731,16 @@ public:
         return 0;
     }
     
+    ///returns the provided value or false as default
+    bool getRecycle() const
+    {
+        if ( hasRecycle())
+        {
+            return m_vmap["recycle"].as<bool >();
+        }
+        return false;
+    }
+    
     ///returns the provided value
     bool getReset() const
     {
@@ -880,6 +902,12 @@ public:
     bool hasInlinePad() const
     {
         return m_vmap.count( "inline-pad") != 0;
+    }
+    
+    ///indicates that the option recycle has been provided
+    bool hasRecycle() const
+    {
+        return m_vmap.count( "recycle") != 0;
     }
     
     ///indicates that the option reset has been provided

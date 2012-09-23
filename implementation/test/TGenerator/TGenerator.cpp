@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOut.txt", "TGeneratorOutExpected.txt"));
 
         //generate the output using intermediate file
-        generator.generate( "TGeneratorTemplate.txt", "TGeneratorOutIntermediateUsed.txt", true, "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
+        generator.generate( "TGeneratorTemplate.txt", "TGeneratorOutIntermediateUsed.txt", true, false, "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOutIntermediateUsed.txt", "TGeneratorOutExpected.txt"));
@@ -137,6 +137,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             "../TGenerator/TGeneratorTemplateInline.txt",
             "../TGenerator/TGeneratorTemplateInline.txt",
             true,
+            false,
             "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
@@ -153,6 +154,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             "../TGenerator/TGeneratorTemplateInline.txt",
             "../TGenerator/TGeneratorTemplateInline.txt",
             true,
+            false,
             "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
@@ -209,7 +211,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //check extended error output
         BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest1.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
         CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest2.tpl", "../TGenerator/LogTest2.tpl", true, "../TGenerator/LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest2.tpl", "../TGenerator/LogTest2.tpl", true, false, "../TGenerator/LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
         BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest3.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
 
         generator.connectLogOutputStream( NULL);
