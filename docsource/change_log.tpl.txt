@@ -21,8 +21,8 @@ Change      Tracker ID Description
 [COMMENT] <!-- release or development snapshot -->
 [END][TRIM]
 [COMMENT] <!-- end if first time -->
-[END][TRIM]
 [OR][TRIM]
+[END][TRIM]
 [COMMENT] <!-- start document body, release entry -->
 [BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
 
