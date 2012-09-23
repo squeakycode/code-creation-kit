@@ -24,6 +24,7 @@ set SAVED_ERROR_LEVEL=0
 if not defined EXAMPLE_HOME exit /b 1
 
 pushd "%EXAMPLE_HOME%"
+for /F "usebackq" %%i in (`dir /s /b CDPlayerStatemachine.h`) do call :RunTplHighlighter[] %%i
 for /F "usebackq" %%i in (`dir /s /b *.tpl.h`) do call :RunTplHighlighter[] %%i
 for /F "usebackq" %%i in (`dir /s /b *.tpl.vb`) do call :RunTplHighlighter[] %%i
 for /F "usebackq" %%i in (`dir /s /b *.gen.h`) do call :RunHighlighter[] %%i

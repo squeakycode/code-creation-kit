@@ -1,6 +1,8 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
-Improvement;;CGenerator can process streams.;;
+New Feature;;Added logging to support debugging of  templates.;;
+New Feature;;Added support for in-place generation using inline templates.;;
+New Feature;;Added auto padding of rows of a CSV-file with empty strings This supports the use of hand-written CSV-files.;;
 Bugfix;;Fixed --csv-comment-chars has no effect.;;
 Bugfix;;Fixed test_base.mpc file to fix a problem when using Microsoft Visual Studio 2010.;;
 New Feature;;Added the append-to-file option for creating a file in multiple generation steps.;;
