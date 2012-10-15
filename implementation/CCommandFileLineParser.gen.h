@@ -49,7 +49,7 @@ public:
         eAddIncludeDirectory,
         eCsvDelimiter,
         eCsvCommentChars,
-        eSetLogStream,
+        eSetLogFile,
         eNoOptionsGiven,
         eOptionsInvalid
     };
@@ -108,7 +108,7 @@ public:
             ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
         ;
         m_descriptionLogging.add_options() //("Logging")
-            ("log-stream,g", value<unsigned int >(), "Switches logging; 0 is off, 1 is log to stdout, and 2 is log to stderr.")
+            ("log-file,g", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
             ;
         // Add the positional descriptions
         m_positionalDescription.add( "load-table", 1);
@@ -184,7 +184,7 @@ public:
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
         bool providedCsvCommentChars = hasCsvCommentChars();
-        bool providedLogStream = hasLogStream();
+        bool providedLogFile = hasLogFile();
     
         if (
                providedTableFile == false
@@ -209,7 +209,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eGenerate;
@@ -238,7 +238,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eGenerateUsingIntermediateFile;
@@ -259,7 +259,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eProcessInlineTemplateFile;
@@ -293,7 +293,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eResetGenerator;
@@ -327,7 +327,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eUnloadTable;
@@ -355,7 +355,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eLoadTable;
@@ -389,7 +389,7 @@ public:
             && providedIncludeDirectories == true
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eAddIncludeDirectory;
@@ -423,7 +423,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == true
             && providedCsvCommentChars == false
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eCsvDelimiter;
@@ -457,7 +457,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == true
-            && providedLogStream == false
+            && providedLogFile == false
         )
         {
             return eCsvCommentChars;
@@ -491,10 +491,10 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
-            && providedLogStream == true
+            && providedLogFile == true
         )
         {
-            return eSetLogStream;
+            return eSetLogFile;
         }
         
         
@@ -526,7 +526,7 @@ public:
             && !providedIncludeDirectories
             && !providedDelimiter
             && !providedCsvCommentChars
-            && !providedLogStream
+            && !providedLogFile
         )
         {
             return eNoOptionsGiven;
@@ -766,9 +766,9 @@ public:
     }
     
     ///returns the provided value
-    unsigned int getLogStream() const
+    StringT getLogFile() const
     {
-        return m_vmap["log-stream"].as<unsigned int >();
+        return m_vmap["log-file"].as<StringT >();
     }
     
 
@@ -934,10 +934,10 @@ public:
         return m_vmap.count( "csv-comment-chars") != 0;
     }
     
-    ///indicates that the option log-stream has been provided
-    bool hasLogStream() const
+    ///indicates that the option log-file has been provided
+    bool hasLogFile() const
     {
-        return m_vmap.count( "log-stream") != 0;
+        return m_vmap.count( "log-file") != 0;
     }
     
     

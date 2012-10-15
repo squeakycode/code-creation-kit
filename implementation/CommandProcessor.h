@@ -42,8 +42,8 @@ namespace CommandProcessor
     { public: ExInvalidCommandLineOptions() : std::runtime_error( "Invalid command line options. Please use --help to get the option description.") {}};
 
     ///process the command line from the console
-    template <typename CharT, typename GeneratorT, typename GeneratorStatisticT>
-    void processCommandLine( int argc, CharT* argv[], GeneratorT& generator, GeneratorStatisticT& generatorStatistic, bool* prompt = 0, bool *logging = 0)
+    template <typename CharT, typename GeneratorT, typename GeneratorStatisticT, typename LogFileT>
+    void processCommandLine( int argc, CharT* argv[], GeneratorT& generator, GeneratorStatisticT& generatorStatistic, LogFileT& logFile, bool* prompt = 0, bool *logging = 0)
     {
         typedef std::basic_string<CharT, std::char_traits<CharT> > StringT;
 
@@ -67,7 +67,7 @@ namespace CommandProcessor
                 std::vector<StringT> commands = parser.getCommands();
                 BOOST_FOREACH( const StringT& command, commands)
                 {
-                    generatorCommandProcessor.processCommand( command, generator, StringT());
+                    generatorCommandProcessor.processCommand( command, generator, StringT(), logFile);
                 }
             }
             else if ( CCommandLineParser<StringT>::eExecuteCommandFile == command )
@@ -105,7 +105,7 @@ namespace CommandProcessor
                     bool useCin = commandFileName == STRING_LITERAL("-");
                     commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
                     CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
-                    generatorCommandProcessor.processCommandStream( commandFile.get(), generator, commandFileAbsolutePath);
+                    generatorCommandProcessor.processCommandStream( commandFile.get(), generator, commandFileAbsolutePath, logFile);
                     commandFile.checkEofReached();
                 }
             }
@@ -131,7 +131,7 @@ namespace CommandProcessor
                     bool useCin = commandFileName == STRING_LITERAL("-");
                     commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
                     CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
-                    generatorCommandProcessor.processCommandStream( commandFile.get(), generatorStatistic, commandFileAbsolutePath, true);
+                    generatorCommandProcessor.processCommandStream( commandFile.get(), generatorStatistic, commandFileAbsolutePath, logFile, true);
                     commandFile.checkEofReached();
 
                     if ( parser.getOutputDependenciesStyle() == STRING_LITERAL("mpc"))

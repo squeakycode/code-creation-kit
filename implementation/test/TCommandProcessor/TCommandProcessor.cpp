@@ -22,6 +22,10 @@
 #include <vector>
 #include <list>
 #include "CommandProcessor.h"
+#include "CTargetFile.h"
+
+class LogFileT;
+
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4512 )
@@ -260,6 +264,8 @@ private:
 template <typename StringT, typename ContainerT, typename GeneratorT> 
 void process( ContainerT& container, GeneratorT& generator)
 {
+    CTargetFile<StringT, LogFileT> logFile;
+
     std::list<StringT> argsString;
     std::vector<typename StringT::value_type*> args;
 
@@ -272,7 +278,7 @@ void process( ContainerT& container, GeneratorT& generator)
         args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
     }
 
-    CommandProcessor::processCommandLine( args.size(), &args[0], generator, generator);
+    CommandProcessor::processCommandLine( args.size(), &args[0], generator, generator, logFile);
 }
 
 ///runs the test for given string type
@@ -314,7 +320,7 @@ void runTest()
         GeneratorT generator;
         generator.m_logStream = false;
         std::vector<std::string> args;
-        args += "-c", "--log-stream 0";
+        args += "-c", "--log-file none";
         process<StringT>( args, generator);
     }
 
@@ -323,7 +329,7 @@ void runTest()
         GeneratorT generator;
         generator.m_logStream = true;
         std::vector<std::string> args;
-        args += "-c", "-g 1";
+        args += "-c", "-g -";
         process<StringT>( args, generator);
     }
 

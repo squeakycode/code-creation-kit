@@ -46,19 +46,19 @@ public:
     { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
 
     ///process a stream of commands
-    template <typename InputStreamT, typename GeneratorT>
-    void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, bool disableReset = false)
+    template <typename InputStreamT, typename GeneratorT, typename LogFileT>
+    void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
     {
         StringT command;
         while( std::getline(stream, command))
         {
-            processCommand( command, generator, commandFileName, disableReset);
-        }    
+            processCommand( command, generator, commandFileName, logFile, disableReset);
+        }
     }
 
     ///process a command for the generator
-    template <typename GeneratorT>
-    void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, bool disableReset = false)
+    template <typename GeneratorT, typename LogFileT>
+    void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
     {
         typedef typename StringT::value_type CharT;
 
@@ -177,19 +177,17 @@ public:
         {
             generator.setCsvCommentChars( m_parser.getCsvCommentChars());
         }
-        else if ( command == ParserT::eSetLogStream )
+        else if ( command == ParserT::eSetLogFile )
         {
-            switch( m_parser.getLogStream())
+            if( m_parser.getLogFile() == STRING_LITERAL("none"))
             {
-            case 1:
-                generator.connectLogOutputStream( &FileSystem::getCout<CharT>());
-                break;
-            case 2:
-                generator.connectLogOutputStream( &FileSystem::getCerr<CharT>());
-                break;
-            default:
                 generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
-                break;
+                logFile.close();
+            }
+            else
+            {
+                logFile.close();
+                logFile.open( m_parser.getLogFile(), m_parser.getLogFile() == STRING_LITERAL("-"), false);
             }
         }
         else if ( command == ParserT::eNoOptionsGiven)
@@ -236,8 +234,8 @@ private:
             }
         }
     }
-private:    
-    ParserT m_parser;    
+private:
+    ParserT m_parser;
 };
 
 #ifdef _MSC_VER

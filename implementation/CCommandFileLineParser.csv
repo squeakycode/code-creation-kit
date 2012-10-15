@@ -1,4 +1,4 @@
-Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ProcessInlineTemplateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiter;CsvCommentChars;SetLogStream
+Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ProcessInlineTemplateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiter;CsvCommentChars;SetLogFile
 Combination;;;;;;;;;;;;;yes;yes;yes;yes;yes;yes;yes;yes;yes;yes
 Example Description;;;;;;;;;;;;;;;;;;;;;;
 Example;;;;;;;;;;;;;;;;;;;;;;
@@ -34,4 +34,4 @@ Example;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 ;CsvTableProperties;CSV Table Properties;csv-delimiter;;;;;;;StringT;Delimiter;Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items.;no;no;no;no;no;no;no;yes;no;no
 ;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.;no;no;no;no;no;no;no;no;yes;no
-;Logging;Logging;log-stream;g;;;;;;unsigned int;LogStream;"Switches logging; 0 is off, 1 is log to stdout, and 2 is log to stderr.";no;no;no;no;no;no;no;no;no;yes
+;Logging;Logging;log-file;g;;;;;;StringT;LogFile;Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.;no;no;no;no;no;no;no;no;no;yes

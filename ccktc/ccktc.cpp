@@ -24,7 +24,9 @@
 #include "CGeneratorStatistic.h"
 #include "CErrorPrinter.gen.h"
 #include "CommandProcessor.h"
+#include "CTargetFile.h"
 
+class LogFileT;
 
 //run processing of command line
 int process( int argc, char* argv[], bool& prompt, bool& logging)
@@ -35,6 +37,9 @@ int process( int argc, char* argv[], bool& prompt, bool& logging)
 
     try
     {
+        //create log file
+        CTargetFile<StringT, LogFileT> logFile;
+
         //create generator
         CGenerator<StringT, LogOutputStreamT> generatorImpl;
         CErrorPrinter<StringT, CGenerator<StringT, LogOutputStreamT> > generator( generatorImpl);
@@ -44,7 +49,7 @@ int process( int argc, char* argv[], bool& prompt, bool& logging)
         CErrorPrinter<StringT, CGeneratorStatistic<StringT> > generatorStatistic( generatorStatisticImpl);
 
         //execute command, which generator is used depends on the command
-        CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, &prompt, &logging);
+        CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, logFile, &prompt, &logging);
     }
     catch( CErrorPrinted&)
     {
