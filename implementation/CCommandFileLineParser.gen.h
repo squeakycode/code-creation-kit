@@ -108,7 +108,7 @@ public:
             ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
         ;
         m_descriptionLogging.add_options() //("Logging")
-            ("log-file,g", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
+            ("log-file", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
             ;
         // Add the positional descriptions
         m_positionalDescription.add( "load-table", 1);

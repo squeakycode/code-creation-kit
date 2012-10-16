@@ -34,4 +34,4 @@ Example;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 ;CsvTableProperties;CSV Table Properties;csv-delimiter;;;;;;;StringT;Delimiter;Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items.;no;no;no;no;no;no;no;yes;no;no
 ;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.;no;no;no;no;no;no;no;no;yes;no
-;Logging;Logging;log-file;g;;;;;;StringT;LogFile;Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.;no;no;no;no;no;no;no;no;no;yes
+;Logging;Logging;log-file;;;;;;;StringT;LogFile;Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.;no;no;no;no;no;no;no;no;no;yes
