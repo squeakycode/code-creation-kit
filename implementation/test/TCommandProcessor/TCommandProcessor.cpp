@@ -145,7 +145,7 @@ public:
 
     void connectLogOutputStream( const void* stream)
     {
-        BOOST_CHECK( m_logStream == (stream != NULL));
+        m_logStream = (stream != NULL);
     }
 
     bool m_reset;
@@ -318,19 +318,31 @@ void runTest()
     {
         //test logging off
         GeneratorT generator;
-        generator.m_logStream = false;
+        generator.m_logStream = true;
         std::vector<std::string> args;
         args += "-c", "--log-file none";
         process<StringT>( args, generator);
+        BOOST_CHECK( !generator.m_logStream);
     }
 
     {
-        //test logging on
+        //test logging on; stdout
         GeneratorT generator;
-        generator.m_logStream = true;
+        generator.m_logStream = false;
         std::vector<std::string> args;
-        args += "-c", "-g -";
+        args += "-c", "--log-file -";
         process<StringT>( args, generator);
+        BOOST_CHECK( generator.m_logStream);
+    }
+
+    {
+        //test logging on; file
+        GeneratorT generator;
+        generator.m_logStream = false;
+        std::vector<std::string> args;
+        args += "-c", "--log-file testlogfile.log";
+        process<StringT>( args, generator);
+        BOOST_CHECK( generator.m_logStream);
     }
 
     {

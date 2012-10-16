@@ -179,15 +179,17 @@ public:
         }
         else if ( command == ParserT::eSetLogFile )
         {
+            generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
+            logFile.close();
+
             if( m_parser.getLogFile() == STRING_LITERAL("none"))
             {
-                generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
-                logFile.close();
+                //nothing to do
             }
             else
             {
-                logFile.close();
                 logFile.open( m_parser.getLogFile(), m_parser.getLogFile() == STRING_LITERAL("-"), false);
+                generator.connectLogOutputStream( &logFile.get());
             }
         }
         else if ( command == ParserT::eNoOptionsGiven)
