@@ -113,7 +113,11 @@ public:
     {
         if ( !m_useCout)
         {
-            m_file.close();
+            if ( m_file.is_open())
+            {
+                m_file.close();
+            }
+            m_file.clear();
         }
     }
 
