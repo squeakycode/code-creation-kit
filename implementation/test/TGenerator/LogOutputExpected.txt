@@ -41,6 +41,7 @@ Found macro (level 0):
 [MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -49,6 +50,7 @@ Found macro (level 0):
 [MACRO_BEGIN]<[ENTRY]["row2"]>[MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -58,6 +60,7 @@ start1<1>end1 <[ENTRY]["row2"]> start4<2>end4
 
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -67,6 +70,7 @@ Found macro (level 0):
 [MACRO_BEGIN][MACRO_BEGIN.]<[ENTRY]["row1"]>[MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -75,6 +79,7 @@ Found macro (level 1):
 [MACRO_BEGIN]<1>end5start6<[ENTRY]["row2"]>[MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -83,6 +88,7 @@ Found macro (level 0):
 [MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -92,6 +98,7 @@ start7<1>end7start8<[ENTRY]["row3"]>end8
 
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -122,6 +129,7 @@ Found macro (level 1):
 [MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -150,6 +158,7 @@ Found macro (level 1):
 [MACRO_END]
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -179,6 +188,7 @@ Found macro (level 1):
 
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -192,6 +202,7 @@ Found macro (level 1):
 
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:
@@ -206,6 +217,7 @@ Found macro (level 1):
 <[ENTRY]["row3"]>off
 Start reading table top down:
 Label=LabelA
+Entries or reading direction do not match macro.
 Start reading table left to right:
 Label=LabelA
 Expanding at index 2:

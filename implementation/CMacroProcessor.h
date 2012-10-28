@@ -266,7 +266,7 @@ private:
         typedef CMacroExpander< MacroT, LocalTableIndexT, LocalTableT> ExpanderT;
         ExpanderT expander( tableIndex, macro, table, topDown);
 
-        if ( expander.canExpand() && table.size() > 0)
+        if ( expander.canExpand())
         {
             IndexT max = table[ 0 ].size();
             IndexT lastRow = max;
@@ -295,6 +295,14 @@ private:
             if ( lastTime && lastRow != max)
             {
                 lastTimeExpanded = expander.expand( lastRow, expandedLastTime, count - 1, true);
+            }
+        }
+        else
+        {
+            //log
+            if ( m_logOutputStream)
+            {
+                *m_logOutputStream << "Entries or reading direction do not match macro." << "\n";
             }
         }
     }
