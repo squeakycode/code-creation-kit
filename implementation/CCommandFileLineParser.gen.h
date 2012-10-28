@@ -96,7 +96,7 @@ public:
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
             ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string must not be empty.")
             ("inline-pad", value<unsigned int >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
-            ("recycle,y", value<bool >()->zero_tokens(), "Used together with inlined option. Moves the target file to the recycle bin of the system if possible before it is replaced by the intermediate file.")
+            ("recycle,y", value<bool >()->zero_tokens(), "Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")

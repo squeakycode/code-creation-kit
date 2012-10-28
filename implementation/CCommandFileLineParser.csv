@@ -26,7 +26,7 @@ Example;;;;;;;;;;;;;;;;;;;;;;;
 ;;;inline-postfix;c;;;;;"boost::lexical_cast<StringT>("""")";StringT;InlinePostfix;A postfix that marks a line of an inline template file as template content. This string can be empty.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;inline-generated-postfix;d;;;;;"boost::lexical_cast<StringT>(""//$"")";StringT;InlineGeneratedPostfix;A postfix that marks a line of an inline template file as generated content. This string must not be empty.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;inline-pad;;;;;;0;unsigned int;InlinePad;The number of characters a generated line is padded up to with spaces before the generated postfix is appended.;no;no;don't care;no;no;no;no;no;no;no;no
-;;;recycle;y;yes;;;;false;bool;Recycle;Used together with inlined option. Moves the target file to the recycle bin of the system if possible before it is replaced by the intermediate file.;no;no;don't care;no;no;no;no;no;no;no;no
+;;;recycle;y;yes;;;;false;bool;Recycle;Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;;no;no
 ;ResetGenerator;Reset Generator;reset;r;yes;;;;;bool;Reset;Reset the generator to defaults.;no;no;no;yes;no;no;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;;no;no

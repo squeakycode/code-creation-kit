@@ -1,12 +1,13 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
-New Feature;;Added recycle option. This option is used together with inline templates.;;
-New Feature;;Added logging to support debugging of  templates.;;
+New Feature;;An empty string can be passed for option --csv-delimiter when no delimiter is desired.;;
+New Feature;;Added option csv-ignore-quotes. Double quotes in table entries are treated as normal character when on.;;
+New Feature;;Added recycle option. This option can be used when processing inline templates. If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ;;
+New Feature;;Added logging for debugging of  templates.;;
 New Feature;;Added support for in-place generation using inline templates.;;
-New Feature;;Added auto padding of CSV-file rows with empty strings. This supports the use of hand-written CSV-files.;;
-Bugfix;;Fixed --csv-comment-chars has no effect.;;
-Bugfix;;Fixed test_base.mpc file to fix a problem when using Microsoft Visual Studio 2010.;;
-New Feature;;Added the append-to-file option for creating a file in multiple generation steps.;;
+New Feature;;Added option --pad-rows for auto padding of CSV-file rows with empty strings. This supports the use of hand-written CSV-files.;;
+Bugfix;;Fixed bug that caused option --csv-comment-chars to have no effect.;;
+New Feature;;Added option --append-to-file  for creating a file in multiple generation steps.;;
 Release;;"The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.
 
 Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.2.0.67;2011-06-19
