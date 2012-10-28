@@ -49,6 +49,7 @@ public:
         eAddIncludeDirectory,
         eCsvDelimiter,
         eCsvCommentChars,
+        eCsvIgnoreDoubleQuotes,
         eSetLogFile,
         eNoOptionsGiven,
         eOptionsInvalid
@@ -104,8 +105,9 @@ public:
             ("add-include-directory,i", value<std::vector<StringT> >()->multitoken(), "Adds an include directory. This option accepts multiple parameters.")
         ;
         m_descriptionCsvTableProperties.add_options() //("CSV Table Properties")
-            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items.")
+            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items. Use an empty string for no delimiter.")
             ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
+            ("csv-ignore-quotes", value<StringT >(), "Double quotes in table entries are treated as normal character when on. Valid values are 'on' and 'off'. The default setting is 'off'. ")
         ;
         m_descriptionLogging.add_options() //("Logging")
             ("log-file", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
@@ -184,6 +186,7 @@ public:
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
         bool providedCsvCommentChars = hasCsvCommentChars();
+        bool providedCsvIgnoreDoubleQuotes = hasCsvIgnoreDoubleQuotes();
         bool providedLogFile = hasLogFile();
     
         if (
@@ -209,6 +212,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -238,6 +242,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -259,6 +264,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -293,6 +299,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -327,6 +334,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -355,6 +363,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -389,6 +398,7 @@ public:
             && providedIncludeDirectories == true
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -423,6 +433,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == true
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -457,6 +468,7 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == true
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == false
         )
         {
@@ -491,6 +503,42 @@ public:
             && providedIncludeDirectories == false
             && providedDelimiter == false
             && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == true
+            && providedLogFile == false
+        )
+        {
+            return eCsvIgnoreDoubleQuotes;
+        }
+        
+        if (
+               providedTableFile == false
+            && providedLabel == false
+            && providedTopDown == false
+            && providedLeftToRight == false
+            && providedRowHeaderIndex == false
+            && providedColumnHeaderIndex == false
+            && providedPadRows == false
+            && providedLabelsOfTableFilesToUnload == false
+            && providedTemplateFile == false
+            && providedOutputFile == false
+            && providedParameters == false
+            && providedUseIntermediateOutputFile == false
+            && providedIntermediateOutputFileExtension == false
+            && providedMarkupPrefix == false
+            && providedMarkupPostfix == false
+            && providedMarkup == false
+            && providedAppendToFile == false
+            && providedInline == false
+            && providedInlinePrefix == false
+            && providedInlinePostfix == false
+            && providedInlineGeneratedPostfix == false
+            && providedInlinePad == false
+            && providedRecycle == false
+            && providedReset == false
+            && providedIncludeDirectories == false
+            && providedDelimiter == false
+            && providedCsvCommentChars == false
+            && providedCsvIgnoreDoubleQuotes == false
             && providedLogFile == true
         )
         {
@@ -526,6 +574,7 @@ public:
             && !providedIncludeDirectories
             && !providedDelimiter
             && !providedCsvCommentChars
+            && !providedCsvIgnoreDoubleQuotes
             && !providedLogFile
         )
         {
@@ -766,6 +815,12 @@ public:
     }
     
     ///returns the provided value
+    StringT getCsvIgnoreDoubleQuotes() const
+    {
+        return m_vmap["csv-ignore-quotes"].as<StringT >();
+    }
+    
+    ///returns the provided value
     StringT getLogFile() const
     {
         return m_vmap["log-file"].as<StringT >();
@@ -932,6 +987,12 @@ public:
     bool hasCsvCommentChars() const
     {
         return m_vmap.count( "csv-comment-chars") != 0;
+    }
+    
+    ///indicates that the option csv-ignore-quotes has been provided
+    bool hasCsvIgnoreDoubleQuotes() const
+    {
+        return m_vmap.count( "csv-ignore-quotes") != 0;
     }
     
     ///indicates that the option log-file has been provided

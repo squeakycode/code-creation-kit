@@ -45,6 +45,9 @@ public:
     class ExInvalidCommandOptions : public std::runtime_error 
     { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
 
+    class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
+    { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
+
     ///process a stream of commands
     template <typename InputStreamT, typename GeneratorT, typename LogFileT>
     void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
@@ -169,6 +172,14 @@ public:
                 {
                     delimiterChar = delimiter[0];
                 }
+                else
+                {
+                    delimiterChar = 0;
+                }
+            }
+            else
+            {
+                throw ExInvalidCommandOptions();
             }
 
             generator.setCsvDelimiter( delimiterChar);
@@ -176,6 +187,29 @@ public:
         else if ( command == ParserT::eCsvCommentChars )
         {
             generator.setCsvCommentChars( m_parser.getCsvCommentChars());
+        }
+        else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+        {
+            if ( m_parser.hasCsvIgnoreDoubleQuotes())
+            {
+                StringT val = m_parser.getCsvIgnoreDoubleQuotes();
+                if ( val == STRING_LITERAL("on"))
+                {
+                    generator.setCsvIgnoreDoubleQuotes( true);
+                }
+                else if ( val == STRING_LITERAL("off"))
+                {
+                    generator.setCsvIgnoreDoubleQuotes( false);
+                }
+                else
+                {
+                    throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
+                }
+            }
+            else
+            {
+                throw ExInvalidCommandOptions();
+            }
         }
         else if ( command == ParserT::eSetLogFile )
         {

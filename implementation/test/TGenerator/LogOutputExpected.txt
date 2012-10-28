@@ -1,7 +1,27 @@
 Enabling log.
 Disabling log.
 Switching log stream.
-Reset.
+Resetting:
+Clearing table list.
+Clearing set include paths.
+Setting CSV Delimiter:
+CSV Delimiter=;
+Setting CSV Comment Chars:
+CSV Comment Chars=
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=0
+Setting CSV Delimiter:
+CSV Delimiter=:
+Setting CSV Delimiter:
+CSV Delimiter=;
+Setting CSV Comment Chars:
+CSV Comment Chars=#*
+Setting CSV Comment Chars:
+CSV Comment Chars=
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=1
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=0
 Adding include directory:
 Include directory=IncludeDirectoryThatDoesNotExist
 Setting markup:

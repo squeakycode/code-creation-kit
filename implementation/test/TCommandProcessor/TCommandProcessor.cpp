@@ -62,6 +62,8 @@ public:
         , m_addIncludeDirectory(false)
         , m_setCsvDelimiter(false)
         , m_setCsvCommentChars(false)
+        , m_setCsvIgnoreDoubleQuotes(false)
+        , m_csvIgnoreDoubleQuotes(false)
         , m_delimiter(0)
         , m_rowHeaderIndex(0)
         , m_columnHeaderIndex(0)
@@ -143,8 +145,15 @@ public:
         BOOST_CHECK( m_csvCommentChars == commentChars);
     }
 
+    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+    {
+        BOOST_CHECK( m_setCsvIgnoreDoubleQuotes);
+        BOOST_CHECK( m_csvIgnoreDoubleQuotes == ignoreDoubleQuotes);
+    }
+
     void connectLogOutputStream( const void* stream)
     {
+        BOOST_CHECK( m_setLogStream);
         m_logStream = (stream != NULL);
     }
 
@@ -159,6 +168,9 @@ public:
     bool m_addIncludeDirectory;
     bool m_setCsvDelimiter;
     bool m_setCsvCommentChars;
+    bool m_setCsvIgnoreDoubleQuotes;
+    bool m_csvIgnoreDoubleQuotes;
+    bool m_setLogStream;
 
     unsigned int m_rowHeaderIndex;
     unsigned int m_columnHeaderIndex;
@@ -318,6 +330,7 @@ void runTest()
     {
         //test logging off
         GeneratorT generator;
+        generator.m_setLogStream = true;
         generator.m_logStream = true;
         std::vector<std::string> args;
         args += "-c", "--log-file none";
@@ -328,6 +341,7 @@ void runTest()
     {
         //test logging on; stdout
         GeneratorT generator;
+        generator.m_setLogStream = true;
         generator.m_logStream = false;
         std::vector<std::string> args;
         args += "-c", "--log-file -";
@@ -338,6 +352,7 @@ void runTest()
     {
         //test logging on; file
         GeneratorT generator;
+        generator.m_setLogStream = true;
         generator.m_logStream = false;
         std::vector<std::string> args;
         args += "-c", "--log-file testlogfile.log";
@@ -405,6 +420,26 @@ void runTest()
         generator.setCsvCommentCharsExpected( "#'");
         std::vector<std::string> args;
         args += "-c", "--csv-comment-chars #'";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test ignore double quotes off
+        GeneratorT generator;
+        generator.m_setCsvIgnoreDoubleQuotes = true;
+        generator.m_csvIgnoreDoubleQuotes = false;
+        std::vector<std::string> args;
+        args += "-c", "--csv-ignore-quotes off";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test ignore double quotes on
+        GeneratorT generator;
+        generator.m_setCsvIgnoreDoubleQuotes = true;
+        generator.m_csvIgnoreDoubleQuotes = true;
+        std::vector<std::string> args;
+        args += "-c", "--csv-ignore-quotes on";
         process<StringT>( args, generator);
     }
 

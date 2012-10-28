@@ -93,6 +93,10 @@ public:
         return m_csvCommentChars;
     }
 
+    void setCsvIgnoreDoubleQuotes( bool /*ignoreDoubleQuotes*/)
+    {
+    }
+
     ///load another table for generation, see also unloadTable
     void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int, bool)
     {

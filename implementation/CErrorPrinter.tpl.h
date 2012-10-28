@@ -101,6 +101,11 @@ public:
         [MACRO_END][TRIM]
     }
 
+    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+    {
+        m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+    }
+
     void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         try

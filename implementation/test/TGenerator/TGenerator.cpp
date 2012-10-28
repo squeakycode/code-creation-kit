@@ -191,6 +191,14 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //reset
         generator.reset();
 
+        //csv options
+        generator.setCsvDelimiter( ':');
+        generator.setCsvDelimiter( ';');
+        generator.setCsvCommentChars( "#*");
+        generator.setCsvCommentChars( "");
+        generator.setCsvIgnoreDoubleQuotes( true);
+        generator.setCsvIgnoreDoubleQuotes( false);
+
         //include
         generator.addIncludeDirectory("IncludeDirectoryThatDoesNotExist");
 

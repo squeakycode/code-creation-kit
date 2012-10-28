@@ -176,6 +176,7 @@ public:
         : m_lastRowNumberWithFailure(1)
         , m_indexOfLastProcessedParameter(0)
         , m_csvDelimiter( STRING_LITERAL(';'))
+        , m_csvIgnoreDoubleQuotes(false)
         , m_logOutputStream(0)
     {
     }
@@ -183,10 +184,17 @@ public:
     ///set delimiter for next csv table to load
     void setCsvDelimiter( CharT delimiter)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Setting CSV Delimiter:\n";
+            *m_logOutputStream << "CSV Delimiter=" << delimiter << "\n";
+        }
+
         //get a stream object used to widen the used characters
         CSourceFile<StringT, CsvFileT> file( "", true);
         //check the delimiter
-        CCsvParser::checkDelimiter( delimiter, file.get());
+        CCsvParser::checkDelimiter( delimiter, m_csvIgnoreDoubleQuotes, file.get());
         m_csvDelimiter = delimiter;
     }
 
@@ -199,10 +207,17 @@ public:
     ///set list of characters as string that mark commented lines for next csv table to load
     void setCsvCommentChars( const StringT& commentChars)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Setting CSV Comment Chars:\n";
+            *m_logOutputStream << "CSV Comment Chars=" << commentChars << "\n";
+        }
+
         //get a stream object used to widen the used characters
         CSourceFile<StringT, CsvFileT> file( "", true);
         //check the characters
-        CCsvParser::checkCharsUsedForCommenting( commentChars, m_csvDelimiter, file.get());
+        CCsvParser::checkCharsUsedForCommenting( commentChars, m_csvDelimiter, m_csvIgnoreDoubleQuotes, file.get());
         //set the characters
         m_csvCommentChars = commentChars;
     }
@@ -211,6 +226,18 @@ public:
     const StringT& getCsvCommentChars() const
     {
         return m_csvCommentChars;
+    }
+
+    ///set csv parsing option
+    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes)
+    {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Setting CSV Ignore Double Quotes=:\n";
+            *m_logOutputStream << "CSV Ignore Double Quotes=" << ignoreDoubleQuotes << "\n";
+        }
+        m_csvIgnoreDoubleQuotes = ignoreDoubleQuotes;
     }
 
     ///load another table for generation, see also unloadTable
@@ -255,7 +282,7 @@ public:
                 //open table file
                 CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
                 //parse the table file
-                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_positionTracker);
+                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
                 m_tableList.push_back( tableData);
@@ -295,7 +322,7 @@ public:
         try
         {
             //parse the table file
-            CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_positionTracker);
+            CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
             //connect table to processor and keep reference in list
             m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
             m_tableList.push_back( tableData);
@@ -505,16 +532,29 @@ public:
         //log
         if ( m_logOutputStream)
         {
-            *m_logOutputStream << "Reset.\n";
+            *m_logOutputStream << "Resetting:\n";
         }
-
         m_templateProcessor.reset();
+
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Clearing table list.\n";
+        }
         m_tableList.clear();
+
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Clearing set include paths.\n";
+        }
         m_templateLoader.reset();
         m_lastRowNumberWithFailure = 1;
         m_positionTracker.reset();
         m_indexOfLastProcessedParameter = 0;
-        m_csvDelimiter = STRING_LITERAL(';');
+        setCsvDelimiter( STRING_LITERAL(';'));
+        setCsvCommentChars( STRING_LITERAL(""));
+        setCsvIgnoreDoubleQuotes( false);
     }
 
     ///unloads a table, see also loadTable
@@ -659,6 +699,7 @@ private:
     SizeT m_indexOfLastProcessedParameter; ///<for error output
     CharT m_csvDelimiter; ///<delimiter used by csv files to load
     StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
+    bool m_csvIgnoreDoubleQuotes; ///< Option for csv parser, double quotes are treated as normal character
     LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 
