@@ -1,16 +1,6 @@
 [MACRO_BEGIN][TRIM]
-[COMMENT] <!-- begin if first time, is release -->
-[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][TRIM]
-[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
-Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]
-===============================================================================
-
-[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,78})\''|([^\n]{0,78})\n|([^\n]{0,78}) +|([^\n]{78})','$1$2$3$4\n']
-
-Change      Tracker ID Description
------------ ---------- --------------------------------------------------------
-[COMMENT] <!-- is first time, not a release -->
-[OR][TRIM]
+[COMMENT] <!-- begin if first time, is not release -->
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
 Development Snapshot
 ===============================================================================
 
@@ -18,14 +8,11 @@ This is a development snapshot.
 
 Change      Tracker ID Description
 ----------- ---------- --------------------------------------------------------
-[COMMENT] <!-- release or development snapshot -->
-[END][TRIM]
-[COMMENT] <!-- end if first time -->
-[OR][TRIM]
-[END][TRIM]
+[COMMENT] <!-- end if first time, development snapshot-->
+[OR][END][TRIM]
 [COMMENT] <!-- start document body, release entry -->
 [BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
-
+[BEGIN][IF][FIRST_TIME][TRIM.][OR][END]
 Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]
 ===============================================================================
 
