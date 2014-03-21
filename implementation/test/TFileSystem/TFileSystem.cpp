@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE( TFileSystem)
     BOOST_CHECK(  run_test<std::wstring>( L"C:\\dir\\c.txt", L"D:\\ddir\\c.txt", L"D:/ddir/c.txt"));
     BOOST_CHECK(  run_test<std::string>( "C:\\c.txt", "a.txt", "C:/a.txt"));
 
-    BOOST_CHECK(  run_test_relative<std::wstring>( L"C:\\dir\\c.txt", L"D:\\dir\\c.txt", L"D:\\dir\\c.txt"));
-    BOOST_CHECK(  run_test_relative<std::string>( "C:\\dir\\c.txt", "D:\\dir\\c.txt", "D:\\dir\\c.txt"));
+    BOOST_CHECK(  run_test_relative<std::wstring>( L"C:\\dir\\c.txt", L"D:\\dir\\c.txt", L"D:/dir/c.txt"));
+    BOOST_CHECK(  run_test_relative<std::string>( "C:\\dir\\c.txt", "D:\\dir\\c.txt", "D:/dir/c.txt"));
     BOOST_CHECK(  run_test_relative<std::string>( "c:\\dir\\c.txt", "C:\\dir\\c.txt", "c.txt"));
     BOOST_CHECK(  run_test_relative<std::string>( "C:\\dir\\..\\dir\\c.txt", "C:\\dir\\c.txt", "c.txt"));
     BOOST_CHECK(  run_test_relative<std::string>( "C:\\dir\\c.txt", "C:\\dir\\a\\c.txt", "a/c.txt"));

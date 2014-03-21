@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2014 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,8 +16,9 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 project {
-  specific(nmake, vc6, vc7, vc71, vc8, vc9) {
+  specific(nmake, vc6, vc7, vc71, vc8, vc9, vc10, vc11) {
     warning_level = 4
     warnaserror = true
+    disablespecificwarnings += 4996
   }
 }

@@ -18,8 +18,15 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 
 set IDE_TYPE=%~1
 
-if not defined IDE_TYPE if exist "%ProgramFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
-if not defined IDE_TYPE if exist "%ProgramFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8
+set MPC_DEPENDENCY_COMBINED_STATIC_LIBRARY=Yes
+
+set PrgFiles=%ProgramFiles%
+if defined %ProgramFiles(x86)% set PrgFiles=%ProgramFiles(x86)%
+
+rem if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 11.0" set IDE_TYPE=vc11
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 10.0" set IDE_TYPE=vc10
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8
 
 call create_test_mpcs.cmd implementation
 if %errorlevel% neq 0 goto :exit_failure
@@ -27,7 +34,7 @@ call create_project_mpc.cmd ..\implementation implementation %CCK_ROOT%
 if %errorlevel% neq 0 goto :exit_failure
 
 pushd ..
-%MPC_ROOT%\mwc.pl -type %IDE_TYPE% -include mpc -features boost=1 -static cck.mwc
+%MPC_ROOT%\mwc.pl -type %IDE_TYPE% -include mpc -features boost=1 -value_template add_references=1 -static cck.mwc
 if %errorlevel% neq 0 popd & goto :exit_failure
 popd
 
