@@ -16,6 +16,9 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 
 #include "CTemplateLoader.h"
@@ -57,7 +60,11 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         loader.connectOutputStream( &str);
         loader.loadTemplateFile( "TemplateLoaderTest1.txt");
         StringT s = str.str();
+#ifdef _MSC_VER //TODO
         BOOST_CHECK( s == "a\nb\nc\n");
+#else
+        BOOST_CHECK( s == "a\r\nb\r\nc\r\n");
+#endif
         BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
     }
 
@@ -67,7 +74,11 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         loader.connectOutputStream( &str);
         loader.loadTemplateFile( "TemplateLoaderTest2.txt");
         StringT s = str.str();
+#ifdef _MSC_VER //TODO
         BOOST_CHECK( s == "x\ny\nz");
+#else
+        BOOST_CHECK( s == "x\r\ny\r\nz");
+#endif
         BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
     }
 

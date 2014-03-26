@@ -161,9 +161,16 @@ public:
                     {
                         if ( !text.empty())
                         {
-                            StringT::const_iterator last = --text.end();
+                            typename StringT::const_iterator last = --text.end();
                             if ( *last == STRING_LITERAL('\n'))
                             {
+                                bool withCarriageReturn = false;
+                                if ( last != text.begin() && *(last - 1) == STRING_LITERAL('\r'))
+                                {
+                                    --last;
+                                    withCarriageReturn = true;
+                                }
+
                                 StringT temp;
                                 temp.assign(text.begin(), last);
                                 if ( temp.size() < m_numInlinePad)
@@ -171,7 +178,10 @@ public:
                                     temp.resize( m_numInlinePad, STRING_LITERAL(' '));
                                 }
                                 *m_finalOutputStream << temp;
-                                *m_finalOutputStream << m_inlineGeneratedPostfixAndNewLine;
+                                *m_finalOutputStream 
+                                    << (withCarriageReturn 
+                                        ? m_inlineGeneratedPostfixAndCarriageReturnNewLine
+                                        : m_inlineGeneratedPostfixAndNewLine);
                             }
                             else
                             {
@@ -300,6 +310,7 @@ public:
     {
         m_inlineTemplateMode = enabled;
         m_inlineGeneratedPostfixAndNewLine = inlineGeneratedPostfix + STRING_LITERAL('\n');
+        m_inlineGeneratedPostfixAndCarriageReturnNewLine = inlineGeneratedPostfix + STRING_LITERAL("\r\n");
         m_numInlinePad = numInlinePad > 64*1024 ? 64*1024 : numInlinePad; //clip value
     }
 
@@ -312,6 +323,7 @@ private:
     OutputStreamT* m_outputStream;
     bool m_inlineTemplateMode; ///<toggles inline template processing
     StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
+    StringT m_inlineGeneratedPostfixAndCarriageReturnNewLine; ///< marks a generated line
     size_t m_numInlinePad; ///< if a line has less chars than this value then pad with spaces
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];

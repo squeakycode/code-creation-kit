@@ -55,6 +55,14 @@ public:
         StringT command;
         while( std::getline(stream, command))
         {
+#ifndef _MSC_VER
+            //assume linux
+            if ( !command.empty() && *(command.rbegin()) == '\r')
+            {
+                command.resize( command.size() - 1);
+            }
+#endif
+
             processCommand( command, generator, commandFileName, logFile, disableReset);
         }
     }

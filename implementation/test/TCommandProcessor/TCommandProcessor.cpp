@@ -16,11 +16,18 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <vector>
 #include <list>
+
+///externally provided exception class showing that an error has been printed
+class CErrorPrinted{};
+
 #include "CommandProcessor.h"
 #include "CTargetFile.h"
 
@@ -30,16 +37,13 @@ class LogFileT;
 #pragma warning( push )
 #pragma warning( disable : 4512 )
 #pragma warning( disable : 4702 )
+#endif
 #include <boost/assign.hpp>
 #include <boost/lexical_cast.hpp>
-#endif
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
 #include <boost/foreach.hpp>
-
-///externally provided exception class showing that an error has been printed
-class CErrorPrinted{};
 
 ///stub for the generator
 template <typename StringT>
@@ -417,9 +421,9 @@ void runTest()
         //test set comment chars
         GeneratorT generator;
         generator.m_setCsvCommentChars = true;
-        generator.setCsvCommentCharsExpected( "#'");
+        generator.setCsvCommentCharsExpected( "#+");
         std::vector<std::string> args;
-        args += "-c", "--csv-comment-chars #'";
+        args += "-c", "--csv-comment-chars #+";
         process<StringT>( args, generator);
     }
 
@@ -490,9 +494,9 @@ void runTest()
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
         generator.m_recycle = true;
-        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
+        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args;
-        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56 -y";
+        args += "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y";
         process<StringT>( args, generator);
     }
 
@@ -585,5 +589,7 @@ void runTest()
 BOOST_AUTO_TEST_CASE( TCommandProcessor)
 {
     runTest<std::string>();
+#ifdef _MSC_VER
     runTest<std::wstring>();
+#endif
 }

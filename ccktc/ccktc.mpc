@@ -15,9 +15,11 @@
 //   You should have received a copy of the GNU General Public License
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
-project(*) : base, boost_program_options, boost_filesystem, boost_regex {
+project(*) : base, boost_program_options, boost_filesystem, boost_regex, boost_system {
   after += implementation
   includes += ../implementation
+  libs += implementation
+  libpaths += ../implementation
   exename   = ccktc
   install   = ../output/bin
 }

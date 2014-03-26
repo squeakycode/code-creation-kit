@@ -183,7 +183,7 @@ public:
         StringT front = StringT() + STRING_LITERAL("|") + STRING_LITERAL("(") + regexPrefix;
         StringT back = regexPostfix + STRING_LITERAL(")");
 
-        expression += STRING_LITERAL("(\n)");
+        expression += STRING_LITERAL("(\r\n|\n)");
         expression += front + STRING_LITERAL("COMMENT") + back;
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
@@ -265,7 +265,7 @@ public:
         //check if the line needs to be trimmed or is comment
         for (;;)
         {
-            RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
+            RangeT range = trimRange( line, boost::is_any_of(" \t\n\r"));
             //if in inline processing Mode
             if ( m_inlineTemplateMode && m_temporaryInlineTemplateLine.empty())
             {
@@ -296,7 +296,7 @@ public:
                     m_temporaryInlineTemplateLine.append( range.end(), end);
                     
                     //switch to processing of this line
-                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n"));
+                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n\r"));
                     start = m_temporaryInlineTemplateLine.begin();
                     fullLineStart = m_temporaryInlineTemplateLine.begin();
                     end = m_temporaryInlineTemplateLine.end(); 

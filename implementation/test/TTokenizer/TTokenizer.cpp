@@ -16,6 +16,9 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 #include "CTokenizer.gen.h"
 #include "CBackEndTokenizer.gen.h"

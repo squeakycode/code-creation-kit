@@ -28,11 +28,6 @@ if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 10.0" set I
 if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
 if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8
 
-call create_test_mpcs.cmd implementation
-if %errorlevel% neq 0 goto :exit_failure
-call create_project_mpc.cmd ..\implementation implementation %CCK_ROOT%
-if %errorlevel% neq 0 goto :exit_failure
-
 pushd ..
 %MPC_ROOT%\mwc.pl -type %IDE_TYPE% -include mpc -features boost=1 -value_template add_references=1 -static cck.mwc
 if %errorlevel% neq 0 popd & goto :exit_failure

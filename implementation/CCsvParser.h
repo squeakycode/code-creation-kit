@@ -156,6 +156,15 @@ public:
                         positionTracker.nextColumn();
                         if ( stream.get( c)) //read next character to find out what to do
                         {
+                            if ( c == carriage_return ) //ignore carriage return
+                            {
+                                if ( !stream.get( c))
+                                {
+                                    c = new_line; //end of file will be treated as new line
+                                    break;
+                                }
+                            }
+
                             if ( c == quote ) //double quote results in single quote
                             {
                                 //no action, added below

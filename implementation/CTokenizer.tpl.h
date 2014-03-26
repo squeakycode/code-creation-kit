@@ -212,7 +212,7 @@ public:
         StringT back = regexPostfix + STRING_LITERAL(")");
         back = StringT() + STRING_LITERAL("(\\.*)") + back;[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
 
-        expression += STRING_LITERAL("(\n)");
+        expression += STRING_LITERAL("(\r\n|\n)");
         expression += front + STRING_LITERAL("[ENTRY]["Tag Name"][READ_TOP_DOWN]") + back;
 
         m_searchExpression = RegexT( expression);
@@ -292,7 +292,7 @@ public:
         //check if the line needs to be trimmed or is comment
         for (;[MACRO_BEGIN]!m_bypassMode[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][MACRO_END];)
         {
-            RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
+            RangeT range = trimRange( line, boost::is_any_of(" \t\n\r"));
             [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][TRIM]
             //if in inline processing Mode
             if ( m_inlineTemplateMode && m_temporaryInlineTemplateLine.empty())
@@ -324,7 +324,7 @@ public:
                     m_temporaryInlineTemplateLine.append( range.end(), end);
                     
                     //switch to processing of this line
-                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n"));
+                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n\r"));
                     start = m_temporaryInlineTemplateLine.begin();
                     fullLineStart = m_temporaryInlineTemplateLine.begin();
                     end = m_temporaryInlineTemplateLine.end(); 

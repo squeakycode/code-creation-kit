@@ -16,6 +16,9 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include "System.h"
@@ -25,7 +28,11 @@ void run_test()
 {
    typedef typename StringT::value_type CharT;
 
+#ifdef _MSC_VER //TODO
    _putenv("TEST_VARIABLE=123abc");
+#else
+    putenv("TEST_VARIABLE=123abc");
+#endif
 
     BOOST_CHECK( System::expandEnvironmentVariables<StringT>( STRING_LITERAL("$(TEST_VARIABLE)")) == STRING_LITERAL("123abc"));
     BOOST_CHECK( System::expandEnvironmentVariables<StringT>( STRING_LITERAL("start$(TEST_VARIABLE)end")) == STRING_LITERAL("start123abcend"));
@@ -37,6 +44,8 @@ void run_test()
 BOOST_AUTO_TEST_CASE( TSystem)
 {
     run_test<std::string>();
+#ifdef _MSC_VER //TODO
     run_test<std::wstring>(); //true wchar support is not implemented
+#endif
 }
 

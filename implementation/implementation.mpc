@@ -1,0 +1,12 @@
+project(*) : base, boost_base, tccmd {
+   CCK_Text_Compiler_Command_Files {
+       conditional(nmake, vc6, vc7, vc71, vc8, vc9, vc10, vc11) {
+CCommandFileLineParser.tccmd >> CCommandFileLineParser.gen.h << CCommandFileLineParser.csv ../templates/CommandLineParser.tpl.h 
+CCommandLineParser.tccmd >> CCommandLineParser.gen.h << CCommandLineParser.csv ../templates/CommandLineParser.tpl.h 
+CErrorPrinter.tccmd >> CErrorPrinter.gen.h << Exceptions.csv CErrorPrinter.tpl.h ErrorPrinterCatch.tpl.h 
+Parser.tccmd >> ConstraintDirectives.gen.h ConversionDirectives.gen.h ParserExtensions.gen.h << "../requirements/Tag Specification.csv" ParserExtensions.csv ConstraintDirectives.tpl.h ConversionDirectives.tpl.h ParserExtensions.tpl.h 
+Substitutions.tccmd >> ESubstitutions.gen.h << "../requirements/Tag Specification.csv" ESubstitutions.tpl.h 
+Tokens.tccmd >> CBackEndTokenizer.gen.h CTokenizer.gen.h ETokens.gen.h test/TTokenizer/TokenizerTest.gen.h << "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h test/TTokenizer/TokenizerTest.tpl.h 
+       }
+    }
+}

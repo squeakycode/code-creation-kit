@@ -19,12 +19,27 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 setlocal enableextensions
 setlocal enabledelayedexpansion
 
-set TEST_HOME=%~1
+set PROJECT_DIRECTORY=..\implementation
+set PROJECT_NAME=implementation
+set USE_GENERATOR=1
 
-for /F "usebackq" %%i in (`dir /s /b ..\%TEST_HOME%\test\*.cpp`) do call :CreateFile > %%~pi%%~ni.mpc
-exit /b 0
+if defined USE_GENERATOR if not defined CCK_ROOT echo Environment variable CCK_ROOT is not set
+if defined USE_GENERATOR if not defined CCK_ROOT exit /b 1
 
-:CreateFile
-echo project(*) : test_base {
-echo     after += %TEST_HOME%
+call :CreateFile[] > "%PROJECT_DIRECTORY%\%PROJECT_NAME%.mpc"
+exit /b %ERRORLEVEL%
+
+:CreateFile[]
+echo project(*) : base, boost_base, tccmd {
+
+if defined USE_GENERATOR echo    CCK_Text_Compiler_Command_Files {
+if defined USE_GENERATOR echo        conditional(nmake, vc6, vc7, vc71, vc8, vc9, vc10, vc11) {
+if defined USE_GENERATOR call :ListCommandFiles[]
+if defined USE_GENERATOR echo        }
+if defined USE_GENERATOR echo     }
 echo }
+exit /b %ERRORLEVEL% 
+
+:ListCommandFiles[]
+for /F "usebackq" %%i in (`dir /b "%PROJECT_DIRECTORY%\*.tccmd"`) do "%CCK_ROOT%\bin\ccktc.exe" "%PROJECT_DIRECTORY%\%%i" -d mpc & echo. 
+exit /b %ERRORLEVEL%

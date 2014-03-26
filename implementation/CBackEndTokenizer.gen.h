@@ -118,7 +118,7 @@ public:
         StringT back = regexPostfix + STRING_LITERAL(")");
         back = StringT() + STRING_LITERAL("(\\.*)") + back;
 
-        expression += STRING_LITERAL("(\n)");
+        expression += STRING_LITERAL("(\r\n|\n)");
         expression += front + STRING_LITERAL("COMMENT") + back;
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
@@ -230,7 +230,7 @@ public:
         //check if the line needs to be trimmed or is comment
         for (;!m_bypassMode;)
         {
-            RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
+            RangeT range = trimRange( line, boost::is_any_of(" \t\n\r"));
             if ( boost::starts_with( range, m_commentKeyword))
             {
                 return *this;
