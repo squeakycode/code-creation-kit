@@ -1,0 +1,19 @@
+Item Type;Text
+heading 1;Introduction 
+paragraph;A software project often contains dull and repetitive tasks. Program options for instance require writing a similar code fragment for each option. Additionally the program options have to be documented. A common solution to avoid error prone coding and poorly maintained documentation is to gather all the program option data in a spreadsheet and then to write a macro that generates the code and the documentation. The drawback of this approach is that writing the macro is often too expensive and the result is too inflexible. The code-creation-kit simplifies the generation part a lot. This allows benefiting from the advantages of generative programming. 
+paragraph;The code-creation-kit mainly consists of a text compiler that can be used to generate code for any text based programming language. The input of the text compiler is modeled in table and template files.  The generation itself is controlled by powerful multistage macro expressions in the template files. The getting started section shows in more detail how this works. 
+heading 1;Benefits 
+list_start;
+list_item;Productivity is increased when generating code. 
+list_item;Less Testing is required. 
+list_item;Multistage macro expressions allow accomplishing complex generation tasks. 
+list_item;Once the table layout is defined and a template is written for a common coding problem the implementation effort is cut down to a minimum for the future. 
+list_item;All the powerful and convenient features of a spreadsheet application can be used to create data tables. 
+list_item;The kit can be used to create code for any text based language. 
+list_item;The text compiler can be integrated into many development environments. 
+list_item;The text based table format allows the tracking of changes in a version control system. 
+list_item;The text compiler is very stable due to high unit test coverage. 
+list_end;
+heading 1;Overview 
+include;overview.table.gen.html
+paragraph; 

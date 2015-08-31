@@ -1,0 +1,21 @@
+# Generator template language definition file
+#
+# Author: Andreas Gau
+#   Date: 23.01.2010
+# ----------
+
+$DESCRIPTION=Generator template language definition file
+
+$KEYWORDS(kwa)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["preprocessor directive"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\]))
+
+$KEYWORDS(kwb)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\]))
+
+$KEYWORDS(kwc)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\]))
+
+$KEYWORDS(kwd)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\.\]))
+
+$KEYWORDS(kwe)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\.\.\]))
+
+$SL_COMMENT=regex(\[COMMENT\].*)
+
+$IGNORECASE=false

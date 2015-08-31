@@ -1,0 +1,5 @@
+workspace {
+    getting_started_simple
+    getting_started_simple_extended
+    documented_state_machine
+}

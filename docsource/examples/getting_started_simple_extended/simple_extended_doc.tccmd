@@ -1,0 +1,8 @@
+-w 0 -n 0 simple_extended.csv
+-s ..\table.tpl.html -o simple_extended.table.gen.html
+--reset
+-w 0 -n 0 simple_extended.map_vbnet.csv
+-s ..\table.tpl.html -o simple_extended.map_vbnet.table.gen.html
+--reset
+-w 0 -n 0 simple_extended.map_cpp.csv
+-s ..\table.tpl.html -o simple_extended.map_cpp.table.gen.html

@@ -1,0 +1,212 @@
+//   Copyright (C) 2011 Andreas Gau
+//
+//   This file is part of the code-creation-kit.
+//
+//   The code-creation-kit is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   The code-creation-kit is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef INCLUDED_FILESYSTEM_H_7536737
+#define INCLUDED_FILESYSTEM_H_7536737
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include "StringLiteral.h"
+
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
+#endif
+#include <boost/algorithm/string.hpp>
+#ifdef _MSC_VER
+#pragma warning( pop ) 
+#endif
+
+namespace FileSystem
+{
+    namespace detail
+    {
+        //used for traits resolution
+        template <typename StringT>
+        struct PathTraits
+        {
+        };
+
+        template <> struct PathTraits<std::string> { typedef boost::filesystem::path_traits type; };
+        template <> struct PathTraits<std::wstring> { typedef boost::filesystem::wpath_traits type; };
+    }
+
+    template <typename StringT>
+    bool equals( const StringT& a, const StringT& b)
+    {
+#if defined WIN32
+        return boost::iequals( a, b);
+#else
+        return boost::equals( a, b);
+#endif
+    }
+
+    ///returns the location (path+name) determined from a fixed location and a location that may be relative to the fixed location
+    template <typename StringT>
+    StringT determineRelativeLocation( const StringT& location, const StringT& dependentLocation, bool locationIsFile = true)
+    {
+        typedef typename StringT::value_type CharT;
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+
+        //create path objects
+        PathT base( location);
+        PathT dependent( dependentLocation);
+
+        base.normalize();
+        dependent.normalize();
+
+        //remove filename if file
+        if ( locationIsFile )
+        {
+            base = base.parent_path();
+        }
+
+        if (   base.has_root_path()
+            && dependent.has_root_path()
+            && equals( base.root_path().string(), dependent.root_path().string())
+            )
+        {
+            //relative location to determine
+            PathT relativeLocation;
+            //iterate over paths
+            typename PathT::const_iterator baseIt = base.begin();
+            typename PathT::const_iterator dependentIt = dependent.begin();
+            //skip root path
+            ++baseIt;
+            ++dependentIt;
+            while( baseIt != base.end() && dependentIt != dependent.end())
+            {
+                //if root folders are different
+                if ( !equals( *baseIt, *dependentIt) )
+                {
+                    //add '..' for each base location folder to move to root
+                    while ( baseIt != base.end())
+                    {
+                        ++baseIt;
+                        relativeLocation /= STRING_LITERAL("..");
+                    }
+                }
+                else
+                {
+                    ++baseIt;
+                    ++dependentIt;
+                }
+
+                //base folder is processed
+                if ( baseIt == base.end() && dependentIt != dependent.end() )
+                {
+                    //move from base to target
+                    for (; dependentIt != dependent.end(); ++dependentIt)
+                    {
+                        relativeLocation /= *dependentIt;
+                    }
+                    return relativeLocation.string();
+                }
+
+                //dependent is processed
+                if ( baseIt != base.end() && dependentIt == dependent.end() )
+                {
+                    //add '..' for each base location folder to move to root
+                    while ( baseIt != base.end())
+                    {
+                        ++baseIt;
+                        relativeLocation /= STRING_LITERAL("..");
+                    }
+                    return relativeLocation.string();
+                }
+            }
+        }
+        return dependentLocation;
+    }
+
+    ///returns the location (path+name) determined from a fixed location and a location that may be relative to the fixed location
+    template <typename StringT>
+    StringT determineDependentLocation( const StringT& location, const StringT& relativeLocation, bool locationIsFile = true)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT base( location);
+        PathT relative( relativeLocation);
+
+        //if is absolute path return it
+        if ( relative.has_root_name())
+        {
+            return relative.string();
+        }
+        else
+        {
+            //create new location relative to base
+            PathT  dependentLocation( (locationIsFile ? base.parent_path() : base) / relativeLocation);
+            //normalize it removing superfluous '..' and so on
+            dependentLocation.normalize();
+            return dependentLocation.string();
+        }
+    }
+
+    ///returns the filename
+    template <typename StringT>
+    StringT determineFilename( const StringT& location)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT path( location);
+        return path.filename();
+    }
+
+    ///returns the location (path+name) determined from a initial path and a location that may be relative to it
+    template <typename StringT>
+    StringT determineDependentLocation( const StringT& relativeLocation)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT initialPath( boost::filesystem::initial_path<PathT>());
+        return determineDependentLocation( initialPath.string(), relativeLocation, false);
+    }
+
+    /// returns true if the loaction specifies an existing file
+    template <typename StringT>
+    bool isRegularFile( const StringT& location)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT path( location);
+        return boost::filesystem::is_regular_file( path);
+    }
+
+    /// removes a file
+    template <typename StringT>
+    bool removeFile( const StringT& location)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT path( location);
+        return boost::filesystem::remove( path);
+    }
+
+    /// moves a file
+    template <typename StringT>
+    void moveFile( const StringT& from, const StringT& to)
+    {
+        typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
+        PathT pathFrom( from);
+        PathT pathTo( to);
+        boost::filesystem::rename( from, to);
+    }
+
+
+}
+
+#endif /* INCLUDED_FILESYSTEM_H_7536737 */

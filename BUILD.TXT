@@ -1,0 +1,91 @@
+How to build under Microsoft Windows
+====================================
+
+Required Tools and Libraries
+----------------------------
+
+Tool                    Version     Where to get                    Needed for
+----------------------  ----------- ------------------------------- ------------
+Microsoft Visual Studio min 7.1     www.microsoft.com               build
+
+boost C++ library       min. 1.36   www.boost.org                   build
+
+Makefile, Project and               www.ociweb.com/products/mpc     build
+Workspace Creator - MPC
+
+Perl, e.g. ActivePerl               www.activestate.com/activeperl  MPC, build
+
+highlight                           www.andre-simon.de              documentation
+
+Inno Setup Compiler     5           www.jrsoftware.org              setup
+
+Inno Setup Preprocessor             ispp.sourceforge.net            setup
+
+
+
+The boost C++ library needs to be build. Consult the boost documentation on how
+to do it.
+
+The environment variable BOOST_ROOT needs to be set, e.g. BOOST_ROOT=C:\libs\boost_1_43_0
+
+The environment variable MPC_ROOT needs to be set, e.g. MPC_ROOT=C:\MPC
+
+Creating the Projects and Solution:
+
+The create_workspace.cmd batch in the tools folder can be used to create
+the project and solution files for building. The used Visual Studio type can be
+passed as first paramter (vc71,vc8,vc9,vc10). Some Visual Studio versions are
+detected automatically, see the batch file for details.
+
+There are two ways the solution can be created. If a text compiler is already
+available (CCK_ROOT is set) then the projects use the text compiler to
+generate code otherwise pregenerated code is used to build the first text
+compiler.
+
+The build text compiler can be found in the output folder.
+
+Creating the Documentation:
+
+The documentation can be created using the _rebuild_documentation.cmd from
+the docsource folder. The result can be found in the output folder.
+
+The subfolders themes and langDefs of %ProgramFiles%\WinHighlight
+(see highlight above) need to writable under Vista and Windows 7, because
+the syntax definitions of the text compiler need to be placed there.
+This is a problem with activated User Account Control (UAC).
+A possible solution for this is to change the access rights to these folders.
+
+Creating the setup:
+
+The setup can be created using the make_release.cmd from the tools folder.
+
+Please make sure that any version numbers you create do not clash with
+the ones from official code-creation-kit releases.
+
+
+How to build under Linux/Unix
+=============================
+
+The code-creation-kit has not been fully build under Linux/Unix.
+The text compiler compiles using the gcc under cygwin but it never linked.
+Some of the test projects do not compile.
+
+Tool                    Version     Where to get                    Needed for
+----------------------  ----------- ------------------------------- ------------
+boost C++ library       min. 1.36   www.boost.org                   build
+
+Makefile, Project and               www.ociweb.com/products/mpc     build
+Workspace Creator - MPC
+
+Perl                                                                MPC, build
+
+
+The boost C++ library needs to be build. Consult the boost documentation on how
+to do it.
+
+The environment variable BOOST_ROOT needs to be set.
+
+The environment variable MPC_ROOT needs to be set.
+
+The make files can be produced using the following command line:
+$(MPC_ROOT)\mwc.pl -type make -include mpc -features boost=1 -static cck.mwc

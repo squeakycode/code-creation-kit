@@ -1,0 +1,27 @@
+Item Type;Text
+heading 2;Data Table Creation 
+table_of_contents;
+paragraph;The code-creation-kit text compiler loads table data provided in the CSV-file format. This table format is very common and it is provided by many applications. It can simply be produced using a text editor. But the recommended way for creating such tables is using a spreadsheet application. Ideally you create a table to model a problem, e.g. a list of parameters, as you normally would without generating code. No special rules for column or row naming need to be applied. The default position for column headings is the first row and the first column for row headings. This can be changed using additional options in the command file. When multiple columns or rows with the same name are contained in a table their content is concatenated in the order it appears during the macro expansion. This behavior can be changed using additional tags. 
+heading 3;The CSV-File Format 
+paragraph;A comma-separated-values file uses a single character as delimiter to separate the items of a table. Common delimiters are semi-colon, tab, or comma. One line in the file stores one row of the table except when an item of the row contains a new line character. In this case or when the delimiter or a double quote is contained in the item text then the item is put into double quotes. Double quotes in the item text are doubled. 
+paragraph;Since the CSV-file format is stored as plain text, it is easy to track changes in a version control system using a text differencing tool. 
+heading 3;Using Spreadsheet Applications 
+paragraph;Using a spreadsheet application to create a data table is very convenient and all the powerful functionality of for instance Microsoft Excel or Open Office Calc can be used. 
+heading 4;Using Microsoft Excel with the Provided Add-In 
+paragraph;The code-creation-kit setup comes with an Excel add-in named ‘Code-Creation-Kit_CSV-Saver.xla’. It is needed because Excel provides no possibility to export the content of a standard workbook to a CSV-file. When using the Save-As option the type of the workbook changes and only the content of the first sheet is saved changing the type of the workbook to CSV. The add-in provides a convenient way to store all sheets of a workbook to CSV-files. This allows keeping the master workbook utilizing all Excel functionality. The following is rules apply. 
+list_start;
+list_item;Each sheet is saved to a separate CSV-file 
+list_item;The CSV-files are saved in the folder where the workbook is located 
+list_item;Naming for the first CSV-file/sheet: [workbook name].csv 
+list_item;Naming for the next CSV-files/sheets: [workbook name].[sheet name].csv 
+list_item;If the sheet name contains special characters they are replaced with '_' 
+list_item;WARNING: files with the name of the produced CSV-files in the workbooks folder are overwritten without notice! 
+list_end;
+heading 5;Store Workbook additionally to CSV-Files using the Toolbar Button 
+paragraph;When the add-in is installed it automatically creates a toolbar with a button used to store the sheets of the active workbook. 
+heading 5;Store Workbook additionally to CSV-Files on Save 
+paragraph;The workbook can be saved to CSV-files automatically when saving the workbook by adding the following before save event handler to the workbook. 
+include;temp\examples\table_creation\BeforeSaveHandler.example.vb.rtf
+paragraph; 
+heading 4;Using the CSV format directly 
+paragraph;A spreadsheet application can also be used to create and modify a CSV-file directly.  

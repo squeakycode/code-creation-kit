@@ -1,0 +1,35 @@
+#   Copyright (C) 2011, Andreas Gau
+#
+#   This file is part of the code-creation-kit.
+#
+#   The code-creation-kit is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   The code-creation-kit is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+
+generated_pages.csv
+-s generate_pages.tpl._tccmd -o temp\generate_pages.gen.tccmd
+-r
+"..\requirements\Tag Specification.csv"
+-s tag_reference.tpl.html -o temp\full_tag_reference.table.gen.html
+-s tag_combinations.tpl.html -o temp\tag_combinations.table.gen.html
+-r
+overview.csv
+-s overview.tpl.html -o temp\overview.table.gen.html
+-r
+"..\implementation\CCommandLineParser.csv"
+-s program_options_table.tpl.html -o temp\command_line_reference.table.gen.html
+-r
+"..\implementation\CCommandFileLineParser.csv"
+-s program_options_table.tpl.html -o temp\command_reference.table.gen.html
+-r
+list_of_examples.csv
+-s list_of_examples.tpl.html -o temp\list_of_examples.table.gen.html

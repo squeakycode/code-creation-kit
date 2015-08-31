@@ -1,0 +1,269 @@
+//   Copyright (C) 2011 Andreas Gau
+//
+//   This file is part of the code-creation-kit.
+//
+//   The code-creation-kit is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   The code-creation-kit is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef INCLUDED_KEYWORDPARAMETERPARSER_H_7175409
+#define INCLUDED_KEYWORDPARAMETERPARSER_H_7175409
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+#include "StringLiteral.h"
+#include <stdexcept>
+#include <vector>
+
+///base functionality for parameter policy classes, that define the parsing of a parameter value
+class CParameterPolicyBase
+{
+protected:
+    struct Chars
+    {
+        static const char opening_par = '[';
+        static const char closing_par = ']';
+        static const char comma = ',';
+        static const char space = ' ';
+        static const char tab = '\t';
+        static const char new_line = '\n';
+        static const char double_quote = '"';
+        static const char single_quote = '\'';
+        static const char back_slash = '\\';
+        static const char t = 't';
+        static const char n = 'n';
+    };
+
+    struct LChars
+    {
+        static const wchar_t opening_par = L'[';
+        static const wchar_t closing_par = L']';
+        static const wchar_t comma = L',';
+        static const wchar_t space = L' ';
+        static const wchar_t tab = L'\t';
+        static const wchar_t new_line = L'\n';
+        static const wchar_t double_quote = L'"';
+        static const wchar_t single_quote = L'\'';
+        static const wchar_t back_slash = L'\\';
+        static const wchar_t t = L't';
+        static const wchar_t n = L'n';
+    };
+
+    ///skip spaces and tabs
+    template <typename IteratorT>
+    static void skipWhiteSpace( IteratorT& start, const IteratorT& end)
+    {
+        typedef typename IteratorT::value_type CharT;
+        while( start != end && (*start == STRING_LITERAL( Chars::space) || *start == STRING_LITERAL( Chars::tab)))
+        {
+            ++start;
+        }
+    }
+
+public:
+
+    ///match parameter expression start
+    template <typename ExceptionT, typename IteratorT>
+    static void parseParameterStart( IteratorT& start, const IteratorT& end )
+    {
+        typedef typename IteratorT::value_type CharT;
+        if ( start != end && *start == STRING_LITERAL( Chars::opening_par) )
+        {
+            ++start;
+            skipWhiteSpace( start, end);
+            return;
+        }
+        throw ExceptionT();
+    }
+
+    ///match parameter expression end
+    template <typename ExceptionT, typename IteratorT>
+    static void parseParameterEnd( IteratorT& start, const IteratorT& end )
+    {
+        typedef typename IteratorT::value_type CharT;
+        skipWhiteSpace( start, end);
+        if ( start != end && *start == STRING_LITERAL( Chars::closing_par) )
+        {
+            ++start;
+            return;
+        }
+        throw ExceptionT();
+    }
+
+    ///match parameter expression separator
+    template <typename ExceptionT, typename IteratorT>
+    static void parseParameterSeparator( IteratorT& start, const IteratorT& end )
+    {
+        typedef typename IteratorT::value_type CharT;
+        skipWhiteSpace( start, end);
+        if ( start != end && *start == STRING_LITERAL( Chars::comma) )
+        {
+            ++start;
+            skipWhiteSpace( start, end);
+            return;
+        }
+        throw ExceptionT();
+    }
+};
+
+///for parameters without special characters and without double quotes
+class CPlainParameterPolicy : public CParameterPolicyBase
+{
+public:
+    ///match parameter expression value and extract it
+    template <typename ExceptionT, typename IteratorT, typename StringT>
+    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    {
+        typedef typename IteratorT::value_type CharT;
+        value.clear();    
+        if ( start != end && *start == STRING_LITERAL( Chars::double_quote) )  //start with "
+        {
+            while ( ++start != end )
+            {
+                if ( *start == STRING_LITERAL( Chars::double_quote) )  //end with "
+                {
+                    ++start;
+                    return;
+                }
+                value += *start; //add char to output value string
+            }
+        }
+        throw ExceptionT();
+    }
+};
+
+///for parameters with (almost) C-style parameters supporting \n  \\  \"  \t
+class CCStyleParameterPolicy : public CParameterPolicyBase
+{
+public:
+    ///match parameter expression value and extract it
+    template <typename ExceptionT, typename IteratorT, typename StringT>
+    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    {
+        typedef typename IteratorT::value_type CharT;
+        value.clear();    
+        if ( start != end && *start == STRING_LITERAL( Chars::double_quote) ) //start with "
+        {
+            bool escape = false;
+            while ( ++start != end )
+            {
+                if ( escape ) //previous was backslash 
+                {
+                    escape = false;
+                    if ( *start == STRING_LITERAL( Chars::n))
+                    {
+                        value += STRING_LITERAL( Chars::new_line);
+                        continue;
+                    }
+                    if ( *start == STRING_LITERAL( Chars::t))
+                    {
+                        value += STRING_LITERAL( Chars::tab);
+                        continue;
+                    }
+                    if ( *start != STRING_LITERAL( Chars::double_quote) && *start != STRING_LITERAL( Chars::back_slash) )
+                    {
+                        break; //char not allowed after backslash, fail
+                    }
+                }
+                else //no special handling
+                {
+                    if ( *start == STRING_LITERAL( Chars::double_quote) )
+                    {
+                        ++start;
+                        return;
+                    }
+                    escape = *start == STRING_LITERAL( Chars::back_slash); //next with special handling
+                    if ( escape ) //do not add to value
+                    {
+                        continue;
+                    }
+                }
+                value += *start; //add char to output value string
+            }
+        }
+        throw ExceptionT();
+    }
+};
+
+///for parameters with regular expressions
+class CRegexParameterPolicy : public CParameterPolicyBase
+{
+public:
+    ///match parameter expression value and extract it
+    template <typename ExceptionT, typename IteratorT, typename StringT>
+    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    {
+        typedef typename IteratorT::value_type CharT;
+        value.clear();    
+        if ( start != end && *start == STRING_LITERAL( Chars::single_quote) )  //start with '
+        {
+            while ( ++start != end )
+            {
+                if ( *start == STRING_LITERAL( Chars::single_quote) )  //end with '
+                {
+                    ++start;
+                    if ( start != end && *start == STRING_LITERAL( Chars::single_quote) )
+                    {
+                        //treat double single quote as one and continue
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                value += *start; //add char to output value string
+            }
+        }
+        throw ExceptionT();
+    }
+};
+
+///parses a range for keyword parameters
+namespace KeywordParameterParser
+{
+    class ExParameterStartExpected : public std::runtime_error 
+    { public: ExParameterStartExpected() : std::runtime_error( "Parameter is missing or syntax incorrect. Expecting '['") {}};
+
+    class ExParameterSeparatorExpected : public std::runtime_error 
+    { public: ExParameterSeparatorExpected() : std::runtime_error( "Less parameters then expected or syntax incorrect. Expecting ','") {}};
+
+    class ExParameterEndExpected : public std::runtime_error 
+    { public: ExParameterEndExpected() : std::runtime_error( "More parameters then expected or syntax incorrect. Expecting ']'") {}};
+
+    class ExParameterValueExpected : public std::runtime_error 
+    { public: ExParameterValueExpected() : std::runtime_error( "Parameter value is missing or syntax incorrect") {}};
+
+    ///parse parameter range, extract values
+    template <typename PolicyT, typename IteratorT, typename ContainerT>
+    void getParameters( IteratorT& start, const IteratorT& end, ContainerT& parameters)
+    {
+        PolicyT:: template parseParameterStart<ExParameterStartExpected>(start, end);
+        for ( typename ContainerT::iterator it = parameters.begin();;)
+        {
+            PolicyT:: template parseParameterValue<ExParameterValueExpected>(start, end, *it);
+            ++it;
+            if( it != parameters.end() )
+            {
+                PolicyT:: template parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
+            }
+            else
+            {
+                break;
+            }
+        }
+        PolicyT:: template parseParameterEnd<ExParameterEndExpected>(start,end);
+    }
+}
+
+#endif /* INCLUDED_KEYWORDPARAMETERPARSER_H_7175409 */

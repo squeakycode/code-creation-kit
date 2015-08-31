@@ -1,0 +1,4 @@
+Item Type;Text
+heading 2;Command Line 
+paragraph;The following table shows all available command line options. 
+include;command_line_reference.table.gen.html

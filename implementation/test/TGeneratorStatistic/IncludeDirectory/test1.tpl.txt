@@ -1,0 +1,8 @@
+a
+b
+c
+[SET_MARKUP]["$", "?"]
+d
+e
+$INCLUDE?["../test2.tpl.txt"][TRIM]
+f

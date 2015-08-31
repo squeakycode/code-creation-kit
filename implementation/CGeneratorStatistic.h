@@ -1,0 +1,209 @@
+//   Copyright (C) 2011 Andreas Gau
+//
+//   This file is part of the code-creation-kit.
+//
+//   The code-creation-kit is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 2 of the License, or
+//   (at your option) any later version.
+//
+//   The code-creation-kit is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef INCLUDED_CGENERATORSTATISTIC_H_907757
+#define INCLUDED_CGENERATORSTATISTIC_H_907757
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+#include <set>
+#include "CTemplateLoader.h"
+#include <boost/noncopyable.hpp>
+#include "ETokens.gen.h"
+#include "CToken.h"
+#include "CTokenizer.gen.h"
+#include "CTemplatePreprocessor.h"
+#include "StringLiteral.h"
+
+///defines exceptions thrown by CGenerator for template argument independent access
+class CGeneratorStatisticExceptions
+{
+public:
+};
+
+///serves generator stub and creating a statistic of the used files
+template <typename StringT>
+class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisticExceptions
+{
+    class CNul
+    {
+    public:
+        template <typename T>
+        CNul& operator<<( const T&) { return *this; }
+    };
+
+    typedef CGeneratorStatistic<StringT> ThisT;
+    typedef CToken<Tokens, StringT> TokenT;
+    typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
+    typedef CTokenizer<TokenT, StringT, PreprocessorT> TokenizerT;
+    typedef CTemplateLoader<TokenizerT, StringT> TemplateLoaderT;
+
+public:
+    typedef typename StringT::value_type CharT;
+    typedef typename TemplateLoaderT::FileDataListT FileDataListT;
+    typedef std::set<StringT> FileSetT;
+
+    CGeneratorStatistic()
+        : m_csvDelimiter( STRING_LITERAL(';'))
+    {
+        //set default markup
+        setDefaultMarkup();
+
+        //setup tokenizer
+        m_tokenizer.connectOutputStream( &m_preprocessor);
+
+        //setup prepocessor
+        m_preprocessor.connectPreprocessedStream( &m_nul);
+        m_preprocessor.connectMarkupObserver( this);
+        m_preprocessor.connectTemplateLoader( this);
+        m_templateLoader.connectOutputStream( &m_tokenizer);
+    }
+
+    ///set delimiter for next csv table to load
+    void setCsvDelimiter( CharT delimiter)
+    {
+        m_csvDelimiter = delimiter;
+    }
+
+    ///get delimiter for next csv table to load
+    CharT getCsvDelimiter()
+    {
+        return m_csvDelimiter;
+    }
+
+    ///set list of characters as string that mark commented lines for next csv table to load
+    void setCsvCommentChars( const StringT& commentChars)
+    {
+        m_csvCommentChars = commentChars;
+    }
+
+    ///get list of characters as string that mark commented lines for next csv table to load
+    const StringT& getCsvCommentChars() const
+    {
+        return m_csvCommentChars;
+    }
+
+    ///load another table for generation, see also unloadTable
+    void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int)
+    {
+        m_tables.insert( tableFileName);
+    }
+
+    ///load template file and keep stats
+    void loadTemplateFile( const StringT& filename, bool useCinInstead = false)
+    {
+        if ( !useCinInstead )
+        {
+            m_templateFiles.insert( m_templateLoader.resolveFileName( filename));
+        }
+        m_templateLoader.loadTemplateFile( filename, useCinInstead);
+    }
+
+    ///generates output by processing a template file
+    template <typename ParameterListT>
+    void generate( const StringT& templateFileName, const StringT& targetFileName, bool, const StringT&, const ParameterListT&)
+    {
+        m_templateLoader.resetInclusionHierarchy();
+
+        if ( targetFileName != STRING_LITERAL("-")) //if not use cout
+        {
+            m_generatedFiles.insert( targetFileName);
+        }
+
+        //start processing the template file
+        loadTemplateFile( templateFileName, templateFileName == STRING_LITERAL("-"));
+    }
+
+    //resets the generator building blocks
+    void reset()
+    {
+        m_templateLoader.reset();
+        m_tables.clear();
+        m_generatedFiles.clear();
+        m_templateFiles.clear();
+        m_csvDelimiter = STRING_LITERAL(';');
+        setDefaultMarkup();
+    }
+
+
+    ///sets new tag markup
+    void setMarkup( const StringT& prefix, const StringT& postfix)
+    {
+        m_preprocessor.setPrefix( prefix);
+        m_preprocessor.setPostfix( postfix);
+        m_tokenizer.setMarkup( prefix, postfix);
+    }
+
+    ///adds an include directory to the list
+    void addIncludeDirectory( const StringT& directory)
+    {
+        m_templateLoader.addIncludeDirectory( directory);
+    }
+
+    ///returns stack of files currently opened
+    const FileDataListT& getInclusionHierarchy()
+    {
+        return m_templateLoader.getInclusionHierarchy();
+    }
+
+    ///get list of loaded tables
+    const FileSetT& getTableFiles() const
+    {
+        return m_tables;
+    }
+
+    ///get list of generated files
+    const FileSetT& getGeneratedFiles() const
+    {
+        return m_generatedFiles;
+    }
+
+    ///get list of template files
+    const FileSetT& getTemplateFiles() const
+    {
+        return m_templateFiles;
+    }
+
+    ///dummy only:
+    void unloadTable( const StringT&){}
+    unsigned int getLastRowNumberWithFailure() { return 1; }
+    unsigned int getIndexOfLastProcessedParameter() { return 0; }
+    unsigned int getLastColumnWithFailure() { return 1;}
+    unsigned int getLastLineWithFailure() { return 1;}
+    static int getMaxNumberOfRecursionLevels() { return 1; }
+    static int getMaxMacroTextSizeBytes() { return 1; }
+private:
+    ///set default markup
+    void setDefaultMarkup()
+    {
+        setMarkup( STRING_LITERAL("["), STRING_LITERAL("]"));
+    }
+
+    TokenizerT m_tokenizer; ///<splits input lines into tokens
+    PreprocessorT m_preprocessor; ///<does the preprocessing
+    TemplateLoaderT m_templateLoader; ///<the loader
+    CNul m_nul; ///<dumps the data stream as no output is produced
+    CharT m_csvDelimiter; ///<delimiter used by csv files to load
+    FileSetT m_tables; ///<list of tables loaded
+    FileSetT m_generatedFiles; ///<list of files generated
+    FileSetT m_templateFiles; ///<list of template files loaded
+    StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
+};
+
+#endif /* INCLUDED_CGENERATORSTATISTIC_H_907757 */
