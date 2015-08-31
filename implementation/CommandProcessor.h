@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -24,7 +24,7 @@
 
 #include <string>
 #include "CCommandLineParser.gen.h"
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "CSourceFile.h"
 #include "FileSystem.h"
@@ -38,40 +38,12 @@ class CommandFileT;
 ///processes user commands
 namespace CommandProcessor
 {
-    ///helper function for getting the right output stream
-    template <typename CharT> 
-    std::basic_ostream<CharT, std::char_traits<CharT> >& getCout()
-    {
-        return std::cout;
-    }
-
-    ///helper function for getting the right output stream
-    template <>
-    std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCout()
-    {
-        return std::wcout;
-    }
-
-    ///helper function for getting the right output stream
-    template <typename CharT> 
-    std::basic_ostream<CharT, std::char_traits<CharT> >& getCerr()
-    {
-        return std::cerr;
-    }
-
-    ///helper function for getting the right output stream
-    template <>
-    std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCerr()
-    {
-        return std::wcerr;
-    }
-
     class ExInvalidCommandLineOptions : public std::runtime_error 
     { public: ExInvalidCommandLineOptions() : std::runtime_error( "Invalid command line options. Please use --help to get the option description.") {}};
 
     ///process the command line from the console
-    template <typename CharT, typename GeneratorT, typename GeneratorStatisticT>
-    void processCommandLine( int argc, CharT* argv[], GeneratorT& generator, GeneratorStatisticT& generatorStatistic, bool* prompt = 0)
+    template <typename CharT, typename GeneratorT, typename GeneratorStatisticT, typename LogFileT>
+    void processCommandLine( int argc, CharT* argv[], GeneratorT& generator, GeneratorStatisticT& generatorStatistic, LogFileT& logFile, bool* prompt = 0, bool *logging = 0)
     {
         typedef std::basic_string<CharT, std::char_traits<CharT> > StringT;
 
@@ -95,7 +67,7 @@ namespace CommandProcessor
                 std::vector<StringT> commands = parser.getCommands();
                 BOOST_FOREACH( const StringT& command, commands)
                 {
-                    generatorCommandProcessor.processCommand( command, generator, StringT());
+                    generatorCommandProcessor.processCommand( command, generator, StringT(), logFile);
                 }
             }
             else if ( CCommandLineParser<StringT>::eExecuteCommandFile == command )
@@ -105,10 +77,15 @@ namespace CommandProcessor
                 {
                     *prompt = parser.hasPrompt();
                 }
-                //output what it is done in prompt mode
-                if ( prompt && parser.hasPrompt())
+                if ( logging && parser.hasPrompt())
                 {
-                    getCerr<CharT>() << "Processing:" << std::endl;
+                    // logging turned on?
+                    if ( *logging)
+                    {
+                        //activate logging via cerr
+                        generator.connectLogOutputStream( &FileSystem::getCerr<CharT>());
+                    }
+                    *logging = true; //return true, logging option can be shown
                 }
 
                 std::vector<StringT> commandFiles = parser.getCommandFiles();
@@ -117,7 +94,8 @@ namespace CommandProcessor
                     //output names of the files processed to show what is processed
                     if ( prompt && parser.hasPrompt())
                     {
-                        getCerr<CharT>() << commandFileName << std::endl;
+                        FileSystem::getCerr<CharT>() << "Processing command file:" << std::endl;
+                        FileSystem::getCerr<CharT>() << commandFileName << std::endl;
                     }
 
                     //reset the generator for every command file
@@ -127,7 +105,7 @@ namespace CommandProcessor
                     bool useCin = commandFileName == STRING_LITERAL("-");
                     commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
                     CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
-                    generatorCommandProcessor.processCommandStream( commandFile.get(), generator, commandFileAbsolutePath);
+                    generatorCommandProcessor.processCommandStream( commandFile.get(), generator, commandFileAbsolutePath, logFile);
                     commandFile.checkEofReached();
                 }
             }
@@ -137,6 +115,10 @@ namespace CommandProcessor
                 if ( prompt )
                 {
                     *prompt = parser.hasPrompt();
+                }
+                if ( logging && parser.hasPrompt())
+                {
+                    *logging = false; //return false, logging option can not be shown
                 }
 
                 std::vector<StringT> commandFiles = parser.getCommandFiles();
@@ -149,16 +131,16 @@ namespace CommandProcessor
                     bool useCin = commandFileName == STRING_LITERAL("-");
                     commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
                     CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
-                    generatorCommandProcessor.processCommandStream( commandFile.get(), generatorStatistic, commandFileAbsolutePath, true);
+                    generatorCommandProcessor.processCommandStream( commandFile.get(), generatorStatistic, commandFileAbsolutePath, logFile, true);
                     commandFile.checkEofReached();
 
                     if ( parser.getOutputDependenciesStyle() == STRING_LITERAL("mpc"))
                     {
-                        DependencyPrinter::printMpc( generatorStatistic.getTableFiles(), generatorStatistic.getGeneratedFiles(), generatorStatistic.getTemplateFiles(), commandFileAbsolutePath, getCout<CharT>());
+                        DependencyPrinter::printMpc( generatorStatistic.getTableFiles(), generatorStatistic.getGeneratedFiles(), generatorStatistic.getTemplateFiles(), commandFileAbsolutePath, FileSystem::getCout<CharT>());
                     }
                     else if ( parser.getOutputDependenciesStyle() == STRING_LITERAL("vs"))
                     {
-                        DependencyPrinter::printVs( generatorStatistic.getTableFiles(), generatorStatistic.getGeneratedFiles(), generatorStatistic.getTemplateFiles(), commandFileAbsolutePath, getCout<CharT>());
+                        DependencyPrinter::printVs( generatorStatistic.getTableFiles(), generatorStatistic.getGeneratedFiles(), generatorStatistic.getTemplateFiles(), commandFileAbsolutePath, FileSystem::getCout<CharT>());
                     }
                     else
                     {
@@ -173,12 +155,12 @@ namespace CommandProcessor
         }
         catch( CSourceFileExceptions<CommandFileT>::ExCannotOpenFile&)
         {
-            getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
+            FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
             throw CErrorPrinted(); //empty class provided externally
         }
         catch( CSourceFileExceptions<CommandFileT>::ExCannotReadFile&)
         {
-            getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
+            FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
             throw CErrorPrinted(); //empty class provided externally
         }
     }

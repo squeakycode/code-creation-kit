@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include "CTemplateLoader.h"
 #include <string>
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         loader.loadTemplateFile( "TemplateLoaderTest2.txt");
         StringT s = str.str();
         BOOST_CHECK( s == "x\ny\nz");
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );    	
+        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
     }
 
     //check load using include directory
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         loader.loadTemplateFile( "TemplateLoaderTest5.txt");
         StringT s = str.str();
         BOOST_CHECK( s == "TemplateLoaderTest4.txt");
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );    	
+        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
     }
 
     //check trigger loading another file by output processing, ends in cyclic inclusion error
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         CTemplateLoader<TestHelper, StringT> loader;
         TestHelper helper( loader);
         loader.connectOutputStream( &helper);
-        BOOST_CHECK_THROW( loader.loadTemplateFile( "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);    	
+        BOOST_CHECK_THROW( loader.loadTemplateFile( "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);
         BOOST_REQUIRE( loader.getInclusionHierarchy().size() == 3 );
         std::string expected[] = {"TemplateLoaderTest3.txt", "InclusionTest/TemplateLoaderTest4.txt", "InclusionTest/TemplateLoaderTest5.txt"};
 

@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,12 +16,16 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <vector>
 #include <list>
 #include "CommandProcessor.h"
+#include "CTargetFile.h"
+
+class LogFileT;
+
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4512 )
@@ -32,7 +36,7 @@
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
-#include <boost\foreach.hpp>
+#include <boost/foreach.hpp>
 
 ///externally provided exception class showing that an error has been printed
 class CErrorPrinted{};
@@ -58,22 +62,39 @@ public:
         , m_addIncludeDirectory(false)
         , m_setCsvDelimiter(false)
         , m_setCsvCommentChars(false)
+        , m_setCsvIgnoreDoubleQuotes(false)
+        , m_csvIgnoreDoubleQuotes(false)
         , m_delimiter(0)
         , m_rowHeaderIndex(0)
         , m_columnHeaderIndex(0)
+        , m_padRows(false)
+        , m_append(false)
+        , m_logStream(false)
+        , m_recycle(false)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
     }
 
-    void generate( const StringT& templateFile, const StringT& targetFile, bool useIntermediateFile, const StringT& intermediateFile, const ParameterListT& parameters)
+    void generate( 
+        const StringT& templateFile,
+        const StringT& targetFile,
+        bool useIntermediateFile,
+        bool recycle,
+        const StringT& intermediateFile,
+        bool append, const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters
+        )
     {
         BOOST_CHECK( m_generate);
         BOOST_CHECK( m_templateFile == templateFile);
         BOOST_CHECK( m_targetFile == targetFile);
         BOOST_CHECK( m_useIntermediateFile == useIntermediateFile);
+        BOOST_CHECK( m_recycle == recycle);
         BOOST_CHECK( m_intermediateFileName == intermediateFile);
         BOOST_CHECK( m_parameters == parameters);
+        BOOST_CHECK( m_append == append);
+        BOOST_CHECK( m_inlineTemplateParameters == inlineTemplateParameters);
     }
 
     void reset()
@@ -81,7 +102,7 @@ public:
         BOOST_CHECK( m_reset);
     }
 
-    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         BOOST_CHECK( m_loadTable);
         BOOST_CHECK( m_tableFileName == tableFileName);
@@ -90,6 +111,7 @@ public:
         BOOST_CHECK( m_leftToRight == leftToRight);
         BOOST_CHECK( m_rowHeaderIndex == rowHeaderIndex);
         BOOST_CHECK( m_columnHeaderIndex == columnHeaderIndex);
+        BOOST_CHECK( m_padRows == padRows);
     }
 
     void unloadTable( const StringT& label)
@@ -123,6 +145,18 @@ public:
         BOOST_CHECK( m_csvCommentChars == commentChars);
     }
 
+    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+    {
+        BOOST_CHECK( m_setCsvIgnoreDoubleQuotes);
+        BOOST_CHECK( m_csvIgnoreDoubleQuotes == ignoreDoubleQuotes);
+    }
+
+    void connectLogOutputStream( const void* stream)
+    {
+        BOOST_CHECK( m_setLogStream);
+        m_logStream = (stream != NULL);
+    }
+
     bool m_reset;
     bool m_loadTable;
     bool m_unloadTable;
@@ -134,9 +168,19 @@ public:
     bool m_addIncludeDirectory;
     bool m_setCsvDelimiter;
     bool m_setCsvCommentChars;
+    bool m_setCsvIgnoreDoubleQuotes;
+    bool m_csvIgnoreDoubleQuotes;
+    bool m_setLogStream;
 
     unsigned int m_rowHeaderIndex;
     unsigned int m_columnHeaderIndex;
+    bool m_padRows;
+
+    CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
+
+    bool m_append;
+    bool m_logStream;
+    bool m_recycle;
 
     void setTemplateFile( const char* text)
     {
@@ -232,6 +276,8 @@ private:
 template <typename StringT, typename ContainerT, typename GeneratorT> 
 void process( ContainerT& container, GeneratorT& generator)
 {
+    CTargetFile<StringT, LogFileT> logFile;
+
     std::list<StringT> argsString;
     std::vector<typename StringT::value_type*> args;
 
@@ -244,7 +290,7 @@ void process( ContainerT& container, GeneratorT& generator)
         args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
     }
 
-    CommandProcessor::processCommandLine( args.size(), &args[0], generator, generator);
+    CommandProcessor::processCommandLine( args.size(), &args[0], generator, generator, logFile);
 }
 
 ///runs the test for given string type
@@ -253,6 +299,7 @@ void runTest()
 {
     using namespace boost::assign;
     typedef TTestGenerator<StringT> GeneratorT;
+    typedef typename StringT::value_type CharT;
 
     {
         //test help
@@ -281,6 +328,39 @@ void runTest()
     }
 
     {
+        //test logging off
+        GeneratorT generator;
+        generator.m_setLogStream = true;
+        generator.m_logStream = true;
+        std::vector<std::string> args;
+        args += "-c", "--log-file none";
+        process<StringT>( args, generator);
+        BOOST_CHECK( !generator.m_logStream);
+    }
+
+    {
+        //test logging on; stdout
+        GeneratorT generator;
+        generator.m_setLogStream = true;
+        generator.m_logStream = false;
+        std::vector<std::string> args;
+        args += "-c", "--log-file -";
+        process<StringT>( args, generator);
+        BOOST_CHECK( generator.m_logStream);
+    }
+
+    {
+        //test logging on; file
+        GeneratorT generator;
+        generator.m_setLogStream = true;
+        generator.m_logStream = false;
+        std::vector<std::string> args;
+        args += "-c", "--log-file testlogfile.log";
+        process<StringT>( args, generator);
+        BOOST_CHECK( generator.m_logStream);
+    }
+
+    {
         //test load table
         GeneratorT generator;
         generator.setTableFileName( "table.csv");
@@ -296,16 +376,17 @@ void runTest()
     }
 
     {
-        //test load table space in name, top down, column
+        //test load table space in name, top down, column, pad rows
         GeneratorT generator;
         generator.setTableFileName( "tab le.csv");
         generator.setLabel( "tab le.csv");
         generator.m_topDown = true;
         generator.m_loadTable = true;
+        generator.m_padRows = true;
         generator.m_columnHeaderIndex = 6;
         generator.m_rowHeaderIndex = 1;
         std::vector<std::string> args;
-        args += "-c", "-n 6 -t \"tab le.csv\"";
+        args += "-c", "-n 6 -t \"tab le.csv\" --pad-rows";
         process<StringT>( args, generator);
     }
     {
@@ -343,6 +424,26 @@ void runTest()
     }
 
     {
+        //test ignore double quotes off
+        GeneratorT generator;
+        generator.m_setCsvIgnoreDoubleQuotes = true;
+        generator.m_csvIgnoreDoubleQuotes = false;
+        std::vector<std::string> args;
+        args += "-c", "--csv-ignore-quotes off";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test ignore double quotes on
+        GeneratorT generator;
+        generator.m_setCsvIgnoreDoubleQuotes = true;
+        generator.m_csvIgnoreDoubleQuotes = true;
+        std::vector<std::string> args;
+        args += "-c", "--csv-ignore-quotes on";
+        process<StringT>( args, generator);
+    }
+
+    {
         //test unload table
         GeneratorT generator;
         generator.setLabel( "LabelA");
@@ -362,6 +463,36 @@ void runTest()
         generator.m_generate = true;
         std::vector<std::string> args;
         args += "-c", "-s a.txt -o b.txt";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test generate with append
+        GeneratorT generator;
+        generator.setTemplateFile( "a.txt");
+        generator.setTargetFile( "b.txt");
+        generator.m_useIntermediateFile = false;
+        generator.m_append = true;
+        generator.setIntermediateFileName( "b.txt.intermediate");
+        generator.m_generate = true;
+        std::vector<std::string> args;
+        args += "-c", "-s a.txt -o b.txt --append-to-file";
+        process<StringT>( args, generator);
+    }
+
+    {
+        //test generate inline
+        GeneratorT generator;
+        generator.setTemplateFile( "a.txt");
+        generator.setTargetFile( "a.txt");
+        generator.m_useIntermediateFile = true;
+        generator.m_append = false;
+        generator.setIntermediateFileName( "a.txt.intermediate");
+        generator.m_generate = true;
+        generator.m_recycle = true;
+        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
+        std::vector<std::string> args;
+        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56 -y";
         process<StringT>( args, generator);
     }
 

@@ -7,6 +7,7 @@ list_start;
 list_item;Productivity is increased when generating code. 
 list_item;Less Testing is required. 
 list_item;Multistage macro expressions allow accomplishing complex generation tasks. 
+list_item;Code can be generated in-place using inline templates. 
 list_item;Once the table layout is defined and a template is written for a common coding problem the implementation effort is cut down to a minimum for the future. 
 list_item;All the powerful and convenient features of a spreadsheet application can be used to create data tables. 
 list_item;The kit can be used to create code for any text based language. 

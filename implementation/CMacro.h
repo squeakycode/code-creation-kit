@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -25,7 +25,7 @@
 #include "CMacroExpression.h"
 #include "CSubstitution.h"
 #include <vector>
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 
 ///data structure representing a macro, created from parsed macro
 template <typename StringT>

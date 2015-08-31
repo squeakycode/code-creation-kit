@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -31,6 +31,7 @@
 #include "CLineCollector.h"
 #include "CBackEndTokenizer.gen.h"
 #include "CProcessingLevelControl.h"
+#include "CInlineTemplateParameters.h"
 
 ///serves as default template loader
 class CNoTemplateLoader
@@ -44,24 +45,24 @@ public:
 };
 
 ///sets up und operates the building blocks needed for processing a template to produce generated output
-template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader>
+template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader, typename LogOutputStreamT = CNul >
 class CTemplateProcessor
 {
-    typedef CTemplateProcessor<TableT, OutputStreamT, TemplateLoaderT> ThisT;
+    typedef CTemplateProcessor<TableT, OutputStreamT, TemplateLoaderT, LogOutputStreamT> ThisT;
     typedef typename TableT::value_type::value_type StringT;
 
     class BackEndTokenizer;
-	class ProcessingLevelControl;
-	typedef CLineCollector< StringT, BackEndTokenizer> LineCollectorT;
-	typedef CMacroProcessor<TableT, ProcessingLevelControl> ProcessorT;
+    class ProcessingLevelControl;
+    typedef CLineCollector< StringT, BackEndTokenizer> LineCollectorT;
+    typedef CMacroProcessor<TableT, ProcessingLevelControl, LogOutputStreamT> ProcessorT;
     typedef CToken<Tokens, StringT> TokenT;
-    typedef CParser<ProcessorT, TokenT, StringT> ParserT;
-	typedef CProcessingLevelControl<ParserT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT> ProcessingLevelControlT;
+    typedef CParser<ProcessorT, TokenT, StringT, LogOutputStreamT> ParserT;
+    typedef CProcessingLevelControl<ParserT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT, LogOutputStreamT> ProcessingLevelControlT;
     typedef CTemplatePreprocessor<ProcessingLevelControl, ThisT, TemplateLoaderT, TokenT, StringT> PreprocessorT;
-    typedef CTokenizer<TokenT, StringT, PreprocessorT> TokenizerT;
-    typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT> BackEndTokenizerT;
+    typedef CTokenizer<TokenT, StringT, PreprocessorT, OutputStreamT, LogOutputStreamT> TokenizerT;
+    typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT, LogOutputStreamT> BackEndTokenizerT;
     class BackEndTokenizer : public BackEndTokenizerT {};
-	class ProcessingLevelControl : public ProcessingLevelControlT {};
+    class ProcessingLevelControl : public ProcessingLevelControlT {};
 
 public:
 
@@ -106,6 +107,7 @@ public:
     void connectOutputStream( OutputStreamT* stream)
     {
         m_processingLevelControl.connectFinalOutputStream( stream);
+        m_tokenizer.connectFinalOutputStream( stream);
     }
 
     ///attaches template loader used for include files
@@ -114,15 +116,25 @@ public:
         m_preprocessor.connectTemplateLoader( loader);
     }
 
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_tokenizer.connectLogOutputStream( stream);
+        m_backEndTokenizer.connectLogOutputStream( stream);
+        m_processingLevelControl.connectLogOutputStream( stream);
+        m_processor.connectLogOutputStream( stream);
+    }
+
     ///resets the processor for next input stream, added for symmetry to close
     void open()
     {
+        m_tokenizer.reset();
         m_processingLevelControl.open();
-		m_backEndTokenizer.open();
+        m_backEndTokenizer.open();
     }
 
     ///processes a line of the input stream
-    CTemplateProcessor< TableT, OutputStreamT, TemplateLoaderT>& operator <<( const StringT& line)
+    ThisT& operator <<( const StringT& line)
     {
         m_tokenizer << line;
         return *this;
@@ -143,16 +155,32 @@ public:
         m_backEndTokenizer.setMarkup( prefix, postfix);
     }
 
+    ///sets inline template processing parameters
+    void setInlineTemplateParameters( const CInlineTemplateParameters<StringT>& p)
+    {
+        m_processingLevelControl.setInlineTemplateParameters( p.enabled, p.inlineGeneratedPostfix, p.inlinePad);
+        m_tokenizer.setInlineTemplateMode( p.enabled);
+
+        if ( p.enabled)
+        {
+            m_tokenizer.setInlineTemplateMarkup(
+                p.inlinePrefix,
+                p.inlinePostfix,
+                p.inlineGeneratedPostfix);
+        }
+    }
+
     ///closes all processing blocks performing consistency checks
     void close()
     {
-		m_backEndTokenizer.close();
-		m_processingLevelControl.close();
+        m_backEndTokenizer.close();
+        m_processingLevelControl.close();
     }
 
     ///resets all buidling blocks
     void reset()
     {
+        m_tokenizer.reset();
         m_processingLevelControl.reset();
         m_processor.reset();
         setDefaultMarkup();
@@ -179,7 +207,7 @@ private:
 
     TokenizerT m_tokenizer; ///<splits input lines into tokens
     BackEndTokenizer m_backEndTokenizer; ///<splits lines produced by a macro into tokens
-	ProcessingLevelControl m_processingLevelControl; ///<controls the level used for processing in spiral recursion
+    ProcessingLevelControl m_processingLevelControl; ///<controls the level used for processing in spiral recursion
     ProcessorT m_processor; ///<processes macro expressions
     PreprocessorT m_preprocessor; ///<preprocesses the input
 };

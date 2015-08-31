@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <fstream>
@@ -54,6 +54,12 @@ namespace test_data
         {6,4,6,6,10},
         {1,2,3,4,5},
         {3,6,9,12,17}
+    };
+
+    const char* itemTableDoubleQuote[2][3] =
+    {
+        {"\"a1","b\"1","c1\""},
+        {"\"x","y\"","z"},
     };
 }
 
@@ -99,6 +105,45 @@ struct TCsvParserTableBuilder
     typedef std::string StringT;
 };
 
+///table builder test stub 
+struct TCsvParserTableBuilderDoubleQuote
+{
+    TCsvParserTableBuilderDoubleQuote() : col(0), row(0), items(0), finishedCount(0) {}
+
+    ///checks data and positions
+    void addItem( const std::string& item)
+    {
+        BOOST_REQUIRE( row < 2 );
+        BOOST_REQUIRE( col < 3 );
+
+        BOOST_CHECK( item == test_data::itemTableDoubleQuote[row][col]);
+
+        col++;
+        items++;
+    }
+
+    ///checks row handling
+    void addRow()
+    {
+        BOOST_CHECK( col == 3);
+        row++;
+        col = 0;
+    }
+
+    ///checks finished handling
+    void finished()
+    {
+        finishedCount++;
+    }
+
+    unsigned int row;
+    unsigned int col;
+    unsigned int items;
+    int finishedCount;
+
+    typedef std::string StringT;
+};
+
 BOOST_AUTO_TEST_CASE( TCsvParser)
 {
     //open test file
@@ -111,7 +156,7 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
     (void) parser;
 
     //parse the file
-    parser.parse( file, helper, ';', "#'", helper.positionTracker);
+    parser.parse( file, helper, ';', "#'", false, helper.positionTracker);
 
     //check parsing ok
     BOOST_CHECK( helper.row == test_data::rows );
@@ -122,17 +167,29 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
     {
         std::stringstream s;
         s << "a\"a"; //a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', ""), CCsvParser::ExUnexpectedQuote);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "", false), CCsvParser::ExUnexpectedQuote);
     }
     {
         std::stringstream s;
         s << "\"a\"a"; //"a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', ""), CCsvParser::ExRequireDelimitingChar);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "", false), CCsvParser::ExRequireDelimitingChar);
     }
     {
         std::stringstream s;
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "\""), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW( parser.checkCharsUsedForCommenting<std::string>( ";", ';', s), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "\"", false), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW( parser.checkCharsUsedForCommenting<std::string>( ";", ';', false, s), CCsvParser::ExBadCommentChars);
+    }
 
+    //check ignore double quotes
+    {
+        TCsvParserTableBuilderDoubleQuote helperDoubleQuote;
+        std::stringstream s;
+        s << "\"a1;b\"1;c1\"\n\"x;y\";z";
+        parser.parse( s, helperDoubleQuote, ';', "", true);
+
+        //check parsing ok
+        BOOST_CHECK( helperDoubleQuote.row == 1 );
+        BOOST_CHECK( helperDoubleQuote.items == 6 );
+        BOOST_CHECK( helperDoubleQuote.finishedCount == 1);
     }
 }

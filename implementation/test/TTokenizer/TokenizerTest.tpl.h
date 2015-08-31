@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -24,14 +24,14 @@
 template <typename TokenizerT, typename StringT> 
 void setKeywords( TokenizerT& tokenizer)
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     tokenizer.setMarkup( STRING_LITERAL("%"), STRING_LITERAL("%"));
 }
 
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
 void testSingleTokens()
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
@@ -41,7 +41,7 @@ void testSingleTokens()
 
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));
 
     [MACRO_BEGIN][TRIM]
     {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]
@@ -59,7 +59,7 @@ void testSingleTokens()
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%[\"parameter1\",\"parameter2\"]end");
         expected[1] = TokenT( TokenT::e[ENTRY]["Tag Name Capital"], STRING_LITERAL("parameter1"), STRING_LITERAL("parameter2"));
         [OR][TRIM]
-        tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%end");        
+        tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%end");
         expected[1] = TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
         [END][TRIM]
         BOOST_CHECK( result.size() == 3);
@@ -72,7 +72,7 @@ void testSingleTokens()
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
 void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -81,8 +81,8 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
     std::vector<TokenT> expected;
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));    
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));
+    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));
 
     [MACRO_BEGIN][TRIM]
     {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]

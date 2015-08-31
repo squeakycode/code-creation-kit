@@ -1,0 +1,294 @@
+Enabling log.
+Disabling log.
+Switching log stream.
+Resetting:
+Clearing table list.
+Clearing set include paths.
+Setting CSV Delimiter:
+CSV Delimiter=;
+Setting CSV Comment Chars:
+CSV Comment Chars=
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=0
+Setting CSV Delimiter:
+CSV Delimiter=:
+Setting CSV Delimiter:
+CSV Delimiter=;
+Setting CSV Comment Chars:
+CSV Comment Chars=#*
+Setting CSV Comment Chars:
+CSV Comment Chars=
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=1
+Setting CSV Ignore Double Quotes=:
+CSV Ignore Double Quotes=0
+Adding include directory:
+Include directory=IncludeDirectoryThatDoesNotExist
+Setting markup:
+Prefix=&
+Postfix=&
+Setting markup:
+Prefix=[
+Postfix=]
+Loading table:
+Table file=TDataflow.csv
+Label=LabelB
+Read top down=1
+Read left to right=1
+Row header index=1
+Column header index=1
+Pad rows=0
+Unloading table:
+Label=LabelB
+Loading table:
+Table file=TDataflow.csv
+Label=LabelA
+Read top down=1
+Read left to right=1
+Row header index=1
+Column header index=1
+Pad rows=0
+Processing file:
+Template file=../TGenerator/TDataflow.tpl.txt
+Target file=TDataflow.gen.txt
+Use intermediate file=0
+Recycle=0
+Intermediate file=
+Append=0
+Starting to read template file:
+Name=../TGenerator/TDataflow.tpl.txt
+Found macro (level 0):
+[MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<1>
+Found macro (level 0):
+[MACRO_BEGIN]<[ENTRY]["row2"]>[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<2>
+Found macro (level 5):
+start1<1>end1 <[ENTRY]["row2"]> start4<2>end4
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+start1<1>end1 <2> start4<2>end4
+
+Found macro (level 0):
+[MACRO_BEGIN][MACRO_BEGIN.]<[ENTRY]["row1"]>[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+[MACRO_BEGIN.]<1>
+Found macro (level 1):
+[MACRO_BEGIN]<1>end5start6<[ENTRY]["row2"]>[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<1>end5start6<2>
+Found macro (level 0):
+[MACRO_BEGIN]<[ENTRY]["row1"]>[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<1>
+Found macro (level 1):
+start7<1>end7start8<[ENTRY]["row3"]>end8
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+start7<1>end7start8<3>end8
+
+Expanding at index 3:
+start7<1>end7start8<3>end8
+
+Found macro (level 0):
+[MACRO_BEGIN]
+    start3
+[MACRO_BEGIN.]
+    <[ENTRY.]["row3"]>
+[MACRO_END.]
+    end3
+[MACRO_END]
+Expanding:
+
+    start3
+[MACRO_BEGIN.]
+    <[ENTRY.]["row3"]>
+[MACRO_END.]
+    end3
+
+Found macro (level 1):
+[MACRO_BEGIN]
+    <[ENTRY]["row3"]>
+[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+
+    <3>
+
+Expanding at index 3:
+
+    <3>
+
+Found macro (level 0):
+[MACRO_BEGIN]
+    <[ENTRY.]["row3"]>
+[MACRO_END]
+Expanding:
+
+    <[ENTRY.]["row3"]>
+
+Found macro (level 1):
+[MACRO_BEGIN]
+    start11
+
+    <[ENTRY]["row3"]>
+
+    end11
+[MACRO_END]
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+
+    start11
+
+    <3>
+
+    end11
+
+Expanding at index 3:
+
+    start11
+
+    <3>
+
+    end11
+
+Found macro (level 0):
+[MACRO_BEGIN]
+->[MACRO_END]
+Expanding:
+
+->
+Found macro (level 1):
+->start10<[ENTRY]["row3"]>end10
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+->start10<3>end10
+
+Expanding at index 3:
+->start10<3>end10
+
+Found macro (level 1):
+<[ENTRY]["row3"]>1/1
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<3>1/1
+
+Expanding at index 3:
+<3>1/1
+
+Finished reading of template file:
+Name=../TGenerator/TDataflow.tpl.txt
+Found macro (level 1):
+<[ENTRY]["row3"]>off
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<3>off
+Expanding at index 3:
+<3>off
+Processing file:
+Template file=../TGenerator/LogTest1.tpl
+Target file=../TGenerator/LogTest1.gen.txt
+Use intermediate file=0
+Recycle=0
+Intermediate file=
+Append=0
+Starting to read template file:
+Name=../TGenerator/LogTest1.tpl
+Found macro (level 0):
+[MACRO_BEGIN]
+
+[IF][IF]
+
+[MACRO_END]
+Successfully processed part of macro:
+[MACRO_BEGIN]
+
+[IF]
+Processing file:
+Template file=../TGenerator/LogTest2.tpl
+Target file=../TGenerator/LogTest2.tpl
+Use intermediate file=1
+Recycle=0
+Intermediate file=../TGenerator/LogTest2.tpl.intermediate
+Append=0
+Inline prefix=$
+Inline postfix=%
+Inline generated postfix=&
+Inline pad=3
+Starting to read template file:
+Name=../TGenerator/LogTest2.tpl
+Error parsing parameters in line:
+ $ a line with bad tag inline parameters [ENTRY]["bad"3]1234567 % 
+  a line with bad tag inline parameters [ENTRY]["bad"
+Processing file:
+Template file=../TGenerator/LogTest3.tpl
+Target file=../TGenerator/LogTest1.gen.txt
+Use intermediate file=0
+Recycle=0
+Intermediate file=
+Append=0
+Starting to read template file:
+Name=../TGenerator/LogTest3.tpl
+Error parsing parameters in line:
+a line with bad tag parameters [ENTRY]["bad"1]1234567 
+a line with bad tag parameters [ENTRY]["bad"
+Disabling log.

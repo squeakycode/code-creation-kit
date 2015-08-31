@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -44,13 +44,30 @@ public:
     CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool useIntermediateFile, const StringT& intermediateFileName, const ParameterListT& parameters)
+    void generate(
+        const StringT& templateFileName,
+        const StringT& targetFileName,
+        bool useIntermediateFile,
+        bool recycle,
+        const StringT& intermediateFileName,
+        bool append,
+        const ParameterListT& parameters,
+        const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+    )
     {
         try
         {
-            m_generator.generate( templateFileName, targetFileName, useIntermediateFile, intermediateFileName, parameters);
+            m_generator.generate( 
+                templateFileName,
+                targetFileName,
+                useIntermediateFile,
+                recycle,
+                intermediateFileName,
+                append,
+                parameters,
+                inlineTemplateParameters);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -67,7 +84,7 @@ public:
         {
             m_generator.setCsvDelimiter( delimiter);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -79,18 +96,23 @@ public:
         {
             m_generator.setCsvCommentChars( commentChars);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
 
-    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+    {
+        m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+    }
+
+    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
         try
         {
-            m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex);
+            m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -101,7 +123,7 @@ public:
         {
             m_generator.unloadTable( label);
         }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]        
+        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
         [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
         [MACRO_END][TRIM]
     }
@@ -138,6 +160,12 @@ public:
         return m_generator.getTemplateFiles();
     }
 
+    ///connect log output stream
+    template <typename LogOutputStreamT>
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_generator.connectLogOutputStream( stream);
+    }
 private:
     void toErrorStream( std::string text)
     {
@@ -166,10 +194,7 @@ private:
         {
             return STRING_LITERAL("???");
         }
-        if ( list.back().usingCin)
-        {
-            return STRING_LITERAL("stdin");
-        }
+
         return list.back().name;
     }
 

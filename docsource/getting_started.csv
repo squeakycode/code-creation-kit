@@ -78,4 +78,9 @@ paragraph;This is the template for creating a C++ state machine. The macros are 
 include;temp\examples\documented_state_machine\DocumentedStatemachine.tpl.h.rtf
 paragraph;This is the generated C++ state machine code. It contains only a few states to not get to large for an example, but it can be extended to any size by extending the matrix. The example folder contains another matrix having more states.  
 include;temp\examples\documented_state_machine\cd_player\CDPlayerStatemachine.gen.h.rtf
-paragraph; 
+heading 3;In-Place Code Generation Using Inline Templates 
+paragraph;Inline templates are placed into a code file for in-place code generation. This works line based using the comment syntax of the source language. The lines of an inline template are marked with a prefix and an optional postfix as template lines. The following C++ example uses the prefix //<> for this purpose.  The inline template lines are ignored by the C++ compiler because they form C++ line comments. Prefix and postfix are removed by the text compiler before processing. Generated code lines are marked with an is-generated-postfix. This allows removing old generated code lines when running the code generation again. The following C++ example uses //$ as is-generated-postfix. Only lines marked as inline template are processed by the text compiler. All other lines are directly passed to the output file. 
+paragraph;WARNING: Use this feature carefully to prevent data loss. Any line ending with the is-generated-postfix is removed by the text compiler. Backup your code before using in-place code generation. 
+include;temp\examples\documented_state_machine\cd_player_inline\CDPlayerStatemachine.h.rtf
+paragraph;This is the used command file: 
+include;temp\examples\documented_state_machine\cd_player_inline\advanced.tccmd.rtf

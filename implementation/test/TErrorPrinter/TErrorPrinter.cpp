@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 #include <string>
 #include "CGenerator.h"
 #include "CErrorPrinter.gen.h"
@@ -35,49 +35,49 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.setCsvDelimiter( '\"'), CErrorPrinted);
     generator.setCsvDelimiter( ';');
     //require delimiting char
-    BOOST_CHECK_THROW( generator.loadTable( "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //unexpected quote
-    BOOST_CHECK_THROW( generator.loadTable( "UnexpectedQuote.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "UnexpectedQuote.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //cannot open table file
-    BOOST_CHECK_THROW( generator.loadTable( "NotThere.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "NotThere.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row overflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowOverflow.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RowOverflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row underflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowUnderflow.csv", "LabelA", true, true, 1, 1), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( "RowUnderflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
 
     //unloaded file not found
     BOOST_CHECK_THROW( generator.unloadTable( "not there"), CErrorPrinted);
 
     //cannot open template file
-    BOOST_CHECK_THROW( generator.generate( "NotThere.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "NotThere.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open target file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open intermediate output file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", true, "BadDir/TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", true, false, "BadDir/TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //failed to move intermediate file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", true, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", true, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //bad parameter
     {
         ParameterListT parameterList;
         parameterList.push_back("a=4");
         parameterList.push_back("b-5");
-        BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
     }
 
-    BOOST_CHECK_THROW( generator.generate( "CyclicInclusion.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "CyclicInclusion.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //infinite loop
     {
         ParameterListT parameterList;
         parameterList.push_back("loop=[ENTRY][\"loop\"]");
-        BOOST_CHECK_THROW( generator.generate( "InfiniteLoop.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( "InfiniteLoop.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
         generator.reset();
     }
 
-    BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, "TargetFile.txt.intermediate", ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 }
 

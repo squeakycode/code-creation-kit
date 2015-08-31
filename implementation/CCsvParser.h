@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -48,7 +48,7 @@ public:
 
     ///check chars used for commenting, throws ExBadCommentChars when bad
     template <typename StringT, typename CharT, typename StreamT>
-    static void checkCharsUsedForCommenting( const StringT& commentChars, const CharT delimiter, const StreamT& stream)
+    static void checkCharsUsedForCommenting( const StringT& commentChars, const CharT delimiter, bool ignoreDoubleQuotes, const StreamT& stream)
     {
         const CharT quote = stream.widen('"');
         const CharT new_line = stream.widen('\n');
@@ -57,8 +57,8 @@ public:
         //check characters for commenting a line
         for ( typename StringT::const_iterator it = commentChars.begin(); it != commentChars.end(); ++it)
         {
-            if (        *it == delimiter 
-                ||  *it == quote
+            if (    *it == delimiter
+                ||  (*it == quote && !ignoreDoubleQuotes)
                 ||  *it == new_line
                 ||  *it == carriage_return)
             {
@@ -69,13 +69,13 @@ public:
 
     ///check chars used for commenting, throws ExBadCommentChars when bad
     template <typename CharT, typename StreamT>
-    static void checkDelimiter( const CharT delimiter, const StreamT& stream)
+    static void checkDelimiter( const CharT delimiter, bool ignoreDoubleQuotes, const StreamT& stream)
     {
         const CharT quote = stream.widen('"');
         const CharT new_line = stream.widen('\n');
         const CharT carriage_return = stream.widen('\r');
 
-        if ( delimiter == quote )
+        if ( delimiter == quote && !ignoreDoubleQuotes)
         {
             throw ExBadDelimiter( "Quote");
         }
@@ -91,7 +91,7 @@ public:
 
     ///parses a csv file with the delimiter given, csv data is fed into table builder, postion is fed into postion tracker
     template <typename StreamT, typename TableBuilderT, typename PositionTrackerT>
-    static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars, PositionTrackerT& positionTracker)
+    static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars, bool ignoreDoubleQuotes,PositionTrackerT& positionTracker)
     {
         positionTracker.reset();
 
@@ -107,8 +107,8 @@ public:
         const CharT new_line = stream.widen('\n');
         const CharT carriage_return = stream.widen('\r');
 
-        checkDelimiter( delimiter, stream); 
-        checkCharsUsedForCommenting( commentChars, delimiter, stream);
+        checkDelimiter( delimiter, ignoreDoubleQuotes, stream); 
+        checkCharsUsedForCommenting( commentChars, delimiter, ignoreDoubleQuotes, stream);
 
         CharT c;
         StringT item;
@@ -145,7 +145,7 @@ public:
             }
 
             item.clear();
-            if ( c == quote ) //item in quotes
+            if ( c == quote && !ignoreDoubleQuotes) //item in quotes
             {
                 positionTracker.nextColumn();
                 while( stream.get( c))
@@ -193,12 +193,12 @@ public:
                 {
                     if ( c == carriage_return ) continue; //ignore carriage return
                     if ( c == delimiter || c == new_line ) break; //end of item
-                    if ( c == quote ) //error condition
+                    if ( c == quote && !ignoreDoubleQuotes) //error condition
                     {
                         throw ExUnexpectedQuote();
                     }
                     item += c; //add character to item
-                    positionTracker.nextColumn();            
+                    positionTracker.nextColumn();
                 }
                 while( stream.get( c));
             }
@@ -227,10 +227,10 @@ public:
 
     ///parse with no position tracker required
     template <typename StreamT, typename TableBuilderT>
-    static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars)
+    static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars, bool ignoreDoubleQuotes)
     {
         CNoTracker noTracker;
-        parse( stream, tableBuilder, delimiter, commentChars, noTracker);
+        parse( stream, tableBuilder, delimiter, commentChars, ignoreDoubleQuotes, noTracker);
     }
 
 private:

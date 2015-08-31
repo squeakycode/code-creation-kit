@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,39 +16,34 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 #include "CVerticalTableBuilder.h"
 #include <string>
-#include <fstream>
 #include <vector>
 
-BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
+template <typename T>
+void testBuilder( T& itemTable, const unsigned int rows, const unsigned int columns, bool pad)
 {
-    //test data array
-    const unsigned int rows = 5;
-    const unsigned int columns = 5;
-    const char* itemTable[rows][columns] =
-    {
-        {"a1","b1","c1","d1","e1"},
-        {"","","","",""},
-        {"\";","b2;\nb2","\"b3;\nb3\"","\"b3\"\nb3\"",";"},
-        {"","","","",""},
-        {"a5","b5","c5","d5","e5"}
-    };
-
     //create builder and container
     typedef std::vector<std::vector<std::string> >  TableT;
     TableT table;
-    CVerticalTableBuilder<TableT> tableBuilder(table);
+    CVerticalTableBuilder<TableT> tableBuilder(table, pad);
 
     //fill in the test data
     for ( unsigned int row = 0; row < rows; ++row)
     {
         for ( unsigned int col = 0; col < columns; ++col)
         {
+            if ( itemTable[row][col] == NULL)
+            {
+                break;
+            }
             tableBuilder.addItem( itemTable[row][col]);
         }
-        tableBuilder.addRow();
+        if ( row + 1 < rows) //not for last row
+        {
+            tableBuilder.addRow();
+        }
     }
     tableBuilder.finished();
 
@@ -59,8 +54,84 @@ BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
         for ( unsigned int col = 0; col < columns; ++col)
         {
             BOOST_REQUIRE( table[col].size() == rows );
-            BOOST_CHECK( table[col][row] == itemTable[row][col] );
+            BOOST_CHECK( table[col][row] == (itemTable[row][col] ? itemTable[row][col] : ""));
         }
     }
+}
+
+BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
+{
+    {
+        //test data array
+        const unsigned int rows = 5;
+        const unsigned int columns = 5;
+        const char* itemTable[rows][columns] =
+        {
+            {"a1","b1","c1","d1","e1"},
+            {"","","","",""},
+            {"\";","b2;\nb2","\"b3;\nb3\"","\"b3\"\nb3\"",";"},
+            {"","","","",""},
+            {"a5","b5","c5","d5","e5"}
+        };
+        testBuilder( itemTable, rows, columns, false);
+    }
+
+    {
+        //test data array, auto pad
+        const unsigned int rows = 6;
+        const unsigned int columns = 5;
+        const char* itemTable[rows][columns] =
+        {
+            {NULL,NULL,NULL,NULL,NULL},
+            {"",NULL,NULL,NULL,NULL},
+            {"a5","b5","c5",NULL,NULL},
+            {"\";","b2;\nb2","\"b3;\nb3\"","\"b3\"\nb3\"",";"},
+            {"","","",NULL,NULL},
+            {"a5","b5","c5","d5",NULL}
+        };
+        testBuilder( itemTable, rows, columns, true);
+    }
+
+    {
+        //test data array, underflow in addRow
+        const unsigned int rows = 3;
+        const unsigned int columns = 2;
+        const char* itemTable[rows][columns] =
+        {
+            {"a","b"},
+            {"c",NULL},
+            {"a5","b5"}
+        };
+        testBuilder( itemTable, rows, columns, true);
+        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+    }
+
+    {
+        //test data array, overflow in addItem
+        const unsigned int rows = 3;
+        const unsigned int columns = 3;
+        const char* itemTable[rows][columns] =
+        {
+            {"a","b", NULL},
+            {"c","a5","b5"},
+            {"a5","b5",NULL}
+        };
+        testBuilder( itemTable, rows, columns, true);
+        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExOverflow);
+    }
+
+    {
+        //test data array, underflow in finished
+        const unsigned int rows = 2;
+        const unsigned int columns = 2;
+        const char* itemTable[rows][columns] =
+        {
+            {"a","b"},
+            {"c",NULL},
+        };
+        testBuilder( itemTable, rows, columns, true);
+        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+    }
+
 }
 

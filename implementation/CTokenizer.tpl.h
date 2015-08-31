@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -26,6 +26,8 @@
 #pragma once
 #endif
 
+#include <ostream>
+
 #include "KeywordParameterParser.h"
 #include "CSpecialRegexCharacterPrefixer.h"
 
@@ -44,12 +46,38 @@
 #endif
 
 #include "StringLiteral.h"
+#include "CNul.h"
 
-///Removes one tick from keywords in input
-template <typename TokenT, typename StringT, typename OutputStreamT>
+[MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][TRIM]
+///defines exceptions thrown by CTokenizer for template argument independent access
+class CTokenizerExceptions
+{
+public:
+    class ExInlinePrefixEmpty : public std::runtime_error //not in error printer table
+    { public: ExInlinePrefixEmpty() : std::runtime_error( "An empty string is not allowed for inline template prefix.") {}};
+
+    class ExInlineGeneratedPostfixEmpty : public std::runtime_error //not in error printer table
+    { public: ExInlineGeneratedPostfixEmpty() : std::runtime_error( "An empty string is not allowed for inline template generated postfix.") {}};
+
+    class ExInlineMarkupWhiteSpace : public std::runtime_error  //collides with TRIM  //not in error printer table
+    { public: ExInlineMarkupWhiteSpace() : std::runtime_error( "Trailing or leading white space for inline template markup is not allowed.") {}};
+
+    class ExBadInlineGeneratedPostfix : public std::runtime_error  //not in error printer table
+    { public: ExBadInlineGeneratedPostfix() : std::runtime_error( "No combination of inline prefix and inline postfix must end with the inline generated postfix.") {}};
+};
+[MACRO_END][TRIM]
+
+///Splits text line input into tokens.
+template <
+      typename TokenT
+    , typename StringT
+    , typename OutputStreamT
+    , typename FinalOutputStreamT[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
+    , typename LogOutputStreamT = CNul >
 class [ENTRY]["Tokenizer"]
 {
 public:
+    typedef [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT[MACRO_BEGIN], FinalOutputStreamT[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][MACRO_END], LogOutputStreamT> ThisT;
     typedef std::vector<StringT> KeywordListT;
     typedef boost::basic_regex<typename StringT::value_type, boost::regex_traits<typename StringT::value_type> > RegexT;
     typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
@@ -59,7 +87,90 @@ public:
         : m_outputStream(0)
         , m_closing(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
         , m_bypassMode(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+        , m_finalOutputStream(0)[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
+        , m_inlineTemplateMode(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
+        , m_logOutputStream(0)
     {
+    }
+
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][TRIM]
+
+    class CAutoLineClear
+    {
+    public:
+        CAutoLineClear()
+            : m_pLine(0)
+        {
+        }
+
+        ~CAutoLineClear()
+        {
+            if ( m_pLine)
+            {
+                m_pLine->clear();
+            }
+        }
+
+        void set( StringT* p)
+        {
+            m_pLine = p;
+        }
+    private:
+        StringT* m_pLine;
+    };
+
+    ///reset state information
+    void reset()
+    {
+        m_temporaryInlineTemplateLine.clear();
+    }
+
+    ///set inline markup
+    void setInlineTemplateMarkup( const StringT& prefix, const StringT& postfix,  const StringT& generatedPostfix)
+    {
+        if (   prefix != boost::trim_copy( prefix)
+            || postfix != boost::trim_copy( postfix)
+            || generatedPostfix != boost::trim_copy( generatedPostfix)
+        )
+        {
+            throw CTokenizerExceptions::ExInlineMarkupWhiteSpace();
+        }
+        if ( prefix.empty())
+        {
+            throw CTokenizerExceptions::ExInlinePrefixEmpty();
+        }
+        if ( generatedPostfix.empty())
+        {
+            throw CTokenizerExceptions::ExInlineGeneratedPostfixEmpty();
+        }
+        if ( boost::ends_with( prefix+postfix, generatedPostfix))
+        {
+            throw CTokenizerExceptions::ExBadInlineGeneratedPostfix();
+        }
+
+        m_inlinePrefix = prefix;
+        m_inlinePostfix = postfix;
+        m_inlineGeneratedPostfix = generatedPostfix;
+    }
+
+    ///connect output file stream
+    void connectFinalOutputStream( FinalOutputStreamT* stream)
+    {
+        m_finalOutputStream = stream;
+    }
+
+    ///switches inline template mode
+    void setInlineTemplateMode( bool enable)
+    {
+        m_inlineTemplateMode = enable;
+    }
+
+    [MACRO_END][TRIM]
+
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        m_logOutputStream = stream;
     }
 
     [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
@@ -128,17 +239,20 @@ public:
     [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
     ///removes a delay mark if needed
     template <typename WhatT>
-    bool RemoveTick( WhatT& what, int pos)
+    bool removeTick( WhatT& what, int pos)
     {
+        // if there is more than one delay mark, remove delay mark and output as text
+        // one delay mark triggers processing
+        // remove delay mark and output in bypass mode in any case
         if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
         {
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
+            *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos - 1 ].first, what[ pos ].first);
+            *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos ].first + 1, what[ pos - 1 ].second);
             return true;
         }
-        else if ( m_bypassMode)
+        else if ( m_bypassMode) // remove delay mark and output in bypass mode in any case
         {
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos - 1 ].second));
+            *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos - 1 ].first, what[ pos - 1 ].second);
             return true;
         }
 
@@ -146,10 +260,30 @@ public:
     }
 
     [MACRO_END][TRIM]
+    template <typename WhatT>
+    typename TokenT::SharedStringListT getSourceText( WhatT& what, int pos, typename StringT::const_iterator& endPos)
+    {
+        [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
+        pos = pos * 2 - 1;
+        if ( (what[ pos ].second - what[ pos ].first) > 0 )
+        {
+            typename TokenT::SharedStringListT list( new typename TokenT::StringListT(2));
+            list->front().assign( what[ pos - 1 ].first, what[ pos ].first);
+            list->back().assign( what[ pos ].first + 1, endPos);
+            return list;
+        }
+        --pos;
+        [MACRO_END][TRIM]
+        typename TokenT::SharedStringListT list( new typename TokenT::StringListT(1));
+        list->front().assign( what[ pos ].first, endPos);
+        return list;
+    }
+
     ///tokenize input line
-    [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
+    ThisT& operator <<( const StringT& line)
     {
         bool trimmed = false;
+        CAutoLineClear autoClear;[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
@@ -159,6 +293,52 @@ public:
         for (;[MACRO_BEGIN]!m_bypassMode[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][MACRO_END];)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
+            [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][TRIM]
+            //if in inline processing Mode
+            if ( m_inlineTemplateMode && m_temporaryInlineTemplateLine.empty())
+            {
+                //check whether the line contains generated content
+                if ( boost::ends_with( range, m_inlineGeneratedPostfix))
+                {
+                    //generated content is ignored/removed
+                    return *this;
+                }
+
+                //write the line to the output file
+                *m_finalOutputStream << line;
+
+                //check whether the line contains template content
+                if (    boost::starts_with( range, m_inlinePrefix) // must start with prefix
+                    &&  (m_inlinePostfix.empty() // either no postfix
+                        || 
+                        (boost::ends_with( range, m_inlinePostfix) // or ends with postfix
+                        &&
+                        static_cast<size_t>(range.size()) >= ( m_inlinePostfix.size() + m_inlinePrefix.size())) //and no overlap
+                        )
+                )
+                {
+                    //remove markup and create a new line used for processing
+                    m_temporaryInlineTemplateLine.clear();
+                    m_temporaryInlineTemplateLine.append( start, range.begin());
+                    m_temporaryInlineTemplateLine.append( range.begin() + m_inlinePrefix.size(), range.end() - m_inlinePostfix.size());
+                    m_temporaryInlineTemplateLine.append( range.end(), end);
+                    
+                    //switch to processing of this line
+                    range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n"));
+                    start = m_temporaryInlineTemplateLine.begin();
+                    fullLineStart = m_temporaryInlineTemplateLine.begin();
+                    end = m_temporaryInlineTemplateLine.end(); 
+
+                    autoClear.set( &m_temporaryInlineTemplateLine);
+                }
+                else
+                {
+                    //not template content, we are done 
+                    return *this;
+                }
+            }
+
+            [MACRO_END][TRIM]
             [MACRO_BEGIN][TRIM]
             if ( boost::[ENTRY]["Tokenizer Preprocessor Check"]( range, m_[ENTRY]["Tag Name Small"]Keyword))
             {
@@ -186,16 +366,23 @@ public:
             //if full line without tags, output as special token
             if ( what[ TokenT::eNewLine ].matched && start == fullLineStart )
             {
-                *m_outputStream << TokenT( TokenT::eFullLineWithoutTags, StringT( start, what[ TokenT::eNewLine ].second));
+                *m_outputStream << TokenT( TokenT::eFullLineWithoutTags, start, what[ TokenT::eNewLine ].second);
                 start = what[ 0 ].second;
-                continue;
+                if ( what[ TokenT::eNewLine ].second == end)
+                {
+                    break;
+                }
+                else
+                {
+                    continue;
+                }
             }
             [MACRO_END][TRIM]
 
             //forward preceding text as token, if not empty
             if ( start != what[ 0 ].first )
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, StringT( start, what[ 0 ].first));
+                *m_outputStream << TokenT( TokenT::eTextFragment, start, what[ 0 ].first);
             }
 
             //set start position for next loop iteration
@@ -204,26 +391,54 @@ public:
             //process tokens
             if ( what[ TokenT::eNewLine ].matched )
             {
-                *m_outputStream << TokenT( TokenT::eNewLine, StringT( what[ TokenT::eNewLine ].first, what[ TokenT::eNewLine ].second));
+                *m_outputStream << TokenT( TokenT::eNewLine, what[ TokenT::eNewLine ].first, what[ TokenT::eNewLine ].second);
             }
             [MACRO_BEGIN][TRIM]
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
             {
                 [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM]
-                if ( RemoveTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
+                if ( removeTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
                 {
                     continue;
                 }
                 [MACRO_END.][TRIM]
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
                 list->resize( [ENTRY]["Parameter Count"]);
-                KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy>( start, end, *list);
-                *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], list);
+                try
+                {
+                    KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy>( start, end, *list);
+                }
+                catch(...)
+                {
+                    //log
+                    if ( isLoggingEnabled())
+                    {
+                        *m_logOutputStream << "Error parsing parameters in line:\n";
+                        *m_logOutputStream << line;
+                        *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                    }
+                    throw;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], list, getSourceText( what, TokenT::e[ENTRY]["Tag Name Capital"], start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], list);
+                }
             }
             [OR][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimitOff"][TRIM]
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
             {
-                *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], typename TokenT::SharedStringListT(), getSourceText( what, TokenT::e[ENTRY]["Tag Name Capital"], start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+                }
             }
             [OR][TRIM]
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
@@ -234,12 +449,19 @@ public:
                 *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
 
                 [OR][END][TRIM]
-                if ( RemoveTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
+                if ( removeTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
                 {
                     continue;
                 }
                 [MACRO_END.][TRIM]
-                *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], typename TokenT::SharedStringListT(), getSourceText( what, TokenT::e[ENTRY]["Tag Name Capital"], start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+                }
             }
             [MACRO_END][TRIM]
             else
@@ -252,9 +474,9 @@ public:
         {
             [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
             //if full line without tags, output as special token used for optimizations, otherwise ouput text fragment
-            *m_outputStream << TokenT( (start == fullLineStart && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, StringT( start, end));
+            *m_outputStream << TokenT( (start == fullLineStart && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, start, end);
             [OR][TRIM]
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( start, end));
+            *m_outputStream << TokenT( TokenT::eTextFragment, start, end);
             [MACRO_END][TRIM]
         }
         if ( trimmed)
@@ -265,6 +487,11 @@ public:
         return *this;
     }
 private:
+    bool isLoggingEnabled()
+    {
+        return m_logOutputStream != NULL;
+    }
+private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
     bool m_closing;///<output line fragments as full line if closing to force flush[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
@@ -273,6 +500,15 @@ private:
     StringT m_[ENTRY]["Tag Name Small"]Keyword; ///<used for special preprocessing action
     StringT m_[ENTRY]["Tag Name Small"]DotKeyword; ///<used for special preprocessing action[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
     [MACRO_END][TRIM]
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][TRIM]
+    StringT m_inlinePrefix; ///< markup for inline template line
+    StringT m_inlinePostfix; ///< markup for inline template line
+    StringT m_inlineGeneratedPostfix; ///< marks a generated line
+    StringT m_temporaryInlineTemplateLine; ///< stores a line; recursion level is greater than 1 when not empty
+    FinalOutputStreamT* m_finalOutputStream; ///<the final ouput file
+    bool m_inlineTemplateMode; ///<toggles inline template processing
+    [MACRO_END][TRIM]
+    LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 
 #endif /* INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377 */

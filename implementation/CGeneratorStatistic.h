@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -30,6 +30,7 @@
 #include "CTokenizer.gen.h"
 #include "CTemplatePreprocessor.h"
 #include "StringLiteral.h"
+#include "CInlineTemplateParameters.h"
 
 ///defines exceptions thrown by CGenerator for template argument independent access
 class CGeneratorStatisticExceptions
@@ -41,17 +42,10 @@ public:
 template <typename StringT>
 class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisticExceptions
 {
-    class CNul
-    {
-    public:
-        template <typename T>
-        CNul& operator<<( const T&) { return *this; }
-    };
-
     typedef CGeneratorStatistic<StringT> ThisT;
     typedef CToken<Tokens, StringT> TokenT;
     typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
-    typedef CTokenizer<TokenT, StringT, PreprocessorT> TokenizerT;
+    typedef CTokenizer<TokenT, StringT, PreprocessorT, CNul> TokenizerT;
     typedef CTemplateLoader<TokenizerT, StringT> TemplateLoaderT;
 
 public:
@@ -99,8 +93,12 @@ public:
         return m_csvCommentChars;
     }
 
+    void setCsvIgnoreDoubleQuotes( bool /*ignoreDoubleQuotes*/)
+    {
+    }
+
     ///load another table for generation, see also unloadTable
-    void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int)
+    void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int, bool)
     {
         m_tables.insert( tableFileName);
     }
@@ -117,10 +115,32 @@ public:
 
     ///generates output by processing a template file
     template <typename ParameterListT>
-    void generate( const StringT& templateFileName, const StringT& targetFileName, bool, const StringT&, const ParameterListT&)
+    void generate( 
+        const StringT& templateFileName, 
+        const StringT& targetFileName, 
+        bool , 
+        bool , 
+        const StringT& , 
+        bool , 
+        const ParameterListT& ,
+        const CInlineTemplateParameters<StringT>& p
+        )
     {
+        //setup tokenizer
+        m_tokenizer.reset();
+        m_tokenizer.setInlineTemplateMode( p.enabled);
+        if ( p.enabled)
+        {
+            m_tokenizer.setInlineTemplateMarkup(
+                p.inlinePrefix,
+                p.inlinePostfix,
+                p.inlineGeneratedPostfix);
+        }
+
+        //reset
         m_templateLoader.resetInclusionHierarchy();
 
+        //add to statistic
         if ( targetFileName != STRING_LITERAL("-")) //if not use cout
         {
             m_generatedFiles.insert( targetFileName);
@@ -134,6 +154,7 @@ public:
     void reset()
     {
         m_templateLoader.reset();
+        m_tokenizer.reset();
         m_tables.clear();
         m_generatedFiles.clear();
         m_templateFiles.clear();
@@ -188,6 +209,9 @@ public:
     unsigned int getLastLineWithFailure() { return 1;}
     static int getMaxNumberOfRecursionLevels() { return 1; }
     static int getMaxMacroTextSizeBytes() { return 1; }
+    template <typename LogOutputStreamT>
+    void connectLogOutputStream( LogOutputStreamT*){}
+
 private:
     ///set default markup
     void setDefaultMarkup()

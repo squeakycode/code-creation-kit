@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -53,26 +53,26 @@ public:
     {
     }
 
-    CTargetFile( const StringT& filename, bool useCoutInstead = false)
+    CTargetFile( const StringT& filename, bool useCoutInstead = false, bool append = false)
         : m_useCout( useCoutInstead)
     {
-        if ( !m_useCout )
-        {
-            open( filename, useCoutInstead);
-        }
+        open( filename, useCoutInstead, append);
     }
 
     ///open file and check
-    void open( const StringT& filename, bool useCoutInstead = false)
+    void open( const StringT& filename, bool useCoutInstead = false, bool append = false)
     {
         //file mode
         m_useCout = useCoutInstead;
 
-        //open file
-        m_file.open( filename.c_str());
-        if ( !m_file.is_open())
+        if ( !m_useCout)
         {
-            throw typename ThisT::ExCannotOpenFile();
+            //open file
+            m_file.open( filename.c_str(), append ? (std::ios::out | std::ios::app) : (std::ios::out | std::ios::trunc));
+            if ( !m_file.is_open())
+            {
+                throw typename ThisT::ExCannotOpenFile();
+            }
         }
     }
 
@@ -100,7 +100,7 @@ public:
     }
 
     ///check file ok
-    void checkGood()    
+    void checkGood()
     {
         if ( !get() )
         {
@@ -113,7 +113,11 @@ public:
     {
         if ( !m_useCout)
         {
-            m_file.close();
+            if ( m_file.is_open())
+            {
+                m_file.close();
+            }
+            m_file.clear();
         }
     }
 

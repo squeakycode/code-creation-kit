@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -24,7 +24,7 @@
 
 #include "CMacro.h"
 #include <vector>
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 
 ///defines exceptions thrown by CParser for template argument independent access
 class CParserExceptions
@@ -84,11 +84,11 @@ public:
 
 #include "ParserExtensions.gen.h"
 
-template <typename OutputStreamT, typename TokenT, typename StringT>
+template <typename OutputStreamT, typename TokenT, typename StringT, typename LogOutputStreamT = CNul >
 class CParser : public CParserExceptions
 {
 public:
-    typedef CParser<OutputStreamT, TokenT, StringT> ThisT;
+    typedef CParser<OutputStreamT, TokenT, StringT, LogOutputStreamT> ThisT;
     typedef CMacro<StringT> MacroT;
     typedef std::vector<TokenT> StackT;
     typedef typename StackT::const_iterator PosT;
@@ -102,6 +102,8 @@ public:
     CParser()
         : m_outputStream( 0)
         , m_currentMacroTextSize( 0)
+        , m_level(0)
+        , m_logOutputStream(0)
     {
     }
 
@@ -109,6 +111,13 @@ public:
     void connectOutputStream( OutputStreamT* stream)
     {
         m_outputStream = stream;
+    }
+
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream, size_t level)
+    {
+        m_level = level;
+        m_logOutputStream = stream;
     }
 
     ///release items on the stack, returns true if something has beed flushed
@@ -139,7 +148,7 @@ public:
     }
 
     ///process tokens, pass on unprocessed text, pass on macros
-    CParser<OutputStreamT, TokenT, StringT>& operator <<( const TokenT& token)
+    ThisT& operator <<( const TokenT& token)
     {
         //monitor macro size
         m_currentMacroTextSize += token.getTextSize();
@@ -234,48 +243,76 @@ private:
     ///start parsing a macro
     void parseMacro( MacroT& macro)
     {
+        //log
+        if ( m_logOutputStream)
+        {
+            *m_logOutputStream << "Found macro (level " << m_level << "):\n";
+            BOOST_FOREACH( const TokenT& token, m_stack)
+            {
+                token.sourceTextToStream( *m_logOutputStream);
+            }
+            *m_logOutputStream << "\n";
+        }
+
         MacroExpressionT expression;
 
         PosT pos = m_stack.begin();
 
-        if (  pos != m_stack.end())
+        try
         {
-            if ( *pos == TokenT::eMacroBegin)
+            if (  pos != m_stack.end())
             {
-                ++pos;
-                MacroExpressionT block;
-                parseBlock<ExMissingMacroEnd>( pos, block, TokenT::eMacroEnd, macro);
-                expression.attach( block);
+                if ( *pos == TokenT::eMacroBegin)
+                {
+                    ++pos;
+                    MacroExpressionT block;
+                    parseBlock<ExMissingMacroEnd>( pos, block, TokenT::eMacroEnd, macro);
+                    expression.attach( block);
+                }
+                else
+                {
+                    MacroExpressionT blockContent;
+                    parseBlockContent( pos, blockContent, macro);
+                    expression.attach( blockContent);
+                }
             }
             else
             {
-                MacroExpressionT blockContent;
-                parseBlockContent( pos, blockContent, macro);
-                expression.attach( blockContent);
+                throw ExUnexpectedEndOfMacro();
             }
-        }
-        else
-        {
-            throw ExUnexpectedEndOfMacro();
-        }
 
-        if ( pos != m_stack.end())
-        {
-            if ( *pos == TokenT::eEnd)
+            if ( pos != m_stack.end())
             {
-                throw ExMissingBlockBegin();
+                if ( *pos == TokenT::eEnd)
+                {
+                    throw ExMissingBlockBegin();
+                }
+                else if ( *pos == TokenT::eMacroEnd)
+                {
+                    throw ExMissingMacroBegin();
+                }
+                else
+                {
+                    throw ExUnexpectedKeyword();
+                }
             }
-            else if ( *pos == TokenT::eMacroEnd)
-            {
-                throw ExMissingMacroBegin();
-            }
-            else
-            {
-                throw ExUnexpectedKeyword();
-            }
-        }
 
-        macro.attach( expression);
+            macro.attach( expression);
+        }
+        catch(...)
+        {
+            //log
+            if ( m_logOutputStream)
+            {
+                *m_logOutputStream << "Successfully processed part of macro:\n";
+                for ( PosT it = m_stack.begin(); it != pos; ++it)
+                {
+                    it->sourceTextToStream( *m_logOutputStream);
+                }
+                *m_logOutputStream << "\n";
+            }
+            throw;
+        }
     }
 
     ///parse a block
@@ -380,6 +417,8 @@ private:
     OutputStreamT* m_outputStream; ///<sink for macros, also excepts text around macros
     StackT m_stack;
     size_t m_currentMacroTextSize;
+    size_t m_level; ///<used for logging purposes
+    LogOutputStreamT* m_logOutputStream; ///<used for logging purposes; NULL if not logging
     static const size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
 };
 

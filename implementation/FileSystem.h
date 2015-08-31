@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -22,6 +22,7 @@
 #pragma once
 #endif
 
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include "StringLiteral.h"
@@ -34,6 +35,8 @@
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
+
+#include <iostream>
 
 namespace FileSystem
 {
@@ -61,7 +64,7 @@ namespace FileSystem
 
     ///returns the location (path+name) determined from a fixed location and a location that may be relative to the fixed location
     template <typename StringT>
-    StringT determineRelativeLocation( const StringT& location, const StringT& dependentLocation, bool locationIsFile = true)
+    inline StringT determineRelativeLocation( const StringT& location, const StringT& dependentLocation, bool locationIsFile = true)
     {
         typedef typename StringT::value_type CharT;
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
@@ -139,7 +142,7 @@ namespace FileSystem
 
     ///returns the location (path+name) determined from a fixed location and a location that may be relative to the fixed location
     template <typename StringT>
-    StringT determineDependentLocation( const StringT& location, const StringT& relativeLocation, bool locationIsFile = true)
+    inline StringT determineDependentLocation( const StringT& location, const StringT& relativeLocation, bool locationIsFile = true)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT base( location);
@@ -162,7 +165,7 @@ namespace FileSystem
 
     ///returns the filename
     template <typename StringT>
-    StringT determineFilename( const StringT& location)
+    inline StringT determineFilename( const StringT& location)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT path( location);
@@ -171,7 +174,7 @@ namespace FileSystem
 
     ///returns the location (path+name) determined from a initial path and a location that may be relative to it
     template <typename StringT>
-    StringT determineDependentLocation( const StringT& relativeLocation)
+    inline StringT determineDependentLocation( const StringT& relativeLocation)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT initialPath( boost::filesystem::initial_path<PathT>());
@@ -180,7 +183,7 @@ namespace FileSystem
 
     /// returns true if the loaction specifies an existing file
     template <typename StringT>
-    bool isRegularFile( const StringT& location)
+    inline bool isRegularFile( const StringT& location)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT path( location);
@@ -189,7 +192,7 @@ namespace FileSystem
 
     /// removes a file
     template <typename StringT>
-    bool removeFile( const StringT& location)
+    inline bool removeFile( const StringT& location)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT path( location);
@@ -198,7 +201,7 @@ namespace FileSystem
 
     /// moves a file
     template <typename StringT>
-    void moveFile( const StringT& from, const StringT& to)
+    inline void moveFile( const StringT& from, const StringT& to)
     {
         typedef boost::filesystem::basic_path< StringT, typename detail::PathTraits<StringT>::type > PathT;
         PathT pathFrom( from);
@@ -206,7 +209,37 @@ namespace FileSystem
         boost::filesystem::rename( from, to);
     }
 
+    /// recycle a file
+    bool recycleFile( const std::string& location);
+    bool recycleFile( const std::wstring& location);
 
+    ///helper function for getting the right output stream
+    template <typename CharT> 
+    inline std::basic_ostream<CharT, std::char_traits<CharT> >& getCout()
+    {
+        return std::cout;
+    }
+
+    ///helper function for getting the right output stream
+    template <>
+    inline std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCout()
+    {
+        return std::wcout;
+    }
+
+    ///helper function for getting the right output stream
+    template <typename CharT> 
+    inline std::basic_ostream<CharT, std::char_traits<CharT> >& getCerr()
+    {
+        return std::cerr;
+    }
+
+    ///helper function for getting the right output stream
+    template <>
+    inline std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& getCerr()
+    {
+        return std::wcerr;
+    }
 }
 
 #endif /* INCLUDED_FILESYSTEM_H_7536737 */

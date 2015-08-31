@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -23,11 +23,12 @@
 #endif
 
 #include "CCommandFileLineParser.gen.h"
-#include "boost/foreach.hpp"
+#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
 #include "System.h"
+#include "CInlineTemplateParameters.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -44,20 +45,23 @@ public:
     class ExInvalidCommandOptions : public std::runtime_error 
     { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
 
+    class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
+    { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
+
     ///process a stream of commands
-    template <typename InputStreamT, typename GeneratorT>
-    void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, bool disableReset = false)
+    template <typename InputStreamT, typename GeneratorT, typename LogFileT>
+    void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
     {
         StringT command;
         while( std::getline(stream, command))
         {
-            processCommand( command, generator, commandFileName, disableReset);
-        }    
+            processCommand( command, generator, commandFileName, logFile, disableReset);
+        }
     }
 
     ///process a command for the generator
-    template <typename GeneratorT>
-    void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, bool disableReset = false)
+    template <typename GeneratorT, typename LogFileT>
+    void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
     {
         typedef typename StringT::value_type CharT;
 
@@ -73,8 +77,30 @@ public:
         const typename ParserT::ECommand command = m_parser.getCommand();
 
         if ( command == ParserT::eGenerate 
-            || command == ParserT::eGenerateUsingIntermediateFile)
+            || command == ParserT::eGenerateUsingIntermediateFile
+            || command == ParserT::eProcessInlineTemplateFile)
         {
+            CInlineTemplateParameters<StringT> inlineTemplateParameters;
+            StringT outputFileName( m_parser.getOutputFile());
+            bool useIntermediateFile = m_parser.getUseIntermediateOutputFile();
+
+            if ( command == ParserT::eProcessInlineTemplateFile)
+            {
+                //pass inline template processing parameters
+                inlineTemplateParameters.enabled = true;
+                inlineTemplateParameters.inlinePrefix = m_parser.getInlinePrefix();
+                inlineTemplateParameters.inlinePostfix = m_parser.getInlinePostfix();
+                inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
+                inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
+
+                //if no output file name has been passed source is also target
+                if ( outputFileName.empty())
+                {
+                    outputFileName = m_parser.getTemplateFile();
+                    useIntermediateFile = true;
+                }
+            }
+
             if ( m_parser.hasMarkup()) //switch for setting prefix and postfix at once
             {
                 generator.setMarkup( m_parser.getMarkup(), m_parser.getMarkup());
@@ -85,10 +111,13 @@ public:
             }
             generator.generate( 
                 prepareFileName( m_parser.getTemplateFile(), commandFileName),
-                prepareFileName( m_parser.getOutputFile(), commandFileName), 
-                m_parser.getUseIntermediateOutputFile(),
-                prepareFileName( m_parser.getOutputFile() + m_parser.getIntermediateOutputFileExtension(), commandFileName),
-                m_parser.getParameters());
+                prepareFileName( outputFileName, commandFileName), 
+                useIntermediateFile,
+                m_parser.getRecycle(),
+                prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                m_parser.getAppendToFile(),
+                m_parser.getParameters(),
+                inlineTemplateParameters);
         }
         else if ( command == ParserT::eLoadTable )
         {
@@ -101,7 +130,8 @@ public:
                 , m_parser.getTopDown() || noDirectionSet
                 , m_parser.getLeftToRight() || noDirectionSet
                 , m_parser.getRowHeaderIndex()
-                , m_parser.getColumnHeaderIndex());
+                , m_parser.getColumnHeaderIndex()
+                , m_parser.getPadRows());
         }
         else if ( command == ParserT::eUnloadTable)
         {
@@ -142,6 +172,14 @@ public:
                 {
                     delimiterChar = delimiter[0];
                 }
+                else
+                {
+                    delimiterChar = 0;
+                }
+            }
+            else
+            {
+                throw ExInvalidCommandOptions();
             }
 
             generator.setCsvDelimiter( delimiterChar);
@@ -149,6 +187,44 @@ public:
         else if ( command == ParserT::eCsvCommentChars )
         {
             generator.setCsvCommentChars( m_parser.getCsvCommentChars());
+        }
+        else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+        {
+            if ( m_parser.hasCsvIgnoreDoubleQuotes())
+            {
+                StringT val = m_parser.getCsvIgnoreDoubleQuotes();
+                if ( val == STRING_LITERAL("on"))
+                {
+                    generator.setCsvIgnoreDoubleQuotes( true);
+                }
+                else if ( val == STRING_LITERAL("off"))
+                {
+                    generator.setCsvIgnoreDoubleQuotes( false);
+                }
+                else
+                {
+                    throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
+                }
+            }
+            else
+            {
+                throw ExInvalidCommandOptions();
+            }
+        }
+        else if ( command == ParserT::eSetLogFile )
+        {
+            generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
+            logFile.close();
+
+            if( m_parser.getLogFile() == STRING_LITERAL("none"))
+            {
+                //nothing to do
+            }
+            else
+            {
+                logFile.open( m_parser.getLogFile(), m_parser.getLogFile() == STRING_LITERAL("-"), false);
+                generator.connectLogOutputStream( &logFile.get());
+            }
         }
         else if ( command == ParserT::eNoOptionsGiven)
         {
@@ -194,8 +270,8 @@ private:
             }
         }
     }
-private:    
-    ParserT m_parser;    
+private:
+    ParserT m_parser;
 };
 
 #ifdef _MSC_VER

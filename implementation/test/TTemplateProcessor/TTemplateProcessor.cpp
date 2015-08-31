@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 #include "CTemplateProcessor.h"
 #include <sstream>
 #include <iostream>
@@ -118,7 +118,7 @@ void testMacroProcessing()
     for ( unsigned int col = 0; col < columns; ++col)
     {
         table[col].resize( rows);
-        for ( unsigned int row = 0; row < rows; ++row)	
+        for ( unsigned int row = 0; row < rows; ++row)
         {
             table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
         }
@@ -355,7 +355,7 @@ void testTemplateProcessor()
     for ( unsigned int col = 0; col < columns; ++col)
     {
         table[col].resize( rows);
-        for ( unsigned int row = 0; row < rows; ++row)	
+        for ( unsigned int row = 0; row < rows; ++row)
         {
             table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
         }

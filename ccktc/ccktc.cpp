@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -14,36 +14,42 @@
 //
 //   You should have received a copy of the GNU General Public License
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
-    
+
 #include <string>
 #include <iostream>
 #ifdef WIN32
-#	include <conio.h>
+#   include <conio.h>
 #endif
 #include "CGenerator.h"
 #include "CGeneratorStatistic.h"
 #include "CErrorPrinter.gen.h"
 #include "CommandProcessor.h"
+#include "CTargetFile.h"
 
+class LogFileT;
 
 //run processing of command line
-int process( int argc, char* argv[], bool& prompt)
+int process( int argc, char* argv[], bool& prompt, bool& logging)
 {
     typedef char CharT;
     typedef std::basic_string<CharT, std::char_traits<CharT> > StringT;
+    typedef std::basic_ostream< CharT, std::char_traits<CharT> > LogOutputStreamT;
 
     try
     {
+        //create log file
+        CTargetFile<StringT, LogFileT> logFile;
+
         //create generator
-        CGenerator<StringT> generatorImpl;
-        CErrorPrinter<StringT, CGenerator<StringT> > generator( generatorImpl);
+        CGenerator<StringT, LogOutputStreamT> generatorImpl;
+        CErrorPrinter<StringT, CGenerator<StringT, LogOutputStreamT> > generator( generatorImpl);
 
         //create generator statistic
         CGeneratorStatistic<StringT> generatorStatisticImpl;
         CErrorPrinter<StringT, CGeneratorStatistic<StringT> > generatorStatistic( generatorStatisticImpl);
 
         //execute command, which generator is used depends on the command
-        CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, &prompt);
+        CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, logFile, &prompt, &logging);
     }
     catch( CErrorPrinted&)
     {
@@ -67,12 +73,13 @@ int process( int argc, char* argv[], bool& prompt)
 int main(int argc, char* argv[])
 {
     bool prompt = false;
+    bool logging = false;
 
     //loop for prompt mode
     for(;;)
     {
         //run processing
-        int exitCode = process( argc, argv, prompt);
+        int exitCode = process( argc, argv, prompt, logging);
 
         //if prompt mode
         if ( prompt )
@@ -80,19 +87,20 @@ int main(int argc, char* argv[])
             char keyPressed = ' ';
             bool success = exitCode == 0;
             //output status
-            std::cout << std::endl << ( success ? "Command file successfully processed..." : "An error occured while processing...") << std::endl;
+            std::cerr << std::endl << ( success ? "Command file successfully processed..." : "An error occured while processing...") << std::endl;
 #ifdef WIN32
-			//output help
-            std::cout << "Press 'r' to rerun the processing, any other key to exit." << std::endl;
+            //output help
+            std::cerr << "Press 'r' to rerun the processing" << (logging ? " or 'l' to rerun with logging" : "") << ", any other key to exit." << std::endl;
             //wait for key press
-			keyPressed = (char)_getch();
+            keyPressed = (char)_getch();
 #else
-			//output help
-            std::cout << "Press 'r' and enter to rerun the processing, any other key and enter to exit." << std::endl;
+            //output help
+            std::cerr << "Press 'r' and enter to rerun the processing" << (logging ? " or 'l' to rerun with logging" : "") << ", any other key and enter to exit." << std::endl;
             //wait for input
-			keyPressed = (char)getchar();
+            keyPressed = (char)getchar();
 #endif
-            if ( keyPressed == 'r' || keyPressed == 'R' )
+            logging = logging && (keyPressed == 'l' || keyPressed == 'L');
+            if ( keyPressed == 'r' || keyPressed == 'R' || logging)
             {
                 //try again, maybe after changing the input files
                 continue;

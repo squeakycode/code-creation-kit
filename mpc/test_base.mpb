@@ -33,7 +33,7 @@ project : base, boost_unit_test_framework, boost_program_options, boost_filesyst
     postbuild = ./test_exe
   }
 
-  specific(!vc71, !vc8, !vc9, !nmake, !em3, !bmake, !bds4) {
+  specific(!vc71, !vc8, !vc9, !vc10, !nmake, !em3, !bmake, !bds4) {
     lit_libs += $(BOOST_STATIC_LIB_PREFIX)boost_system$(BOOST_CFG)
   }
 }

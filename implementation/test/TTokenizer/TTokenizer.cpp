@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -16,7 +16,7 @@
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define BOOST_TEST_MAIN
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 #include "CTokenizer.gen.h"
 #include "CBackEndTokenizer.gen.h"
 #include "ETokens.gen.h"
@@ -26,17 +26,24 @@
 #include <vector>
 #include "StringLiteral.h"
 
-template <typename TokenT>
+template <typename TokenT, typename StringT>
 class CTokenizerTestHelper
 {
 public:
-    CTokenizerTestHelper<TokenT> operator << ( const TokenT& token)
+    CTokenizerTestHelper<TokenT,StringT>& operator << ( const StringT& text)
+    {
+        resultString.push_back( text);
+        return *this;
+    }
+
+    CTokenizerTestHelper<TokenT,StringT>& operator << ( const TokenT& token)
     {
         result.push_back( token);
         return *this;
     }
 
     std::vector<TokenT> result;
+    std::vector<StringT> resultString;
 };
 
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
@@ -203,22 +210,91 @@ void testBackEndFeatures()
     }
 }
 
+template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
+void testInlineTemplateProcessing()
+{
+    typedef typename StringT::value_type CharT;
+    TokenizerT tokenizer;
+    setKeywords<TokenizerT, StringT>( tokenizer);
+
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ * "), STRING_LITERAL("* /"), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* / "), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* /"), STRING_LITERAL("// $ ")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL(""), STRING_LITERAL("*/"), STRING_LITERAL("//$")), CTokenizerExceptions::ExInlinePrefixEmpty);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("")), CTokenizerExceptions::ExInlineGeneratedPostfixEmpty);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("**/"), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("**/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*/"), STRING_LITERAL(""), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+
+    OutputT helper;
+    tokenizer.connectOutputStream( &helper); 
+    tokenizer.connectFinalOutputStream( &helper); 
+    tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("//$"));
+    tokenizer.setInlineTemplateMode( true);
+    std::vector<TokenT>& result = helper.result;
+    std::vector<StringT>& result2 = helper.resultString;
+
+    {//test
+        result.clear();
+        result2.clear();
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( "text\n");
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( " /* macro */ \n");
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( " /*/ \n");
+
+        BOOST_REQUIRE( result.size() == 2);
+        BOOST_CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro  ")));
+        BOOST_CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        BOOST_REQUIRE( result2.size() == 3);
+        BOOST_CHECK(   result2[0] == STRING_LITERAL("text\n"));
+        BOOST_CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
+        BOOST_CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
+    }
+
+    {//test no postfix
+        tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL(""), STRING_LITERAL("//$"));
+        result.clear();
+        result2.clear();
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( "text\n");
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( " /* macro */ \n");
+        tokenizer << STRING_LITERAL( "generated //$");
+        tokenizer << STRING_LITERAL( " /*/ \n");
+
+        BOOST_REQUIRE( result.size() == 4);
+        BOOST_CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro */ ")));
+        BOOST_CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        BOOST_CHECK(   result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" / ")));
+        BOOST_CHECK(   result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        BOOST_REQUIRE( result2.size() == 3);
+        BOOST_CHECK(   result2[0] == STRING_LITERAL("text\n"));
+        BOOST_CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
+        BOOST_CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
+    }
+
+
+}
+
 
 BOOST_AUTO_TEST_CASE( TTokenizer)
 {
     {
         typedef std::string StringT;
         typedef CToken<Tokens, StringT> TokenT;    
-        typedef CTokenizerTestHelper<TokenT> OutputT;
-        typedef CTokenizer<TokenT, StringT, OutputT> TokenizerT;
+        typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
+        typedef CTokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
+        testInlineTemplateProcessing<TokenizerT, OutputT, TokenT, StringT>();
     }
 
     {
         typedef std::string StringT;
         typedef CToken<Tokens, StringT> TokenT;    
-        typedef CTokenizerTestHelper<TokenT> OutputT;
+        typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
         typedef CBackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
@@ -228,16 +304,17 @@ BOOST_AUTO_TEST_CASE( TTokenizer)
     {
         typedef std::wstring StringT;
         typedef CToken<Tokens, StringT> TokenT;    
-        typedef CTokenizerTestHelper<TokenT> OutputT;
-        typedef CTokenizer<TokenT, StringT, OutputT> TokenizerT;
+        typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
+        typedef CTokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
+        testInlineTemplateProcessing<TokenizerT, OutputT, TokenT, StringT>();
     }
 
     {
         typedef std::wstring StringT;
         typedef CToken<Tokens, StringT> TokenT;    
-        typedef CTokenizerTestHelper<TokenT> OutputT;
+        typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
         typedef CBackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();

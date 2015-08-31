@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -24,14 +24,14 @@
 template <typename TokenizerT, typename StringT> 
 void setKeywords( TokenizerT& tokenizer)
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     tokenizer.setMarkup( STRING_LITERAL("%"), STRING_LITERAL("%"));
 }
 
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
 void testSingleTokens()
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
@@ -41,11 +41,11 @@ void testSingleTokens()
 
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));
 
     {//COMMENT
         result.clear();
-        tokenizer << STRING_LITERAL("start%COMMENT%end");        
+        tokenizer << STRING_LITERAL("start%COMMENT%end");
         expected[1] = TokenT( TokenT::eComment);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -69,7 +69,7 @@ void testSingleTokens()
 
     {//TRIM
         result.clear();
-        tokenizer << STRING_LITERAL("start%TRIM%end");        
+        tokenizer << STRING_LITERAL("start%TRIM%end");
         expected[1] = TokenT( TokenT::eTrim);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -77,7 +77,7 @@ void testSingleTokens()
 
     {//TRIM_LEFT
         result.clear();
-        tokenizer << STRING_LITERAL("start%TRIM_LEFT%end");        
+        tokenizer << STRING_LITERAL("start%TRIM_LEFT%end");
         expected[1] = TokenT( TokenT::eTrimLeft);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -85,7 +85,7 @@ void testSingleTokens()
 
     {//ANY
         result.clear();
-        tokenizer << STRING_LITERAL("start%ANY%end");        
+        tokenizer << STRING_LITERAL("start%ANY%end");
         expected[1] = TokenT( TokenT::eAny);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -93,7 +93,7 @@ void testSingleTokens()
 
     {//AS_VOLATILE
         result.clear();
-        tokenizer << STRING_LITERAL("start%AS_VOLATILE%end");        
+        tokenizer << STRING_LITERAL("start%AS_VOLATILE%end");
         expected[1] = TokenT( TokenT::eVolatil);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -101,7 +101,7 @@ void testSingleTokens()
 
     {//BEGIN
         result.clear();
-        tokenizer << STRING_LITERAL("start%BEGIN%end");        
+        tokenizer << STRING_LITERAL("start%BEGIN%end");
         expected[1] = TokenT( TokenT::eBegin);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -117,7 +117,7 @@ void testSingleTokens()
 
     {//COUNT
         result.clear();
-        tokenizer << STRING_LITERAL("start%COUNT%end");        
+        tokenizer << STRING_LITERAL("start%COUNT%end");
         expected[1] = TokenT( TokenT::eCount);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -125,7 +125,7 @@ void testSingleTokens()
 
     {//END
         result.clear();
-        tokenizer << STRING_LITERAL("start%END%end");        
+        tokenizer << STRING_LITERAL("start%END%end");
         expected[1] = TokenT( TokenT::eEnd);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -165,7 +165,7 @@ void testSingleTokens()
 
     {//FIRST_TIME
         result.clear();
-        tokenizer << STRING_LITERAL("start%FIRST_TIME%end");        
+        tokenizer << STRING_LITERAL("start%FIRST_TIME%end");
         expected[1] = TokenT( TokenT::eFirstTime);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -173,7 +173,7 @@ void testSingleTokens()
 
     {//FLUSH
         result.clear();
-        tokenizer << STRING_LITERAL("start%FLUSH%end");        
+        tokenizer << STRING_LITERAL("start%FLUSH%end");
         expected[1] = TokenT( TokenT::eFlush);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -181,7 +181,7 @@ void testSingleTokens()
 
     {//FOR_ALL
         result.clear();
-        tokenizer << STRING_LITERAL("start%FOR_ALL%end");        
+        tokenizer << STRING_LITERAL("start%FOR_ALL%end");
         expected[1] = TokenT( TokenT::eForAll);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -189,7 +189,7 @@ void testSingleTokens()
 
     {//IF
         result.clear();
-        tokenizer << STRING_LITERAL("start%IF%end");        
+        tokenizer << STRING_LITERAL("start%IF%end");
         expected[1] = TokenT( TokenT::eIf_);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -197,7 +197,7 @@ void testSingleTokens()
 
     {//IGNORE_CASE
         result.clear();
-        tokenizer << STRING_LITERAL("start%IGNORE_CASE%end");        
+        tokenizer << STRING_LITERAL("start%IGNORE_CASE%end");
         expected[1] = TokenT( TokenT::eIgnoreCase);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -205,7 +205,7 @@ void testSingleTokens()
 
     {//INDEX
         result.clear();
-        tokenizer << STRING_LITERAL("start%INDEX%end");        
+        tokenizer << STRING_LITERAL("start%INDEX%end");
         expected[1] = TokenT( TokenT::eIndex);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -213,7 +213,7 @@ void testSingleTokens()
 
     {//LAST_TIME
         result.clear();
-        tokenizer << STRING_LITERAL("start%LAST_TIME%end");        
+        tokenizer << STRING_LITERAL("start%LAST_TIME%end");
         expected[1] = TokenT( TokenT::eLastTime);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -221,7 +221,7 @@ void testSingleTokens()
 
     {//MACRO_BEGIN
         result.clear();
-        tokenizer << STRING_LITERAL("start%MACRO_BEGIN%end");        
+        tokenizer << STRING_LITERAL("start%MACRO_BEGIN%end");
         expected[1] = TokenT( TokenT::eMacroBegin);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -229,7 +229,7 @@ void testSingleTokens()
 
     {//MACRO_END
         result.clear();
-        tokenizer << STRING_LITERAL("start%MACRO_END%end");        
+        tokenizer << STRING_LITERAL("start%MACRO_END%end");
         expected[1] = TokenT( TokenT::eMacroEnd);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -253,7 +253,7 @@ void testSingleTokens()
 
     {//NOT
         result.clear();
-        tokenizer << STRING_LITERAL("start%NOT%end");        
+        tokenizer << STRING_LITERAL("start%NOT%end");
         expected[1] = TokenT( TokenT::eNot_);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -261,7 +261,7 @@ void testSingleTokens()
 
     {//OR
         result.clear();
-        tokenizer << STRING_LITERAL("start%OR%end");        
+        tokenizer << STRING_LITERAL("start%OR%end");
         expected[1] = TokenT( TokenT::eOr_);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -269,7 +269,7 @@ void testSingleTokens()
 
     {//READ_LEFT_TO_RIGHT
         result.clear();
-        tokenizer << STRING_LITERAL("start%READ_LEFT_TO_RIGHT%end");        
+        tokenizer << STRING_LITERAL("start%READ_LEFT_TO_RIGHT%end");
         expected[1] = TokenT( TokenT::eLeftToRight);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -277,7 +277,7 @@ void testSingleTokens()
 
     {//READ_TOP_DOWN
         result.clear();
-        tokenizer << STRING_LITERAL("start%READ_TOP_DOWN%end");        
+        tokenizer << STRING_LITERAL("start%READ_TOP_DOWN%end");
         expected[1] = TokenT( TokenT::eTopDown);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -309,7 +309,7 @@ void testSingleTokens()
 
     {//TO_CSTRING
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_CSTRING%end");        
+        tokenizer << STRING_LITERAL("start%TO_CSTRING%end");
         expected[1] = TokenT( TokenT::eToCString);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -317,7 +317,7 @@ void testSingleTokens()
 
     {//TO_LOWER
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_LOWER%end");        
+        tokenizer << STRING_LITERAL("start%TO_LOWER%end");
         expected[1] = TokenT( TokenT::eToLower);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -325,7 +325,7 @@ void testSingleTokens()
 
     {//TO_UPPER
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_UPPER%end");        
+        tokenizer << STRING_LITERAL("start%TO_UPPER%end");
         expected[1] = TokenT( TokenT::eToUpper);
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
@@ -336,7 +336,7 @@ void testSingleTokens()
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
 void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
 {
-	typedef typename StringT::value_type CharT;
+    typedef typename StringT::value_type CharT;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -345,8 +345,8 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
     std::vector<TokenT> expected;
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));    
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));
+    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));
 
     {//COMMENT
 

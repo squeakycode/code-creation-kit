@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -37,7 +37,7 @@ public:
 };
 
 
-template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT>
+template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
 class CProcessingLevelControl : public CProcessingLevelControlExceptions
 {
     ///represents a processing stage in the processing spiral
@@ -63,7 +63,7 @@ class CProcessingLevelControl : public CProcessingLevelControlExceptions
     };
 
 public:
-    typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT> ThisT;
+    typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
     typedef typename ParserT::ParserTokenT TokenT;
     typedef typename ParserT::ParserStringT StringT;
     typedef typename StringT::value_type CharT;
@@ -73,6 +73,8 @@ public:
         , m_levelLimit( m_levelBlocks + m_cMaxNumLevel)
         , m_finalOutputStream(0)
         , m_outputStream(0)
+        , m_inlineTemplateMode(false)
+        , m_numInlinePad(0)
     {
 
     }
@@ -99,6 +101,15 @@ public:
         BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
         {
             levelBlock.parser.connectOutputStream( processor);
+        }
+    }
+
+    ///connect log output stream
+    void connectLogOutputStream( LogOutputStreamT* stream)
+    {
+        BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+        {
+            levelBlock.parser.connectLogOutputStream( stream, &levelBlock - m_levelBlocks);
         }
     }
 
@@ -135,8 +146,41 @@ public:
             || ( m_level > m_levelLimit)
             )
         {
-            assert(  token == TokenT::eFullLineWithoutTags || token == TokenT::eTextFragment || token == TokenT::eNewLine);
-            token.toStream( *m_finalOutputStream);
+            if ( !m_inlineTemplateMode)
+            {
+                token.toStream( *m_finalOutputStream);
+            }
+            else
+            {
+                //insert inline generated postfix
+                typename TokenT::ConstSharedStringListT stringList = token.getStringList();
+                if ( stringList)
+                {
+                    const typename TokenT::StringListT& strings = *stringList;
+                    BOOST_FOREACH( const StringT& text, strings)
+                    {
+                        if ( !text.empty())
+                        {
+                            StringT::const_iterator last = --text.end();
+                            if ( *last == STRING_LITERAL('\n'))
+                            {
+                                StringT temp;
+                                temp.assign(text.begin(), last);
+                                if ( temp.size() < m_numInlinePad)
+                                {
+                                    temp.resize( m_numInlinePad, STRING_LITERAL(' '));
+                                }
+                                *m_finalOutputStream << temp;
+                                *m_finalOutputStream << m_inlineGeneratedPostfixAndNewLine;
+                            }
+                            else
+                            {
+                                *m_finalOutputStream << text;
+                            }
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -251,6 +295,14 @@ public:
         return m_cMaxNumLevel;
     }
 
+    ///set inline template processing parameters
+    void setInlineTemplateParameters( bool enabled, const StringT& inlineGeneratedPostfix, size_t numInlinePad)
+    {
+        m_inlineTemplateMode = enabled;
+        m_inlineGeneratedPostfixAndNewLine = inlineGeneratedPostfix + STRING_LITERAL('\n');
+        m_numInlinePad = numInlinePad > 64*1024 ? 64*1024 : numInlinePad; //clip value
+    }
+
 private:
     static const unsigned int m_cMaxNumLevel = 32;
 
@@ -258,6 +310,9 @@ private:
     ProcessingLevelBlocks* m_levelLimit;
     FinalOutputStreamT* m_finalOutputStream;
     OutputStreamT* m_outputStream;
+    bool m_inlineTemplateMode; ///<toggles inline template processing
+    StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
+    size_t m_numInlinePad; ///< if a line has less chars than this value then pad with spaces
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
 };

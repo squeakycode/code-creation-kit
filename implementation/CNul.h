@@ -1,4 +1,4 @@
-//   Copyright (C) 2011 Andreas Gau
+//   Copyright (C) 2011-2012 Andreas Gau
 //
 //   This file is part of the code-creation-kit.
 //
@@ -15,3 +15,19 @@
 //   You should have received a copy of the GNU General Public License
 //   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef INCLUDED_CNUL_H_345669
+#define INCLUDED_CNUL_H_345669
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+///Nul device.
+class CNul
+{
+public:
+    template <typename T>
+    CNul& operator<<( const T&) { return *this; }
+};
+
+#endif /* INCLUDED_CNUL_H_345669 */
