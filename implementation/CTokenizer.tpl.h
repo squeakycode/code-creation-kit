@@ -58,6 +58,7 @@ public:
     [ENTRY]["Tokenizer"]()
         : m_outputStream(0)
         , m_closing(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+        , m_bypassMode(false)[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
     {
     }
 
@@ -66,6 +67,7 @@ public:
     void open()
     {
         m_closing = false;
+        m_bypassMode = false;
     }
 
     ///open
@@ -74,11 +76,20 @@ public:
         m_closing = true;
     }
 
+    ///<used when limiting recursion level, forces text output with tick removal
+    void setBypassMode( bool enable)
+    {
+        m_bypassMode = enable;
+    }
+
     [MACRO_END][TRIM]
     ///sets up regex search expression; 
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
-        m_[ENTRY]["Tag Name Small"]Keyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Small"][EQUALS]["trim"][EQUALS]["comment"]") + postfix;
+        [MACRO_BEGIN][IF][ENTRY]["Tokenizer Preprocessor Action"][TRIM]
+        m_[ENTRY]["Tag Name Small"]Keyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"]") + postfix;
+        m_[ENTRY]["Tag Name Small"]DotKeyword = prefix + STRING_LITERAL("[ENTRY]["Tag Name"].") + postfix;[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
+        [MACRO_END][TRIM]
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -114,39 +125,59 @@ public:
         return RangeT( start, end);
     }
 
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][TRIM]
     ///removes a delay mark if needed
     template <typename WhatT>
     bool RemoveTick( WhatT& what, int pos)
     {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
+        if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
         {
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
+            return true;
         }
+        else if ( m_bypassMode)
+        {
+            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos - 1 ].second));
+            return true;
+        }
+
         return false;
     }
 
+    [MACRO_END][TRIM]
     ///tokenize input line
     [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
     {
+        bool trimmed = false;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        for (;[MACRO_BEGIN]!m_bypassMode[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][MACRO_END];)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() &&  boost::starts_with( range, m_commentKeyword)) //is comment, drop line
+            [MACRO_BEGIN][TRIM]
+            if ( boost::[ENTRY]["Tokenizer Preprocessor Check"]( range, m_[ENTRY]["Tag Name Small"]Keyword))
             {
-                return *this;
+                [BEGIN][TRIM]
+                size_t keywordSize = m_[ENTRY]["Tag Name Small"][STARTS_WITH]["trim"]Keyword.size();
+                [OR][END][TRIM]
+                [ENTRY]["Tokenizer Preprocessor Action"][REPLACE]["\n","\n                "]
             }
-            if ( !m_trimKeyword.empty() && boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
+            [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM.]
+            if ( boost::[ENTRY]["Tokenizer Preprocessor Check"]( range, m_[ENTRY]["Tag Name Small"]DotKeyword))
             {
-                start = range.begin();
-                end = range.end() - m_trimKeyword.size();
+                [BEGIN][TRIM]
+                size_t keywordSize = m_[ENTRY]["Tag Name Small"][STARTS_WITH]["trim"]DotKeyword.size();
+                [OR][END][TRIM]
+                [ENTRY]["Tokenizer Preprocessor Action"][REPLACE]["\n","\n                "]
             }
+            [MACRO_END.][TRIM.]
+            [MACRO_END][TRIM]
+            break;
         }
 
         while( regex_search(start, end, what, m_searchExpression)) 
@@ -189,10 +220,20 @@ public:
                 KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy>( start, end, *list);
                 *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"], list);
             }
+            [OR][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimitOff"][TRIM]
+            else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
+            }
             [OR][TRIM]
             else if ( what[ (TokenT::e[ENTRY]["Tag Name Capital"][BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]-1)*2[OR.])[END.] ].matched )
             {
                 [MACRO_BEGIN.][IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"][TRIM]
+                [BEGIN][IF][ENTRY]["Tag Name Capital"][EQUALS]["SetRecursionLevelLimit"][TRIM]
+                //turn limit off to make sure that the new limit gets processed
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+
+                [OR][END][TRIM]
                 if ( RemoveTick( what, (TokenT::e[ENTRY]["Tag Name Capital"] * 2) - 1))
                 {
                     continue;
@@ -216,14 +257,22 @@ public:
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( start, end));
             [MACRO_END][TRIM]
         }
+        if ( trimmed)
+        {
+            //a trimmed line is treated as line macro
+            *m_outputStream << TokenT( TokenT::eNewLine);
+        }
         return *this;
     }
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    bool m_closing;[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
-    StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines    
+    bool m_closing;///<output line fragments as full line if closing to force flush[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"]
+    [MACRO_BEGIN][IF][ENTRY]["Tokenizer Preprocessor Action"][TRIM]
+    StringT m_[ENTRY]["Tag Name Small"]Keyword; ///<used for special preprocessing action
+    StringT m_[ENTRY]["Tag Name Small"]DotKeyword; ///<used for special preprocessing action[IF.][ENTRY.]["Tokenizer"][EQUALS.]["CBackEndTokenizer"]
+    [MACRO_END][TRIM]
 };
 
 #endif /* INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377 */

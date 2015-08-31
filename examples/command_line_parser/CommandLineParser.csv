@@ -1,0 +1,15 @@
+Short Option Name;Option Name;Option Name Identifier;Data Type;Default Value;Description
+h;help;help;;;Print help.
+w;wait;wait;;;Wait for keypress before exit.
+t;;time;unsigned int;15;Time to run in minutes. This option takes an unsigned int as parameter.
+x;extra;extra;std::string;"""mode""";Extra value. This option takes a string as parameter.
+;my-timeout;myTimeout;double;10.5;"Large description block:
+
+12345678901234567890123456789012345678901234567890
+A      
+B
+C
+text text text text text text text text text text text text text text text text text text 
+texttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttexttext
+This option takes a double as parameter."
+;;;;;

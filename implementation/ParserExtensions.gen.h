@@ -133,6 +133,7 @@ bool isSubstitution( PosT& pos)
     if (
            *pos == PosT::value_type::eCount
         || *pos == PosT::value_type::eEntry
+        || *pos == PosT::value_type::eError_
         || *pos == PosT::value_type::eFirstTime
         || *pos == PosT::value_type::eIndex
         || *pos == PosT::value_type::eLastTime
@@ -266,8 +267,6 @@ bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT par
     typedef typename PosT::value_type TokenT;
     typedef typename TokenT::StringListT::value_type StringT;
 
-
-
     bool success = false;
     while ( pos != end && isDirectiveForConstraint( pos)) 
     {
@@ -289,7 +288,6 @@ bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT par
                 {
                     item.flush( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -305,7 +303,6 @@ bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT par
                 {
                     item.forAll( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -321,7 +318,6 @@ bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT par
                 {
                     item.ignoreCase( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -332,8 +328,6 @@ bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT par
         }
     }
 
-
-
     return success;
 }
 
@@ -343,7 +337,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
 {
     typedef typename PosT::value_type TokenT;
     typedef typename TokenT::StringListT::value_type StringT;
-
 
     bool not_ = false;
     if ( pos != end && *pos == TokenT::eNot_)
@@ -369,8 +362,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -383,8 +374,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -397,8 +386,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -411,8 +398,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -425,8 +410,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -439,8 +422,6 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 item.attach( constraint);
                 ConstraintDirectives<StringT>& newItem = *constraint;
                 if ( not_ ) constraint->not_( not_);
-                not_ = false;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -450,13 +431,18 @@ bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
         default:
             throw std::runtime_error( "Internal program error, a handler for a constraint is missing.");
         }
+        not_ = false;
+        if ( pos != end && *pos == TokenT::eNot_)
+        {
+            not_ = true;
+            ++pos;
+        }
     }
 
     if ( not_)
     {
         throw CParserExceptions::ExConstraintExpectedAfterNot();
     }
-
 
     return success;
 }
@@ -467,8 +453,6 @@ bool parseDirectiveForConversion( PosT& pos, PosT& end, ItemT& item, ETokenT par
 {
     typedef typename PosT::value_type TokenT;
     typedef typename TokenT::StringListT::value_type StringT;
-
-
 
     bool success = false;
     while ( pos != end && isDirectiveForConversion( pos)) 
@@ -491,7 +475,6 @@ bool parseDirectiveForConversion( PosT& pos, PosT& end, ItemT& item, ETokenT par
                 {
                     item.ignoreCase( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -502,8 +485,6 @@ bool parseDirectiveForConversion( PosT& pos, PosT& end, ItemT& item, ETokenT par
         }
     }
 
-
-
     return success;
 }
 
@@ -513,8 +494,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
 {
     typedef typename PosT::value_type TokenT;
     typedef typename TokenT::StringListT::value_type StringT;
-
-
 
     bool success = false;
     while ( pos != end && isConversion( pos)) 
@@ -532,7 +511,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CMergeConversion<StringT>* conversion = newItem1<CMergeConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -544,7 +522,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CRegexReplaceConversion<StringT>* conversion = newItem2<CRegexReplaceConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -556,7 +533,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CReplaceConversion<StringT>* conversion = newItem2<CReplaceConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -568,7 +544,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CToCStringConversion<StringT>* conversion = newItem0<CToCStringConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -580,7 +555,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CToLowerConversion<StringT>* conversion = newItem0<CToLowerConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -592,7 +566,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
                 CToUpperConversion<StringT>* conversion = newItem0<CToUpperConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -604,8 +577,6 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
         }
     }
 
-
-
     return success;
 }
 
@@ -615,8 +586,6 @@ bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT p
 {
     typedef typename PosT::value_type TokenT;
     typedef typename TokenT::StringListT::value_type StringT;
-
-
 
     bool success = false;
     while ( pos != end && isDirectiveForSubstitution( pos)) 
@@ -639,7 +608,6 @@ bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT p
                 {
                     item.volatil( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -655,7 +623,6 @@ bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT p
                 {
                     item.leftToRight( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -671,7 +638,6 @@ bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT p
                 {
                     item.topDown( true);
                 }
-                
                 PosT newParentItem = pos;
                 ++pos;
             }
@@ -681,8 +647,6 @@ bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT p
             throw std::runtime_error( "Internal program error, a handler for a directive for substitution is missing.");
         }
     }
-
-
 
     return success;
 }
@@ -708,7 +672,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
         }
     }
 
-
     bool success = false;
     if ( pos != end && isSubstitution( pos)) 
     {
@@ -722,10 +685,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;
                 if ( not_ ) newItem.not_( not_);
-                not_ = false;
-                
-                
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -741,10 +700,21 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;
                 if ( not_ ) newItem.not_( not_);
-                not_ = false;
-                
-                
-                
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
+                parseConstraint( pos, end, newItem, newParentItem->getToken());
+                parseConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
+        case TokenT::eError_:
+            {
+                item = ItemT( ItemT::eError_, pos->getStringList());
+                ItemT& newItem = item;
+                if ( if_ ) newItem.if_( if_);
+                if_ = false;
+                if ( not_ ) newItem.not_( not_);
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -760,10 +730,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;
                 if ( not_ ) newItem.not_( not_);
-                not_ = false;
-                
-                
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -779,10 +745,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;
                 if ( not_ ) newItem.not_( not_);
-                not_ = false;
-                
-                
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -798,10 +760,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
                 if ( if_ ) newItem.if_( if_);
                 if_ = false;
                 if ( not_ ) newItem.not_( not_);
-                not_ = false;
-                
-                
-                
                 PosT newParentItem = pos;
                 ++pos;
                 parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -814,7 +772,6 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
             throw std::runtime_error( "Internal program error, a handler for a substitution is missing.");
         }
     }
-
 
     if ( if_)
     {

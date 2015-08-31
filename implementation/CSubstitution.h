@@ -116,6 +116,12 @@ public:
         return getParameters().front();
     }
 
+    ///returns error Message
+    const StringT& errorMessage() const
+    {
+        return getParameters().front();
+    }
+
     ///returns the list of parameters
     ConstStringListT& getParameters() const
     {

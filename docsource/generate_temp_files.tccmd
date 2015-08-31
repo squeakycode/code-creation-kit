@@ -33,3 +33,7 @@ overview.csv
 -r
 list_of_examples.csv
 -s list_of_examples.tpl.html -o temp\list_of_examples.table.gen.html
+-r
+change_log.csv
+-s change_log_content.tpl.html -o temp\change_log.content.gen.html -p "file=change_log.gen.html" "heading=Change Log"
+-s change_log.tpl.txt -o ..\output\change_log.txt

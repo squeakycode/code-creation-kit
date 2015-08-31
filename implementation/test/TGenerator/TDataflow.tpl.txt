@@ -34,3 +34,13 @@ start9
 [MACRO_BEGIN]
 ->[MACRO_END]start10<[ENTRY.]["row3"]>end10
 end9
+
+[COMMENT] recursion level limit test
+[SET_RECURSION_LEVEL_LIMIT][TRIM]
+<[ENTRY.]["row3"]>0/1
+[SET_RECURSION_LEVEL_LIMIT.][TRIM]
+<[ENTRY.]["row3"]>1/1
+[SET_RECURSION_LEVEL_LIMIT...][TRIM]
+<[ENTRY....]["row3"]>3/4
+[SET_RECURSION_LEVEL_LIMIT_OFF.][TRIM]
+<[ENTRY.]["row3"]>off

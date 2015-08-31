@@ -43,7 +43,7 @@ public:
     { public: ExFileInclusionNotSupported() : std::runtime_error( "The inclusion of template files is not supported.") {}};
 
     class ExBadlyPlacedTrim : public std::runtime_error
-    { public: ExBadlyPlacedTrim() : std::runtime_error( "TRIM is expected at the end of a line. Trailing whitespace is allowed.") {}};
+    { public: ExBadlyPlacedTrim() : std::runtime_error( "Trim directives are expected at the end of a line. Trailing whitespace is allowed.") {}};
 
     class ExBadlyPlacedComment : public std::runtime_error
     { public: ExBadlyPlacedComment() : std::runtime_error( "COMMENT is expected at the beginning of a line. Leading whitespace is allowed.") {}};
@@ -114,7 +114,7 @@ public:
                 throw ExFileInclusionNotSupported();
             }
         }
-        else if ( token == TokenT::eTrim )
+        else if ( token == TokenT::eTrim || token == TokenT::eTrimLeft )
         {
             throw ExBadlyPlacedTrim();
         }

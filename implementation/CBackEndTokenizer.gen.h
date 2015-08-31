@@ -58,6 +58,7 @@ public:
     CBackEndTokenizer()
         : m_outputStream(0)
         , m_closing(false)
+        , m_bypassMode(false)
     {
     }
 
@@ -65,6 +66,7 @@ public:
     void open()
     {
         m_closing = false;
+        m_bypassMode = false;
     }
 
     ///open
@@ -73,11 +75,21 @@ public:
         m_closing = true;
     }
 
+    ///<used when limiting recursion level, forces text output with tick removal
+    void setBypassMode( bool enable)
+    {
+        m_bypassMode = enable;
+    }
+
     ///sets up regex search expression; 
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
         m_commentKeyword = prefix + STRING_LITERAL("COMMENT") + postfix;
+        m_commentDotKeyword = prefix + STRING_LITERAL("COMMENT.") + postfix;
         m_trimKeyword = prefix + STRING_LITERAL("TRIM") + postfix;
+        m_trimDotKeyword = prefix + STRING_LITERAL("TRIM.") + postfix;
+        m_trimLeftKeyword = prefix + STRING_LITERAL("TRIM_LEFT") + postfix;
+        m_trimLeftDotKeyword = prefix + STRING_LITERAL("TRIM_LEFT.") + postfix;
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -94,6 +106,9 @@ public:
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
+        expression += front + STRING_LITERAL("TRIM_LEFT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
         expression += front + STRING_LITERAL("AS_VOLATILE") + back;
         expression += front + STRING_LITERAL("BEGIN") + back;
@@ -103,6 +118,7 @@ public:
         expression += front + STRING_LITERAL("ENDS_WITH") + back;
         expression += front + STRING_LITERAL("ENTRY") + back;
         expression += front + STRING_LITERAL("EQUALS") + back;
+        expression += front + STRING_LITERAL("ERROR") + back;
         expression += front + STRING_LITERAL("FIRST_TIME") + back;
         expression += front + STRING_LITERAL("FLUSH") + back;
         expression += front + STRING_LITERAL("FOR_ALL") + back;
@@ -150,35 +166,73 @@ public:
     template <typename WhatT>
     bool RemoveTick( WhatT& what, int pos)
     {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
+        if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
         {
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
+            return true;
         }
+        else if ( m_bypassMode)
+        {
+            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos - 1 ].second));
+            return true;
+        }
+
         return false;
     }
 
     ///tokenize input line
     CBackEndTokenizer<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
     {
+        bool trimmed = false;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        for (;!m_bypassMode;)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() &&  boost::starts_with( range, m_commentKeyword)) //is comment, drop line
+            if ( boost::starts_with( range, m_commentKeyword))
             {
                 return *this;
             }
-            if ( !m_trimKeyword.empty() && boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
+            if ( boost::starts_with( range, m_commentDotKeyword))
             {
-                start = range.begin();
-                end = range.end() - m_trimKeyword.size();
+                return *this;
             }
+            if ( boost::ends_with( range, m_trimKeyword))
+            {
+                size_t keywordSize = m_trimKeyword.size();
+                start = range.begin();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            if ( boost::ends_with( range, m_trimDotKeyword))
+            {
+                size_t keywordSize = m_trimDotKeyword.size();
+                start = range.begin();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            if ( boost::ends_with( range, m_trimLeftKeyword))
+            {
+                size_t keywordSize = m_trimLeftKeyword.size();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            if ( boost::ends_with( range, m_trimLeftDotKeyword))
+            {
+                size_t keywordSize = m_trimLeftDotKeyword.size();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            break;
         }
 
         while( regex_search(start, end, what, m_searchExpression)) 
@@ -242,6 +296,29 @@ public:
                     continue;
                 }
                 *m_outputStream << TokenT( TokenT::eTrim);
+            }
+            else if ( what[ (TokenT::eTrimLeft-1)*2 ].matched )
+            {
+                if ( RemoveTick( what, (TokenT::eTrimLeft * 2) - 1))
+                {
+                    continue;
+                }
+                *m_outputStream << TokenT( TokenT::eTrimLeft);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimit-1)*2 ].matched )
+            {
+                //turn limit off to make sure that the new limit gets processed
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+
+                if ( RemoveTick( what, (TokenT::eSetRecursionLevelLimit * 2) - 1))
+                {
+                    continue;
+                }
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimitOff-1)*2 ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
             }
             else if ( what[ (TokenT::eAny-1)*2 ].matched )
             {
@@ -326,6 +403,17 @@ public:
                 list->resize( 1);
                 KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 *m_outputStream << TokenT( TokenT::eMatches, list);
+            }
+            else if ( what[ (TokenT::eError_-1)*2 ].matched )
+            {
+                if ( RemoveTick( what, (TokenT::eError_ * 2) - 1))
+                {
+                    continue;
+                }
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                list->resize( 1);
+                KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
+                *m_outputStream << TokenT( TokenT::eError_, list);
             }
             else if ( what[ (TokenT::eFirstTime-1)*2 ].matched )
             {
@@ -521,14 +609,24 @@ public:
             //if full line without tags, output as special token used for optimizations, otherwise ouput text fragment
             *m_outputStream << TokenT( (start == fullLineStart && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, StringT( start, end));
         }
+        if ( trimmed)
+        {
+            //a trimmed line is treated as line macro
+            *m_outputStream << TokenT( TokenT::eNewLine);
+        }
         return *this;
     }
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    bool m_closing;
-    StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines    
+    bool m_closing;///<output line fragments as full line if closing to force flush
+    bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal
+    StringT m_commentKeyword; ///<used for special preprocessing action
+    StringT m_commentDotKeyword; ///<used for special preprocessing action
+    StringT m_trimKeyword; ///<used for special preprocessing action
+    StringT m_trimDotKeyword; ///<used for special preprocessing action
+    StringT m_trimLeftKeyword; ///<used for special preprocessing action
+    StringT m_trimLeftDotKeyword; ///<used for special preprocessing action
 };
 
 #endif /* INCLUDED_CBACKENDTOKENIZER_TPL_H_6955377 */

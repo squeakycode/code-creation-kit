@@ -34,6 +34,7 @@ public:
     {
         eCount,
         eEntry,
+        eError_,
         eFirstTime,
         eIndex,
         eLastTime,

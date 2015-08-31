@@ -75,6 +75,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//TRIM_LEFT
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TRIM_LEFT%end");        
+        expected[1] = TokenT( TokenT::eTrimLeft);
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//ANY
         result.clear();
         tokenizer << STRING_LITERAL("start%ANY%end");        
@@ -143,6 +151,14 @@ void testSingleTokens()
         result.clear();
         tokenizer << STRING_LITERAL("start%EQUALS%[\"parameter1\"]end");
         expected[1] = TokenT( TokenT::eMatches, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
+    {//ERROR
+        result.clear();
+        tokenizer << STRING_LITERAL("start%ERROR%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eError_, STRING_LITERAL("parameter1"));
         BOOST_CHECK( result.size() == 3);
         BOOST_CHECK( expected == result);
     }
@@ -318,10 +334,9 @@ void testSingleTokens()
 }
 
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
-void testRemoveDelayMarks()
+void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
 {
 	typedef typename StringT::value_type CharT;
-    TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -330,13 +345,13 @@ void testRemoveDelayMarks()
     std::vector<TokenT> expected;
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL(".%")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));    
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
 
     {//COMMENT
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%COMMENT..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%COMMENT.%end") : STRING_LITERAL("start%COMMENT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT"));
         BOOST_CHECK( expected == result);
     }
@@ -344,7 +359,7 @@ void testRemoveDelayMarks()
     {//INCLUDE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%INCLUDE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%INCLUDE.%end") : STRING_LITERAL("start%INCLUDE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%INCLUDE"));
         BOOST_CHECK( expected == result);
     }
@@ -352,7 +367,7 @@ void testRemoveDelayMarks()
     {//SET_MARKUP
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%SET_MARKUP..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%SET_MARKUP.%end") : STRING_LITERAL("start%SET_MARKUP..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%SET_MARKUP"));
         BOOST_CHECK( expected == result);
     }
@@ -360,15 +375,23 @@ void testRemoveDelayMarks()
     {//TRIM
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%TRIM..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TRIM.%end") : STRING_LITERAL("start%TRIM..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TRIM_LEFT
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TRIM_LEFT.%end") : STRING_LITERAL("start%TRIM_LEFT..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM_LEFT"));
         BOOST_CHECK( expected == result);
     }
 
     {//ANY
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%ANY..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%ANY.%end") : STRING_LITERAL("start%ANY..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%ANY"));
         BOOST_CHECK( expected == result);
     }
@@ -376,7 +399,7 @@ void testRemoveDelayMarks()
     {//AS_VOLATILE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%AS_VOLATILE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%AS_VOLATILE.%end") : STRING_LITERAL("start%AS_VOLATILE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%AS_VOLATILE"));
         BOOST_CHECK( expected == result);
     }
@@ -384,7 +407,7 @@ void testRemoveDelayMarks()
     {//BEGIN
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%BEGIN..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%BEGIN.%end") : STRING_LITERAL("start%BEGIN..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%BEGIN"));
         BOOST_CHECK( expected == result);
     }
@@ -392,7 +415,7 @@ void testRemoveDelayMarks()
     {//CONTAINS
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%CONTAINS..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%CONTAINS.%end") : STRING_LITERAL("start%CONTAINS..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%CONTAINS"));
         BOOST_CHECK( expected == result);
     }
@@ -400,7 +423,7 @@ void testRemoveDelayMarks()
     {//COUNT
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%COUNT..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%COUNT.%end") : STRING_LITERAL("start%COUNT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%COUNT"));
         BOOST_CHECK( expected == result);
     }
@@ -408,7 +431,7 @@ void testRemoveDelayMarks()
     {//END
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%END..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%END.%end") : STRING_LITERAL("start%END..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%END"));
         BOOST_CHECK( expected == result);
     }
@@ -416,7 +439,7 @@ void testRemoveDelayMarks()
     {//ENDS_WITH
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%ENDS_WITH..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%ENDS_WITH.%end") : STRING_LITERAL("start%ENDS_WITH..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%ENDS_WITH"));
         BOOST_CHECK( expected == result);
     }
@@ -424,7 +447,7 @@ void testRemoveDelayMarks()
     {//ENTRY
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%ENTRY..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%ENTRY.%end") : STRING_LITERAL("start%ENTRY..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%ENTRY"));
         BOOST_CHECK( expected == result);
     }
@@ -432,15 +455,23 @@ void testRemoveDelayMarks()
     {//EQUALS
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%EQUALS..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%EQUALS.%end") : STRING_LITERAL("start%EQUALS..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%EQUALS"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//ERROR
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%ERROR.%end") : STRING_LITERAL("start%ERROR..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%ERROR"));
         BOOST_CHECK( expected == result);
     }
 
     {//FIRST_TIME
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%FIRST_TIME..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%FIRST_TIME.%end") : STRING_LITERAL("start%FIRST_TIME..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%FIRST_TIME"));
         BOOST_CHECK( expected == result);
     }
@@ -448,7 +479,7 @@ void testRemoveDelayMarks()
     {//FLUSH
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%FLUSH..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%FLUSH.%end") : STRING_LITERAL("start%FLUSH..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%FLUSH"));
         BOOST_CHECK( expected == result);
     }
@@ -456,7 +487,7 @@ void testRemoveDelayMarks()
     {//FOR_ALL
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%FOR_ALL..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%FOR_ALL.%end") : STRING_LITERAL("start%FOR_ALL..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%FOR_ALL"));
         BOOST_CHECK( expected == result);
     }
@@ -464,7 +495,7 @@ void testRemoveDelayMarks()
     {//IF
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%IF..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%IF.%end") : STRING_LITERAL("start%IF..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%IF"));
         BOOST_CHECK( expected == result);
     }
@@ -472,7 +503,7 @@ void testRemoveDelayMarks()
     {//IGNORE_CASE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%IGNORE_CASE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%IGNORE_CASE.%end") : STRING_LITERAL("start%IGNORE_CASE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%IGNORE_CASE"));
         BOOST_CHECK( expected == result);
     }
@@ -480,7 +511,7 @@ void testRemoveDelayMarks()
     {//INDEX
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%INDEX..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%INDEX.%end") : STRING_LITERAL("start%INDEX..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%INDEX"));
         BOOST_CHECK( expected == result);
     }
@@ -488,7 +519,7 @@ void testRemoveDelayMarks()
     {//LAST_TIME
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%LAST_TIME..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%LAST_TIME.%end") : STRING_LITERAL("start%LAST_TIME..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%LAST_TIME"));
         BOOST_CHECK( expected == result);
     }
@@ -496,7 +527,7 @@ void testRemoveDelayMarks()
     {//MACRO_BEGIN
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%MACRO_BEGIN..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%MACRO_BEGIN.%end") : STRING_LITERAL("start%MACRO_BEGIN..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%MACRO_BEGIN"));
         BOOST_CHECK( expected == result);
     }
@@ -504,7 +535,7 @@ void testRemoveDelayMarks()
     {//MACRO_END
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%MACRO_END..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%MACRO_END.%end") : STRING_LITERAL("start%MACRO_END..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%MACRO_END"));
         BOOST_CHECK( expected == result);
     }
@@ -512,7 +543,7 @@ void testRemoveDelayMarks()
     {//MATCHES_REGEX
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%MATCHES_REGEX..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%MATCHES_REGEX.%end") : STRING_LITERAL("start%MATCHES_REGEX..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%MATCHES_REGEX"));
         BOOST_CHECK( expected == result);
     }
@@ -520,7 +551,7 @@ void testRemoveDelayMarks()
     {//MERGE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%MERGE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%MERGE.%end") : STRING_LITERAL("start%MERGE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%MERGE"));
         BOOST_CHECK( expected == result);
     }
@@ -528,7 +559,7 @@ void testRemoveDelayMarks()
     {//NOT
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%NOT..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%NOT.%end") : STRING_LITERAL("start%NOT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%NOT"));
         BOOST_CHECK( expected == result);
     }
@@ -536,7 +567,7 @@ void testRemoveDelayMarks()
     {//OR
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%OR..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%OR.%end") : STRING_LITERAL("start%OR..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%OR"));
         BOOST_CHECK( expected == result);
     }
@@ -544,7 +575,7 @@ void testRemoveDelayMarks()
     {//READ_LEFT_TO_RIGHT
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%READ_LEFT_TO_RIGHT..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%READ_LEFT_TO_RIGHT.%end") : STRING_LITERAL("start%READ_LEFT_TO_RIGHT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%READ_LEFT_TO_RIGHT"));
         BOOST_CHECK( expected == result);
     }
@@ -552,7 +583,7 @@ void testRemoveDelayMarks()
     {//READ_TOP_DOWN
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%READ_TOP_DOWN..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%READ_TOP_DOWN.%end") : STRING_LITERAL("start%READ_TOP_DOWN..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%READ_TOP_DOWN"));
         BOOST_CHECK( expected == result);
     }
@@ -560,7 +591,7 @@ void testRemoveDelayMarks()
     {//REGEX_REPLACE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%REGEX_REPLACE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%REGEX_REPLACE.%end") : STRING_LITERAL("start%REGEX_REPLACE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%REGEX_REPLACE"));
         BOOST_CHECK( expected == result);
     }
@@ -568,7 +599,7 @@ void testRemoveDelayMarks()
     {//REPLACE
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%REPLACE..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%REPLACE.%end") : STRING_LITERAL("start%REPLACE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%REPLACE"));
         BOOST_CHECK( expected == result);
     }
@@ -576,7 +607,7 @@ void testRemoveDelayMarks()
     {//STARTS_WITH
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%STARTS_WITH..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%STARTS_WITH.%end") : STRING_LITERAL("start%STARTS_WITH..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%STARTS_WITH"));
         BOOST_CHECK( expected == result);
     }
@@ -584,7 +615,7 @@ void testRemoveDelayMarks()
     {//TO_CSTRING
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_CSTRING..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TO_CSTRING.%end") : STRING_LITERAL("start%TO_CSTRING..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_CSTRING"));
         BOOST_CHECK( expected == result);
     }
@@ -592,7 +623,7 @@ void testRemoveDelayMarks()
     {//TO_LOWER
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_LOWER..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TO_LOWER.%end") : STRING_LITERAL("start%TO_LOWER..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_LOWER"));
         BOOST_CHECK( expected == result);
     }
@@ -600,7 +631,7 @@ void testRemoveDelayMarks()
     {//TO_UPPER
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%TO_UPPER..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TO_UPPER.%end") : STRING_LITERAL("start%TO_UPPER..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_UPPER"));
         BOOST_CHECK( expected == result);
     }

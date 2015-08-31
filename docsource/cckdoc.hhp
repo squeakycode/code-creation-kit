@@ -1,0 +1,14 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=..\CCK_Help.chm
+Contents file=cckdoctoc.hhc
+Default topic=index.html
+Display compile progress=No
+Enhanced decompilation=Yes
+Full-text search=Yes
+Language=0x409 English (United States)
+Title=CCK Help
+
+
+[INFOTYPES]
+

@@ -44,7 +44,7 @@ void testSingleTokens()
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
 
     [MACRO_BEGIN][TRIM]
-    {//[ENTRY]["Tag Name"]
+    {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]
         result.clear();
         [BEGIN][IF][ENTRY]["Parameter Count"][EQUALS]["1"][IF][ENTRY]["Parameter Format"][EQUALS]["Regex"][TRIM]
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%['parameter1']end");
@@ -70,10 +70,9 @@ void testSingleTokens()
 }
 
 template <typename TokenizerT, typename OutputT, typename TokenT, typename StringT>
-void testRemoveDelayMarks()
+void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
 {
 	typedef typename StringT::value_type CharT;
-    TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -82,14 +81,14 @@ void testRemoveDelayMarks()
     std::vector<TokenT> expected;
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("start")));
     expected.push_back( TokenT());
-    expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL(".%")));    
+    expected.push_back( TokenT( TokenT::eTextFragment, bypassMode ? STRING_LITERAL("%") : STRING_LITERAL(".%")));    
     expected.push_back( TokenT( TokenT::eTextFragment, STRING_LITERAL("end")));    
 
     [MACRO_BEGIN][TRIM]
-    {//[ENTRY]["Tag Name"][READ_TOP_DOWN]
+    {//[ENTRY]["Tag Name"][IF][ENTRY]["Tag Name Capital"][NOT][STARTS_WITH]["SetRecursionLevelLimit"]
 
         result.clear();
-        tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]..%end");
+        tokenizer << (bypassMode ? STRING_LITERAL("start%[ENTRY]["Tag Name"].%end") : STRING_LITERAL("start%[ENTRY]["Tag Name"]..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%[ENTRY]["Tag Name"]"));
         BOOST_CHECK( expected == result);
     }

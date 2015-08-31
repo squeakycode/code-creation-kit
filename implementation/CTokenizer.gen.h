@@ -65,6 +65,7 @@ public:
     {
         m_commentKeyword = prefix + STRING_LITERAL("COMMENT") + postfix;
         m_trimKeyword = prefix + STRING_LITERAL("TRIM") + postfix;
+        m_trimLeftKeyword = prefix + STRING_LITERAL("TRIM_LEFT") + postfix;
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -80,6 +81,9 @@ public:
         expression += front + STRING_LITERAL("INCLUDE") + back;
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
+        expression += front + STRING_LITERAL("TRIM_LEFT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
+        expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
         expression += front + STRING_LITERAL("AS_VOLATILE") + back;
         expression += front + STRING_LITERAL("BEGIN") + back;
@@ -89,6 +93,7 @@ public:
         expression += front + STRING_LITERAL("ENDS_WITH") + back;
         expression += front + STRING_LITERAL("ENTRY") + back;
         expression += front + STRING_LITERAL("EQUALS") + back;
+        expression += front + STRING_LITERAL("ERROR") + back;
         expression += front + STRING_LITERAL("FIRST_TIME") + back;
         expression += front + STRING_LITERAL("FLUSH") + back;
         expression += front + STRING_LITERAL("FOR_ALL") + back;
@@ -132,39 +137,39 @@ public:
         return RangeT( start, end);
     }
 
-    ///removes a delay mark if needed
-    template <typename WhatT>
-    bool RemoveTick( WhatT& what, int pos)
-    {
-        if ( (what[ pos ].second - what[ pos ].first) > 1 )
-        {
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos - 1 ].first, what[ pos ].first));
-            *m_outputStream << TokenT( TokenT::eTextFragment, StringT( what[ pos ].first + 1, what[ pos - 1 ].second));
-            return true;                        
-        }
-        return false;
-    }
-
     ///tokenize input line
     CTokenizer<TokenT, StringT, OutputStreamT>& operator <<( const StringT& line)
     {
+        bool trimmed = false;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
         typename StringT::const_iterator end = line.end(); 
 
         //check if the line needs to be trimmed or is comment
+        for (;;)
         {
             RangeT range = trimRange( line, boost::is_any_of(" \t\n"));
-            if ( !m_commentKeyword.empty() &&  boost::starts_with( range, m_commentKeyword)) //is comment, drop line
+            if ( boost::starts_with( range, m_commentKeyword))
             {
                 return *this;
             }
-            if ( !m_trimKeyword.empty() && boost::ends_with( range, m_trimKeyword)) //trim keyword, trim line
+            if ( boost::ends_with( range, m_trimKeyword))
             {
+                size_t keywordSize = m_trimKeyword.size();
                 start = range.begin();
-                end = range.end() - m_trimKeyword.size();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
             }
+            if ( boost::ends_with( range, m_trimLeftKeyword))
+            {
+                size_t keywordSize = m_trimLeftKeyword.size();
+                end = range.end() - keywordSize;
+                trimmed = true;
+                break;
+            }
+            break;
         }
 
         while( regex_search(start, end, what, m_searchExpression)) 
@@ -205,6 +210,18 @@ public:
             else if ( what[ (TokenT::eTrim) ].matched )
             {
                 *m_outputStream << TokenT( TokenT::eTrim);
+            }
+            else if ( what[ (TokenT::eTrimLeft) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eTrimLeft);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimit) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit);
+            }
+            else if ( what[ (TokenT::eSetRecursionLevelLimitOff) ].matched )
+            {
+                *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
             }
             else if ( what[ (TokenT::eAny) ].matched )
             {
@@ -253,6 +270,13 @@ public:
                 list->resize( 1);
                 KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 *m_outputStream << TokenT( TokenT::eMatches, list);
+            }
+            else if ( what[ (TokenT::eError_) ].matched )
+            {
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                list->resize( 1);
+                KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
+                *m_outputStream << TokenT( TokenT::eError_, list);
             }
             else if ( what[ (TokenT::eFirstTime) ].matched )
             {
@@ -363,13 +387,19 @@ public:
         {
             *m_outputStream << TokenT( TokenT::eTextFragment, StringT( start, end));
         }
+        if ( trimmed)
+        {
+            //a trimmed line is treated as line macro
+            *m_outputStream << TokenT( TokenT::eNewLine);
+        }
         return *this;
     }
 private:
     RegexT m_searchExpression; ///<used for finding keywords and new line
     OutputStreamT* m_outputStream; ///<sink for tokens
-    StringT m_trimKeyword; ///keyword for trimming lines
-    StringT m_commentKeyword; ///keyword for comment lines    
+    StringT m_commentKeyword; ///<used for special preprocessing action
+    StringT m_trimKeyword; ///<used for special preprocessing action
+    StringT m_trimLeftKeyword; ///<used for special preprocessing action
 };
 
 #endif /* INCLUDED_CTOKENIZER_TPL_H_6955377 */

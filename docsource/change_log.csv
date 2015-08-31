@@ -1,0 +1,20 @@
+Change Type;Tracker ID;Description;Release Version;Release Date
+;;;;
+Release;;"The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.
+
+Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.2.0.67;2011-06-19
+Improvement;;Modified the PSPad syntax highlighter example to highlight preprocessor tags with delay marks.;;
+Improvement;;Examples use the Visual Studio 2003 solution format instead of the Visual Studio 2008 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
+Bugfix;;Fixed handling of NOT for constraints. The parsing was not correct when NOT has been used together with a constraint that is not the first constraint.;;
+Bugfix;;Fixed wrong error message shown when BEGIN is missing before END inside a macro block.;;
+New Feature;;Added TRIM_LEFT tag.;;
+New Feature;;Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.;;
+Improvement;;Added change log to documentation.;;
+New Feature;;Added simple command line parser example.;;
+Bugfix;3238280;Fixed TRIM. and COMMENT. do no work.;;
+Bugfix;3238276;Fixed TRIM extends line macro to next line.;;
+Bugfix;3208956;Fixed IF NOT FIRST_TIME and IF NOT LAST_TIME do not work.;;
+New Feature;;Added ERROR tag that can be used to report errors in text compiler input.;;
+Release;;"This is the first release of the code-creation-kit. The main purpose of the kit is to be used as code generator.
+Please note that it is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.1.0.40;2011-03-06
+New Feature;;Initial release.;;

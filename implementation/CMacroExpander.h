@@ -41,9 +41,34 @@
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
+///defines exceptions thrown by CMacroExpander for template argument independent access
+class CMacroExpanderExceptions
+{
+public:
+    template <typename StringT>
+    class ExErrorTagExpanded : public std::runtime_error 
+    { 
+    public: 
+        ExErrorTagExpanded( const StringT& message) 
+            : std::runtime_error( "An error tag has been triggered.") 
+            , m_message( message)
+        {
+        }
+        ~ExErrorTagExpanded() throw()
+        {
+        }
+        const StringT& getMessage()
+        {
+            return m_message;
+        }
+    private:
+        StringT m_message;
+    };
+};
+
 ///uses the macro data structure, a table index and a table index to create the expanded macro
 template <typename MacroT, typename TableIndexT, typename TableT>
-class CMacroExpander
+class CMacroExpander : public CMacroExpanderExceptions
 {
 public:
     typedef CMacroExpander<MacroT,TableIndexT,TableT> MacroExpanderT;
@@ -177,13 +202,17 @@ private:
         std::vector<StringT> output;
         bool success = false;
 
-        if ( substitutionData == MacroT::SubstitutionT::eFirstTime)
+        if ( substitutionData == MacroT::SubstitutionT::eError_)
         {
-            success = count == 0;
+            throw ExErrorTagExpanded<StringT>( substitutionData.errorMessage());
+        }
+        else if ( substitutionData == MacroT::SubstitutionT::eFirstTime)
+        {
+            success = (count == 0) != substitutionData.not_();
         }
         else if ( substitutionData == MacroT::SubstitutionT::eLastTime)
         {
-            success = lastTime;
+            success = lastTime != substitutionData.not_();
         }
         else if (  substitutionData == MacroT::SubstitutionT::eCount)
         {

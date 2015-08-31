@@ -298,6 +298,11 @@ private:
             return;
         }
 
+        if ( pos != m_stack.end() && *pos == TokenT::eEnd)
+        {
+            throw ExMissingBlockBegin();
+        }
+
         throw MissingEndExceptionT();
     }
 

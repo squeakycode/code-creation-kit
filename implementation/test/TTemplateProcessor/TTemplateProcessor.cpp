@@ -136,6 +136,7 @@ void testMacroProcessing()
     processor.connectTable( &table, "label A", true, true, 1, 1);
 
     //error handling    
+    BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
     BOOST_CHECK_THROW( test( processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
     BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
     BOOST_CHECK_THROW( test( processor, "a[BEGIN][MACRO_END]", ""), CParserExceptions::ExMissingBlockEnd);
@@ -151,6 +152,14 @@ void testMacroProcessing()
     BOOST_CHECK_THROW( test( processor, "a[INDEX][TO_UPPER]", ""), CParserExceptions::ExCannotApplyConversionToSubstitution);
     BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
     BOOST_CHECK_THROW( test( processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
+
+    //something still in parser
+    BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    //something still in line collector
+    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    //something still in next level
+    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+
 
     class ExCannotApplyConversionToSubstitution : public std::runtime_error 
     { public: ExCannotApplyConversionToSubstitution() : std::runtime_error( "Conversion cannot be applied to this substitution.") {}};
@@ -175,6 +184,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><descriptionmore><><>"));
     //last time
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
     //last time empty
     BOOST_CHECK( test( processor, "[BEGIN][IF][LAST_TIME][OR]<[ENTRY][\"Type\"]>[END]", "<int><double><bool>"));
     //count
@@ -193,6 +203,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[IF][NOT][ENTRY][\"Array Maximum\"][ENTRY][\"Type\"]>", "<int><bool><bool>"));
     //first time
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
+    BOOST_CHECK( test( processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
     //text correctly sorted
     BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[more]§"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
@@ -258,9 +269,11 @@ void testMacroProcessing()
     //ends with
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"ol\"]>", "<bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"OL\"][IGNORE_CASE]>", "<bool><bool>"));
-    //starts with
+    //contains
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"oo\"]>", "<bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"OO\"][IGNORE_CASE]>", "<bool><bool>"));
+    //not contains x 2
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][CONTAINS][\"o\"][NOT][CONTAINS][\"u\"]>", "<int><bool><bool>"));
     //to cstring
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][TO_UPPER][REPLACE][\"I\",\"\\n\"][TO_CSTRING]>", "<\\nNT><DOUBLE><BOOL><BOOL>"));
     //if count and constraints
@@ -271,7 +284,30 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int2+><double><bool><bool>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool+><bool+>"));
-
+    //error tag
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
+    BOOST_CHECK_THROW( test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    try
+    {
+        test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
+    }
+    catch( CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
+    {
+        BOOST_CHECK_EQUAL( e.getMessage(), "Error Message 1234.");
+    }
+    //trim
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
+    //trim left
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "  <int>  <double>  <bool>  <bool>"));
+    //comment
+    BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
+    BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
+    //set recursion level limit
+    BOOST_CHECK( test( processor, "[SET_RECURSION_LEVEL_LIMIT][MACRO_BEGIN]<[ENTRY][\"Type\"]>[MACRO_END]<[ENTRY.][\"Type\"]>", "<int><double><bool><bool><[ENTRY][\"Type\"]>"));
+    //check limit is reseted properly
+    BOOST_CHECK( test( processor, "<[ENTRY.][\"Type\"]>", "<int><double><bool><bool>")); 
 
     //connect more tables for testing unloading
     TableT anotherTableA;

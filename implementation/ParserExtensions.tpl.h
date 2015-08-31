@@ -103,8 +103,8 @@ bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][
             ++pos;
         }
     }
-    [OR][END][TRIM]
 
+    [OR][END][TRIM]
     [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["constraint"][TRIM]
     bool not_ = false;
     if ( pos != end && *pos == TokenT::eNot_)
@@ -112,8 +112,8 @@ bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][
         not_ = true;
         ++pos;
     }
-    [OR][END][TRIM]
 
+    [OR][END][TRIM]
     bool success = false;
     [BEGIN]if[IF][ENTRY]["Subtype"][EQUALS]["substitution"][OR]while[END] ( pos != end && is[ENTRY]["Name for Subtype"]( pos)) 
     {
@@ -127,7 +127,7 @@ bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][
         success = true;
         switch ( pos->getToken())
         {
-            [MACRO_BEGIN.][TRIM]
+        [MACRO_BEGIN.][TRIM.]
         case TokenT::e[ENTRY.]["Tag Name Capital"][IF.][ENTRY.]["Subtype"][EQUALS.]["[ENTRY]["Subtype"]"]:
             {
                 [ENTRY]["Action"][REGEX_REPLACE]['\n', '\n                ']
@@ -137,10 +137,18 @@ bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][
             }
             break;
 
-            [MACRO_END.][TRIM]
+        [MACRO_END.][TRIM.]
         default:
             throw std::runtime_error( "Internal program error, a handler for a [ENTRY]["Subtype"] is missing.");
         }
+        [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["constraint"][TRIM]
+        not_ = false;
+        if ( pos != end && *pos == TokenT::eNot_)
+        {
+            not_ = true;
+            ++pos;
+        }
+        [OR][END][TRIM]
     }
 
     [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["constraint"][TRIM]
@@ -148,15 +156,15 @@ bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][
     {
         throw CParserExceptions::ExConstraintExpectedAfterNot();
     }
-    [OR][END][TRIM]
 
+    [OR][END][TRIM]
     [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["substitution"][TRIM]
     if ( if_)
     {
         throw CParserExceptions::ExSubstitutionExpectedAfterIf();
     }
-    [OR][END][TRIM]
 
+    [OR][END][TRIM]
     return success;
 }
 

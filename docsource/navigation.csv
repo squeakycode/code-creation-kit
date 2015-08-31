@@ -10,3 +10,4 @@ command_line.gen.html;full_tag_reference.gen.html;;index.html;command_file.gen.h
 command_file.gen.html;command_line.gen.html;;index.html;command_reference.gen.html
 command_reference.gen.html;command_file.gen.html;;index.html;ide_integration.gen.html
 ide_integration.gen.html;command_reference.gen.html;;index.html;index.html
+change_log.gen.html;;;index.html;
