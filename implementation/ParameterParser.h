@@ -94,6 +94,11 @@ namespace ParameterParser
             table[i].resize( max + 1); //plus one for the name
         }
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4456 ) // warning C4456: declaration of '_foreach_cur' hides previous local declaration
+#endif
+
         //transfer the values
         SizeT indexColumn = 0;
         BOOST_FOREACH( PairT& pair, map)
@@ -109,6 +114,9 @@ namespace ParameterParser
             }
             ++indexColumn;
         }
+#ifdef _MSC_VER
+#pragma warning( pop ) 
+#endif
     }
 }
 

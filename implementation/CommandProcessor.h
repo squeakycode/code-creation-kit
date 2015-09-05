@@ -65,9 +65,9 @@ namespace CommandProcessor
             else if ( CCommandLineParser<StringT>::eExecuteCommand == command )
             {
                 std::vector<StringT> commands = parser.getCommands();
-                BOOST_FOREACH( const StringT& command, commands)
+                BOOST_FOREACH( const StringT& generatorCommand, commands)
                 {
-                    generatorCommandProcessor.processCommand( command, generator, StringT(), logFile);
+                    generatorCommandProcessor.processCommand(generatorCommand, generator, StringT(), logFile);
                 }
             }
             else if ( CCommandLineParser<StringT>::eExecuteCommandFile == command )

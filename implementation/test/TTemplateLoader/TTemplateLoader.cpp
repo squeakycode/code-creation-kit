@@ -52,45 +52,47 @@ public:
 BOOST_AUTO_TEST_CASE( TTemplateLoader)
 {
     typedef std::string StringT;
-    CTemplateLoader<std::stringstream, StringT> loader;
-
-    //check result of loading last line with new line
     {
-        std::stringstream str;
-        loader.connectOutputStream( &str);
-        loader.loadTemplateFile( "TemplateLoaderTest1.txt");
-        StringT s = str.str();
+        CTemplateLoader<std::stringstream, StringT> loader;
+
+        //check result of loading last line with new line
+        {
+            std::stringstream str;
+            loader.connectOutputStream(&str);
+            loader.loadTemplateFile("TemplateLoaderTest1.txt");
+            StringT s = str.str();
 #ifdef _MSC_VER //TODO
-        BOOST_CHECK( s == "a\nb\nc\n");
+            BOOST_CHECK(s == "a\nb\nc\n");
 #else
-        BOOST_CHECK( s == "a\r\nb\r\nc\r\n");
+            BOOST_CHECK(s == "a\r\nb\r\nc\r\n");
 #endif
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
-    }
+            BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
+        }
 
-    //check result of loading last line without new line
-    {
-        std::stringstream str;
-        loader.connectOutputStream( &str);
-        loader.loadTemplateFile( "TemplateLoaderTest2.txt");
-        StringT s = str.str();
+        //check result of loading last line without new line
+        {
+            std::stringstream str;
+            loader.connectOutputStream(&str);
+            loader.loadTemplateFile("TemplateLoaderTest2.txt");
+            StringT s = str.str();
 #ifdef _MSC_VER //TODO
-        BOOST_CHECK( s == "x\ny\nz");
+            BOOST_CHECK(s == "x\ny\nz");
 #else
-        BOOST_CHECK( s == "x\r\ny\r\nz");
+            BOOST_CHECK(s == "x\r\ny\r\nz");
 #endif
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
-    }
+            BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
+        }
 
-    //check load using include directory
-    {
-        std::stringstream str;
-        loader.connectOutputStream( &str);
-        loader.addIncludeDirectory( "InclusionTest");
-        loader.loadTemplateFile( "TemplateLoaderTest5.txt");
-        StringT s = str.str();
-        BOOST_CHECK( s == "TemplateLoaderTest4.txt");
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0 );
+        //check load using include directory
+        {
+            std::stringstream str;
+            loader.connectOutputStream(&str);
+            loader.addIncludeDirectory("InclusionTest");
+            loader.loadTemplateFile("TemplateLoaderTest5.txt");
+            StringT s = str.str();
+            BOOST_CHECK(s == "TemplateLoaderTest4.txt");
+            BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
+        }
     }
 
     //check trigger loading another file by output processing, ends in cyclic inclusion error

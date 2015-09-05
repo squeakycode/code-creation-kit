@@ -21,9 +21,11 @@ set IDE_TYPE=%~1
 set MPC_DEPENDENCY_COMBINED_STATIC_LIBRARY=Yes
 
 set PrgFiles=%ProgramFiles%
-if defined %ProgramFiles(x86)% set PrgFiles=%ProgramFiles(x86)%
+if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
 
-rem if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 11.0" set IDE_TYPE=vc11
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 14.0" set IDE_TYPE=vc14
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 12.0" set IDE_TYPE=vc12
+if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 11.0" set IDE_TYPE=vc11
 if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 10.0" set IDE_TYPE=vc10
 if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
 if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8

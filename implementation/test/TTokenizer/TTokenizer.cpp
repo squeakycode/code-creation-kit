@@ -201,13 +201,11 @@ void testBackEndFeatures()
 
     //generated tests
     {
-        TokenizerT tokenizer;
         testRemoveDelayMarks<TokenizerT, OutputT, TokenT, StringT>(tokenizer, false);
     }
 
     //generated tests
     {
-        TokenizerT tokenizer;
         tokenizer.setBypassMode( true);
         testRemoveDelayMarks<TokenizerT, OutputT, TokenT, StringT>(tokenizer, true);
     }

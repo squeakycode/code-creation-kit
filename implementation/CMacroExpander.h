@@ -279,6 +279,11 @@ private:
         return constraintList.empty();
     }
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4456 ) // warning C4456: declaration of '_foreach_cur' hides previous local declaration
+#endif
+
     template <typename ConstraintListT, typename IndexVectorT, typename OutputT>
     bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
     {
@@ -390,6 +395,10 @@ private:
 
         return !output.empty();
     }
+
+#ifdef _MSC_VER
+#pragma warning( pop ) 
+#endif
 
 private:
 
