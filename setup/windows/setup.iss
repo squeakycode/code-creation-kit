@@ -1,4 +1,4 @@
-;   Copyright (C) 2011, Andreas Gau
+;   Copyright (C) 2011-2015, Andreas Gau
 ;
 ;   This file is part of the code-creation-kit.
 ;
@@ -16,20 +16,21 @@
 ;   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
 #define PackageName "code-creation-kit"
-#define PackageCopyright ReadIni("..\..\version\version.gen.ini", "version", "copyrightinfo")
-#define PackageVersion ReadIni("..\..\version\version.gen.ini", "version", "versiontext")
-#define PackageReleaseType ReadIni("..\..\version\version.gen.ini", "version", "versiontype")
+#define PackageCopyright ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "copyrightinfo")
+#define PackageVersion ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontext")
+#define PackageVersionRaw ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontextraw")
+#define PackageReleaseType ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontype")
 
 [Messages]
 SetupAppTitle={#PackageName} {#PackageVersion}
 
 [Setup]
 OutputDir=current_release
-VersionInfoVersion={#PackageVersion}
+VersionInfoVersion={#PackageVersionRaw}
 VersionInfoCopyright={#PackageCopyright}
 Compression=lzma/ultra
 VersionInfoProductName={#PackageName}
-VersionInfoProductVersion={#PackageVersion}
+VersionInfoProductVersion={#PackageVersionRaw}
 AppCopyright={#PackageCopyright}
 AppName={#PackageName}
 LicenseFile=..\..\license\gpl\gpl-2.0.txt

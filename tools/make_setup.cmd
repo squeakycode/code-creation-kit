@@ -16,8 +16,11 @@ rem
 rem   You should have received a copy of the GNU General Public License
 rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
+set PrgFiles=%ProgramFiles%
+if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
+
 pushd ..\setup\windows
-"%ProgramFiles%\Inno Setup 5\iscc.exe" setup.iss
+"%PrgFiles%\Inno Setup 5\iscc.exe" setup.iss
 if %errorlevel% neq 0 popd & exit /b %errorlevel%
 popd
 exit /b %errorlevel%

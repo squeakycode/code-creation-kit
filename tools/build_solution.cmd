@@ -20,7 +20,10 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 
 set SOLUTION_NAME=%~1
 
-call "%ProgramFiles%\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat"
+set PrgFiles=%ProgramFiles%
+if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
+
+call "%PrgFiles%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
 devenv "%SOLUTION_NAME%" /Build "Release|Win32"
 
 exit /b %errorlevel%

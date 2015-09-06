@@ -51,15 +51,15 @@ if %errorlevel% neq 0 goto :exit_failure
 echo Copying example files for test build
 xcopy /s /e /q ..\output\examples ..\output\examples_build_test\
 
-echo Creating workspace vc71
+echo Creating workspace vc8
 pushd ..\output\examples\mpc_integration
-call create_workspace.cmd vc71 nowait
+call create_workspace.cmd vc8 nowait
 popd
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Creating workspace for test build
 pushd ..\output\examples_build_test\mpc_integration
-call create_workspace.cmd vc9 nowait
+call create_workspace.cmd vc14 nowait
 popd
 if %errorlevel% neq 0 goto :exit_failure
 

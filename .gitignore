@@ -35,6 +35,7 @@ ipch/
 [Rr]elease*/
 /output
 /docsource/temp
+/setup/windows/current_release
 test.exe
 /implementation/test/TErrorPrinter/TargetFile.txt
 /implementation/test/TErrorPrinter/TargetFile.txt.intermediate

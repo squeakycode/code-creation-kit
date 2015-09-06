@@ -1,5 +1,5 @@
-@echo on
-rem   Copyright (C) 2011, Andreas Gau
+@echo off
+rem   Copyright (C) 2011-2015, Andreas Gau
 rem
 rem   This file is part of the code-creation-kit.
 rem
