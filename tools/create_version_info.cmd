@@ -19,8 +19,6 @@ rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses
 if not defined CCK_ROOT echo Environment variable CCK_ROOT is not set
 if not defined CCK_ROOT exit /b 1
 
-SubWCRev .. ..\version\version.svntpl.csv ..\version\version.svngen.csv
-if %errorlevel% neq 0 goto :exit_failure
 "%CCK_ROOT%\bin\ccktc.exe" ..\version\version.tccmd
 if %errorlevel% neq 0 goto :exit_failure
 
