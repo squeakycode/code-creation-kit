@@ -34,6 +34,7 @@ ipch/
 [Dd]ebug*/
 [Rr]elease*/
 /output
+/docsource/temp
 test.exe
 /implementation/test/TErrorPrinter/TargetFile.txt
 /implementation/test/TErrorPrinter/TargetFile.txt.intermediate

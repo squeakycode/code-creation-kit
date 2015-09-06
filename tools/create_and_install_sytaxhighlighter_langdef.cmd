@@ -16,19 +16,26 @@ rem
 rem   You should have received a copy of the GNU General Public License
 rem   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
 
+rem change path back to where the cmd file resides when run as admin
+if /I "%CD%" EQU "%SystemRoot%\System32" cd /d "%~dp0"
+
+set PrgFiles=%ProgramFiles%
+if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
+
 "%CCK_ROOT%\bin\ccktc.exe" syntaxhighlighter.tccmd
 if %errorlevel% neq 0 goto :exit_failure
 
-move /Y syntaxhighlighter.gen.lang "%ProgramFiles%\WinHighlight\langDefs\tpl.lang"
+move /Y syntaxhighlighter.gen.lang "%PrgFiles%\Highlight\langDefs\tpl.lang"
 if %errorlevel% neq 0 goto :exit_failure
 
-move /Y syntaxhighlighter_tccmd.gen.lang "%ProgramFiles%\WinHighlight\langDefs\tccmd.lang"
+move /Y syntaxhighlighter_tccmd.gen.lang "%PrgFiles%\Highlight\langDefs\tccmd.lang"
 if %errorlevel% neq 0 goto :exit_failure
 
-copy /Y vb.lang "%ProgramFiles%\WinHighlight\langDefs\vb.lang"
+rem adds some keywords to the standard vb.lang language definition of Highlight
+copy /Y vb.lang "%PrgFiles%\Highlight\langDefs\vb.lang"
 if %errorlevel% neq 0 goto :exit_failure
 
-copy /Y syntaxhighlighter.style "%ProgramFiles%\WinHighlight\themes\tpl.style"
+copy /Y syntaxhighlighter.theme "%PrgFiles%\Highlight\themes\tpl.theme"
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Create and install syntax highlighter language definition successful...

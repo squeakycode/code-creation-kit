@@ -1,21 +1,28 @@
-# Generator template language definition file
-#
-# Author: Andreas Gau
-#   Date: 23.01.2010
-# ----------
+Description="code-creation-kit template language definition file"
 
-$DESCRIPTION=Generator template language definition file
+Keywords={
+  {  Id=1,
+     Regex=[[ (!MACRO_BEGIN!\[!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]\]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!MACRO_END!) ]],
+  },
+  {  Id=2,
+     Regex=[[ (!MACRO_BEGIN!\[!ENTRY!["Tag Name"]!IF!!ENTRY!["Tag Name"]!NOT!!EQUALS!["COMMENT"]!IF!!ENTRY!["Type"]!EQUALS!["preprocessor directive"]!EQUALS!["processing directive"]\]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!MACRO_END!) ]],
+  },
+  {  Id=3,
+     Regex=[[ (!MACRO_BEGIN!\[!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]\.\]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!MACRO_END!) ]],
+  },
+  {  Id=4,
+     Regex=[[ (!MACRO_BEGIN!\[!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]\.\.\]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!MACRO_END!) ]],
+  },
+  {  Id=5,
+     Regex=[[ (!MACRO_BEGIN!\[!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]\.\.\.\]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!MACRO_END!) ]],
+  },
+}
 
-$KEYWORDS(kwa)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["preprocessor directive"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\]))
+Comments = {
+   {
+     Block=false,
+     Delimiter = { [[ \[COMMENT\] ]] }
+   }
+}
 
-$KEYWORDS(kwb)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\]))
-
-$KEYWORDS(kwc)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\]))
-
-$KEYWORDS(kwd)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\.\]))
-
-$KEYWORDS(kwe)=regex((\[(!BEGIN!!ENTRY!["Tag Name"]!IF!!ENTRY!["Type"]!EQUALS!["macro keyword"]!BEGIN!!IF!!LAST_TIME!!OR!|!END!!END!)\.\.\.\]))
-
-$SL_COMMENT=regex(\[COMMENT\].*)
-
-$IGNORECASE=false
+IgnoreCase=false

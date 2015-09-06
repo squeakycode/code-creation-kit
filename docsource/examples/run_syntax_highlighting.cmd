@@ -1,4 +1,4 @@
-@echo off
+@echo on
 rem   Copyright (C) 2011, Andreas Gau
 rem
 rem   This file is part of the code-creation-kit.
@@ -23,6 +23,9 @@ set EXAMPLE_HOME=%~1
 set SAVED_ERROR_LEVEL=0
 if not defined EXAMPLE_HOME exit /b 1
 
+set PrgFiles=%ProgramFiles%
+if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
+
 pushd "%EXAMPLE_HOME%"
 for /F "usebackq" %%i in (`dir /s /b CDPlayerStatemachine.h`) do call :RunTplHighlighter[] %%i
 for /F "usebackq" %%i in (`dir /s /b *.tpl.h`) do call :RunTplHighlighter[] %%i
@@ -36,23 +39,23 @@ popd
 exit /b %SAVED_ERROR_LEVEL%
 
 :RunTplHighlighter[]
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=tpl --syntax=tpl
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=tpl --syntax=tpl
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.rtf" --style=tpl --syntax=tpl --rtf
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.rtf" --style=tpl --syntax=tpl --out-format=rtf
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
     exit /b 0
     
 :RunHighlighter[]
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=ide-msvs2008
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=edit-msvs2008
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.rtf" --style=ide-msvs2008 --rtf
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.rtf" --style=edit-msvs2008 --out-format=rtf
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
     exit /b 0
     
 :RunTcCmdHighlighter[]
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=tpl --syntax=tccmd
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.html" --inline-css --fragment --style=tpl --syntax=tccmd
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
-    "%ProgramFiles%\WinHighlight\highlight" -i "%~1" -o "%~1.rtf" --style=tpl --syntax=tccmd --rtf
+    "%PrgFiles%\Highlight\highlight" -i "%~1" -o "%~1.rtf" --style=tpl --syntax=tccmd --out-format=rtf
     if %errorlevel% neq 0 set SAVED_ERROR_LEVEL=%errorlevel%
     exit /b 0
     
