@@ -187,6 +187,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//HTML_ESCAPE
+        result.clear();
+        tokenizer << STRING_LITERAL("start%HTML_ESCAPE%end");
+        expected[1] = TokenT( TokenT::eHtmlEscape);
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//IF
         result.clear();
         tokenizer << STRING_LITERAL("start%IF%end");
@@ -489,6 +497,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%FOR_ALL.%end") : STRING_LITERAL("start%FOR_ALL..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%FOR_ALL"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//HTML_ESCAPE
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%HTML_ESCAPE.%end") : STRING_LITERAL("start%HTML_ESCAPE..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%HTML_ESCAPE"));
         BOOST_CHECK( expected == result);
     }
 

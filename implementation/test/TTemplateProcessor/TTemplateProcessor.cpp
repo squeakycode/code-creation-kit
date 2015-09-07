@@ -67,7 +67,7 @@ const char* itemTable[rows][columns] =
 {
     {"Item","Type","Name","Array Maximum","Default","Description","Description"},
     {"a","int","valueCount","","0","",""},
-    {"b","double","values","30","5.4","description","more"},
+    {"b","double","values","30","5.4","description","&more"},
     {"c","bool","valid","","false","",""},
     {"d","bool","test","","false","",""}
 };
@@ -184,7 +184,7 @@ void testMacroProcessing()
     //entry
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
     //any
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><descriptionmore><><>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><description&more><><>"));
     //last time
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
@@ -197,9 +197,9 @@ void testMacroProcessing()
     //entry left to right
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"]>", "<int><valueCount><0>"));
     //entry list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"]>", "<descriptionmore>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"]>", "<description&more>"));
     //entry list with separator
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;&more>"));
     //if entry
     BOOST_CHECK( test( processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<,30>"));
     //if not entry
@@ -208,7 +208,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
     //text correctly sorted
-    BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[more]§"));
+    BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[&more]§"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
     BOOST_CHECK( test( processor, "[BEGIN]    [IF][ENTRY][\"Item\"][READ_TOP_DOWN][EQUALS][\"a\"][ENTRY][\"Name\"][END]\n", "    valueCount\n"));
     //matches
@@ -220,14 +220,14 @@ void testMacroProcessing()
     //not matches ignore case
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"Bool\"][IGNORE_CASE]>", "<int><double>"));
     //matches list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"]>", "<more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"]>", "<&more>"));
     //matches list + flush 
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FLUSH]>", "<descriptionmore>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FLUSH][MERGE][\";\"]>", "<description;more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH]>", "<description&more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH][MERGE][\";\"]>", "<description;&more>"));
     //matches list + forall
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FOR_ALL]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FOR_ALL][FLUSH]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<descriptionmore>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL]>", ""));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL][FLUSH]>", ""));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<description&more>"));
     //check left to right
     BOOST_CHECK( test( processor, "<[ENTRY][\"Item\"][READ_LEFT_TO_RIGHT]>", "<Type><Name><Array Maximum><Default><Description><Description>"));
     //top down
@@ -290,6 +290,8 @@ void testMacroProcessing()
     //error tag
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
     BOOST_CHECK_THROW( test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    //html escape
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][HTML_ESCAPE]>", "<description&amp;more>"));
     try
     {
         test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");

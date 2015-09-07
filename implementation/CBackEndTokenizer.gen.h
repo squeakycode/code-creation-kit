@@ -139,6 +139,7 @@ public:
         expression += front + STRING_LITERAL("FIRST_TIME") + back;
         expression += front + STRING_LITERAL("FLUSH") + back;
         expression += front + STRING_LITERAL("FOR_ALL") + back;
+        expression += front + STRING_LITERAL("HTML_ESCAPE") + back;
         expression += front + STRING_LITERAL("IF") + back;
         expression += front + STRING_LITERAL("IGNORE_CASE") + back;
         expression += front + STRING_LITERAL("INDEX") + back;
@@ -719,6 +720,21 @@ public:
                 else
                 {
                     *m_outputStream << TokenT( TokenT::eForAll);
+                }
+            }
+            else if ( what[ (TokenT::eHtmlEscape-1)*2 ].matched )
+            {
+                if ( removeTick( what, (TokenT::eHtmlEscape * 2) - 1))
+                {
+                    continue;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::eHtmlEscape, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eHtmlEscape, start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::eHtmlEscape);
                 }
             }
             else if ( what[ (TokenT::eIf_-1)*2 ].matched )

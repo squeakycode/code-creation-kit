@@ -33,6 +33,7 @@
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
 #endif
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
@@ -331,6 +332,97 @@ public:
         BOOST_FOREACH( StringT& text, textList)
         {
             text = convertSpecialCharacters( text);
+        }
+    }
+};
+
+template <typename StringT>
+class CHtmlEscapeConversion : public ConversionDirectives<StringT>
+{
+    typedef typename StringT::value_type CharT;
+    struct SCharTable
+    {
+        const CharT c;
+        const CharT* htmlEscaped;
+    };
+
+public:
+    typedef CToUpperConversion<StringT> ThisT;
+    typedef typename IConversion<StringT>::StringListT StringListT;
+
+    virtual bool operator==(const IConversion<StringT>& conversion) const
+    {
+        const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
+        if (m)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    StringT convertSpecialCharacters(const StringT& text) const
+    {
+        static const SCharTable table[] =
+            {
+                {'&' , STRING_LITERAL("&amp;")},
+                {'<' , STRING_LITERAL("&lt")  },
+                {'>' , STRING_LITERAL("&gt")  },
+                {'"' , STRING_LITERAL("&quot")},
+                {'\'', NULL   },
+                {'`' , NULL   },
+                {'(' , NULL   },
+                {')' , NULL   },
+                {'{' , NULL   },
+                {'}' , NULL   },
+                {'[' , NULL   },
+                {']' , NULL   },
+                {'!' , NULL   },
+                {'@' , NULL   },
+                {'$' , NULL   },
+                {'%' , NULL   },
+                {'=' , NULL   },
+                {'+' , NULL   },
+                {  0 , NULL   }
+            };
+
+        // iterate all chars of text
+        StringT result;
+        BOOST_FOREACH(CharT c, text)
+        {
+            //check for characters to escape
+            const SCharTable* p = table;
+            for (; p->c; ++p)
+            {
+                if (c == p->c)
+                {
+                    //character to escape found
+                    if (p->htmlEscaped)
+                    {
+                        result += p->htmlEscaped;
+                    }
+                    else
+                    {
+                        result += STRING_LITERAL("&#");
+                        result += boost::lexical_cast<StringT>((int)c);
+                        result += STRING_LITERAL(";");
+                    }
+                    break;
+                }
+            }
+            //has not been escaped?
+            if (!p->c)
+            {
+                result += c;
+            }
+        }
+        return result;
+    }
+
+    virtual void modify(StringListT& textList) const
+    {
+        BOOST_FOREACH(StringT& text, textList)
+        {
+            text = convertSpecialCharacters(text);
         }
     }
 };

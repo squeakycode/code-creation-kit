@@ -98,7 +98,8 @@ template <typename PosT>
 bool isConversion( PosT& pos)
 {
     if (
-           *pos == PosT::value_type::eMerge
+           *pos == PosT::value_type::eHtmlEscape
+        || *pos == PosT::value_type::eMerge
         || *pos == PosT::value_type::eRegexReplace
         || *pos == PosT::value_type::eReplace
         || *pos == PosT::value_type::eToCString
@@ -200,6 +201,7 @@ bool isValidCombination( typename TokenT::ETokenT item, typename TokenT::ETokenT
             case TokenT::eEndsWith: return true;
             case TokenT::eContains: return true;
             case TokenT::eToCString: return true;
+            case TokenT::eHtmlEscape: return true;
             }
         }
     case TokenT::eMatches:
@@ -506,6 +508,17 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
         success = true;
         switch ( pos->getToken())
         {
+        case TokenT::eHtmlEscape:
+            {
+                CHtmlEscapeConversion<StringT>* conversion = newItem0<CHtmlEscapeConversion<StringT> >( pos);
+                item.attach( conversion);
+                ConversionDirectives<StringT>& newItem = *conversion;
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
         case TokenT::eMerge:
             {
                 CMergeConversion<StringT>* conversion = newItem1<CMergeConversion<StringT> >( pos);

@@ -109,6 +109,19 @@ void testToCString()
     BOOST_CHECK( v[0] == STRING_LITERAL("abc\\'\\\"\\?\\\\\\a\\b\\f\\n\\r\\t\\v123"));
 }
 
+template <typename StringT, typename ConversionT>
+void testHtmlEscape()
+{
+    typedef typename StringT::value_type CharT;
+    ConversionT htmlEscape;
+
+    std::vector<StringT> v;
+    v.push_back(STRING_LITERAL("&, <, >, \", ', `, (, ), {, }, [, ], !, @, $, %, =, +,"));
+
+    htmlEscape.modify(v);
+    BOOST_CHECK(v[0] == STRING_LITERAL("&amp;, &lt, &gt, &quot, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
+}
+
 BOOST_AUTO_TEST_CASE( TConversions)
 {
     testReplace<std::string, CReplaceConversion<std::string> >();
@@ -118,5 +131,8 @@ BOOST_AUTO_TEST_CASE( TConversions)
 
     testToCString<std::string, CToCStringConversion<std::string> >();
     testToCString<std::wstring, CToCStringConversion<std::wstring> >();
+
+    testHtmlEscape<std::string, CHtmlEscapeConversion<std::string> >();
+    testHtmlEscape<std::wstring, CHtmlEscapeConversion<std::wstring> >();
 }
 

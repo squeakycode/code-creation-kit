@@ -53,6 +53,7 @@ public:
         eFirstTime,
         eFlush,
         eForAll,
+        eHtmlEscape,
         eIf_,
         eIgnoreCase,
         eIndex,
