@@ -19,7 +19,7 @@ project : base, boost_unit_test_framework, boost_program_options, boost_filesyst
  
   includes += ../../../implementation
  
-  specific(nmake, vc6, vc7, vc71, vc8, vc9, vc10, vc11, vc12, vc14) {
+  specific(prop:microsoft) {
     after += implementation
     install = .
     exename = test
@@ -27,13 +27,13 @@ project : base, boost_unit_test_framework, boost_program_options, boost_filesyst
     postbuild = test.exe --result_code=no
   }
 
-  specific(gnuace,make) {
+  specific(make) {
     exename = ./test_exe
     prebuild = rm -f ./test_exe
     postbuild = ./test_exe
   }
 
-  specific(!vc71, !vc8, !vc9, !vc10, !vc11, !vc12, !vc14, !nmake, !em3, !bmake, !bds4) {
+  specific(!prop:windows) {
     lit_libs += $(BOOST_STATIC_LIB_PREFIX)boost_system$(BOOST_CFG)
   }
 }

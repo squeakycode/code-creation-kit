@@ -44,7 +44,7 @@ exit /b %ERRORLEVEL%
 :CreateFile[]
 echo.project(*) : tccmd {
 echo.
-echo.    specific(nmake, vc6, vc7, vc71, vc8, vc9) {
+echo.    specific(prop:microsoft) {
 echo.       warning_level = 4
 echo.    }
 echo.
