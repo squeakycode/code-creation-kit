@@ -1,33 +1,33 @@
-<div class="informaltable">
-<table class="table">
-  <tbody>
-    <tr>
-      <th>Option Group</th>    
-      <th>Option Name</th>
-      <th>Short</th>
-      <th>Description</th>
-    </tr>
-    [MACRO_BEGIN][TRIM]
-    <tr>
-      <th>[ENTRY]["Group Description"]</th>    
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>    
-      <td>[ENTRY]["Name"]</td>
-      <td>[BEGIN][ENTRY]["Shortcut"][OR] [END]</td>
-      <td>[BEGIN][ENTRY]["Description"][OR] [END]</td>
-    </tr>
-    [OR][TRIM]
-    <tr>
-      <td></td>    
-      <td>[ENTRY]["Name"]</td>
-      <td>[BEGIN][ENTRY]["Shortcut"][OR] [END]</td>
-      <td>[BEGIN][ENTRY]["Description"][OR] [END]</td>
-    </tr>
-    [MACRO_END][TRIM]    
-  </tbody>
-</table>
-</div>
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Option Group</th>    
+          <th>Option Name</th>
+          <th>Short</th>
+          <th>Description</th>
+        </tr>
+        [MACRO_BEGIN][TRIM]
+        <tr>
+          <th>[ENTRY]["Group Description"][HTML_ESCAPE]</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>[ENTRY]["Name"][HTML_ESCAPE]</td>
+          <td>[BEGIN][ENTRY]["Shortcut"][HTML_ESCAPE][OR] [END]</td>
+          <td>[BEGIN][ENTRY]["Description"][HTML_ESCAPE][OR] [END]</td>
+        </tr>
+        [OR][TRIM]
+        <tr>
+          <td></td>    
+          <td>[ENTRY]["Name"][HTML_ESCAPE]</td>
+          <td>[BEGIN][ENTRY]["Shortcut"][HTML_ESCAPE][OR] [END]</td>
+          <td>[BEGIN][ENTRY]["Description"][HTML_ESCAPE][OR] [END]</td>
+        </tr>
+        [MACRO_END][TRIM]    
+      </tbody>
+    </table>
+    </div>

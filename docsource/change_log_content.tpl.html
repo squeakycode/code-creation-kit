@@ -34,17 +34,17 @@
     </table>
     </div>
 [OR][END][TRIM]    
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"] ([ENTRY]["Release Date"])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"][HTML_ESCAPE] ([ENTRY]["Release Date"][HTML_ESCAPE])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
     <p>
-    [ENTRY]["Description"][REPLACE]["\n","</p><p>"]
+    [ENTRY]["Description"][HTML_ESCAPE][REPLACE]["\n","</p><p>"]
     </p>
 [INCLUDE]["change_log_table_header.tpl.html"]
 [COMMENT] <!-- document body, bugfix or feature entry -->
 [OR][TRIM]
             <tr>
-                <td>[ENTRY]["Change Type"]</td>
-                <td>[BEGIN][ENTRY]["Tracker ID"][OR] [END]</td>
-                <td>[ENTRY]["Description"]</td>
+                <td>[ENTRY]["Change Type"][HTML_ESCAPE]</td>
+                <td>[BEGIN][ENTRY]["Tracker ID"][HTML_ESCAPE][OR] [END]</td>
+                <td>[ENTRY]["Description"][HTML_ESCAPE]</td>
             </tr>
 [COMMENT] <!-- end document body -->
 [END][TRIM]
