@@ -1,4 +1,4 @@
 Item Type;Text
-heading 2;Command Line 
+heading 2;Text Compiler Command Line 
 paragraph;The following table shows all available command line options. 
 include;command_line_reference.table.gen.html

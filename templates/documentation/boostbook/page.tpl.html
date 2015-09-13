@@ -27,16 +27,28 @@
 <html>
 <head>
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>[ENTRY]["title"]</title>
+  <title>[ENTRY]["title"][HTML_ESCAPE]</title>
   <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
 </head>
 
 <body>
 [COMMENT] <!-- insert logo, create empty file if no logo -->
 $INCLUDE$["logo.tpl.html"]$TRIM$
-<hr>
+    <hr>
 [INCLUDE]["navigation.tpl.html"][TRIM]
 
+[SET_RECURSION_LEVEL_LIMIT_OFF][TRIM]
 [COMMENT] <!-- insert heading? -->
 [MACRO_BEGIN][IF][ENTRY]["Item Type"][MATCHES_REGEX]['heading [1-9]'][TRIM]
     [COMMENT] <!-- h1 to h6 are looked up as second step -->
@@ -45,7 +57,7 @@ $INCLUDE$["logo.tpl.html"]$TRIM$
 [OR][IF][ENTRY]["Item Type"][EQUALS]["table_of_contents"][TRIM]
     <div class="toc">
 [COMMENT] <!-- insert additional heading for table of content if text is provided -->
-    [BEGIN]<p><b>[ENTRY]["Text"]</b></p>[OR][END]
+    [BEGIN]<p><b>[ENTRY]["Text"][HTML_ESCAPE]</b></p>[OR][END]
     <dl>
 [COMMENT]    
 [COMMENT] <!-- the following is done: list headings in table, look up <dd><dl> tags in matrix for indentation, look up filename -->
@@ -57,18 +69,20 @@ $INCLUDE$["logo.tpl.html"]$TRIM$
     [BEGIN.][TRIM]
     [IF.][FIRST_TIME.][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][ENTRY..]["[ENTRY.]["Item Type"]"]
     [OR.][TRIM]
+[COMMENT] <!-- trailing entry of lower block -->
     [ENTRY..]["[ENTRY.]["Item Type"]"][END..]
     [END.][TRIM]
 [COMMENT]
 [COMMENT] <!-- headings in table, look up filename -->
 [COMMENT]
-    <dt><span class="section"><a href="[ENTRY..]["file"]#anchor[INDEX.]">[ENTRY.]["Text"]</a></span></dt>
+    <dt><span class="section"><a href="[ENTRY..]["file"]#anchor[INDEX.]">[ENTRY.]["Text"][HTML_ESCAPE.]</a></span></dt>
 [COMMENT]
 [COMMENT] <!-- look up <dd><dl> tags in matrix for indentation -->
 [COMMENT]
     [BEGIN.][TRIM]
-    [IF.][LAST_TIME.][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][ENTRY..]["heading 1"]
+    [IF.][LAST_TIME.][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][ENTRY..]["heading 2"]
     [OR.][TRIM]
+[COMMENT] <!-- completed by trailing entry of upper block -->
     [BEGIN..][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][TRIM]
     [END.][TRIM]
 [COMMENT]
@@ -92,7 +106,7 @@ $INCLUDE$["logo.tpl.html"]$TRIM$
     </li>
 [COMMENT] <!--insert list end? -->        
 [OR][IF][ENTRY]["Item Type"][EQUALS]["list_end"][TRIM]
-    </div>
+    </ul></div>
 [COMMENT] <!--insert text paragraph? -->        
 [OR][IF][ENTRY]["Item Type"][EQUALS]["paragraph"][TRIM]
     <p>
@@ -103,17 +117,17 @@ $INCLUDE$["logo.tpl.html"]$TRIM$
 $INCLUDE$["[ENTRY]["Text"]"]$TRIM$
 [COMMENT] <!-- insert include for an rtf file with accompanying html file, in a second generation step the include is executed -->        
 [OR][IF][ENTRY]["Item Type"][EQUALS]["include"][IF][ENTRY]["Text"][MATCHES_REGEX]['.*\.rtf'][TRIM]
-<pre class="synopsis">
+    <pre class="synopsis">
 $INCLUDE$["[ENTRY]["Text"][REGEX_REPLACE]['(.*)\.rtf','$1\.html']"]$TRIM$
-</pre>
+    </pre>
 [COMMENT] <!-- insert include, in a second generation step the include is executed -->        
 [OR][IF][ENTRY]["Item Type"][EQUALS]["include"][TRIM]
-<pre class="synopsis">
+    <pre class="synopsis">
 $INCLUDE$["[ENTRY]["Text"]"]$TRIM$
-</pre>
+    </pre>
 [MACRO_END][TRIM]
 
-<hr>
+    <hr>
 [INCLUDE]["navigation.tpl.html"][TRIM]
 </body>
 </html>

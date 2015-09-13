@@ -1,13 +1,13 @@
-csv file;target file;title;title;
-index.csv;index.html;;The code-creation-kit;
-getting_started.csv;getting_started.gen.html;code-creation-kit - ;Getting Started;
-available_examples.csv;available_examples.gen.html;code-creation-kit - ;Examples;
-share.csv;share.gen.html;code-creation-kit - ;Share;
-full_tag_reference.csv;full_tag_reference.gen.html;code-creation-kit - ;Full Tag Reference;
-table_creation.csv;table_creation.gen.html;code-creation-kit - ;Data Table Creation;
-template_creation.csv;template_creation.gen.html;code-creation-kit - ;Template Creation;
-command_line.csv;command_line.gen.html;code-creation-kit - ;Command Line;
-command_file.csv;command_file.gen.html;code-creation-kit - ;Command File;
-command_reference.csv;command_reference.gen.html;code-creation-kit - ;Command Reference;
-ide_integration.csv;ide_integration.gen.html;code-creation-kit - ;IDE Integration;
-change_log_page.csv;change_log.gen.html;code-creation-kit - ;Change Log;
+csv file;target file;title;title
+index.csv;index.html;The code-creation-kit;
+getting_started.csv;getting_started.gen.html;Getting Started; | code-creation-kit
+available_examples.csv;available_examples.gen.html;Examples; | code-creation-kit
+share.csv;share.gen.html;Share; | code-creation-kit
+full_tag_reference.csv;full_tag_reference.gen.html;Full Tag Reference; | code-creation-kit
+table_creation.csv;table_creation.gen.html;Data Table Creation; | code-creation-kit
+template_creation.csv;template_creation.gen.html;Template Creation; | code-creation-kit
+command_line.csv;command_line.gen.html;Text Compiler Command Line; | code-creation-kit
+command_file.csv;command_file.gen.html;Command File; | code-creation-kit
+command_reference.csv;command_reference.gen.html;Command Reference; | code-creation-kit
+ide_integration.csv;ide_integration.gen.html;IDE Integration; | code-creation-kit
+change_log_page.csv;change_log.gen.html;Change Log; | code-creation-kit
