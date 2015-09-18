@@ -1,5 +1,7 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Adden PAD_RIGHT conversion;;
+New Feature;;Adden PAD_LEFT conversion;;
 Release;;"This release adds in-place generation using inline templates, logging for debugging support, and more CSV-file handling features.
 
 Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.3.0.96;2012-10-30

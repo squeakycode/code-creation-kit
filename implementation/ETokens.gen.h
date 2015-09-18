@@ -64,6 +64,8 @@ public:
         eMerge,
         eNot_,
         eOr_,
+        ePadLeft,
+        ePadRight,
         eLeftToRight,
         eTopDown,
         eRegexReplace,

@@ -24,7 +24,7 @@ project : base, boost_unit_test_framework, boost_program_options, boost_filesyst
     install = .
     exename = test
     prebuild = if exist test.exe del test.exe
-    postbuild = test.exe --result_code=no
+    postbuild = test.exe
   }
 
   specific(make) {

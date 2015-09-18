@@ -82,5 +82,8 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+
+    //bad chars passed for padding
+    BOOST_CHECK_THROW(generator.generate("BadCharsPassedForPadding.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 }
 

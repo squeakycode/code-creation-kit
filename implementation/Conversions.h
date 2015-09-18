@@ -347,7 +347,7 @@ class CHtmlEscapeConversion : public ConversionDirectives<StringT>
     };
 
 public:
-    typedef CToUpperConversion<StringT> ThisT;
+    typedef CHtmlEscapeConversion<StringT> ThisT;
     typedef typename IConversion<StringT>::StringListT StringListT;
 
     virtual bool operator==(const IConversion<StringT>& conversion) const
@@ -427,4 +427,226 @@ public:
     }
 };
 
+template <typename StringT>
+class CPadConversionBase : public ConversionDirectives<StringT>
+{
+protected:
+    typedef typename StringT::value_type CharT;
+
+    template<typename IteratorT>
+    CPadConversionBase(
+        const StringT& padText
+        , const StringT& padUpToWidthFirst
+        , const IteratorT& padUpToWidthOptionalBegin
+        , const IteratorT& padUpToWidthOptionalEnd
+    )
+    {
+        m_padText = padText;
+        m_padUpToWidths.reserve(1 + (padUpToWidthOptionalEnd == padUpToWidthOptionalBegin ? 0 : padUpToWidthOptionalEnd - padUpToWidthOptionalBegin));
+        m_padUpToWidths.push_back(boost::lexical_cast<size_t>(padUpToWidthFirst));
+        for (IteratorT it = padUpToWidthOptionalBegin; it != padUpToWidthOptionalEnd; ++it)
+        {
+            m_padUpToWidths.push_back(boost::lexical_cast<size_t>(*it));
+        }
+        
+        //remove unsupported chars
+        const CharT newLine = STRING_LITERAL('\n');
+        const CharT cr = STRING_LITERAL('\r');
+        const CharT tab = STRING_LITERAL('\t');
+        for (typename StringT::iterator it = m_padText.begin(); it != m_padText.end();)
+        {
+            if (*it == newLine || *it == tab || *it == cr)
+            {
+                it = m_padText.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+
+    void addMultipliedTextPadding(StringT& result, size_t padCharsNeeded) const
+    {
+        const size_t max = padCharsNeeded / m_padText.size();
+        for (size_t i = 0; i < max; ++i)
+        {
+            result += m_padText;
+        }
+        const size_t rest = padCharsNeeded % m_padText.size();
+        if (rest)
+        {
+            result.append(m_padText.begin(), m_padText.begin() + rest);
+        }
+    }
+
+
+    StringT pad(const StringT& text, bool padLeft) const
+    {
+        StringT result;
+        const CharT newLine = STRING_LITERAL('\n');
+        const CharT tab = STRING_LITERAL('\t');
+        size_t lineWidth = 0;
+        size_t lineNumber = 0;
+        for (typename StringT::const_iterator it = text.begin(), lineStart = text.begin();;++it)
+        {
+            if (it == text.end() || *it == newLine)
+            {
+                //get number of chars to pad up to
+                size_t padUpToWidth = 0;
+                if (lineNumber < m_padUpToWidths.size())
+                {
+                    padUpToWidth = m_padUpToWidths[lineNumber];
+                }
+                else
+                {
+                    padUpToWidth = m_padUpToWidths.back();
+                }
+
+                //padding needed?
+                if (lineWidth < padUpToWidth && !m_padText.empty())
+                {
+                    size_t padCharsNeeded = padUpToWidth - lineWidth;
+                    result.reserve(result.size() + padCharsNeeded);
+
+                    if (m_padText.size() == 1)
+                    {
+                        if (padLeft)
+                        {
+                            result.append(padCharsNeeded, m_padText[0]);
+                        }
+                        result.append(lineStart, it);
+                        if (!padLeft)
+                        {
+                            result.append(padCharsNeeded, m_padText[0]);
+                        }
+                    }
+                    else
+                    {
+                        if (padLeft)
+                        {
+                            addMultipliedTextPadding(result, padCharsNeeded);
+                        }
+                        result.append(lineStart, it);
+                        if (!padLeft)
+                        {
+                            addMultipliedTextPadding(result, padCharsNeeded);
+                        }
+                    }
+                }
+                else
+                {
+                    result.append(lineStart, it);
+                }
+
+                if (it == text.end())
+                {
+                    break;
+                }
+
+                result += *it;
+                lineStart = it + 1;
+                ++lineNumber;
+                lineWidth = 0;
+            }
+            else if (*it == tab)
+            {
+                lineWidth += cTabSize;
+            }
+            else
+            {
+                ++lineWidth;
+            }
+        }
+        return result;
+    }
+
+    StringT m_padText;
+    std::vector<size_t> m_padUpToWidths;
+    static const size_t cTabSize = 4;
+};
+
+
+template <typename StringT>
+class CPadLeftConversion : public CPadConversionBase<StringT>
+{
+public:
+    
+    template<typename IteratorT>
+    CPadLeftConversion(
+        const StringT& padText
+        , const StringT& padWidthFirst
+        , const IteratorT& padWidthOptionalBegin
+        , const IteratorT& padWidthOptionalEnd
+        )
+        : CPadConversionBase(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+    {
+    }
+
+    typedef CPadLeftConversion<StringT> ThisT;
+    typedef typename IConversion<StringT>::StringListT StringListT;
+
+    virtual bool operator==(const IConversion<StringT>& conversion) const
+    {
+        const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
+        if (m)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    virtual void modify(StringListT& textList) const
+    {
+        if (!this->m_padText.empty())
+        {
+            BOOST_FOREACH(StringT& text, textList)
+            {
+                text = pad(text, true);
+            }
+        }
+    }
+};
+
+template <typename StringT>
+class CPadRightConversion : public CPadConversionBase<StringT>
+{
+public:
+
+    template<typename IteratorT>
+    CPadRightConversion(
+        const StringT& padText
+        , const StringT& padWidthFirst
+        , const IteratorT& padWidthOptionalBegin
+        , const IteratorT& padWidthOptionalEnd
+        )
+        : CPadConversionBase(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+    {
+    }
+
+    typedef CPadRightConversion<StringT> ThisT;
+    typedef typename IConversion<StringT>::StringListT StringListT;
+
+    virtual bool operator==(const IConversion<StringT>& conversion) const
+    {
+        const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
+        if (m)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    virtual void modify(StringListT& textList) const
+    {
+        if (!this->m_padText.empty())
+        {
+            BOOST_FOREACH(StringT& text, textList)
+            {
+                text = pad(text, false);
+            }
+        }
+    }
+};
 #endif /* INCLUDED_CONVERSIONS_H_8639185 */

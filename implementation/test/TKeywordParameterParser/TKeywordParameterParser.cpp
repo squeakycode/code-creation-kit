@@ -20,7 +20,7 @@
 #   define BOOST_TEST_DYN_LINK
 #endif
 #include <boost/test/unit_test.hpp>
-#include "KeywordParameterParser.h"
+#include "CombiKeywordParameterParser.gen.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -107,4 +107,35 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
         expectedParameters.push_back( "a'b");
         test<CRegexParameterPolicy>( "['a''b']-", expectedParameters, 1);
     }
+
+    { // getParametersCombiCStyleUIntUIntRepeat
+        std::vector<std::string> expectedParameters;
+        std::vector<std::string> parsedParameters;
+        expectedParameters.push_back(" ");
+        expectedParameters.push_back("99");
+        {
+            std::string text("[\" \" , 99]");
+            std::string::iterator it = text.begin();
+            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            BOOST_CHECK(it == text.end());
+            BOOST_CHECK(expectedParameters == parsedParameters);
+        }
+        expectedParameters.push_back("22");
+        {
+            std::string text("[ \" \" , 99, 22 ]");
+            std::string::iterator it = text.begin();
+            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            BOOST_CHECK(it == text.end());
+            BOOST_CHECK(expectedParameters == parsedParameters);
+        }
+        expectedParameters.push_back("42");
+        {
+            std::string text("[\" \",99,22,42]");
+            std::string::iterator it = text.begin();
+            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            BOOST_CHECK(it == text.end());
+            BOOST_CHECK(expectedParameters == parsedParameters);
+        }
+    }
+
 }

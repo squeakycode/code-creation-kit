@@ -1,0 +1,2 @@
+Identifier;Mandatory Parameter Count;Fixed Part;Variable Part;Variable Part Maximum Count
+CombiCStyleUIntUIntRepeat;2;"CStyle;UInt";UInt;SIZE_MAX

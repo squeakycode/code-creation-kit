@@ -47,6 +47,14 @@ T* newItem2( PosT& pos)
     return new T( pos->getStringList()->front(), pos->getStringList()->back());
 }
 
+template <typename T, typename PosT>
+T* newItem2VariableArguments(PosT& pos)
+{
+    return new T(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
+}
+
+
+
 ///returns true if token at position is a directive for constraint
 template <typename PosT>
 bool isDirectiveForConstraint( PosT& pos)
@@ -100,6 +108,8 @@ bool isConversion( PosT& pos)
     if (
            *pos == PosT::value_type::eHtmlEscape
         || *pos == PosT::value_type::eMerge
+        || *pos == PosT::value_type::ePadLeft
+        || *pos == PosT::value_type::ePadRight
         || *pos == PosT::value_type::eRegexReplace
         || *pos == PosT::value_type::eReplace
         || *pos == PosT::value_type::eToCString
@@ -164,13 +174,15 @@ bool isValidCombination( typename TokenT::ETokenT item, typename TokenT::ETokenT
         {
             switch( appliedItem)
             {
-            case TokenT::eRegexMatches: return true;
+            case TokenT::eContains: return true;
             case TokenT::eMatches: return true;
-            case TokenT::eReplace: return true;
-            case TokenT::eRegexReplace: return true;
+            case TokenT::eRegexMatches: return true;
             case TokenT::eStartsWith: return true;
             case TokenT::eEndsWith: return true;
-            case TokenT::eContains: return true;
+            case TokenT::ePadLeft: return true;
+            case TokenT::ePadRight: return true;
+            case TokenT::eReplace: return true;
+            case TokenT::eRegexReplace: return true;
             }
         }
     case TokenT::eEndsWith:
@@ -189,19 +201,21 @@ bool isValidCombination( typename TokenT::ETokenT item, typename TokenT::ETokenT
             case TokenT::eLeftToRight: return true;
             case TokenT::eTopDown: return true;
             case TokenT::eVolatil: return true;
-            case TokenT::eRegexMatches: return true;
-            case TokenT::eMatches: return true;
             case TokenT::eAny: return true;
+            case TokenT::eContains: return true;
+            case TokenT::eMatches: return true;
+            case TokenT::eRegexMatches: return true;
+            case TokenT::eStartsWith: return true;
+            case TokenT::eEndsWith: return true;
+            case TokenT::eHtmlEscape: return true;
             case TokenT::eMerge: return true;
+            case TokenT::ePadLeft: return true;
+            case TokenT::ePadRight: return true;
             case TokenT::eReplace: return true;
             case TokenT::eRegexReplace: return true;
             case TokenT::eToLower: return true;
             case TokenT::eToUpper: return true;
-            case TokenT::eStartsWith: return true;
-            case TokenT::eEndsWith: return true;
-            case TokenT::eContains: return true;
             case TokenT::eToCString: return true;
-            case TokenT::eHtmlEscape: return true;
             }
         }
     case TokenT::eMatches:
@@ -217,13 +231,15 @@ bool isValidCombination( typename TokenT::ETokenT item, typename TokenT::ETokenT
         {
             switch( appliedItem)
             {
-            case TokenT::eRegexMatches: return true;
+            case TokenT::eContains: return true;
             case TokenT::eMatches: return true;
-            case TokenT::eReplace: return true;
-            case TokenT::eRegexReplace: return true;
+            case TokenT::eRegexMatches: return true;
             case TokenT::eStartsWith: return true;
             case TokenT::eEndsWith: return true;
-            case TokenT::eContains: return true;
+            case TokenT::ePadLeft: return true;
+            case TokenT::ePadRight: return true;
+            case TokenT::eReplace: return true;
+            case TokenT::eRegexReplace: return true;
             }
         }
     case TokenT::eRegexMatches:
@@ -522,6 +538,28 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
         case TokenT::eMerge:
             {
                 CMergeConversion<StringT>* conversion = newItem1<CMergeConversion<StringT> >( pos);
+                item.attach( conversion);
+                ConversionDirectives<StringT>& newItem = *conversion;
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
+        case TokenT::ePadLeft:
+            {
+                CPadLeftConversion<StringT>* conversion = newItem2VariableArguments<CPadLeftConversion<StringT> >( pos);
+                item.attach( conversion);
+                ConversionDirectives<StringT>& newItem = *conversion;
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
+        case TokenT::ePadRight:
+            {
+                CPadRightConversion<StringT>* conversion = newItem2VariableArguments<CPadRightConversion<StringT> >( pos);
                 item.attach( conversion);
                 ConversionDirectives<StringT>& newItem = *conversion;
                 PosT newParentItem = pos;

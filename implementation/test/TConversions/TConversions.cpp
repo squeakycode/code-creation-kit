@@ -122,6 +122,53 @@ void testHtmlEscape()
     BOOST_CHECK(v[0] == STRING_LITERAL("&amp;, &lt, &gt, &quot, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
 }
 
+template <typename StringT, typename ConversionT>
+void testPad(const StringT& in, const StringT& out, const StringT& padText, const StringT& padUpToWidth1, const StringT& padUpToWidth2)
+{
+    {
+        std::vector<StringT> dummy;
+        if (!padUpToWidth2.empty())
+        {
+            dummy.push_back(padUpToWidth2);
+        }
+        ConversionT pad(padText, padUpToWidth1, dummy.begin(), dummy.end());
+
+        std::vector<StringT> v;
+        v.push_back(in);
+
+        pad.modify(v);
+        if (v[0] != out)
+        {
+            BOOST_CHECK(v[0] == out);
+        }
+    }
+}
+
+template <typename StringT>
+void testPadLeft()
+{
+    typedef typename StringT::value_type CharT;
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n       6\n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("ab123456"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc12345\nabcabca6\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("aba12345\na6\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\na6\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("123456  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6       \n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("123456ab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345abc\n6abcabca\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345aba\n6a\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6a\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+
+    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+}
+
 BOOST_AUTO_TEST_CASE( TConversions)
 {
     testReplace<std::string, CReplaceConversion<std::string> >();
@@ -134,5 +181,8 @@ BOOST_AUTO_TEST_CASE( TConversions)
 
     testHtmlEscape<std::string, CHtmlEscapeConversion<std::string> >();
     testHtmlEscape<std::wstring, CHtmlEscapeConversion<std::wstring> >();
+
+    testPadLeft<std::string>();
+    testPadLeft<std::wstring>();
 }
 

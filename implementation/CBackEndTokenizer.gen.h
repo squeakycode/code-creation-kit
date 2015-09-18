@@ -28,8 +28,9 @@
 
 #include <ostream>
 
-#include "KeywordParameterParser.h"
+#include "CombiKeywordParameterParser.gen.h"
 #include "CSpecialRegexCharacterPrefixer.h"
+#include "KeywordParameterCheckFunctions.h"
 
 #include <boost/regex.hpp> 
 #include <boost/foreach.hpp>
@@ -150,6 +151,8 @@ public:
         expression += front + STRING_LITERAL("MERGE") + back;
         expression += front + STRING_LITERAL("NOT") + back;
         expression += front + STRING_LITERAL("OR") + back;
+        expression += front + STRING_LITERAL("PAD_LEFT") + back;
+        expression += front + STRING_LITERAL("PAD_RIGHT") + back;
         expression += front + STRING_LITERAL("READ_LEFT_TO_RIGHT") + back;
         expression += front + STRING_LITERAL("READ_TOP_DOWN") + back;
         expression += front + STRING_LITERAL("REGEX_REPLACE") + back;
@@ -326,9 +329,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -358,9 +361,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 2);
                 try
                 {
+                    list->resize(2);
                     KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -494,9 +497,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -556,9 +559,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -588,9 +591,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -620,9 +623,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -652,9 +655,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -834,9 +837,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CRegexParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -866,9 +869,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -921,6 +924,70 @@ public:
                     *m_outputStream << TokenT( TokenT::eOr_);
                 }
             }
+            else if ( what[ (TokenT::ePadLeft-1)*2 ].matched )
+            {
+                if ( removeTick( what, (TokenT::ePadLeft * 2) - 1))
+                {
+                    continue;
+                }
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                try
+                {
+                    KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(start, end, *list);
+                    checkPadParameters(*list);
+                }
+                catch(...)
+                {
+                    //log
+                    if ( isLoggingEnabled())
+                    {
+                        *m_logOutputStream << "Error parsing parameters in line:\n";
+                        *m_logOutputStream << line;
+                        *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                    }
+                    throw;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::ePadLeft, list, getSourceText( what, TokenT::ePadLeft, start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::ePadLeft, list);
+                }
+            }
+            else if ( what[ (TokenT::ePadRight-1)*2 ].matched )
+            {
+                if ( removeTick( what, (TokenT::ePadRight * 2) - 1))
+                {
+                    continue;
+                }
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                try
+                {
+                    KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(start, end, *list);
+                    checkPadParameters(*list);
+                }
+                catch(...)
+                {
+                    //log
+                    if ( isLoggingEnabled())
+                    {
+                        *m_logOutputStream << "Error parsing parameters in line:\n";
+                        *m_logOutputStream << line;
+                        *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                    }
+                    throw;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::ePadRight, list, getSourceText( what, TokenT::ePadRight, start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::ePadRight, list);
+                }
+            }
             else if ( what[ (TokenT::eLeftToRight-1)*2 ].matched )
             {
                 if ( removeTick( what, (TokenT::eLeftToRight * 2) - 1))
@@ -958,9 +1025,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 2);
                 try
                 {
+                    list->resize(2);
                     KeywordParameterParser::getParameters<CRegexParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -990,9 +1057,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 2);
                 try
                 {
+                    list->resize(2);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)
@@ -1022,9 +1089,9 @@ public:
                     continue;
                 }
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( 1);
                 try
                 {
+                    list->resize(1);
                     KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
                 }
                 catch(...)

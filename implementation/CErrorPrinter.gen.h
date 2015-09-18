@@ -263,6 +263,20 @@ public:
             toErrorStream( formatter.str());
             throw CErrorPrinted();
         }
+        catch( KeywordParameterParser::ExCharsUsedForPaddingNotSupported& e)
+        {
+            (void) e;
+            
+            //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1215: The text passed for padding contains unsupported characters. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+#else
+            FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1215: The text passed for padding contains unsupported characters. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+#endif
+            formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+            toErrorStream( formatter.str());
+            throw CErrorPrinted();
+        }
         catch( CProcessingLevelControlExceptions::ExPossibleInfiniteLoop& e)
         {
             (void) e;

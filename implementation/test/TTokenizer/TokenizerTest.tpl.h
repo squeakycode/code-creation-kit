@@ -52,6 +52,9 @@ void testSingleTokens()
         [OR][IF][ENTRY]["Parameter Count"][EQUALS]["2"][IF][ENTRY]["Parameter Format"][EQUALS]["Regex"][TRIM]
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%['parameter1','parameter2']end");
         expected[1] = TokenT( TokenT::e[ENTRY]["Tag Name Capital"], STRING_LITERAL("parameter1"), STRING_LITERAL("parameter2"));
+        [OR][IF][ENTRY]["Parameter Count"][EQUALS]["2"][IF][ENTRY]["Parameter Format"][EQUALS]["CombiCStyleUIntUIntRepeat"][TRIM]
+        tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%[\"parameter1\",42]end");
+        expected[1] = TokenT(TokenT::e[ENTRY]["Tag Name Capital"], STRING_LITERAL("parameter1"), STRING_LITERAL("42"));
         [OR][IF][ENTRY]["Parameter Count"][EQUALS]["1"][TRIM]
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%[\"parameter1\"]end");
         expected[1] = TokenT( TokenT::e[ENTRY]["Tag Name Capital"], STRING_LITERAL("parameter1"));

@@ -47,6 +47,14 @@ T* newItem2( PosT& pos)
     return new T( pos->getStringList()->front(), pos->getStringList()->back());
 }
 
+template <typename T, typename PosT>
+T* newItem2VariableArguments(PosT& pos)
+{
+    return new T(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
+}
+
+
+
 [MACRO_BEGIN][TRIM]
 ///returns true if token at position is a [ENTRY]["Subtype"]
 template <typename PosT>

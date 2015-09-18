@@ -28,8 +28,9 @@
 
 #include <ostream>
 
-#include "KeywordParameterParser.h"
+#include "CombiKeywordParameterParser.gen.h"
 #include "CSpecialRegexCharacterPrefixer.h"
+#include "KeywordParameterCheckFunctions.h"
 
 #include <boost/regex.hpp> 
 #include <boost/foreach.hpp>
@@ -403,10 +404,17 @@ public:
                 }
                 [MACRO_END.][TRIM]
                 typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
-                list->resize( [ENTRY]["Parameter Count"]);
                 try
                 {
+                [BEGIN][TRIM]
+                    KeywordParameterParser::getParameters[ENTRY]["Parameter Format"][STARTS_WITH]["Combi"](start, end, *list);
+                [OR][TRIM]
+                    list->resize([ENTRY]["Parameter Count"]);
                     KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy>( start, end, *list);
+                [END][TRIM]
+                    [BEGIN][TRIM]
+                    [ENTRY]["Parameter Check Function"](*list);
+                [OR][END][TRIM]
                 }
                 catch(...)
                 {

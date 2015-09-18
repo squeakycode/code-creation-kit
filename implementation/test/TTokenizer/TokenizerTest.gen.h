@@ -275,6 +275,22 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//PAD_LEFT
+        result.clear();
+        tokenizer << STRING_LITERAL("start%PAD_LEFT%[\"parameter1\",42]end");
+        expected[1] = TokenT(TokenT::ePadLeft, STRING_LITERAL("parameter1"), STRING_LITERAL("42"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
+    {//PAD_RIGHT
+        result.clear();
+        tokenizer << STRING_LITERAL("start%PAD_RIGHT%[\"parameter1\",42]end");
+        expected[1] = TokenT(TokenT::ePadRight, STRING_LITERAL("parameter1"), STRING_LITERAL("42"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//READ_LEFT_TO_RIGHT
         result.clear();
         tokenizer << STRING_LITERAL("start%READ_LEFT_TO_RIGHT%end");
@@ -585,6 +601,22 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%OR.%end") : STRING_LITERAL("start%OR..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%OR"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//PAD_LEFT
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%PAD_LEFT.%end") : STRING_LITERAL("start%PAD_LEFT..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%PAD_LEFT"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//PAD_RIGHT
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%PAD_RIGHT.%end") : STRING_LITERAL("start%PAD_RIGHT..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%PAD_RIGHT"));
         BOOST_CHECK( expected == result);
     }
 

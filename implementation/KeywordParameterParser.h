@@ -43,6 +43,8 @@ protected:
         static const char back_slash = '\\';
         static const char t = 't';
         static const char n = 'n';
+        static const char digit0 = '0';
+        static const char digit9 = '9';
     };
 
     struct LChars
@@ -58,6 +60,8 @@ protected:
         static const wchar_t back_slash = L'\\';
         static const wchar_t t = L't';
         static const wchar_t n = L'n';
+        static const wchar_t digit0 = L'0';
+        static const wchar_t digit9 = L'9';
     };
 
     ///skip spaces and tabs
@@ -75,35 +79,45 @@ public:
 
     ///match parameter expression start
     template <typename ExceptionT, typename IteratorT>
-    static void parseParameterStart( IteratorT& start, const IteratorT& end )
+    static bool parseParameterStart( IteratorT& start, const IteratorT& end, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         if ( start != end && *start == STRING_LITERAL( Chars::opening_par) )
         {
             ++start;
             skipWhiteSpace( start, end);
-            return;
+            return true;
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
 
     ///match parameter expression end
     template <typename ExceptionT, typename IteratorT>
-    static void parseParameterEnd( IteratorT& start, const IteratorT& end )
+    static bool parseParameterEnd( IteratorT& start, const IteratorT& end, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         skipWhiteSpace( start, end);
         if ( start != end && *start == STRING_LITERAL( Chars::closing_par) )
         {
             ++start;
-            return;
+            return true;
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
 
     ///match parameter expression separator
     template <typename ExceptionT, typename IteratorT>
-    static void parseParameterSeparator( IteratorT& start, const IteratorT& end )
+    static bool parseParameterSeparator( IteratorT& start, const IteratorT& end, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         skipWhiteSpace( start, end);
@@ -111,7 +125,12 @@ public:
         {
             ++start;
             skipWhiteSpace( start, end);
-            return;
+            return true;
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
@@ -123,7 +142,7 @@ class CPlainParameterPolicy : public CParameterPolicyBase
 public:
     ///match parameter expression value and extract it
     template <typename ExceptionT, typename IteratorT, typename StringT>
-    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    static bool parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         value.clear();    
@@ -134,10 +153,44 @@ public:
                 if ( *start == STRING_LITERAL( Chars::double_quote) )  //end with "
                 {
                     ++start;
-                    return;
+                    return true;
                 }
                 value += *start; //add char to output value string
             }
+        }
+
+        if (returnOnly)
+        {
+            return false;
+        }
+        throw ExceptionT();
+    }
+};
+
+///for usigned number parameters
+class CUIntParameterPolicy : public CParameterPolicyBase
+{
+public:
+    ///match parameter expression value and extract it
+    template <typename ExceptionT, typename IteratorT, typename StringT>
+    static bool parseParameterValue(IteratorT& start, const IteratorT& end, StringT& value, bool returnOnly = false)
+    {
+        typedef typename IteratorT::value_type CharT;
+        value.clear();
+
+        if (start != end && *start >= STRING_LITERAL(Chars::digit0) && *start <= STRING_LITERAL(Chars::digit9))
+        {
+            value += *start; //add char to output value string
+            while (++start != end && *start >= STRING_LITERAL(Chars::digit0) && *start <= STRING_LITERAL(Chars::digit9))
+            {
+                value += *start; //add char to output value string
+            }
+            return true;
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
@@ -149,7 +202,7 @@ class CCStyleParameterPolicy : public CParameterPolicyBase
 public:
     ///match parameter expression value and extract it
     template <typename ExceptionT, typename IteratorT, typename StringT>
-    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    static bool parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         value.clear();    
@@ -181,7 +234,7 @@ public:
                     if ( *start == STRING_LITERAL( Chars::double_quote) )
                     {
                         ++start;
-                        return;
+                        return true;
                     }
                     escape = *start == STRING_LITERAL( Chars::back_slash); //next with special handling
                     if ( escape ) //do not add to value
@@ -191,6 +244,11 @@ public:
                 }
                 value += *start; //add char to output value string
             }
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
@@ -202,7 +260,7 @@ class CRegexParameterPolicy : public CParameterPolicyBase
 public:
     ///match parameter expression value and extract it
     template <typename ExceptionT, typename IteratorT, typename StringT>
-    static void parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value)
+    static bool parseParameterValue( IteratorT& start, const IteratorT& end, StringT& value, bool returnOnly = false)
     {
         typedef typename IteratorT::value_type CharT;
         value.clear();    
@@ -219,11 +277,16 @@ public:
                     }
                     else
                     {
-                        return;
+                        return true;
                     }
                 }
                 value += *start; //add char to output value string
             }
+        }
+
+        if (returnOnly)
+        {
+            return false;
         }
         throw ExceptionT();
     }
