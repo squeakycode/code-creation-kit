@@ -90,12 +90,37 @@ public:
 };
 
 template< typename ProcessorT>
-bool test( ProcessorT& processor, const std::string& in, const std::string& out)
+bool test( ProcessorT& processor, const std::string& in, const std::string& out, bool newLineSplit = false)
 {
     std::stringstream str;
     processor.connectOutputStream(&str);
     processor.open();
-    processor << in;
+    if (newLineSplit)
+    {
+        for (boost::algorithm::split_iterator<std::string::const_iterator> it
+            = make_split_iterator(in, token_finder(
+                boost::algorithm::is_any_of("\n"),
+                boost::algorithm::token_compress_off));
+            ;
+            )
+        {
+            std::string txt(it->begin(), it->end());
+            ++it;
+            if (it != boost::algorithm::split_iterator<std::string::const_iterator>())
+            {
+                processor << (txt + "\n");
+            }
+            else
+            {
+                processor << txt;
+                break;
+            }
+        }
+    }
+    else
+    {
+        processor << in;
+    }
     processor.close();
     std::string resultString = str.str();
     bool result = resultString == out;
@@ -317,6 +342,8 @@ void testMacroProcessing()
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_LEFT][\" \",15]>", "<    description          &more>"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\" \",5,7]>", "<description\n  &more>"));
 
+    //check fix for bug #4 [TRIM] breaks multi line macro 
+    BOOST_CHECK(test(processor, "\na[MACRO_BEGIN]<[TRIM]\n[ENTRY][\"Type\"][TRIM]\n[REPLACE][\"b\", \"B\"]>\nb[MACRO_END]\nc", "\na<int>\nb<douBle>\nb<Bool>\nb<Bool>\nb\nc", true));
 
     //connect more tables for testing unloading
     TableT anotherTableA;

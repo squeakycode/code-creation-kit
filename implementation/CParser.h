@@ -169,9 +169,20 @@ public:
         }
         else if ( token == TokenT::eNewLine || token == TokenT::eFullLineWithoutTags)
         {
-            m_stack.push_back( token);
-            if ( m_stack.front() != TokenT::eMacroBegin) //if not inside macro
+            if (!m_stack.empty() && m_stack.front() == TokenT::eMacroBegin) //if inside macro block
             {
+                if (token == TokenT::eNewLine && !token.getStringList())
+                {
+                    //trimmed line, ignore new line
+                }
+                else
+                {
+                    m_stack.push_back(token);
+                }
+            }
+            else
+            {
+                m_stack.push_back(token);
                 parseStack();
             }
         }
