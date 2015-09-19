@@ -58,10 +58,11 @@ exit /b 0
     echo.Valid options are:
     echo.
     [MACRO_BEGIN][BEGIN][IF][ENTRY]["Short Option Name"][OR][IF][ENTRY]["Option Name"][END][TRIM]
-    echo.[BEGIN]-[ENTRY]["Short Option Name"][REGEX_REPLACE]['\''','               '][REGEX_REPLACE]['(.{5}).*','$1'][OR]      [END][BEGIN] --[ENTRY]["Option Name"][REGEX_REPLACE]['\''','                     '][REGEX_REPLACE]['(.{21}).*','$1'][OR]                        [END][ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,49})\''|([^\n]{0,49})\n|([^\n]{0,49}) +|([^\n]{49})','    echo.                              $1$2$3$4\n'][REGEX_REPLACE]['\`    echo\. *','']
+    echo.[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][REPLACE]["\n","\n    echo.                              "]
     [BEGIN][TRIM]
+    echo.
     echo.                              Default Value:
-    echo.                              [ENTRY]["Default Value"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,49})\''|([^\n]{0,49})\n|([^\n]{0,49}) +|([^\n]{49})','    echo.                              $1$2$3$4\n'][REGEX_REPLACE]['\`    echo\. *','']
+    echo.                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][REPLACE]["\n","\n    echo.                              "]
     [OR][END][TRIM]
     echo.
     [MACRO_END][TRIM]

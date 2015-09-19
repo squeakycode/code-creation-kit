@@ -195,6 +195,7 @@ public:
         expression += front + STRING_LITERAL("ANY") + back;
         expression += front + STRING_LITERAL("AS_VOLATILE") + back;
         expression += front + STRING_LITERAL("BEGIN") + back;
+        expression += front + STRING_LITERAL("BLOCK_FORMAT") + back;
         expression += front + STRING_LITERAL("CONTAINS") + back;
         expression += front + STRING_LITERAL("COUNT") + back;
         expression += front + STRING_LITERAL("END") + back;
@@ -495,6 +496,34 @@ public:
                 else
                 {
                     *m_outputStream << TokenT( TokenT::eBegin);
+                }
+            }
+            else if ( what[ (TokenT::eBlockFormat) ].matched )
+            {
+                typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                try
+                {
+                    list->resize(1);
+                    KeywordParameterParser::getParameters<CUIntParameterPolicy>( start, end, *list);
+                }
+                catch(...)
+                {
+                    //log
+                    if ( isLoggingEnabled())
+                    {
+                        *m_logOutputStream << "Error parsing parameters in line:\n";
+                        *m_logOutputStream << line;
+                        *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                    }
+                    throw;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::eBlockFormat, list, getSourceText( what, TokenT::eBlockFormat, start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::eBlockFormat, list);
                 }
             }
             else if ( what[ (TokenT::eContains) ].matched )

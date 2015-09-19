@@ -145,7 +145,7 @@ void testPad(const StringT& in, const StringT& out, const StringT& padText, cons
 }
 
 template <typename StringT>
-void testPadLeft()
+void testPad()
 {
     typedef typename StringT::value_type CharT;
     testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
@@ -169,6 +169,39 @@ void testPadLeft()
     testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
 }
 
+template <typename StringT>
+void testBlockFormat(const StringT& in, const StringT& out, const StringT& blockWidth)
+{
+    {
+        CBlockFormatConversion<StringT> bf(blockWidth);
+
+        std::vector<StringT> v;
+        v.push_back(in);
+
+        bf.modify(v);
+        if (v[0] != out)
+        {
+            BOOST_CHECK(v[0] == out);
+        }
+    }
+}
+
+template <typename StringT>
+void testBlockFormat()
+{
+    typedef typename StringT::value_type CharT;
+    testBlockFormat<StringT>(STRING_LITERAL("123456"), STRING_LITERAL("123456"), STRING_LITERAL("0"));
+    testBlockFormat<StringT>(STRING_LITERAL("123456"), STRING_LITERAL("12\n34\n56"), STRING_LITERAL("2"));
+    testBlockFormat<StringT>(STRING_LITERAL("123456"), STRING_LITERAL("1\n2\n3\n4\n5\n6"), STRING_LITERAL("1"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234\n56"), STRING_LITERAL("12\n34\n56"), STRING_LITERAL("2"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234 5 6"), STRING_LITERAL("1234\n5 6"), STRING_LITERAL("5"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234\t5 6"), STRING_LITERAL("1234\n5 6"), STRING_LITERAL("5"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234 6 8 0 2"), STRING_LITERAL("1234 6 8\n0 2"), STRING_LITERAL("8"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234 6 8\t0 2"), STRING_LITERAL("1234 6 8\n0 2"), STRING_LITERAL("8"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234 6 8 0 2"), STRING_LITERAL("1234 6 8 0 2"), STRING_LITERAL("80"));
+    testBlockFormat<StringT>(STRING_LITERAL("1234 6\n 8 0 2"), STRING_LITERAL("1234 6\n 8 0 2"), STRING_LITERAL("80"));
+}
+
 BOOST_AUTO_TEST_CASE( TConversions)
 {
     testReplace<std::string, CReplaceConversion<std::string> >();
@@ -182,7 +215,10 @@ BOOST_AUTO_TEST_CASE( TConversions)
     testHtmlEscape<std::string, CHtmlEscapeConversion<std::string> >();
     testHtmlEscape<std::wstring, CHtmlEscapeConversion<std::wstring> >();
 
-    testPadLeft<std::string>();
-    testPadLeft<std::wstring>();
+    testPad<std::string>();
+    testPad<std::wstring>();
+
+    testBlockFormat<std::string>();
+    testBlockFormat<std::wstring>();
 }
 

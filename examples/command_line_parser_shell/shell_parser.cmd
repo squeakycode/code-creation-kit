@@ -99,24 +99,20 @@ exit /b 0
     echo.Valid options are:
     echo.
     echo.-h     --help                 Print help.
-
     echo.
     echo.-w     --wait                 Wait for keypress before exit.
-
     echo.
     echo.-t                            Time to run in minutes. This option takes an
     echo.                              unsigned int as parameter.
-
+    echo.
     echo.                              Default Value:
     echo.                              15
-
     echo.
     echo.-x     --extra                Extra value. This option takes a string as
     echo.                              parameter.
-
+    echo.
     echo.                              Default Value:
     echo.                              mode
-
     echo.
     echo.       --my-timeout           Large description block:
     echo.                              
@@ -130,10 +126,9 @@ exit /b 0
     echo.                              texttexttexttexttexttexttexttexttexttexttexttextt
     echo.                              exttexttexttexttexttexttexttexttexttexttexttext
     echo.                              This option takes a double as parameter.
-
+    echo.
     echo.                              Default Value:
     echo.                              10.5
-
     echo.
 
 exit /b 0

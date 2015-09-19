@@ -43,6 +43,7 @@ public:
         eAny,
         eVolatil,
         eBegin,
+        eBlockFormat,
         eContains,
         eCount,
         eEnd,

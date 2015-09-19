@@ -649,4 +649,139 @@ public:
         }
     }
 };
+
+template <typename StringT>
+class CBlockFormatConversion : public ConversionDirectives<StringT>
+{
+    typedef typename StringT::value_type CharT;
+public:
+    CBlockFormatConversion(const StringT& blockWidth)
+    {
+        m_blockWidth = boost::lexical_cast<size_t>(blockWidth);
+    }
+
+    typedef CBlockFormatConversion<StringT> ThisT;
+    typedef typename IConversion<StringT>::StringListT StringListT;
+
+    virtual bool operator==(const IConversion<StringT>& conversion) const
+    {
+        const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
+        if (m)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    StringT blockFormat(const StringT& text) const
+    {
+        const CharT newLine = STRING_LITERAL('\n');
+        const CharT tab = STRING_LITERAL('\t');
+        const CharT space = STRING_LITERAL(' ');
+        StringT result;
+
+        size_t count = 0;
+        StringT::const_iterator lineStart = text.begin();
+        StringT::const_iterator lastWhiteSpace = text.begin();
+        StringT::const_iterator it = text.begin();
+        for (;it != text.end();)
+        {
+            CharT c = *it;
+            if (c == tab)
+            {
+                lastWhiteSpace = it;
+                count += cTabSize;
+                ++it;
+            }
+            else if (c == space)
+            {
+                lastWhiteSpace = it;
+                count += 1;
+                ++it;
+            }
+            else if (c == newLine)
+            {
+                ++it;
+                result += StringT(lineStart, it);
+                lastWhiteSpace = lineStart = it;
+                count = 0;
+                continue;
+            }
+            else
+            {
+                ++it;
+                ++count;
+            }
+
+            if (count >= m_blockWidth)
+            {
+                if (it != text.end() && *it == newLine)
+                {
+                    //next char is new line anyway
+                    ++it;
+                    result += StringT(lineStart, it);
+                    lastWhiteSpace = lineStart = it;
+                    count = 0;
+                }
+                else if (lineStart != lastWhiteSpace)
+                {
+                    //there is whitespace in the parsed text
+                    //whitespace is replaced by new line
+
+                    if (it != text.end() && *it == space || *it == tab)
+                    {
+                        //next char is space anyway
+                        result += StringT(lineStart, it);
+                        result += newLine;
+                        ++it;
+                        lastWhiteSpace = lineStart = it;
+                        count = 0;
+                    }
+                    else
+                    {
+                        result += StringT(lineStart, lastWhiteSpace);
+                        result += newLine;
+                        ++lastWhiteSpace;
+                        lineStart = lastWhiteSpace;
+                        count = it - lastWhiteSpace;
+                    }
+                }
+                else
+                {
+                    //forcibly insert a new line into text
+                    result += StringT(lineStart, it);
+                    if (it != text.end())
+                    {
+                        result += newLine;
+                    }
+                    lastWhiteSpace = lineStart = it;
+                    count = 0;
+                }
+            }
+        }
+        if (lineStart != text.end())
+        {
+            result += StringT(lineStart, text.end());
+        }
+
+        return result;
+    }
+
+    virtual void modify(StringListT& textList) const
+    {
+        if (m_blockWidth)
+        {
+            BOOST_FOREACH(StringT& text, textList)
+            {
+                text = blockFormat(text);
+            }
+        }
+    }
+
+private:
+    size_t m_blockWidth;
+    static const size_t cTabSize = 4;
+};
+
+
 #endif /* INCLUDED_CONVERSIONS_H_8639185 */

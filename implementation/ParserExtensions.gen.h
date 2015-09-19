@@ -106,7 +106,8 @@ template <typename PosT>
 bool isConversion( PosT& pos)
 {
     if (
-           *pos == PosT::value_type::eHtmlEscape
+           *pos == PosT::value_type::eBlockFormat
+        || *pos == PosT::value_type::eHtmlEscape
         || *pos == PosT::value_type::eMerge
         || *pos == PosT::value_type::ePadLeft
         || *pos == PosT::value_type::ePadRight
@@ -207,6 +208,7 @@ bool isValidCombination( typename TokenT::ETokenT item, typename TokenT::ETokenT
             case TokenT::eRegexMatches: return true;
             case TokenT::eStartsWith: return true;
             case TokenT::eEndsWith: return true;
+            case TokenT::eBlockFormat: return true;
             case TokenT::eHtmlEscape: return true;
             case TokenT::eMerge: return true;
             case TokenT::ePadLeft: return true;
@@ -524,6 +526,17 @@ bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
         success = true;
         switch ( pos->getToken())
         {
+        case TokenT::eBlockFormat:
+            {
+                CBlockFormatConversion<StringT>* conversion = newItem1<CBlockFormatConversion<StringT> >( pos);
+                item.attach( conversion);
+                ConversionDirectives<StringT>& newItem = *conversion;
+                PosT newParentItem = pos;
+                ++pos;
+                parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+            }
+            break;
+
         case TokenT::eHtmlEscape:
             {
                 CHtmlEscapeConversion<StringT>* conversion = newItem0<CHtmlEscapeConversion<StringT> >( pos);

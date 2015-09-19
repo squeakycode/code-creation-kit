@@ -107,6 +107,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//BLOCK_FORMAT
+        result.clear();
+        tokenizer << STRING_LITERAL("start%BLOCK_FORMAT%[20]end");
+        expected[1] = TokenT(TokenT::eBlockFormat, STRING_LITERAL("20"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//CONTAINS
         result.clear();
         tokenizer << STRING_LITERAL("start%CONTAINS%[\"parameter1\"]end");
@@ -433,6 +441,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%BEGIN.%end") : STRING_LITERAL("start%BEGIN..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%BEGIN"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//BLOCK_FORMAT
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%BLOCK_FORMAT.%end") : STRING_LITERAL("start%BLOCK_FORMAT..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%BLOCK_FORMAT"));
         BOOST_CHECK( expected == result);
     }
 

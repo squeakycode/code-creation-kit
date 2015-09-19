@@ -27,19 +27,16 @@ public:
     ///prints help
     void printHelp()
     {
-        std::cerr.fill(' ');
-        [MACRO_BEGIN][TRIM]
-        std::cerr.width(4);
+        std::cerr << std::endl;
+        std::cerr << "Valid options are:" << std::endl;
+        std::cerr << std::endl;
+        [MACRO_BEGIN][BEGIN][IF][ENTRY]["Short Option Name"][OR][IF][ENTRY]["Option Name"][END][TRIM]
+        std::cerr << "[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][TO_CSTRING][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][TO_CSTRING][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][REPLACE]["\n","\" << std::endl;\n        std::cerr << \"                              "]" << std::endl;
         [BEGIN][TRIM]
-        std::cerr << "-[ENTRY]["Short Option Name"]" << " [ --[ENTRY]["Option Name"] ]" << std::endl;
-        [OR][TRIM]
-        std::cerr << "-[ENTRY]["Short Option Name"]" << std::endl;
-        [OR][TRIM]
-        std::cerr << "--" << "[ENTRY]["Option Name"]" << std::endl;
-        [END][TRIM]
-        [COMMENT]//                         [tabs to spaces      ][block format->   |buffer end?   |string ends \n |string with ' '| text no ' '| line start spaces for formatting       insert match][remove last new line     ][to cstring][replace \n for formatting generated code                  ]
-        std::cerr << "[ENTRY]["Description"][REPLACE]["\t","    "][REGEX_REPLACE]['([^\n]{1,39})\''|([^\n]{0,39})\n|([^\n]{0,39}) +|([^\n]{39})','                                        $1$2$3$4\n'][REGEX_REPLACE]['\n\''',''][TO_CSTRING][REPLACE]["\\n","\" << std::endl;\n        std::cerr << \""]" << std::endl;
-        
+        std::cerr << "                              Default Value:" << std::endl;
+        std::cerr << "                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][TO_CSTRING][REPLACE]["\n","\" << std::endl;\n        std::cerr << \"                              "]" << std::endl;
+        [OR][END][TRIM]
+        std::cerr << std::endl;
         [MACRO_END][TRIM]
     }
 
