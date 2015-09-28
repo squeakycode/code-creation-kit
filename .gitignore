@@ -33,6 +33,7 @@ ipch/
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
+#Temp files
 /output
 /docsource/temp
 /setup/windows/current_release
@@ -47,3 +48,9 @@ test.exe
 /implementation/test/TGenerator/TDataflow.gen.txt
 /implementation/test/TGenerator/TGeneratorOut.txt
 /implementation/test/TGenerator/TGeneratorOutIntermediateUsed.txt
+#gcc files
+*.o
+*.a
+test_exe
+#gedit temp files
+*~
