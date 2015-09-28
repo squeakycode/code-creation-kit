@@ -31,7 +31,7 @@ void run_test()
 #ifdef _MSC_VER //TODO
    _putenv("TEST_VARIABLE=123abc");
 #else
-    putenv("TEST_VARIABLE=123abc");
+    setenv("TEST_VARIABLE","123abc",1);
 #endif
 
     BOOST_CHECK( System::expandEnvironmentVariables<StringT>( STRING_LITERAL("$(TEST_VARIABLE)")) == STRING_LITERAL("123abc"));

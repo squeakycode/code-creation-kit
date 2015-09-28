@@ -148,25 +148,25 @@ template <typename StringT>
 void testPad()
 {
     typedef typename StringT::value_type CharT;
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n       6\n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("ab123456"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc12345\nabcabca6\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("aba12345\na6\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\na6\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n       6\n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("ab123456"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc12345\nabcabca6\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("aba12345\na6\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\na6\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
 
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("123456  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6       \n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("123456"), STRING_LITERAL("123456ab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345abc\n6abcabca\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345aba\n6a\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT>>(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6a\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6       \n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456ab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345abc\n6abcabca\nabcabcab"), STRING_LITERAL("abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345aba\n6a\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6a\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
 
-    testPad<StringT, CPadLeftConversion<StringT>>(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
 }
 
 template <typename StringT>

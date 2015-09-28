@@ -30,7 +30,7 @@ namespace KeywordParameterParser
 template <typename ContainerT>
 void checkPadParameters(const ContainerT& container)
 {
-    typename const ContainerT::value_type& first = container.front();
+    const typename ContainerT::value_type& first = container.front();
     for (typename ContainerT::value_type::const_iterator it = first.begin(); it != first.end(); ++it)
     {
         if (*it < ' ')

@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( TParameterParser)
     parameterList += "c=y", "b=1", "c=z", "a=x", "b=2", "b=3";
 
     //parse the list
-    unsigned int lastProcessed;
+    size_t lastProcessed = 0;
     ParameterParser::parse( parameterList, table, lastProcessed,'=');
 
     //check if the data in the table and the array is the same

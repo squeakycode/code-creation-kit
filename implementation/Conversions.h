@@ -580,7 +580,7 @@ public:
         , const IteratorT& padWidthOptionalBegin
         , const IteratorT& padWidthOptionalEnd
         )
-        : CPadConversionBase(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
     {
     }
 
@@ -603,7 +603,7 @@ public:
         {
             BOOST_FOREACH(StringT& text, textList)
             {
-                text = pad(text, true);
+                text = this->pad(text, true);
             }
         }
     }
@@ -621,7 +621,7 @@ public:
         , const IteratorT& padWidthOptionalBegin
         , const IteratorT& padWidthOptionalEnd
         )
-        : CPadConversionBase(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
     {
     }
 
@@ -644,7 +644,7 @@ public:
         {
             BOOST_FOREACH(StringT& text, textList)
             {
-                text = pad(text, false);
+                text = this->pad(text, false);
             }
         }
     }
@@ -681,9 +681,9 @@ public:
         StringT result;
 
         size_t count = 0;
-        StringT::const_iterator lineStart = text.begin();
-        StringT::const_iterator lastWhiteSpace = text.begin();
-        StringT::const_iterator it = text.begin();
+        typename StringT::const_iterator lineStart = text.begin();
+        typename StringT::const_iterator lastWhiteSpace = text.begin();
+        typename StringT::const_iterator it = text.begin();
         for (;it != text.end();)
         {
             CharT c = *it;
