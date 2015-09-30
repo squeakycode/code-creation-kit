@@ -128,9 +128,9 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
             BOOST_CHECK(it == text.end());
             BOOST_CHECK(expectedParameters == parsedParameters);
         }
-        expectedParameters.push_back("42");
+        expectedParameters.push_back("+42");
         {
-            std::string text("[\" \",99,22,42]");
+            std::string text("[\" \",99,22,+42]");
             std::string::iterator it = text.begin();
             KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
             BOOST_CHECK(it == text.end());

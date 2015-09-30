@@ -31,10 +31,10 @@ public:
         std::cerr << "Valid options are:" << std::endl;
         std::cerr << std::endl;
         [MACRO_BEGIN][BEGIN][IF][ENTRY]["Short Option Name"][OR][IF][ENTRY]["Option Name"][END][TRIM]
-        std::cerr << "[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][TO_CSTRING][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][TO_CSTRING][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][REPLACE]["\n","\" << std::endl;\n        std::cerr << \"                              "]" << std::endl;
+        std::cerr << "[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][TO_CSTRING][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][TO_CSTRING][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][PAD_LEFT][" ",0,+30][TO_CSTRING][REPLACE]["\\n","\" << std::endl;\n        std::cerr << \""]" << std::endl;
         [BEGIN][TRIM]
         std::cerr << "                              Default Value:" << std::endl;
-        std::cerr << "                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][TO_CSTRING][REPLACE]["\n","\" << std::endl;\n        std::cerr << \"                              "]" << std::endl;
+        std::cerr << "                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][PAD_LEFT][" ",0,+30][TO_CSTRING][REPLACE]["\\n","\" << std::endl;\n        std::cerr << \""]" << std::endl;
         [OR][END][TRIM]
         std::cerr << std::endl;
         [MACRO_END][TRIM]

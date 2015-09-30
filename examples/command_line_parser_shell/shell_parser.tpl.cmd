@@ -58,11 +58,11 @@ exit /b 0
     echo.Valid options are:
     echo.
     [MACRO_BEGIN][BEGIN][IF][ENTRY]["Short Option Name"][OR][IF][ENTRY]["Option Name"][END][TRIM]
-    echo.[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][REPLACE]["\n","\n    echo.                              "]
+    echo.[BEGIN]-[ENTRY]["Short Option Name"][PAD_RIGHT][" ",5][OR]      [END][BEGIN] --[ENTRY]["Option Name"][PAD_RIGHT][" ",21][OR]                        [END][ENTRY]["Description"][BLOCK_FORMAT][49][PAD_LEFT]["    echo. ",0,+39]
     [BEGIN][TRIM]
     echo.
     echo.                              Default Value:
-    echo.                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][REPLACE]["\n","\n    echo.                              "]
+    echo.                              [ENTRY]["Default Value"][BLOCK_FORMAT][49][PAD_LEFT]["    echo. ",0,+39]
     [OR][END][TRIM]
     echo.
     [MACRO_END][TRIM]

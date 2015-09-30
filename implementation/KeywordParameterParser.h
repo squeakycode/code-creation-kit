@@ -45,6 +45,7 @@ protected:
         static const char n = 'n';
         static const char digit0 = '0';
         static const char digit9 = '9';
+        static const char plus = '+';
     };
 
     struct LChars
@@ -62,6 +63,7 @@ protected:
         static const wchar_t n = L'n';
         static const wchar_t digit0 = L'0';
         static const wchar_t digit9 = L'9';
+        static const wchar_t plus = '+';
     };
 
     ///skip spaces and tabs
@@ -177,7 +179,11 @@ public:
     {
         typedef typename IteratorT::value_type CharT;
         value.clear();
-
+        if (start != end && *start == STRING_LITERAL(Chars::plus))
+        {
+            value += *start; //add char to output value string
+            ++start;
+        }
         if (start != end && *start >= STRING_LITERAL(Chars::digit0) && *start <= STRING_LITERAL(Chars::digit9))
         {
             value += *start; //add char to output value string

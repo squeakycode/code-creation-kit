@@ -436,50 +436,70 @@ protected:
     template<typename IteratorT>
     CPadConversionBase(
         const StringT& padText
-        , const StringT& padUpToWidthFirst
-        , const IteratorT& padUpToWidthOptionalBegin
-        , const IteratorT& padUpToWidthOptionalEnd
+        , const StringT& padWidthFirst
+        , const IteratorT& padWidthOptionalBegin
+        , const IteratorT& padWidthOptionalEnd
+        , bool padLeft
     )
     {
-        m_padText = padText;
-        m_padUpToWidths.reserve(1 + (padUpToWidthOptionalEnd == padUpToWidthOptionalBegin ? 0 : padUpToWidthOptionalEnd - padUpToWidthOptionalBegin));
-        m_padUpToWidths.push_back(boost::lexical_cast<size_t>(padUpToWidthFirst));
-        for (IteratorT it = padUpToWidthOptionalBegin; it != padUpToWidthOptionalEnd; ++it)
+        //any input to use for padding?
+        if (!padText.empty())
         {
-            m_padUpToWidths.push_back(boost::lexical_cast<size_t>(*it));
+            //get text that is always added
+            if (padText.size() > 1)
+            {
+                if (padLeft)
+                {
+                    m_extensionText.assign(padText.begin(), padText.end() - 1);
+                }
+                else
+                {
+                    m_extensionText.assign(padText.begin() + 1, padText.end());
+                }
+            }
+            //get char to repeat for padding
+            if (padLeft)
+            {
+                m_padChar = *padText.rbegin();
+            }
+            else
+            {
+                m_padChar = *padText.begin();
+            }
+        }
+        else
+        {
+            m_padChar = 0;
+        }
+
+        //get line based info used for padding
+        m_padWidthInfos.reserve(1 + (padWidthOptionalEnd == padWidthOptionalBegin ? 0 : padWidthOptionalEnd - padWidthOptionalBegin));
+        m_padWidthInfos.push_back(padWidthFirst);
+        for (IteratorT it = padWidthOptionalBegin; it != padWidthOptionalEnd; ++it)
+        {
+            m_padWidthInfos.push_back(*it);
         }
         
         //remove unsupported chars
         const CharT newLine = STRING_LITERAL('\n');
         const CharT cr = STRING_LITERAL('\r');
         const CharT tab = STRING_LITERAL('\t');
-        for (typename StringT::iterator it = m_padText.begin(); it != m_padText.end();)
+        for (typename StringT::iterator it = m_extensionText.begin(); it != m_extensionText.end();)
         {
             if (*it == newLine || *it == tab || *it == cr)
             {
-                it = m_padText.erase(it);
+                it = m_extensionText.erase(it);
             }
             else
             {
                 ++it;
             }
         }
-    }
-
-
-    void addMultipliedTextPadding(StringT& result, size_t padCharsNeeded) const
-    {
-        const size_t max = padCharsNeeded / m_padText.size();
-        for (size_t i = 0; i < max; ++i)
+        if (m_padChar == newLine || m_padChar == tab || m_padChar == cr)
         {
-            result += m_padText;
+            m_padChar = STRING_LITERAL(' ');
         }
-        const size_t rest = padCharsNeeded % m_padText.size();
-        if (rest)
-        {
-            result.append(m_padText.begin(), m_padText.begin() + rest);
-        }
-    }
+   }
 
 
     StringT pad(const StringT& text, bool padLeft) const
@@ -489,55 +509,74 @@ protected:
         const CharT tab = STRING_LITERAL('\t');
         size_t lineWidth = 0;
         size_t lineNumber = 0;
+        size_t extensionTextSize = m_extensionText.size();
         for (typename StringT::const_iterator it = text.begin(), lineStart = text.begin();;++it)
         {
             if (it == text.end() || *it == newLine)
             {
-                //get number of chars to pad up to
-                size_t padUpToWidth = 0;
-                if (lineNumber < m_padUpToWidths.size())
+                //get number pad width info
+                SPadWidthInfo padInfo;
+                if (lineNumber < m_padWidthInfos.size())
                 {
-                    padUpToWidth = m_padUpToWidths[lineNumber];
+                    padInfo = m_padWidthInfos[lineNumber];
                 }
                 else
                 {
-                    padUpToWidth = m_padUpToWidths.back();
+                    padInfo = m_padWidthInfos.back();
                 }
 
-                //padding needed?
-                if (lineWidth < padUpToWidth && !m_padText.empty())
+                if (padInfo.padWidth == 0) //if pad width == 0 do not pad
                 {
-                    size_t padCharsNeeded = padUpToWidth - lineWidth;
-                    result.reserve(result.size() + padCharsNeeded);
-
-                    if (m_padText.size() == 1)
+                    result.append(lineStart, it);
+                }
+                else if (padInfo.extend) //padding by extension needed?
+                {
+                    if (padLeft)
                     {
-                        if (padLeft)
+                        //pad left
+                        result += m_extensionText;
+                        if (padInfo.padWidth > extensionTextSize)
                         {
-                            result.append(padCharsNeeded, m_padText[0]);
+                            result.append(padInfo.padWidth - extensionTextSize, m_padChar);
                         }
                         result.append(lineStart, it);
-                        if (!padLeft)
-                        {
-                            result.append(padCharsNeeded, m_padText[0]);
-                        }
                     }
                     else
                     {
-                        if (padLeft)
-                        {
-                            addMultipliedTextPadding(result, padCharsNeeded);
-                        }
+                        //pad right
                         result.append(lineStart, it);
-                        if (!padLeft)
+                        if (padInfo.padWidth > extensionTextSize)
                         {
-                            addMultipliedTextPadding(result, padCharsNeeded);
+                            result.append(padInfo.padWidth - extensionTextSize, m_padChar);
                         }
+                        result += m_extensionText;
                     }
                 }
                 else
                 {
-                    result.append(lineStart, it);
+                    if (padLeft)
+                    {
+                        result += m_extensionText;
+                    }
+                    else
+                    {
+                        result.append(lineStart, it);
+                    }
+
+                    lineWidth += extensionTextSize;
+                    if ( lineWidth < padInfo.padWidth)
+                    {
+                        result.append(padInfo.padWidth - lineWidth, m_padChar);
+                    }
+
+                    if (padLeft)
+                    {
+                        result.append(lineStart, it);
+                    }
+                    else
+                    {
+                        result += m_extensionText;
+                    }
                 }
 
                 if (it == text.end())
@@ -562,8 +601,27 @@ protected:
         return result;
     }
 
-    StringT m_padText;
-    std::vector<size_t> m_padUpToWidths;
+    StringT m_extensionText;
+    CharT m_padChar;
+
+    struct SPadWidthInfo
+    {
+        SPadWidthInfo(size_t padWidth_ = 0, bool extend_ = false)
+            : padWidth(padWidth_)
+            , extend(extend_)
+        {
+        }
+
+        SPadWidthInfo(const StringT& padWidth)
+            : padWidth(boost::lexical_cast<size_t>(padWidth))
+            , extend(!padWidth.empty() && padWidth[0] == STRING_LITERAL('+'))
+        {
+        }
+
+        size_t padWidth;
+        bool extend;
+    };
+    std::vector<SPadWidthInfo> m_padWidthInfos;
     static const size_t cTabSize = 4;
 };
 
@@ -580,7 +638,7 @@ public:
         , const IteratorT& padWidthOptionalBegin
         , const IteratorT& padWidthOptionalEnd
         )
-        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, true)
     {
     }
 
@@ -599,7 +657,7 @@ public:
 
     virtual void modify(StringListT& textList) const
     {
-        if (!this->m_padText.empty())
+        if (this->m_padChar)
         {
             BOOST_FOREACH(StringT& text, textList)
             {
@@ -621,7 +679,7 @@ public:
         , const IteratorT& padWidthOptionalBegin
         , const IteratorT& padWidthOptionalEnd
         )
-        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd)
+        : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, false)
     {
     }
 
@@ -640,7 +698,7 @@ public:
 
     virtual void modify(StringListT& textList) const
     {
-        if (!this->m_padText.empty())
+        if (this->m_padChar)
         {
             BOOST_FOREACH(StringT& text, textList)
             {

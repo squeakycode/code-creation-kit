@@ -24,7 +24,7 @@ Change      Tracker ID Description
 [OR][TRIM]
 [ENTRY]["Change Type"][PAD_RIGHT][" ",12][TRIM]
 [ENTRY]["Tracker ID"][ANY][PAD_LEFT][" ",10] [TRIM]
-[ENTRY]["Description"][BLOCK_FORMAT][50][REPLACE]["\n","\n                       "]
+[ENTRY]["Description"][BLOCK_FORMAT][50][PAD_LEFT][" ",0,+23]
 
 [COMMENT] <!-- end document body -->
 [END][TRIM]

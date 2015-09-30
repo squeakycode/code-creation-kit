@@ -341,9 +341,11 @@ void testMacroProcessing()
     //pad left
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_LEFT][\" \",15]>", "<    description          &more>"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\" \",5,7]>", "<description\n  &more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\"x \",+5,7]>", "<x    description\nx &more>"));
     //pad right
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_RIGHT][\" \",15]>", "<description    &more          >"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_RIGHT][\" \",5,7]>", "<description\n&more  >"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_RIGHT][\" \",5,+7]>", "<description\n&more       >"));
 
     //check fix for bug #4 [TRIM] breaks multi line macro 
     BOOST_CHECK(test(processor, "\na[MACRO_BEGIN]<[TRIM]\n[ENTRY][\"Type\"][TRIM]\n[REPLACE][\"b\", \"B\"]>\nb[MACRO_END]\nc", "\na<int>\nb<douBle>\nb<Bool>\nb<Bool>\nb\nc", true));
