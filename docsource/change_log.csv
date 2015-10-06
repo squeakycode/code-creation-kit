@@ -1,10 +1,12 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
-New Feature;;Added BLOCK_FORMAT conversion;;
-Bugfix;4;Fixed bug #4: TRIM breaks multi line macro ;;
-New Feature;;Added PAD_RIGHT conversion;;
-New Feature;;Added PAD_LEFT conversion;;
-New Feature;;Added HTML_ESCAPE conversion;;
+Bugfix;;Fixed TRIM_LEFT.;;
+New Feature;;Added TRIM_RIGHT.;;
+New Feature;;Added BLOCK_FORMAT conversion.;;
+Bugfix;4;Fixed bug #4: TRIM breaks multi line macro .;;
+New Feature;;Added PAD_RIGHT conversion.;;
+New Feature;;Added PAD_LEFT conversion.;;
+New Feature;;Added HTML_ESCAPE conversion.;;
 Release;;"This release adds in-place generation using inline templates, logging for debugging support, and more CSV-file handling features.
 
 Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.3.0.96;2012-10-30

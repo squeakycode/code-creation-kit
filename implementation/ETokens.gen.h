@@ -38,6 +38,7 @@ public:
         eMarkup,
         eTrim,
         eTrimLeft,
+        eTrimRight,
         eSetRecursionLevelLimit,
         eSetRecursionLevelLimitOff,
         eAny,

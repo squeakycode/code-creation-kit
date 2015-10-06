@@ -83,6 +83,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//TRIM_RIGHT
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TRIM_RIGHT%end");
+        expected[1] = TokenT( TokenT::eTrimRight);
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//ANY
         result.clear();
         tokenizer << STRING_LITERAL("start%ANY%end");
@@ -417,6 +425,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%TRIM_LEFT.%end") : STRING_LITERAL("start%TRIM_LEFT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM_LEFT"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TRIM_RIGHT
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TRIM_RIGHT.%end") : STRING_LITERAL("start%TRIM_RIGHT..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM_RIGHT"));
         BOOST_CHECK( expected == result);
     }
 

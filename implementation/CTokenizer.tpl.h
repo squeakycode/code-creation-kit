@@ -283,12 +283,14 @@ public:
     ///tokenize input line
     ThisT& operator <<( const StringT& line)
     {
-        bool trimmed = false;
+        bool trimmedRight = false;
         CAutoLineClear autoClear;[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
         typename StringT::const_iterator end = line.end(); 
+        typename StringT::const_iterator trimLeftTokenTrailingTextBegin = end;
+        typename StringT::const_iterator trimLeftTokenTrailingTextEnd = end;
 
         //check if the line needs to be trimmed or is comment
         for (;[MACRO_BEGIN]!m_bypassMode[IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][MACRO_END];)
@@ -329,6 +331,8 @@ public:
                     start = m_temporaryInlineTemplateLine.begin();
                     fullLineStart = m_temporaryInlineTemplateLine.begin();
                     end = m_temporaryInlineTemplateLine.end(); 
+                    trimLeftTokenTrailingTextBegin = end;
+                    trimLeftTokenTrailingTextEnd = end;
 
                     autoClear.set( &m_temporaryInlineTemplateLine);
                 }
@@ -487,10 +491,28 @@ public:
             *m_outputStream << TokenT( TokenT::eTextFragment, start, end);
             [MACRO_END][TRIM]
         }
-        if ( trimmed)
+        if ( trimmedRight)
         {
-            //a trimmed line is treated as line macro
+            //a right trimmed line is treated as line macro
             *m_outputStream << TokenT( TokenT::eNewLine);
+        }
+        else if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextEnd)
+        {
+            typename StringT::const_iterator trimLeftTokenTrailingTextNewLine = trimLeftTokenTrailingTextEnd - 1;
+            //trailing text ends with new line?
+            if (*trimLeftTokenTrailingTextNewLine == STRING_LITERAL('\n'))
+            {
+                //only new line?
+                if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextNewLine)
+                {
+                    *m_outputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
+                }
+                *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
+            }
+            else
+            {
+                *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
+            }
         }
         return *this;
     }

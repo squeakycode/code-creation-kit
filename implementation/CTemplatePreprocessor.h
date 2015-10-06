@@ -114,7 +114,7 @@ public:
                 throw ExFileInclusionNotSupported();
             }
         }
-        else if ( token == TokenT::eTrim || token == TokenT::eTrimLeft )
+        else if ( token == TokenT::eTrim || token == TokenT::eTrimLeft || token == TokenT::eTrimRight)
         {
             throw ExBadlyPlacedTrim();
         }

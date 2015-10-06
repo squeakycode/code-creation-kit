@@ -4,10 +4,14 @@ INCLUDE;include;Include;preprocessor directive;preprocessor;;1;Plain;;;Path and 
 SET_MARKUP;markup;Markup;preprocessor directive;preprocessor;;2;Plain;;;Prefix, Postfix;"[MARKUP][""<<"","">>""]";Changes the   markup postfix used for the rest of the template file containing the statement and for subsequently included files. Leading whitespace for a prefix  and trailing whitespace for a postfix is not allowed.;;;;;;;;;;;;;;;;;;;;;
 TRIM;trim;Trim;preprocessor directive;preprocessor;;;;;;;    [BEGIN][TRIM];Leading and trailing white space characters (including the new line character) and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file. A single line macro is not extended to the next line when using trim.;"start = range.begin();
 end = range.end() - keywordSize;
-trimmed = true;
+trimmedRight = true;
 break;";ends_with;;;;;;;;;;;;;;;;;;;
-TRIM_LEFT;trimLeft;TrimLeft;preprocessor directive;preprocessor;;;;;;;"    [ENTRY][""List""][TRIM_LEFT]";Trailing white space characters (including the new line character) and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file. A single line macro is not extended to the next line when using trim left.;"end = range.end() - keywordSize;
-trimmed = true;
+TRIM_LEFT;trimLeft;TrimLeft;preprocessor directive;preprocessor;;;;;;;"    [ENTRY][""List""][TRIM_LEFT]";Leading white space characters and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file.;"start = range.begin();
+end = range.end() - keywordSize;
+trimLeftTokenTrailingTextBegin = range.end();
+break;";ends_with;;;;;;;;;;;;;;;;;;;
+TRIM_RIGHT;trimRight;TrimRight;preprocessor directive;preprocessor;;;;;;;"    [ENTRY][""List""][TRIM_RIGHT]     ";Trailing white space characters (including the new line character) and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file. A single line macro is not extended to the next line when using trim left.;"end = range.end() - keywordSize;
+trimmedRight = true;
 break;";ends_with;;;;;;;;;;;;;;;;;;;
 SET_RECURSION_LEVEL_LIMIT;setRecursionLevelLimit;SetRecursionLevelLimit;processing directive;processor;;;;;;;[SET_RECURSION_LEVEL_LIMIT.][TRIM];This directive can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging. Insert zero or more delay dots to indicate the last level to process. The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. This tag is always processed.;;;;;;;;;;;;;;;;;;;;;
 SET_RECURSION_LEVEL_LIMIT_OFF;setRecursionLevelLimitOff;SetRecursionLevelLimitOff;processing directive;processor;;;;;;;[SET_RECURSION_LEVEL_LIMIT_OFF][TRIM];This directive can be used to remove a recursion level limit. This tag is always processed. Delay dots have no effect.;;;;;;;;;;;;;;;;;;;;;

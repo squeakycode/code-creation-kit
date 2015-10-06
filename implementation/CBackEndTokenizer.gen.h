@@ -108,6 +108,8 @@ public:
         m_trimDotKeyword = prefix + STRING_LITERAL("TRIM.") + postfix;
         m_trimLeftKeyword = prefix + STRING_LITERAL("TRIM_LEFT") + postfix;
         m_trimLeftDotKeyword = prefix + STRING_LITERAL("TRIM_LEFT.") + postfix;
+        m_trimRightKeyword = prefix + STRING_LITERAL("TRIM_RIGHT") + postfix;
+        m_trimRightDotKeyword = prefix + STRING_LITERAL("TRIM_RIGHT.") + postfix;
 
         StringT regexPrefix = prefix;
         StringT regexPostfix = postfix;
@@ -125,6 +127,7 @@ public:
         expression += front + STRING_LITERAL("SET_MARKUP") + back;
         expression += front + STRING_LITERAL("TRIM") + back;
         expression += front + STRING_LITERAL("TRIM_LEFT") + back;
+        expression += front + STRING_LITERAL("TRIM_RIGHT") + back;
         expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
         expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
         expression += front + STRING_LITERAL("ANY") + back;
@@ -226,11 +229,13 @@ public:
     ///tokenize input line
     ThisT& operator <<( const StringT& line)
     {
-        bool trimmed = false;
+        bool trimmedRight = false;
         boost::match_results<typename StringT::const_iterator> what; 
         typename StringT::const_iterator start = line.begin();
         typename StringT::const_iterator fullLineStart = line.begin();
         typename StringT::const_iterator end = line.end(); 
+        typename StringT::const_iterator trimLeftTokenTrailingTextBegin = end;
+        typename StringT::const_iterator trimLeftTokenTrailingTextEnd = end;
 
         //check if the line needs to be trimmed or is comment
         for (;!m_bypassMode;)
@@ -249,7 +254,7 @@ public:
                 size_t keywordSize = m_trimKeyword.size();
                 start = range.begin();
                 end = range.end() - keywordSize;
-                trimmed = true;
+                trimmedRight = true;
                 break;
             }
             if ( boost::ends_with( range, m_trimDotKeyword))
@@ -257,21 +262,37 @@ public:
                 size_t keywordSize = m_trimDotKeyword.size();
                 start = range.begin();
                 end = range.end() - keywordSize;
-                trimmed = true;
+                trimmedRight = true;
                 break;
             }
             if ( boost::ends_with( range, m_trimLeftKeyword))
             {
                 size_t keywordSize = m_trimLeftKeyword.size();
+                start = range.begin();
                 end = range.end() - keywordSize;
-                trimmed = true;
+                trimLeftTokenTrailingTextBegin = range.end();
                 break;
             }
             if ( boost::ends_with( range, m_trimLeftDotKeyword))
             {
                 size_t keywordSize = m_trimLeftDotKeyword.size();
+                start = range.begin();
                 end = range.end() - keywordSize;
-                trimmed = true;
+                trimLeftTokenTrailingTextBegin = range.end();
+                break;
+            }
+            if ( boost::ends_with( range, m_trimRightKeyword))
+            {
+                size_t keywordSize = m_trimRightKeyword.size();
+                end = range.end() - keywordSize;
+                trimmedRight = true;
+                break;
+            }
+            if ( boost::ends_with( range, m_trimRightDotKeyword))
+            {
+                size_t keywordSize = m_trimRightDotKeyword.size();
+                end = range.end() - keywordSize;
+                trimmedRight = true;
                 break;
             }
             break;
@@ -415,6 +436,21 @@ public:
                 else
                 {
                     *m_outputStream << TokenT( TokenT::eTrimLeft);
+                }
+            }
+            else if ( what[ (TokenT::eTrimRight-1)*2 ].matched )
+            {
+                if ( removeTick( what, (TokenT::eTrimRight * 2) - 1))
+                {
+                    continue;
+                }
+                if ( isLoggingEnabled())
+                {
+                    *m_outputStream << TokenT( TokenT::eTrimRight, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTrimRight, start));
+                }
+                else
+                {
+                    *m_outputStream << TokenT( TokenT::eTrimRight);
                 }
             }
             else if ( what[ (TokenT::eSetRecursionLevelLimit-1)*2 ].matched )
@@ -1203,10 +1239,28 @@ public:
             //if full line without tags, output as special token used for optimizations, otherwise ouput text fragment
             *m_outputStream << TokenT( (start == fullLineStart && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, start, end);
         }
-        if ( trimmed)
+        if ( trimmedRight)
         {
-            //a trimmed line is treated as line macro
+            //a right trimmed line is treated as line macro
             *m_outputStream << TokenT( TokenT::eNewLine);
+        }
+        else if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextEnd)
+        {
+            typename StringT::const_iterator trimLeftTokenTrailingTextNewLine = trimLeftTokenTrailingTextEnd - 1;
+            //trailing text ends with new line?
+            if (*trimLeftTokenTrailingTextNewLine == STRING_LITERAL('\n'))
+            {
+                //only new line?
+                if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextNewLine)
+                {
+                    *m_outputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
+                }
+                *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
+            }
+            else
+            {
+                *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
+            }
         }
         return *this;
     }
@@ -1226,6 +1280,8 @@ private:
     StringT m_trimDotKeyword; ///<used for special preprocessing action
     StringT m_trimLeftKeyword; ///<used for special preprocessing action
     StringT m_trimLeftDotKeyword; ///<used for special preprocessing action
+    StringT m_trimRightKeyword; ///<used for special preprocessing action
+    StringT m_trimRightDotKeyword; ///<used for special preprocessing action
     LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 

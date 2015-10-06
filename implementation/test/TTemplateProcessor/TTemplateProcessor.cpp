@@ -329,8 +329,13 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
     BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
     //trim left
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "  <int>  <double>  <bool>  <bool>"));
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] ", "<int> <double> <bool> <bool> "));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT]\n", "<int>\n<double>\n<bool>\n<bool>\n"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
+    //trim right
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT.] \n", "  <int>  <double>  <bool>  <bool>"));
     //comment
     BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
     BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
