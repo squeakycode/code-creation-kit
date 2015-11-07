@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Improvement;;Updated documentation.;;
 Bugfix;;Fixed TRIM_LEFT.;;
 New Feature;;Added TRIM_RIGHT.;;
 New Feature;;Added BLOCK_FORMAT conversion.;;

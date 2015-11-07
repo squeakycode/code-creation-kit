@@ -11,7 +11,7 @@
             <tr>
               <th>Remarks:</th>
               <td>Aditional directives that can be placed behind the listed tag.</td>
-              <td>Constraints for a successful substitution that can be placed behind the listed tag and it's additional directives. If multiple constraints are used then they are treated as if combined by an or. Constraints can be prefixed with the NOT tag. The default constraint is [NOT][EQUALS]("").</td>
+              <td>Constraints for a successful substitution that can be placed behind the listed tag and it's additional directives. If multiple constraints are used then they are treated as if combined by an &#39;or&#39;. To create an &#39;and&#39; condition the substituted tag, e.g. ENTRY, has to be added multiple times to a macro preceded by an IF tag. Constraints can be prefixed with the NOT tag. The default constraint is [NOT][EQUALS][""].</td>
               <td>One or multiple conversions can be applied to the substituted text. The conversions are performed in the order they appear. These tags can be placed behind the listed tag after additional directives or constraints.</td>
             </tr>
             $SET_MARKUP$["[","]"]$TRIM$
