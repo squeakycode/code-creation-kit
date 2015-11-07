@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CPOSITIONTRACKER_H_8456385
-#define INCLUDED_CPOSITIONTRACKER_H_8456385
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 ///tracks the current position in a text file
 class CPositionTracker
@@ -61,4 +56,3 @@ private:
     unsigned int m_line;
 };
 
-#endif /* INCLUDED_CPOSITIONTRACKER_H_8456385 */

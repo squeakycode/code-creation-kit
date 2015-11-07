@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_CONVERSIONDIRECTIVES_TPL_H_09888422
-#define INCLUDED_CONVERSIONDIRECTIVES_TPL_H_09888422
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "IConversion.h"
 
@@ -67,4 +62,3 @@ public:
 #pragma warning( pop ) 
 #endif
 
-#endif /* INCLUDED_CONVERSIONDIRECTIVES_TPL_H_09888422 */

@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CINLINETEMPLATEPARAMETERS_H_3727686
-#define INCLUDED_CINLINETEMPLATEPARAMETERS_H_3727686
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 /// paramters for inline template processing
 template <typename StringT>
@@ -66,4 +61,3 @@ struct CInlineTemplateParameters
     size_t  inlinePad;
 };
 
-#endif /* INCLUDED_CINLINETEMPLATEPARAMETERS_H_3727686 */

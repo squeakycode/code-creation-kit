@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CSOURCEFILE_H_9569666
-#define INCLUDED_CSOURCEFILE_H_9569666
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <fstream>
 #include <iostream>
@@ -172,4 +167,3 @@ private:
     InputFileStreamT m_file;
 };
 
-#endif /* INCLUDED_CSOURCEFILE_H_9569666 */

@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CTEMPLATEPROCESSOR_H_3494989
-#define INCLUDED_CTEMPLATEPROCESSOR_H_3494989
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "ETokens.gen.h"
 #include "CToken.h"
@@ -220,4 +215,3 @@ private:
     PreprocessorT m_preprocessor; ///<preprocesses the input
 };
 
-#endif /* INCLUDED_CTEMPLATEPROCESSOR_H_3494989 */

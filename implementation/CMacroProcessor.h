@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CMACROPROCESSOR_H_5484125
-#define INCLUDED_CMACROPROCESSOR_H_5484125
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <list>
 #include "CTableIndex.h"
@@ -321,4 +316,3 @@ private:
     TableListT m_tableList; ///<list of attached tables
 };
 
-#endif /* INCLUDED_CMACROPROCESSOR_H_5484125 */

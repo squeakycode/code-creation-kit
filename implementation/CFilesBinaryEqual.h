@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CFILESBINARYEQUAL_H_7098963
-#define INCLUDED_CFILESBINARYEQUAL_H_7098963
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <string>
 #include <fstream>
@@ -80,5 +75,3 @@ bool FilesBinaryEqual( const StringT& fileNameA, const StringT& fileNameB)
     bool equal = a == b && fileA.eof() && fileB.eof(); 
     return equal;
 }
-
-#endif /* INCLUDED_CFILESBINARYEQUAL_H_7098963 */

@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CPARSER_H_1584436
-#define INCLUDED_CPARSER_H_1584436
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "CMacro.h"
 #include <vector>
@@ -441,4 +436,3 @@ private:
     static const size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
 };
 
-#endif /* INCLUDED_CPARSER_H_1584436 */

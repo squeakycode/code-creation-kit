@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_STRINGLITERAL_H_8481256
-#define INCLUDED_STRINGLITERAL_H_8481256
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <boost/preprocessor/cat.hpp>
 
@@ -53,5 +48,3 @@ inline wchar_t getStringLiteral( char, wchar_t b, const wchar_t*)
 }
 
 #define STRING_LITERAL( stringLiteral) getStringLiteral( stringLiteral, BOOST_PP_CAT(L, stringLiteral), (CharT*)0)
-
-#endif /* INCLUDED_STRINGLITERAL_H_8481256 */

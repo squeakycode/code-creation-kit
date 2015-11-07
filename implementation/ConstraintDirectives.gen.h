@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_CONSTRAINTDIRECTIVES_TPL_H_4512751
-#define INCLUDED_CONSTRAINTDIRECTIVES_TPL_H_4512751
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "IConstraint.h"
 #include <stdexcept>
@@ -86,4 +81,3 @@ public:
 #pragma warning( pop ) 
 #endif
 
-#endif /* INCLUDED_CONSTRAINTDIRECTIVES_TPL_H_4512751 */

@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CGENERATORSTATISTIC_H_907757
-#define INCLUDED_CGENERATORSTATISTIC_H_907757
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <set>
 #include "CTemplateLoader.h"
@@ -237,5 +232,3 @@ private:
     FileSetT m_templateFiles; ///<list of template files loaded
     StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
 };
-
-#endif /* INCLUDED_CGENERATORSTATISTIC_H_907757 */

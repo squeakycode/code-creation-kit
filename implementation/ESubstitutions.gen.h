@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_ESUBSTITUTIONS_TPL_H_132642
-#define INCLUDED_ESUBSTITUTIONS_TPL_H_132642
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 class Substitutions
 {
@@ -52,4 +47,3 @@ public:
     typedef ESubstitutions enum_type; 
 };
 
-#endif /* INCLUDED_ESUBSTITUTIONS_TPL_H_132642 */

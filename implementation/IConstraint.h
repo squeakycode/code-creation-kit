@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_ICONSTRAINT_H_4452783
-#define INCLUDED_ICONSTRAINT_H_4452783
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 ///used to check a constraint for a single table entry 
 template <typename StringT>
@@ -45,6 +40,3 @@ public:
     {
     };
 };
-
-
-#endif /* INCLUDED_ICONSTRAINT_H_4452783 */

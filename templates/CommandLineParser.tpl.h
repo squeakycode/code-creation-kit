@@ -34,12 +34,7 @@
 */
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_[ENTRY]["Parser Name"]_H
-#define INCLUDED_[ENTRY]["Parser Name"]_H
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <iostream>
 
@@ -208,4 +203,3 @@ private:
 #pragma warning( pop ) 
 #endif
 
-#endif /* INCLUDED_[ENTRY]["Parser Name"]_H */

@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_ETOKENS_TPL_H_132635
-#define INCLUDED_ETOKENS_TPL_H_132635
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 class Tokens
 {
@@ -91,4 +86,3 @@ public:
     typedef ETokens token_type; 
 };
 
-#endif /* INCLUDED_ETOKENS_TPL_H_132635 */

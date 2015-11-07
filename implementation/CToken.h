@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CTOKEN_H_3732416
-#define INCLUDED_CTOKEN_H_3732416
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "CComparableSharedObject.h"
 #include <boost/shared_ptr.hpp>
@@ -183,4 +178,3 @@ public:
     CComparableSharedObject<StringListT> m_sourceText;
 };
 
-#endif /* INCLUDED_CTOKEN_H_3732416 */

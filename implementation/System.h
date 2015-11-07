@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_SYSTEM_H_1264154
-#define INCLUDED_SYSTEM_H_1264154
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <boost/regex.hpp> 
 #include "StringLiteral.h"
@@ -124,5 +119,3 @@ namespace System
         return result;
     }
 }
-
-#endif /* INCLUDED_SYSTEM_H_1264154 */

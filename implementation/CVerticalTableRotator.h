@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CVERTICALTABLEROTATOR_H_9937403
-#define INCLUDED_CVERTICALTABLEROTATOR_H_9937403
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 ///adapter for processing a table from left to right
 template <typename TableT>
@@ -100,4 +95,3 @@ private:
     const TableT* m_table; ///<the original table
 };
 
-#endif /* INCLUDED_CVERTICALTABLEROTATOR_H_9937403 */

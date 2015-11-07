@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CMACROEXPRESSION_H_0751459
-#define INCLUDED_CMACROEXPRESSION_H_0751459
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <list>
 #include <algorithm>
@@ -188,4 +183,3 @@ private:
     StringT m_macroExpression; ///text when text leaf
 };
 
-#endif /* INCLUDED_CMACROEXPRESSION_H_0751459 */

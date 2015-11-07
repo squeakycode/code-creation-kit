@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377
-#define INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <ostream>
 
@@ -549,4 +544,3 @@ private:
     LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
 };
 
-#endif /* INCLUDED_[ENTRY]["Tokenizer"][TO_UPPER]_TPL_H_6955377 */

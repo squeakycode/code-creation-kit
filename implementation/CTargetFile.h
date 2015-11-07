@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CTARGETFILE_H_0496332
-#define INCLUDED_CTARGETFILE_H_0496332
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <fstream>
 #include <iostream>
@@ -147,4 +142,3 @@ private:
     OutputFileStreamT m_file;
 };
 
-#endif /* INCLUDED_CTARGETFILE_H_0496332 */

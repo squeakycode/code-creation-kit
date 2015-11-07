@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CTABLEINDEX_H_04827517
-#define INCLUDED_CTABLEINDEX_H_04827517
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -132,4 +127,3 @@ private:
     IndexVectorT m_dummyIndexVector; ///used when lookup failes
 };
 
-#endif /* INCLUDED_CTABLEINDEX_H_04827517 */

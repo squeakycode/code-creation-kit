@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CPROCESSINGLEVELCONTROL_H_01302737
-#define INCLUDED_CPROCESSINGLEVELCONTROL_H_01302737
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <boost/foreach.hpp>
 #include <stdexcept>
@@ -336,6 +331,3 @@ private:
 
     ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
 };
-
-
-#endif /* INCLUDED_CPROCESSINGLEVELCONTROL_H_01302737 */

@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_AMACRO_H_07629031
-#define INCLUDED_AMACRO_H_07629031
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "CMacroExpression.h"
 #include "CSubstitution.h"
@@ -110,4 +105,3 @@ public:
     SubstitutionVectorT m_substitutions; ///<holds the data representing a substitution, e.g. for an entry
 };
 
-#endif /* INCLUDED_AMACRO_H_07629031 */

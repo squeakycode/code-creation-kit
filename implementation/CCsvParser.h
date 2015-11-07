@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CCSVPARSER_H_284054
-#define INCLUDED_CCSVPARSER_H_284054
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <stdexcept>
 
@@ -254,5 +249,3 @@ private:
     ///dummy position tracker used when prosition tracking is not required
     struct CNoTracker{void reset(){}void nextLine(){}void nextColumn(){}};
 };
-
-#endif /* INCLUDED_CCSVPARSER_H_284054 */

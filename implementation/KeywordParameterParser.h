@@ -23,12 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_KEYWORDPARAMETERPARSER_H_7175409
-#define INCLUDED_KEYWORDPARAMETERPARSER_H_7175409
 
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "StringLiteral.h"
 #include <stdexcept>
@@ -342,5 +338,3 @@ namespace KeywordParameterParser
         PolicyT:: template parseParameterEnd<ExParameterEndExpected>(start,end);
     }
 }
-
-#endif /* INCLUDED_KEYWORDPARAMETERPARSER_H_7175409 */

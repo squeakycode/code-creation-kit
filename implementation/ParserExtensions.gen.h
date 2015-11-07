@@ -27,12 +27,7 @@
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_PARSEREXTENSIONS_TPL_H_07842654
-#define INCLUDED_PARSEREXTENSIONS_TPL_H_07842654
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "Constraints.h"
 #include "Conversions.h"
@@ -853,5 +848,3 @@ bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
     return success;
 }
 
-
-#endif /* INCLUDED_PARSEREXTENSIONS_TPL_H_07842654 */

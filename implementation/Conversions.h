@@ -23,12 +23,7 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CONVERSIONS_H_8639185
-#define INCLUDED_CONVERSIONS_H_8639185
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include "ConversionDirectives.gen.h"
 #include "StringLiteral.h"
@@ -849,5 +844,3 @@ private:
     static const size_t cTabSize = 4;
 };
 
-
-#endif /* INCLUDED_CONVERSIONS_H_8639185 */
