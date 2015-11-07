@@ -32,6 +32,8 @@
 #include "CGenerator.h"
 #include "CErrorPrinter.gen.h"
 
+using namespace code_creation_kit;
+
 BOOST_AUTO_TEST_CASE( TErrorPrinter)
 {
     typedef std::string StringT;

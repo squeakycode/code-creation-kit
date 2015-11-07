@@ -27,79 +27,81 @@
 
 #include "StringLiteral.h"
 
-///takes text snippets and produces linewise output
-template <typename StringT, typename OutputStreamT>
-class CLineCollector
+namespace code_creation_kit
 {
-public:
-    typedef typename StringT::value_type CharT;
-
-    CLineCollector()
-        : m_outputStream(0)
+    ///takes text snippets and produces linewise output
+    template <typename StringT, typename OutputStreamT>
+    class CLineCollector
     {
-    }
+    public:
+        typedef typename StringT::value_type CharT;
 
-    ///attaches an output stream
-    void connectOutputStream( OutputStreamT* stream)
-    {
-        m_outputStream = stream;
-    }
-
-    ///resets the collector for next input stream, added for symmetry to close
-    void open()
-    {
-        reset();
-    }
-
-    ///collects text fragments and creates a linewise output from the fragments
-    template <typename RangeT>
-    CLineCollector<StringT, OutputStreamT>& operator <<( const RangeT& text)
-    {
-        for ( typename RangeT::const_iterator it = text.begin(); it != text.end(); ++it)
+        CLineCollector()
+            : m_outputStream(0)
         {
-            m_line += *it;
-            if ( *it == STRING_LITERAL('\n'))
+        }
+
+        ///attaches an output stream
+        void connectOutputStream( OutputStreamT* stream)
+        {
+            m_outputStream = stream;
+        }
+
+        ///resets the collector for next input stream, added for symmetry to close
+        void open()
+        {
+            reset();
+        }
+
+        ///collects text fragments and creates a linewise output from the fragments
+        template <typename RangeT>
+        CLineCollector<StringT, OutputStreamT>& operator <<( const RangeT& text)
+        {
+            for ( typename RangeT::const_iterator it = text.begin(); it != text.end(); ++it)
+            {
+                m_line += *it;
+                if ( *it == STRING_LITERAL('\n'))
+                {
+                    *m_outputStream << m_line;
+                    m_line.clear();
+                }
+            }
+
+            return *this;
+        }
+
+        ///return true if currently processing a macro
+        bool processingInProgress()
+        {
+            return !m_line.empty();
+        }
+
+        ///flushes the last line to the output, returns true if something has been flushed
+        bool close()
+        {
+            return flush();
+        }
+
+        ///flushes the last line to the output, returns true if something has been flushed
+        bool flush()
+        {
+            if ( !m_line.empty())
             {
                 *m_outputStream << m_line;
                 m_line.clear();
+                return true;
             }
+            return false;
         }
 
-        return *this;
-    }
-
-    ///return true if currently processing a macro
-    bool processingInProgress()
-    {
-        return !m_line.empty();
-    }
-
-    ///flushes the last line to the output, returns true if something has been flushed
-    bool close()
-    {
-        return flush();
-    }
-
-    ///flushes the last line to the output, returns true if something has been flushed
-    bool flush()
-    {
-        if ( !m_line.empty())
+        ///resets the text internal buffer
+        void reset()
         {
-            *m_outputStream << m_line;
             m_line.clear();
-            return true;
         }
-        return false;
-    }
 
-    ///resets the text internal buffer
-    void reset()
-    {
-        m_line.clear();
-    }
-
-private:
-    StringT m_line; ///<buffers incomplete lines
-    OutputStreamT* m_outputStream; ///<the output stream
-};
-
+    private:
+        StringT m_line; ///<buffers incomplete lines
+        OutputStreamT* m_outputStream; ///<the output stream
+    };
+}

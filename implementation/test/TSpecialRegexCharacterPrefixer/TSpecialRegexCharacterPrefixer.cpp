@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 
+using namespace code_creation_kit;
+
 BOOST_AUTO_TEST_CASE( TSpecialRegexCharacterPrefixer)
 {
     {

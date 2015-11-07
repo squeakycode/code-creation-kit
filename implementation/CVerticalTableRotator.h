@@ -25,73 +25,75 @@
 
 #pragma once
 
-///adapter for processing a table from left to right
-template <typename TableT>
-class CVerticalTableRotator
+namespace code_creation_kit
 {
-    typedef std::size_t SizeT;
-    typedef SizeT IndexT;
-public:
-    typedef typename TableT::value_type::value_type StringT;
-
-    CVerticalTableRotator( const TableT* table)
-        : m_table(table)
+    ///adapter for processing a table from left to right
+    template <typename TableT>
+    class CVerticalTableRotator
     {
-    }
-
-    ///represents a column
-    class CVerticalTableRotatorColumn
-    {
+        typedef std::size_t SizeT;
+        typedef SizeT IndexT;
     public:
-        CVerticalTableRotatorColumn( const TableT* table, IndexT index)
+        typedef typename TableT::value_type::value_type StringT;
+
+        CVerticalTableRotator( const TableT* table)
             : m_table(table)
-            , m_index(index)
         {
         }
 
-        const StringT& operator[] ( IndexT index) const
+        ///represents a column
+        class CVerticalTableRotatorColumn
         {
-            return (*m_table)[ index ][ m_index ];
+        public:
+            CVerticalTableRotatorColumn( const TableT* table, IndexT index)
+                : m_table(table)
+                , m_index(index)
+            {
+            }
+
+            const StringT& operator[] ( IndexT index) const
+            {
+                return (*m_table)[ index ][ m_index ];
+            }
+
+            SizeT size() const
+            {
+                return m_table->size();
+            }
+
+            typedef StringT value_type;
+        private:
+            const TableT* m_table;
+            IndexT m_index;
+        };
+
+        ///returns a column
+        const CVerticalTableRotatorColumn operator[] ( IndexT index) const
+        {
+            return CVerticalTableRotatorColumn( m_table, index);
         }
 
+        ///returns the size
         SizeT size() const
         {
-            return m_table->size();
+            if ( !m_table->empty())
+            {
+                return (*m_table)[0].size();
+            }
+            return 0;
         }
 
-        typedef StringT value_type;
+        bool empty() const
+        {
+            if ( !m_table->empty())
+            {
+                return (*m_table)[0].empty();
+            }
+            return true;
+        }
+
+        typedef CVerticalTableRotatorColumn value_type;
     private:
-        const TableT* m_table;
-        IndexT m_index;
+        const TableT* m_table; ///<the original table
     };
-
-    ///returns a column
-    const CVerticalTableRotatorColumn operator[] ( IndexT index) const
-    {
-        return CVerticalTableRotatorColumn( m_table, index);
-    }
-
-    ///returns the size
-    SizeT size() const
-    {
-        if ( !m_table->empty())
-        {
-            return (*m_table)[0].size();
-        }
-        return 0;
-    }
-
-    bool empty() const
-    {
-        if ( !m_table->empty())
-        {
-            return (*m_table)[0].empty();
-        }
-        return true;
-    }
-
-    typedef CVerticalTableRotatorColumn value_type;
-private:
-    const TableT* m_table; ///<the original table
-};
-
+}

@@ -39,6 +39,8 @@
 #pragma warning( pop ) 
 #endif
 
+using namespace code_creation_kit;
+
 ///represents streams in test
 template <typename StringT>
 class TStreamHelper

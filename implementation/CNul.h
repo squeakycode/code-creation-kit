@@ -25,11 +25,13 @@
 
 #pragma once
 
-///Nul device.
-class CNul
+namespace code_creation_kit
 {
-public:
-    template <typename T>
-    CNul& operator<<( const T&) { return *this; }
-};
-
+    ///Nul device.
+    class CNul
+    {
+    public:
+        template <typename T>
+        CNul& operator<<( const T&) { return *this; }
+    };
+}

@@ -29,60 +29,62 @@
 
 #pragma once
 
-class Tokens
+namespace code_creation_kit
 {
-public:
-    ///the tokens
-    enum ETokens
+    class Tokens
     {
-        eNewLine = 1,
-        eComment,
-        eInclude,
-        eMarkup,
-        eTrim,
-        eTrimLeft,
-        eTrimRight,
-        eSetRecursionLevelLimit,
-        eSetRecursionLevelLimitOff,
-        eAny,
-        eVolatil,
-        eBegin,
-        eBlockFormat,
-        eContains,
-        eCount,
-        eEnd,
-        eEndsWith,
-        eEntry,
-        eMatches,
-        eError_,
-        eFirstTime,
-        eFlush,
-        eForAll,
-        eHtmlEscape,
-        eIf_,
-        eIgnoreCase,
-        eIndex,
-        eLastTime,
-        eMacroBegin,
-        eMacroEnd,
-        eRegexMatches,
-        eMerge,
-        eNot_,
-        eOr_,
-        ePadLeft,
-        ePadRight,
-        eLeftToRight,
-        eTopDown,
-        eRegexReplace,
-        eReplace,
-        eStartsWith,
-        eToCString,
-        eToLower,
-        eToUpper,
-        eTextFragment,
-        eFullLineWithoutTags
+    public:
+        ///the tokens
+        enum ETokens
+        {
+            eNewLine = 1,
+            eComment,
+            eInclude,
+            eMarkup,
+            eTrim,
+            eTrimLeft,
+            eTrimRight,
+            eSetRecursionLevelLimit,
+            eSetRecursionLevelLimitOff,
+            eAny,
+            eVolatil,
+            eBegin,
+            eBlockFormat,
+            eContains,
+            eCount,
+            eEnd,
+            eEndsWith,
+            eEntry,
+            eMatches,
+            eError_,
+            eFirstTime,
+            eFlush,
+            eForAll,
+            eHtmlEscape,
+            eIf_,
+            eIgnoreCase,
+            eIndex,
+            eLastTime,
+            eMacroBegin,
+            eMacroEnd,
+            eRegexMatches,
+            eMerge,
+            eNot_,
+            eOr_,
+            ePadLeft,
+            ePadRight,
+            eLeftToRight,
+            eTopDown,
+            eRegexReplace,
+            eReplace,
+            eStartsWith,
+            eToCString,
+            eToLower,
+            eToUpper,
+            eTextFragment,
+            eFullLineWithoutTags
+        };
+
+        typedef ETokens token_type; 
     };
-
-    typedef ETokens token_type; 
-};
-
+}

@@ -38,43 +38,45 @@
 
 #include <boost/foreach.hpp>
 
-///handles prefixing of special regular expression characters with /
-class CSpecialRegexCharacterPrefixer
+namespace code_creation_kit
 {
-public:
-    ///handles prefixing in the string
-    template <typename StringT>
-    static void prefixSpecialCharacters( StringT& text)
+    ///handles prefixing of special regular expression characters with /
+    class CSpecialRegexCharacterPrefixer
     {
-        typedef typename StringT::value_type CharT;
-        StringT result;
-        BOOST_FOREACH( typename StringT::value_type c, text)
+    public:
+        ///handles prefixing in the string
+        template <typename StringT>
+        static void prefixSpecialCharacters( StringT& text)
         {
-            if ( boost::is_any_of( STRING_LITERAL(".[]{}()\\*+?|^$") )(c))
+            typedef typename StringT::value_type CharT;
+            StringT result;
+            BOOST_FOREACH( typename StringT::value_type c, text)
             {
-                result += '\\';
+                if ( boost::is_any_of( STRING_LITERAL(".[]{}()\\*+?|^$") )(c))
+                {
+                    result += '\\';
+                }
+                result += c;
             }
-            result += c;
+            result.swap( text);
         }
-        result.swap( text);
-    }
 
-    ///handles prefixing for all strings in the container
-    template <typename StringT>
-    static void prefixSpecialCharacters( std::vector<StringT>& container)
-    {
-        prefixSpecialCharactersContainer( container);
-    }
-
-private:
-    ///handles prefixing for all strings in a container
-    template <typename ContainerT>
-    static void prefixSpecialCharactersContainer( ContainerT& container)
-    {
-        BOOST_FOREACH( typename ContainerT::value_type& item, container)
+        ///handles prefixing for all strings in the container
+        template <typename StringT>
+        static void prefixSpecialCharacters( std::vector<StringT>& container)
         {
-            prefixSpecialCharacters( item);
+            prefixSpecialCharactersContainer( container);
         }
-    }
-};
 
+    private:
+        ///handles prefixing for all strings in a container
+        template <typename ContainerT>
+        static void prefixSpecialCharactersContainer( ContainerT& container)
+        {
+            BOOST_FOREACH( typename ContainerT::value_type& item, container)
+            {
+                prefixSpecialCharacters( item);
+            }
+        }
+    };
+}

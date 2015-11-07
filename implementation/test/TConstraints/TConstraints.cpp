@@ -31,6 +31,8 @@
 
 #include "Constraints.h"
 
+using namespace code_creation_kit;
+
 template <typename StringT, typename MatchesConstraintT>
 void testMatches()
 {

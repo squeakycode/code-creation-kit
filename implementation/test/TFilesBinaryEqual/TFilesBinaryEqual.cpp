@@ -32,6 +32,8 @@
 #include "CFilesBinaryEqual.h"
 #include <string>
 
+using namespace code_creation_kit;
+
 BOOST_AUTO_TEST_CASE( TFilesBinaryEqual)
 {
     BOOST_CHECK( FilesBinaryEqual<std::string>( "a.txt", "a_.txt"));

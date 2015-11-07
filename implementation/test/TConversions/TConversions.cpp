@@ -31,6 +31,8 @@
 #include <string>
 #include "Conversions.h"
 
+using namespace code_creation_kit;
+
 template <typename StringT, typename ReplaceConversionT>
 void testReplace()
 {

@@ -31,6 +31,8 @@
 #include <string>
 #include "System.h"
 
+using namespace code_creation_kit;
+
 template <typename StringT>
 void run_test()
 {

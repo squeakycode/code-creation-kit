@@ -27,19 +27,21 @@
 
 #include <vector>
 
-///used to modify an inserted table entry
-template <typename StringT>
-class IConversion
+namespace code_creation_kit
 {
-public:
-    typedef std::vector<StringT> StringListT;
-
-    virtual void modify( StringListT& text) const = 0;
-
-    virtual bool operator==( const IConversion& conversion) const = 0;
-
-    virtual ~IConversion() 
+    ///used to modify an inserted table entry
+    template <typename StringT>
+    class IConversion
     {
-    };
-};
+    public:
+        typedef std::vector<StringT> StringListT;
 
+        virtual void modify( StringListT& text) const = 0;
+
+        virtual bool operator==( const IConversion& conversion) const = 0;
+
+        virtual ~IConversion() 
+        {
+        };
+    };
+}

@@ -35,6 +35,8 @@
 #include "CCsvParser.h"
 #include "CPositionTracker.h"
 
+using namespace code_creation_kit;
+
 namespace test_data
 {
     const unsigned int rows = 5;

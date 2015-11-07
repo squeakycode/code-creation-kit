@@ -25,18 +25,21 @@
 
 #pragma once
 
-///used to check a constraint for a single table entry 
-template <typename StringT>
-class IConstraint
+namespace code_creation_kit
 {
-public:
-    virtual bool matchesConstraint( const StringT& text) const = 0;
-    virtual bool forAll() const = 0;
-    virtual bool flush() const = 0;
-
-    virtual bool operator==( const IConstraint& conversion) const = 0;
-
-    virtual ~IConstraint() 
+    ///used to check a constraint for a single table entry 
+    template <typename StringT>
+    class IConstraint
     {
+    public:
+        virtual bool matchesConstraint( const StringT& text) const = 0;
+        virtual bool forAll() const = 0;
+        virtual bool flush() const = 0;
+
+        virtual bool operator==( const IConstraint& conversion) const = 0;
+
+        virtual ~IConstraint() 
+        {
+        };
     };
-};
+}

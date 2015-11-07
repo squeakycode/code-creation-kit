@@ -33,258 +33,261 @@
 #include "System.h"
 #include "CInlineTemplateParameters.h"
 
+namespace code_creation_kit
+{
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
-///processes user commands
-template <typename StringT>
-class CGeneratorCommandProcessor
-{
-    typedef CCommandFileLineParser<StringT> ParserT;
-    typedef typename StringT::value_type CharT;
-public:
-    class ExInvalidCommandOptions : public std::runtime_error 
-    { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
-
-    class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
-    { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
-
-    ///process a stream of commands
-    template <typename InputStreamT, typename GeneratorT, typename LogFileT>
-    void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
+    ///processes user commands
+    template <typename StringT>
+    class CGeneratorCommandProcessor
     {
-        StringT command;
-        while( std::getline(stream, command))
+        typedef CCommandFileLineParser<StringT> ParserT;
+        typedef typename StringT::value_type CharT;
+    public:
+        class ExInvalidCommandOptions : public std::runtime_error 
+        { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
+
+        class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
+        { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
+
+        ///process a stream of commands
+        template <typename InputStreamT, typename GeneratorT, typename LogFileT>
+        void processCommandStream( InputStreamT& stream, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
         {
-#ifndef _MSC_VER
-            //assume linux
-            if ( !command.empty() && *(command.rbegin()) == '\r')
+            StringT command;
+            while( std::getline(stream, command))
             {
-                command.resize( command.size() - 1);
-            }
+#ifndef _MSC_VER
+                //assume linux
+                if ( !command.empty() && *(command.rbegin()) == '\r')
+                {
+                    command.resize( command.size() - 1);
+                }
 #endif
 
-            processCommand( command, generator, commandFileName, logFile, disableReset);
-        }
-    }
-
-    ///process a command for the generator
-    template <typename GeneratorT, typename LogFileT>
-    void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
-    {
-        typedef typename StringT::value_type CharT;
-
-        //check for comment
-        if ( !commandText.empty() && commandText[ 0 ] == STRING_LITERAL('#') )
-        {
-            //exit is comment
-            return;
+                processCommand( command, generator, commandFileName, logFile, disableReset);
+            }
         }
 
-        m_parser.parse( commandText);
-
-        const typename ParserT::ECommand command = m_parser.getCommand();
-
-        if ( command == ParserT::eGenerate 
-            || command == ParserT::eGenerateUsingIntermediateFile
-            || command == ParserT::eProcessInlineTemplateFile)
+        ///process a command for the generator
+        template <typename GeneratorT, typename LogFileT>
+        void processCommand( const StringT& commandText, GeneratorT& generator, const StringT& commandFileName, LogFileT& logFile, bool disableReset = false)
         {
-            CInlineTemplateParameters<StringT> inlineTemplateParameters;
-            StringT outputFileName( m_parser.getOutputFile());
-            bool useIntermediateFile = m_parser.getUseIntermediateOutputFile();
+            typedef typename StringT::value_type CharT;
 
-            if ( command == ParserT::eProcessInlineTemplateFile)
+            //check for comment
+            if ( !commandText.empty() && commandText[ 0 ] == STRING_LITERAL('#') )
             {
-                //pass inline template processing parameters
-                inlineTemplateParameters.enabled = true;
-                inlineTemplateParameters.inlinePrefix = m_parser.getInlinePrefix();
-                inlineTemplateParameters.inlinePostfix = m_parser.getInlinePostfix();
-                inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
-                inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
+                //exit is comment
+                return;
+            }
 
-                //if no output file name has been passed source is also target
-                if ( outputFileName.empty())
+            m_parser.parse( commandText);
+
+            const typename ParserT::ECommand command = m_parser.getCommand();
+
+            if ( command == ParserT::eGenerate 
+                || command == ParserT::eGenerateUsingIntermediateFile
+                || command == ParserT::eProcessInlineTemplateFile)
+            {
+                CInlineTemplateParameters<StringT> inlineTemplateParameters;
+                StringT outputFileName( m_parser.getOutputFile());
+                bool useIntermediateFile = m_parser.getUseIntermediateOutputFile();
+
+                if ( command == ParserT::eProcessInlineTemplateFile)
                 {
-                    outputFileName = m_parser.getTemplateFile();
-                    useIntermediateFile = true;
+                    //pass inline template processing parameters
+                    inlineTemplateParameters.enabled = true;
+                    inlineTemplateParameters.inlinePrefix = m_parser.getInlinePrefix();
+                    inlineTemplateParameters.inlinePostfix = m_parser.getInlinePostfix();
+                    inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
+                    inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
+
+                    //if no output file name has been passed source is also target
+                    if ( outputFileName.empty())
+                    {
+                        outputFileName = m_parser.getTemplateFile();
+                        useIntermediateFile = true;
+                    }
+                }
+
+                if ( m_parser.hasMarkup()) //switch for setting prefix and postfix at once
+                {
+                    generator.setMarkup( m_parser.getMarkup(), m_parser.getMarkup());
+                }
+                else //if not overridden by markup switch apply other switches or default
+                {
+                    generator.setMarkup( m_parser.getMarkupPrefix(), m_parser.getMarkupPostfix());
+                }
+                generator.generate( 
+                    prepareFileName( m_parser.getTemplateFile(), commandFileName),
+                    prepareFileName( outputFileName, commandFileName), 
+                    useIntermediateFile,
+                    m_parser.getRecycle(),
+                    prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                    m_parser.getAppendToFile(),
+                    m_parser.getParameters(),
+                    inlineTemplateParameters);
+            }
+            else if ( command == ParserT::eLoadTable )
+            {
+                //if no direction is explicitly provided, read all directions
+                bool noDirectionSet = !m_parser.getTopDown() && !m_parser.getLeftToRight();
+
+                generator.loadTable( 
+                    prepareFileName( m_parser.getTableFile(), commandFileName)
+                    , m_parser.hasLabel() ? m_parser.getLabel() : m_parser.getTableFile()
+                    , m_parser.getTopDown() || noDirectionSet
+                    , m_parser.getLeftToRight() || noDirectionSet
+                    , m_parser.getRowHeaderIndex()
+                    , m_parser.getColumnHeaderIndex()
+                    , m_parser.getPadRows());
+            }
+            else if ( command == ParserT::eUnloadTable)
+            {
+                std::vector<StringT> labels = m_parser.getLabelsOfTableFilesToUnload();
+                BOOST_FOREACH( const StringT& label, labels)
+                {
+                    generator.unloadTable( label);
                 }
             }
-
-            if ( m_parser.hasMarkup()) //switch for setting prefix and postfix at once
+            else if ( command == ParserT::eResetGenerator)
             {
-                generator.setMarkup( m_parser.getMarkup(), m_parser.getMarkup());
-            }
-            else //if not overridden by markup switch apply other switches or default
-            {
-                generator.setMarkup( m_parser.getMarkupPrefix(), m_parser.getMarkupPostfix());
-            }
-            generator.generate( 
-                prepareFileName( m_parser.getTemplateFile(), commandFileName),
-                prepareFileName( outputFileName, commandFileName), 
-                useIntermediateFile,
-                m_parser.getRecycle(),
-                prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
-                m_parser.getAppendToFile(),
-                m_parser.getParameters(),
-                inlineTemplateParameters);
-        }
-        else if ( command == ParserT::eLoadTable )
-        {
-            //if no direction is explicitly provided, read all directions
-            bool noDirectionSet = !m_parser.getTopDown() && !m_parser.getLeftToRight();
-
-            generator.loadTable( 
-                prepareFileName( m_parser.getTableFile(), commandFileName)
-                , m_parser.hasLabel() ? m_parser.getLabel() : m_parser.getTableFile()
-                , m_parser.getTopDown() || noDirectionSet
-                , m_parser.getLeftToRight() || noDirectionSet
-                , m_parser.getRowHeaderIndex()
-                , m_parser.getColumnHeaderIndex()
-                , m_parser.getPadRows());
-        }
-        else if ( command == ParserT::eUnloadTable)
-        {
-            std::vector<StringT> labels = m_parser.getLabelsOfTableFilesToUnload();
-            BOOST_FOREACH( const StringT& label, labels)
-            {
-                generator.unloadTable( label);
-            }
-        }
-        else if ( command == ParserT::eResetGenerator)
-        {
-            if ( !disableReset)
-            {
-                generator.reset();
-            }
-        }
-        else if ( command == ParserT::eAddIncludeDirectory)
-        {
-            //add include directories relative to command file
-            std::vector<StringT> includeDirectories = m_parser.getIncludeDirectories();
-            BOOST_FOREACH( const StringT& directory, includeDirectories)
-            {
-                generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
-            }
-        }
-        else if ( command == ParserT::eCsvDelimiter )
-        {
-            CharT delimiterChar = STRING_LITERAL(';');
-
-            if ( m_parser.hasDelimiter())
-            {
-                StringT delimiter = m_parser.getDelimiter();
-                if ( delimiter == STRING_LITERAL("tab"))
+                if ( !disableReset)
                 {
-                    delimiterChar = STRING_LITERAL('\t');
+                    generator.reset();
                 }
-                else if ( delimiter.size())
+            }
+            else if ( command == ParserT::eAddIncludeDirectory)
+            {
+                //add include directories relative to command file
+                std::vector<StringT> includeDirectories = m_parser.getIncludeDirectories();
+                BOOST_FOREACH( const StringT& directory, includeDirectories)
                 {
-                    delimiterChar = delimiter[0];
+                    generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
+                }
+            }
+            else if ( command == ParserT::eCsvDelimiter )
+            {
+                CharT delimiterChar = STRING_LITERAL(';');
+
+                if ( m_parser.hasDelimiter())
+                {
+                    StringT delimiter = m_parser.getDelimiter();
+                    if ( delimiter == STRING_LITERAL("tab"))
+                    {
+                        delimiterChar = STRING_LITERAL('\t');
+                    }
+                    else if ( delimiter.size())
+                    {
+                        delimiterChar = delimiter[0];
+                    }
+                    else
+                    {
+                        delimiterChar = 0;
+                    }
                 }
                 else
                 {
-                    delimiterChar = 0;
+                    throw ExInvalidCommandOptions();
                 }
+
+                generator.setCsvDelimiter( delimiterChar);
+            }
+            else if ( command == ParserT::eCsvCommentChars )
+            {
+                generator.setCsvCommentChars( m_parser.getCsvCommentChars());
+            }
+            else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+            {
+                if ( m_parser.hasCsvIgnoreDoubleQuotes())
+                {
+                    StringT val = m_parser.getCsvIgnoreDoubleQuotes();
+                    if ( val == STRING_LITERAL("on"))
+                    {
+                        generator.setCsvIgnoreDoubleQuotes( true);
+                    }
+                    else if ( val == STRING_LITERAL("off"))
+                    {
+                        generator.setCsvIgnoreDoubleQuotes( false);
+                    }
+                    else
+                    {
+                        throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
+                    }
+                }
+                else
+                {
+                    throw ExInvalidCommandOptions();
+                }
+            }
+            else if ( command == ParserT::eSetLogFile )
+            {
+                generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
+                logFile.close();
+
+                if( m_parser.getLogFile() == STRING_LITERAL("none"))
+                {
+                    //nothing to do
+                }
+                else
+                {
+                    logFile.open( m_parser.getLogFile(), m_parser.getLogFile() == STRING_LITERAL("-"), false);
+                    generator.connectLogOutputStream( &logFile.get());
+                }
+            }
+            else if ( command == ParserT::eNoOptionsGiven)
+            {
+                //empty lines are OK
             }
             else
             {
                 throw ExInvalidCommandOptions();
             }
+        }
 
-            generator.setCsvDelimiter( delimiterChar);
-        }
-        else if ( command == ParserT::eCsvCommentChars )
+        //prints parser help
+        void printDescription()
         {
-            generator.setCsvCommentChars( m_parser.getCsvCommentChars());
+            m_parser.printDescription();
         }
-        else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+
+    private:
+        ///expand environment variables and determine location relative to command file if command file and not std stream
+        static StringT prepareFileName( const StringT& filename, const StringT& base)
         {
-            if ( m_parser.hasCsvIgnoreDoubleQuotes())
+            return relativeTo( System::expandEnvironmentVariables( filename), base);
+        }
+
+        ///determine location relative to command file if command file and not std stream
+        static StringT relativeTo( const StringT& filename, const StringT& base)
+        {
+            //std stream specified return filename
+            if ( filename == STRING_LITERAL("-"))
             {
-                StringT val = m_parser.getCsvIgnoreDoubleQuotes();
-                if ( val == STRING_LITERAL("on"))
-                {
-                    generator.setCsvIgnoreDoubleQuotes( true);
-                }
-                else if ( val == STRING_LITERAL("off"))
-                {
-                    generator.setCsvIgnoreDoubleQuotes( false);
-                }
-                else
-                {
-                    throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
-                }
+                return filename;
             }
             else
             {
-                throw ExInvalidCommandOptions();
+                //if no base file given, determine position relative to executable startup directory
+                if ( base.empty())
+                {
+                    return FileSystem::determineDependentLocation( filename);
+                }
+                else //determine path relative to base
+                {
+                    return FileSystem::determineDependentLocation( base, filename);
+                }
             }
         }
-        else if ( command == ParserT::eSetLogFile )
-        {
-            generator.connectLogOutputStream( (std::basic_ostream<CharT, std::char_traits<CharT> >*)0);
-            logFile.close();
-
-            if( m_parser.getLogFile() == STRING_LITERAL("none"))
-            {
-                //nothing to do
-            }
-            else
-            {
-                logFile.open( m_parser.getLogFile(), m_parser.getLogFile() == STRING_LITERAL("-"), false);
-                generator.connectLogOutputStream( &logFile.get());
-            }
-        }
-        else if ( command == ParserT::eNoOptionsGiven)
-        {
-            //empty lines are OK
-        }
-        else
-        {
-            throw ExInvalidCommandOptions();
-        }
-    }
-
-    //prints parser help
-    void printDescription()
-    {
-        m_parser.printDescription();
-    }
-
-private:
-    ///expand environment variables and determine location relative to command file if command file and not std stream
-    static StringT prepareFileName( const StringT& filename, const StringT& base)
-    {
-        return relativeTo( System::expandEnvironmentVariables( filename), base);
-    }
-
-    ///determine location relative to command file if command file and not std stream
-    static StringT relativeTo( const StringT& filename, const StringT& base)
-    {
-        //std stream specified return filename
-        if ( filename == STRING_LITERAL("-"))
-        {
-            return filename;
-        }
-        else
-        {
-            //if no base file given, determine position relative to executable startup directory
-            if ( base.empty())
-            {
-                return FileSystem::determineDependentLocation( filename);
-            }
-            else //determine path relative to base
-            {
-                return FileSystem::determineDependentLocation( base, filename);
-            }
-        }
-    }
-private:
-    ParserT m_parser;
-};
+    private:
+        ParserT m_parser;
+    };
 
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
+}

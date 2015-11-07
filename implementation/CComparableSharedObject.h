@@ -27,83 +27,86 @@
 
 #include <boost/shared_ptr.hpp>
 
-///allows to compare objects held by shared_ptr
-template <typename T>
-class CComparableSharedObject
+namespace code_creation_kit
 {
-public:
-    CComparableSharedObject()
+    ///allows to compare objects held by shared_ptr
+    template <typename T>
+    class CComparableSharedObject
     {
-    }
-
-    CComparableSharedObject( T* ptr)
-        : m_ptr( ptr)
-    {
-    }
-
-    CComparableSharedObject( boost::shared_ptr<T> ptr)
-        : m_ptr( ptr)
-    {
-    }
-
-    bool operator == ( const CComparableSharedObject<T>& rhs) const
-    {
-        if ( (bool) m_ptr == (bool) rhs.m_ptr)
+    public:
+        CComparableSharedObject()
         {
-            if ( m_ptr)
-            {
-                return *m_ptr == *rhs.m_ptr;
-            }
-            return true;
         }
 
-        return false;
-    }
+        CComparableSharedObject( T* ptr)
+            : m_ptr( ptr)
+        {
+        }
 
-    bool operator != ( const CComparableSharedObject<T>& rhs) const
-    {
-        return !(*this == rhs);
-    }
+        CComparableSharedObject( boost::shared_ptr<T> ptr)
+            : m_ptr( ptr)
+        {
+        }
 
-    T* operator -> ()
-    {
-        return &(*m_ptr);
-    }
+        bool operator == ( const CComparableSharedObject<T>& rhs) const
+        {
+            if ( (bool) m_ptr == (bool) rhs.m_ptr)
+            {
+                if ( m_ptr)
+                {
+                    return *m_ptr == *rhs.m_ptr;
+                }
+                return true;
+            }
 
-    const T* operator -> () const
-    {
-        return &(*m_ptr);
-    }
+            return false;
+        }
 
-    boost::shared_ptr<T> get()
-    {
-        return m_ptr;
-    }
+        bool operator != ( const CComparableSharedObject<T>& rhs) const
+        {
+            return !(*this == rhs);
+        }
 
-    boost::shared_ptr<const T> get() const
-    {
-        return m_ptr;
-    }
+        T* operator -> ()
+        {
+            return &(*m_ptr);
+        }
 
-    operator boost::shared_ptr<T>()
-    {
-        return m_ptr;
-    }
+        const T* operator -> () const
+        {
+            return &(*m_ptr);
+        }
 
-    operator boost::shared_ptr<const T>() const
-    {
-        return m_ptr;
-    }
+        boost::shared_ptr<T> get()
+        {
+            return m_ptr;
+        }
 
-    operator bool() const
-    {
-        return (bool)m_ptr;
-    }
+        boost::shared_ptr<const T> get() const
+        {
+            return m_ptr;
+        }
 
-    const T& operator*() const
-    {
-        return *m_ptr;
-    }
-private:
-    boost::shared_ptr<T> m_ptr;
-};
+        operator boost::shared_ptr<T>()
+        {
+            return m_ptr;
+        }
+
+        operator boost::shared_ptr<const T>() const
+        {
+            return m_ptr;
+        }
+
+        operator bool() const
+        {
+            return (bool)m_ptr;
+        }
+
+        const T& operator*() const
+        {
+            return *m_ptr;
+        }
+    private:
+        boost::shared_ptr<T> m_ptr;
+    };
+}

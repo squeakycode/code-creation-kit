@@ -37,29 +37,31 @@
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
 #endif
 
-template <typename StringT>
-class ConstraintDirectives : public IConstraint<StringT>
+namespace code_creation_kit
 {
-    void throwInternalProgramError() const
+    template <typename StringT>
+    class ConstraintDirectives : public IConstraint<StringT>
     {
-        throw std::runtime_error( "Internal program error, the implementation for a constraint directive is missing.");
-    }
-public:
-    [MACRO_BEGIN][IF][ENTRY]["Subtype"][EQUALS]["directive for constraint"][TRIM]
-    virtual void [ENTRY]["Tag Name Small"]( bool)
-    {
-        throwInternalProgramError();
-    }
-    virtual bool [ENTRY]["Tag Name Small"]() const
-    {
-        throwInternalProgramError();
-        return false;
-    }
+        void throwInternalProgramError() const
+        {
+            throw std::runtime_error( "Internal program error, the implementation for a constraint directive is missing.");
+        }
+    public:
+        [MACRO_BEGIN][IF][ENTRY]["Subtype"][EQUALS]["directive for constraint"][TRIM]
+        virtual void [ENTRY]["Tag Name Small"]( bool)
+        {
+            throwInternalProgramError();
+        }
+        virtual bool [ENTRY]["Tag Name Small"]() const
+        {
+            throwInternalProgramError();
+            return false;
+        }
 
-    [MACRO_END][TRIM]
-};
+        [MACRO_END][TRIM]
+    };
+}
 
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
-

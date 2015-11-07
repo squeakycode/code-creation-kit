@@ -29,21 +29,23 @@
 
 #pragma once
 
-class Substitutions
+namespace code_creation_kit
 {
-public:
-    ///the substitutions
-    enum ESubstitutions
+    class Substitutions
     {
-        eCount,
-        eEntry,
-        eError_,
-        eFirstTime,
-        eIndex,
-        eLastTime,
-        eInvalid
+    public:
+        ///the substitutions
+        enum ESubstitutions
+        {
+            eCount,
+            eEntry,
+            eError_,
+            eFirstTime,
+            eIndex,
+            eLastTime,
+            eInvalid
+        };
+
+        typedef ESubstitutions enum_type; 
     };
-
-    typedef ESubstitutions enum_type; 
-};
-
+}

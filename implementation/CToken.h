@@ -30,151 +30,153 @@
 #include <vector>
 #include <boost/foreach.hpp>
 
-template <typename ETokenHolderT, typename StringT>
-class CToken : public ETokenHolderT
+namespace code_creation_kit
 {
-public:
-    typedef typename ETokenHolderT::token_type ETokenT;
-    typedef std::vector<StringT> StringListT;
-    typedef boost::shared_ptr<StringListT> SharedStringListT;
-    typedef boost::shared_ptr<const StringListT> ConstSharedStringListT;
-
-    CToken()
-        : m_token((ETokenT)0)
+    template <typename ETokenHolderT, typename StringT>
+    class CToken : public ETokenHolderT
     {
-    }
+    public:
+        typedef typename ETokenHolderT::token_type ETokenT;
+        typedef std::vector<StringT> StringListT;
+        typedef boost::shared_ptr<StringListT> SharedStringListT;
+        typedef boost::shared_ptr<const StringListT> ConstSharedStringListT;
 
-    CToken( ETokenT token)
-        : m_token( token)
-    {
-    }
-
-    CToken( ETokenT token, SharedStringListT stringList)
-        : m_token( token)
-        , m_stringList( stringList)
-    {
-    }
-
-    CToken( ETokenT token, SharedStringListT stringList, SharedStringListT sourceText)
-        : m_token( token)
-        , m_stringList( stringList)
-        , m_sourceText( sourceText)
-    {
-    }
-
-    CToken( ETokenT token, const StringT& textA)
-        : m_token( token)
-        , m_stringList( new StringListT(1))
-    {
-        m_stringList->front() = textA;
-    }
-
-    CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
-        : m_token( token)
-        , m_stringList( new StringListT(1))
-    {
-        m_stringList->back().assign( start, end);
-    }
-
-    CToken( ETokenT token, const StringT& textA, const StringT& textB)
-        : m_token( token)
-        , m_stringList( new StringListT(2))
-    {
-        m_stringList->front() = textA;
-        m_stringList->back() = textB;
-    }
-
-    CToken( const CToken<ETokenHolderT, StringT>& rhs)
-        : m_token( rhs.m_token)
-        , m_stringList( rhs.m_stringList)
-        , m_sourceText( rhs.m_sourceText)
-    {
-    }
-
-    CToken<ETokenHolderT, StringT>& operator = ( const CToken<ETokenHolderT, StringT>& rhs)
-    {
-        m_token = rhs.m_token;
-        m_stringList = rhs.m_stringList;
-        m_sourceText = rhs.m_sourceText;
-        return *this;
-    }
-
-    bool operator == ( ETokenT token) const
-    {
-        return m_token == token;
-    }
-
-    bool operator != ( ETokenT token) const
-    {
-        return m_token != token;
-    }
-
-    bool operator == ( const CToken<ETokenHolderT, StringT>& rhs) const
-    {
-        if (   m_token != rhs.m_token
-            || m_stringList != rhs.m_stringList
-            )
+        CToken()
+            : m_token((ETokenT)0)
         {
-            return false;
         }
-        return true;
-    }
 
-
-    ETokenT getToken() const
-    {
-        return m_token;
-    }
-
-    ConstSharedStringListT getStringList() const
-    {
-        return m_stringList;
-    }
-
-    size_t getTextSize() const
-    {
-        if ( m_stringList)
+        CToken( ETokenT token)
+            : m_token( token)
         {
-            size_t result = 0;
-            const StringListT& textList = *m_stringList;
-            BOOST_FOREACH( const StringT& text, textList)
+        }
+
+        CToken( ETokenT token, SharedStringListT stringList)
+            : m_token( token)
+            , m_stringList( stringList)
+        {
+        }
+
+        CToken( ETokenT token, SharedStringListT stringList, SharedStringListT sourceText)
+            : m_token( token)
+            , m_stringList( stringList)
+            , m_sourceText( sourceText)
+        {
+        }
+
+        CToken( ETokenT token, const StringT& textA)
+            : m_token( token)
+            , m_stringList( new StringListT(1))
+        {
+            m_stringList->front() = textA;
+        }
+
+        CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
+            : m_token( token)
+            , m_stringList( new StringListT(1))
+        {
+            m_stringList->back().assign( start, end);
+        }
+
+        CToken( ETokenT token, const StringT& textA, const StringT& textB)
+            : m_token( token)
+            , m_stringList( new StringListT(2))
+        {
+            m_stringList->front() = textA;
+            m_stringList->back() = textB;
+        }
+
+        CToken( const CToken<ETokenHolderT, StringT>& rhs)
+            : m_token( rhs.m_token)
+            , m_stringList( rhs.m_stringList)
+            , m_sourceText( rhs.m_sourceText)
+        {
+        }
+
+        CToken<ETokenHolderT, StringT>& operator = ( const CToken<ETokenHolderT, StringT>& rhs)
+        {
+            m_token = rhs.m_token;
+            m_stringList = rhs.m_stringList;
+            m_sourceText = rhs.m_sourceText;
+            return *this;
+        }
+
+        bool operator == ( ETokenT token) const
+        {
+            return m_token == token;
+        }
+
+        bool operator != ( ETokenT token) const
+        {
+            return m_token != token;
+        }
+
+        bool operator == ( const CToken<ETokenHolderT, StringT>& rhs) const
+        {
+            if (   m_token != rhs.m_token
+                || m_stringList != rhs.m_stringList
+                )
             {
-                result += text.size();
+                return false;
             }
-            return result;
+            return true;
         }
-        return 0;
-    }
 
-    template <typename StreamT>
-    void toStream( StreamT& stream) const
-    {
-        if ( m_stringList)
+
+        ETokenT getToken() const
         {
-            const StringListT& textList = *m_stringList;
-            BOOST_FOREACH( const StringT& text, textList)
+            return m_token;
+        }
+
+        ConstSharedStringListT getStringList() const
+        {
+            return m_stringList;
+        }
+
+        size_t getTextSize() const
+        {
+            if ( m_stringList)
             {
-                stream << text;
+                size_t result = 0;
+                const StringListT& textList = *m_stringList;
+                BOOST_FOREACH( const StringT& text, textList)
+                {
+                    result += text.size();
+                }
+                return result;
             }
+            return 0;
         }
-    }
 
-    template <typename StreamT>
-    void sourceTextToStream( StreamT& stream) const
-    {
-        if ( m_sourceText || m_stringList)
+        template <typename StreamT>
+        void toStream( StreamT& stream) const
         {
-            const StringListT& textList = *(m_sourceText ? m_sourceText : m_stringList);
-            BOOST_FOREACH( const StringT& text, textList)
+            if ( m_stringList)
             {
-                stream << text;
+                const StringListT& textList = *m_stringList;
+                BOOST_FOREACH( const StringT& text, textList)
+                {
+                    stream << text;
+                }
             }
         }
-    }
 
-public:
-    ETokenT m_token;
-    CComparableSharedObject<StringListT> m_stringList;
-    CComparableSharedObject<StringListT> m_sourceText;
-};
+        template <typename StreamT>
+        void sourceTextToStream( StreamT& stream) const
+        {
+            if ( m_sourceText || m_stringList)
+            {
+                const StringListT& textList = *(m_sourceText ? m_sourceText : m_stringList);
+                BOOST_FOREACH( const StringT& text, textList)
+                {
+                    stream << text;
+                }
+            }
+        }
 
+    public:
+        ETokenT m_token;
+        CComparableSharedObject<StringListT> m_stringList;
+        CComparableSharedObject<StringListT> m_sourceText;
+    };
+}

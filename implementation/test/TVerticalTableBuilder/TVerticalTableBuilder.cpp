@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 
+using namespace code_creation_kit;
+
 template <typename T>
 void testBuilder( T& itemTable, const unsigned int rows, const unsigned int columns, bool pad)
 {

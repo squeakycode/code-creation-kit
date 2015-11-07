@@ -37,6 +37,8 @@
 #include <vector>
 #include "StringLiteral.h"
 
+using namespace code_creation_kit;
+
 template <typename TokenT, typename StringT>
 class CTokenizerTestHelper
 {

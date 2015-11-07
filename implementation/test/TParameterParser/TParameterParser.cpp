@@ -42,6 +42,8 @@
 #pragma warning( pop ) 
 #endif
 
+using namespace code_creation_kit;
+
 BOOST_AUTO_TEST_CASE( TParameterParser)
 {
     using namespace boost::assign;

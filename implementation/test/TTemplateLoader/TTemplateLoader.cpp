@@ -39,6 +39,8 @@
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
+using namespace code_creation_kit;
+
 ///simulates triggering include of another file by stream processing
 class TestHelper
 {

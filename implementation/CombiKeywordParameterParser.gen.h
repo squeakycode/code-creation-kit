@@ -30,40 +30,43 @@
 #include <stdint.h>
 #endif
 
-namespace KeywordParameterParser
+namespace code_creation_kit
 {
-    ///parse parameter range, extract values
-    template <typename IteratorT, typename ContainerT>
-    void getParametersCombiCStyleUIntUIntRepeat(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+    namespace KeywordParameterParser
     {
-        parameters.clear();
-        parameters.resize(2);
-
-        //parse opening parentheses
-        CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+        ///parse parameter range, extract values
+        template <typename IteratorT, typename ContainerT>
+        void getParametersCombiCStyleUIntUIntRepeat(IteratorT& start, const IteratorT& end, ContainerT& parameters)
         {
-            typename ContainerT::iterator it = parameters.begin();
-            CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;
-            CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
-            assert(it == parameters.end());
-        }
+            parameters.clear();
+            parameters.resize(2);
 
-        for (size_t i = 1; i < SIZE_MAX; ++i)
-        {
-            IteratorT temp(start);
-            if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+            //parse opening parentheses
+            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
-                break;
+                typename ContainerT::iterator it = parameters.begin();
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;
+            CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
+                assert(it == parameters.end());
             }
-            start = temp;
-            typename ContainerT::value_type parameterValue;
-            CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
-            parameters.push_back(parameterValue);
+
+            for (size_t i = 1; i < SIZE_MAX; ++i)
+            {
+                IteratorT temp(start);
+                if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                {
+                    break;
+                }
+                start = temp;
+                typename ContainerT::value_type parameterValue;
+                CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+            }
+
+            //parse closing parentheses
+            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
 
-        //parse closing parentheses
-        CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+
     }
-
-
 }

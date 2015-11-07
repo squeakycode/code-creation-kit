@@ -33,6 +33,8 @@
 #include <sstream>
 #include "CGenerator.h"
 
+using namespace code_creation_kit;
+
 class LogFileT;
 
 BOOST_AUTO_TEST_CASE( TGenerator)

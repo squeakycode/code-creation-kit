@@ -31,6 +31,8 @@
 
 #include "CLineCollector.h"
 
+using namespace code_creation_kit;
+
 ///represents output stream in test
 template <typename StringT>
 class THelper

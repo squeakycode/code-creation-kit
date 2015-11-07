@@ -25,34 +25,36 @@
 
 #pragma once
 
-///tracks the current position in a text file
-class CPositionTracker
+namespace code_creation_kit
 {
-public:
-    CPositionTracker() : m_column(1), m_line(1) {}
-
-    unsigned int getColumn() { return m_column;}
-    unsigned int getLine() { return m_line;}
-
-    void reset()
+    ///tracks the current position in a text file
+    class CPositionTracker
     {
-        m_line = 1;
-        m_column = 1;
-    }
+    public:
+        CPositionTracker() : m_column(1), m_line(1) {}
 
-    void nextLine()
-    {
-        m_line++;
-        m_column = 1;
-    }
+        unsigned int getColumn() { return m_column;}
+        unsigned int getLine() { return m_line;}
 
-    void nextColumn()
-    {
-        m_column++;
-    }
+        void reset()
+        {
+            m_line = 1;
+            m_column = 1;
+        }
 
-private:
-    unsigned int m_column;
-    unsigned int m_line;
-};
+        void nextLine()
+        {
+            m_line++;
+            m_column = 1;
+        }
 
+        void nextColumn()
+        {
+            m_column++;
+        }
+
+    private:
+        unsigned int m_column;
+        unsigned int m_line;
+    };
+}

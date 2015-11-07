@@ -33,6 +33,8 @@
 #include <vector>
 #include "CGeneratorStatistic.h"
 
+using namespace code_creation_kit;
+
 BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
 {
     // standard

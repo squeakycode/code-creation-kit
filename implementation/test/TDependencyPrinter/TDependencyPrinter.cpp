@@ -35,6 +35,8 @@
 #include "DependencyPrinter.h"
 #include "StringLiteral.h"
 
+using namespace code_creation_kit;
+
 template <typename StringT>
 void run_test()
 {

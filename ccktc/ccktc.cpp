@@ -34,6 +34,8 @@
 #include "CommandProcessor.h"
 #include "CTargetFile.h"
 
+using namespace code_creation_kit;
+
 class LogFileT;
 
 //run processing of command line

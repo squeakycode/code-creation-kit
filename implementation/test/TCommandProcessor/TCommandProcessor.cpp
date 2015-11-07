@@ -38,6 +38,7 @@ class CErrorPrinted{};
 
 #include "CommandProcessor.h"
 #include "CTargetFile.h"
+using namespace code_creation_kit;
 
 class LogFileT;
 

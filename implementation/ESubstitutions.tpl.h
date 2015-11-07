@@ -29,16 +29,18 @@
 
 #pragma once
 
-class Substitutions
+namespace code_creation_kit
 {
-public:
-    ///the substitutions
-    enum ESubstitutions
+    class Substitutions
     {
-        e[ENTRY]["Tag Name Capital"][IF][ENTRY]["Subtype"][EQUALS]["substitution"],
-        eInvalid
+    public:
+        ///the substitutions
+        enum ESubstitutions
+        {
+            e[ENTRY]["Tag Name Capital"][IF][ENTRY]["Subtype"][EQUALS]["substitution"],
+            eInvalid
+        };
+
+        typedef ESubstitutions enum_type; 
     };
-
-    typedef ESubstitutions enum_type; 
-};
-
+}

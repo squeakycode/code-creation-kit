@@ -36,27 +36,29 @@
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
 #endif
 
-template <typename StringT>
-class ConversionDirectives : public IConversion<StringT>
+namespace code_creation_kit
 {
-    void throwInternalProgramError() const
+    template <typename StringT>
+    class ConversionDirectives : public IConversion<StringT>
     {
-        throw std::runtime_error( "Internal program error, the implementation for a conversion directive is missing.");
-    }
-public:
-    virtual void ignoreCase( bool)
-    {
-        throwInternalProgramError();
-    }
-    virtual bool ignoreCase() const
-    {
-        throwInternalProgramError();
-        return false;
-    }
+        void throwInternalProgramError() const
+        {
+            throw std::runtime_error( "Internal program error, the implementation for a conversion directive is missing.");
+        }
+    public:
+        virtual void ignoreCase( bool)
+        {
+            throwInternalProgramError();
+        }
+        virtual bool ignoreCase() const
+        {
+            throwInternalProgramError();
+            return false;
+        }
 
-};
+    };
+}
 
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
-

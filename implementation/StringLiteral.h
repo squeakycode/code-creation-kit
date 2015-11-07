@@ -27,24 +27,27 @@
 
 #include <boost/preprocessor/cat.hpp>
 
-inline const char* getStringLiteral( const char* a, const wchar_t*, const char*)
+namespace code_creation_kit
 {
-    return a;
-}
+    inline const char* getStringLiteral( const char* a, const wchar_t*, const char*)
+    {
+        return a;
+    }
 
-inline const wchar_t* getStringLiteral( const char*, const wchar_t* b, const wchar_t*)
-{
-    return b;
-}
+    inline const wchar_t* getStringLiteral( const char*, const wchar_t* b, const wchar_t*)
+    {
+        return b;
+    }
 
-inline char getStringLiteral( char a, wchar_t, const char*)
-{
-    return a;
-}
+    inline char getStringLiteral( char a, wchar_t, const char*)
+    {
+        return a;
+    }
 
-inline wchar_t getStringLiteral( char, wchar_t b, const wchar_t*)
-{
-    return b;
+    inline wchar_t getStringLiteral( char, wchar_t b, const wchar_t*)
+    {
+        return b;
+    }
 }
 
 #define STRING_LITERAL( stringLiteral) getStringLiteral( stringLiteral, BOOST_PP_CAT(L, stringLiteral), (CharT*)0)

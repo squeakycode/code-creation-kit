@@ -33,130 +33,132 @@
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
-///defines exceptions thrown by CVerticalTableBuilder for template argument independent access
-class CVerticalTableBuilderExceptions
+namespace code_creation_kit
 {
-public:
-    class ExOverflow : public std::overflow_error 
-    { public: ExOverflow() : std::overflow_error( "Row contains more items than first row.") {}};
-
-    class ExUnderflow : public std::underflow_error 
-    { public: ExUnderflow() : std::underflow_error( "Row contains less items than first row.") {}};
-};
-
-///Supports adding table items to a container and checks for over- and underflows
-template <typename VerticalContainerT>
-class CVerticalTableBuilder : public CVerticalTableBuilderExceptions
-{
-public:
-    typedef typename VerticalContainerT::value_type::value_type StringT;
-    typedef typename VerticalContainerT::value_type ColumnT;
-
-    CVerticalTableBuilder( VerticalContainerT& container, bool pad = false) 
-        : m_container( container)
-        , m_pad(pad)
-        , m_currentRowIndex(0)
+    ///defines exceptions thrown by CVerticalTableBuilder for template argument independent access
+    class CVerticalTableBuilderExceptions
     {
-        container.clear();
-    }
+    public:
+        class ExOverflow : public std::overflow_error 
+        { public: ExOverflow() : std::overflow_error( "Row contains more items than first row.") {}};
 
-    ///adds an item and advances the writing head, checks for overflows in a row
-    void addItem( const StringT& item)
+        class ExUnderflow : public std::underflow_error 
+        { public: ExUnderflow() : std::underflow_error( "Row contains less items than first row.") {}};
+    };
+
+    ///Supports adding table items to a container and checks for over- and underflows
+    template <typename VerticalContainerT>
+    class CVerticalTableBuilder : public CVerticalTableBuilderExceptions
     {
-        if ( isFirstRow())
+    public:
+        typedef typename VerticalContainerT::value_type::value_type StringT;
+        typedef typename VerticalContainerT::value_type ColumnT;
+
+        CVerticalTableBuilder( VerticalContainerT& container, bool pad = false) 
+            : m_container( container)
+            , m_pad(pad)
+            , m_currentRowIndex(0)
         {
-            //add column
-            m_container.push_back( ColumnT());
-            //add item
-            m_container.back().push_back(item);
+            container.clear();
         }
-        else
+
+        ///adds an item and advances the writing head, checks for overflows in a row
+        void addItem( const StringT& item)
         {
-            if ( m_iterator == m_container.end() )
+            if ( isFirstRow())
             {
-                if ( m_pad)
-                {
-                    //add column
-                    m_container.push_back( ColumnT());
-                    //fill up with empty items
-                    m_container.back().resize( m_currentRowIndex);
-                    //add item
-                    m_container.back().push_back( item);
-                    //update iterator
-                    m_iterator = m_container.end();
-                }
-                else
-                {
-                    throw ExOverflow();
-                }
+                //add column
+                m_container.push_back( ColumnT());
+                //add item
+                m_container.back().push_back(item);
             }
             else
             {
-                m_iterator->push_back( item);
-                ++m_iterator;
-            }
-        }   
-    }
-
-    ///resets the writing head to first column, checks for underflows in a row
-    void addRow()
-    {
-        if ( !isFirstRow())
-        {
-            if ( m_iterator != m_container.end())
-            {
-                if ( m_pad)
+                if ( m_iterator == m_container.end() )
                 {
-                    for (;m_iterator != m_container.end(); ++m_iterator)
+                    if ( m_pad)
                     {
-                        m_iterator->push_back( StringT());
+                        //add column
+                        m_container.push_back( ColumnT());
+                        //fill up with empty items
+                        m_container.back().resize( m_currentRowIndex);
+                        //add item
+                        m_container.back().push_back( item);
+                        //update iterator
+                        m_iterator = m_container.end();
+                    }
+                    else
+                    {
+                        throw ExOverflow();
                     }
                 }
                 else
                 {
-                    throw ExUnderflow();
+                    m_iterator->push_back( item);
+                    ++m_iterator;
                 }
-            }
+            }   
         }
-        ++m_currentRowIndex;
-        m_iterator = m_container.begin();
-    }
 
-    ///checks for underflows in the last row
-    void finished()
-    {
-        if ( !isFirstRow())
+        ///resets the writing head to first column, checks for underflows in a row
+        void addRow()
         {
-            //is partial filled row?
-            if ( m_iterator != m_container.begin() && m_iterator != m_container.end())
+            if ( !isFirstRow())
             {
-                if ( m_pad)
+                if ( m_iterator != m_container.end())
                 {
-                    //pad if needed
-                    addRow();
+                    if ( m_pad)
+                    {
+                        for (;m_iterator != m_container.end(); ++m_iterator)
+                        {
+                            m_iterator->push_back( StringT());
+                        }
+                    }
+                    else
+                    {
+                        throw ExUnderflow();
+                    }
                 }
-                else
+            }
+            ++m_currentRowIndex;
+            m_iterator = m_container.begin();
+        }
+
+        ///checks for underflows in the last row
+        void finished()
+        {
+            if ( !isFirstRow())
+            {
+                //is partial filled row?
+                if ( m_iterator != m_container.begin() && m_iterator != m_container.end())
                 {
-                    throw ExUnderflow();
+                    if ( m_pad)
+                    {
+                        //pad if needed
+                        addRow();
+                    }
+                    else
+                    {
+                        throw ExUnderflow();
+                    }
                 }
             }
         }
-    }
 
-private:
+    private:
 
-    ///used for over- and underflowchecks when not in first row
-    bool isFirstRow()
-    {
-        return m_currentRowIndex == 0;
-    }
+        ///used for over- and underflowchecks when not in first row
+        bool isFirstRow()
+        {
+            return m_currentRowIndex == 0;
+        }
 
-    VerticalContainerT& m_container; ///<reference to the container to be filled
-    bool m_pad; ///<auto pad rows when rows are too short
-    size_t m_currentRowIndex; ///< index of the current row
-    typename VerticalContainerT::iterator m_iterator; ///<the writing head
-};
-
+        VerticalContainerT& m_container; ///<reference to the container to be filled
+        bool m_pad; ///<auto pad rows when rows are too short
+        size_t m_currentRowIndex; ///< index of the current row
+        typename VerticalContainerT::iterator m_iterator; ///<the writing head
+    };
+}
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif

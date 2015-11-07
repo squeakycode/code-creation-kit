@@ -29,18 +29,20 @@
 
 #pragma once
 
-class Tokens
+namespace code_creation_kit
 {
-public:
-    ///the tokens
-    enum ETokens
+    class Tokens
     {
-        eNewLine = 1,
-        e[ENTRY]["Tag Name Capital"],
-        eTextFragment,
-        eFullLineWithoutTags
+    public:
+        ///the tokens
+        enum ETokens
+        {
+            eNewLine = 1,
+            e[ENTRY]["Tag Name Capital"],
+            eTextFragment,
+            eFullLineWithoutTags
+        };
+
+        typedef ETokens token_type; 
     };
-
-    typedef ETokens token_type; 
-};
-
+}

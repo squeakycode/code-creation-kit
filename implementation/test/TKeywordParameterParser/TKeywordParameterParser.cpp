@@ -42,6 +42,8 @@
 #pragma warning( pop ) 
 #endif
 
+using namespace code_creation_kit;
+
 //perform the actual test
 template <typename StringT, typename PolicyT>
 void test( const char* testText, std::vector<std::string> expectedParameters, unsigned int count)

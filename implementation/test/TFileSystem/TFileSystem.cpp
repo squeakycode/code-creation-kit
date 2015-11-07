@@ -32,6 +32,8 @@
 #include <iostream>
 #include <fstream>
 
+using namespace code_creation_kit;
+
 template <typename StringT>
 bool run_test( const StringT& base, const StringT& relative, const StringT& expected)
 {
