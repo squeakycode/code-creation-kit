@@ -1,4 +1,4 @@
-[COMMENT]  Copyright (c) 2011, Andreas Gau
+[COMMENT]  Copyright (c) 2011-2015 Andreas Gau
 [COMMENT]  All rights reserved.
 [COMMENT]
 [COMMENT]  Redistribution and use in source and binary forms, with or without
@@ -8,14 +8,14 @@
 [COMMENT]      * Redistributions in binary form must reproduce the above copyright
 [COMMENT]        notice, this list of conditions and the following disclaimer in the
 [COMMENT]        documentation and/or other materials provided with the distribution.
-[COMMENT]      * Neither the name of the author nor the
+[COMMENT]      * Neither the name of the copyright holder nor the
 [COMMENT]        names of contributors may be used to endorse or promote products
 [COMMENT]        derived from this software without specific prior written permission.
 [COMMENT]
 [COMMENT]  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 [COMMENT]  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 [COMMENT]  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-[COMMENT]  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+[COMMENT]  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
 [COMMENT]  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 [COMMENT]  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 [COMMENT]  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND

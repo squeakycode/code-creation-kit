@@ -1,20 +1,14 @@
 Licenses
 --------
 
-The text compiler source code is licensed under the GNU General Public License
-(GPL) Version 2 or later.
-Other parts of the code-creation-kit are licensed using the modified
-Berkeley Software Distribution (BSD) license.
-This is because templates and add-ins should be freely adaptable
-to the user's needs without the strong copyleft of the GPL.
-Some resources of the documentation are copied from boostbook(see www.boost.org).
-For these parts the Boost Software License applies.
-
 Part                                License
 -------------------------           ----------------------
-Text compiler source code           GPLv2 or later
-Add-In VBA code                     'Modified BSD License'
-Templates                           'Modified BSD License'
+Text compiler source code           3-clause BSD
+Add-In VBA code                     3-clause BSD
+Templates                           3-clause BSD
 Documentation Resources (partly)    Boost Software License
+
+Some resources of the documentation are copied from boostbook(see www.boost.org).
+For these parts the Boost Software License applies.
 
 See the license folder for copies of the licenses.
