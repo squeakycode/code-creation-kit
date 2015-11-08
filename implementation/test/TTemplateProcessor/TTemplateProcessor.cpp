@@ -1,25 +1,38 @@
-//   Copyright (C) 2011-2012 Andreas Gau
+//  Copyright (c) 2011-2015 Andreas Gau
+//  All rights reserved.
 //
-//   This file is part of the code-creation-kit.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//        notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//        notice, this list of conditions and the following disclaimer in the
+//        documentation and/or other materials provided with the distribution.
+//      * Neither the name of the copyright holder nor the
+//        names of contributors may be used to endorse or promote products
+//        derived from this software without specific prior written permission.
 //
-//   The code-creation-kit is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 2 of the License, or
-//   (at your option) any later version.
-//
-//   The code-creation-kit is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 #include "CTemplateProcessor.h"
 #include <sstream>
 #include <iostream>
+
+using namespace code_creation_kit;
 
 ///represents streams in test
 template <typename StringT>
@@ -64,7 +77,7 @@ const char* itemTable[rows][columns] =
 {
     {"Item","Type","Name","Array Maximum","Default","Description","Description"},
     {"a","int","valueCount","","0","",""},
-    {"b","double","values","30","5.4","description","more"},
+    {"b","double","values","30","5.4","description","&more"},
     {"c","bool","valid","","false","",""},
     {"d","bool","test","","false","",""}
 };
@@ -87,12 +100,37 @@ public:
 };
 
 template< typename ProcessorT>
-bool test( ProcessorT& processor, const std::string& in, const std::string& out)
+bool test( ProcessorT& processor, const std::string& in, const std::string& out, bool newLineSplit = false)
 {
     std::stringstream str;
     processor.connectOutputStream(&str);
     processor.open();
-    processor << in;
+    if (newLineSplit)
+    {
+        for (boost::algorithm::split_iterator<std::string::const_iterator> it
+            = make_split_iterator(in, token_finder(
+                boost::algorithm::is_any_of("\n"),
+                boost::algorithm::token_compress_off));
+            ;
+            )
+        {
+            std::string txt(it->begin(), it->end());
+            ++it;
+            if (it != boost::algorithm::split_iterator<std::string::const_iterator>())
+            {
+                processor << (txt + "\n");
+            }
+            else
+            {
+                processor << txt;
+                break;
+            }
+        }
+    }
+    else
+    {
+        processor << in;
+    }
     processor.close();
     std::string resultString = str.str();
     bool result = resultString == out;
@@ -181,7 +219,7 @@ void testMacroProcessing()
     //entry
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
     //any
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><descriptionmore><><>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><description&more><><>"));
     //last time
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
@@ -194,9 +232,9 @@ void testMacroProcessing()
     //entry left to right
     BOOST_CHECK( test( processor, "<[ENTRY][\"a\"]>", "<int><valueCount><0>"));
     //entry list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"]>", "<descriptionmore>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"]>", "<description&more>"));
     //entry list with separator
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;&more>"));
     //if entry
     BOOST_CHECK( test( processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<,30>"));
     //if not entry
@@ -205,7 +243,7 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
     //text correctly sorted
-    BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[more]§"));
+    BOOST_CHECK( test( processor, "§[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]§[BEGIN][END]", "§<++int>§§<valueCount$>§§[30]§§<0$>§§[description]§§[&more]§"));
     BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
     BOOST_CHECK( test( processor, "[BEGIN]    [IF][ENTRY][\"Item\"][READ_TOP_DOWN][EQUALS][\"a\"][ENTRY][\"Name\"][END]\n", "    valueCount\n"));
     //matches
@@ -217,14 +255,14 @@ void testMacroProcessing()
     //not matches ignore case
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"Bool\"][IGNORE_CASE]>", "<int><double>"));
     //matches list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"]>", "<more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"]>", "<&more>"));
     //matches list + flush 
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FLUSH]>", "<descriptionmore>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FLUSH][MERGE][\";\"]>", "<description;more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH]>", "<description&more>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH][MERGE][\";\"]>", "<description;&more>"));
     //matches list + forall
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FOR_ALL]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"more\"][FOR_ALL][FLUSH]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<descriptionmore>"));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL]>", ""));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL][FLUSH]>", ""));
+    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<description&more>"));
     //check left to right
     BOOST_CHECK( test( processor, "<[ENTRY][\"Item\"][READ_LEFT_TO_RIGHT]>", "<Type><Name><Array Maximum><Default><Description><Description>"));
     //top down
@@ -287,6 +325,8 @@ void testMacroProcessing()
     //error tag
     BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
     BOOST_CHECK_THROW( test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    //html escape
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][HTML_ESCAPE]>", "<description&amp;more>"));
     try
     {
         test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
@@ -299,8 +339,13 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
     BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
     //trim left
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "  <int>  <double>  <bool>  <bool>"));
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] ", "<int> <double> <bool> <bool> "));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT]\n", "<int>\n<double>\n<bool>\n<bool>\n"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
+    //trim right
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT.] \n", "  <int>  <double>  <bool>  <bool>"));
     //comment
     BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
     BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
@@ -308,6 +353,20 @@ void testMacroProcessing()
     BOOST_CHECK( test( processor, "[SET_RECURSION_LEVEL_LIMIT][MACRO_BEGIN]<[ENTRY][\"Type\"]>[MACRO_END]<[ENTRY.][\"Type\"]>", "<int><double><bool><bool><[ENTRY][\"Type\"]>"));
     //check limit is reseted properly
     BOOST_CHECK( test( processor, "<[ENTRY.][\"Type\"]>", "<int><double><bool><bool>")); 
+    //pad left
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_LEFT][\" \",15]>", "<    description          &more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\" \",5,7]>", "<description\n  &more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\"x \",+5,7]>", "<x    description\nx &more>"));
+    //pad right
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_RIGHT][\" \",15]>", "<description    &more          >"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_RIGHT][\" \",5,7]>", "<description\n&more  >"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_RIGHT][\" \",5,+7]>", "<description\n&more       >"));
+
+    //check fix for bug #4 [TRIM] breaks multi line macro 
+    BOOST_CHECK(test(processor, "\na[MACRO_BEGIN]<[TRIM]\n[ENTRY][\"Type\"][TRIM]\n[REPLACE][\"b\", \"B\"]>\nb[MACRO_END]\nc", "\na<int>\nb<douBle>\nb<Bool>\nb<Bool>\nb\nc", true));
+
+    //block format
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\" \"][BLOCK_FORMAT][5]>", "<descr\niptio\nn\n&more>"));
 
     //connect more tables for testing unloading
     TableT anotherTableA;

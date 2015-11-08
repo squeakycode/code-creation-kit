@@ -1,0 +1,79 @@
+#----------------------------------------------------------------------------
+#       Macros
+#----------------------------------------------------------------------------
+CC            = gcc
+CXX           = g++
+LD            = $(CXX) $(CCFLAGS) $(CPPFLAGS)
+AR            = ar
+PICFLAGS      = -fPIC
+CPPFLAGS      = $(PICFLAGS) $(GENFLAGS) -D_REENTRANT -I"$(BOOST_ROOT)/include/$(BOOST_VERSION)" -I"$(BOOST_ROOT)/." -I"../../../implementation"
+OBJEXT        = .o
+OUTPUT_OPTION = -o "$@"
+COMPILE.c     = $(CC) $(CFLAGS) $(CPPFLAGS) -c
+COMPILE.cc    = $(CXX) $(CCFLAGS) $(CPPFLAGS) -c
+LDFLAGS       = -L"." -L"$(BOOST_ROOT)/lib"
+CCC           = $(CXX)
+MAKEFILE      = Makefile.TTableIndex
+DEPENDENCIES  = .depend.$(MAKEFILE)
+BTARGETDIR    = ./
+BIN           = $(BTARGETDIR)./test_exe$(EXESUFFIX)$(EXEEXT)
+CAT           = cat
+MV            = mv -f
+RM            = rm -rf
+CP            = cp -p
+NUL           = /dev/null
+MKDIR         = mkdir -p
+TESTDIRSTART  = test -d
+TESTDIREND    = ||
+TOUCH         = touch
+EXEEXT        = 
+LIBPREFIX     = lib
+LIBSUFFIX     = 
+GENFLAGS      = -O
+LDLIBS        = -l"$(BOOST_STATIC_LIB_PREFIX)boost_system$(BOOST_CFG)" -l"$(BOOST_STATIC_LIB_PREFIX)boost_regex$(BOOST_CFG)" -l"$(BOOST_STATIC_LIB_PREFIX)boost_filesystem$(BOOST_CFG)" -l"$(BOOST_STATIC_LIB_PREFIX)boost_program_options$(BOOST_CFG)" -l"$(BOOST_STATIC_LIB_PREFIX)boost_unit_test_framework$(BOOST_CFG)" -ldl $(subst lib,-l,$(sort $(basename $(notdir $(wildcard /usr/lib/librt.so /lib/librt.so))))) -lpthread
+OBJS          = TTableIndex$(OBJEXT)
+SRC           = TTableIndex.cpp
+LINK.cc       = $(LD) $(LDFLAGS)
+EXPORTFLAGS   = $(STATICFLAGS)
+DEPLIBS       = $(foreach lib, "$(BOOST_STATIC_LIB_PREFIX)boost_system$(BOOST_CFG)" "$(BOOST_STATIC_LIB_PREFIX)boost_regex$(BOOST_CFG)" "$(BOOST_STATIC_LIB_PREFIX)boost_filesystem$(BOOST_CFG)" "$(BOOST_STATIC_LIB_PREFIX)boost_program_options$(BOOST_CFG)" $(BOOST_STATIC_LIB_PREFIX)boost_unit_test_framework$(BOOST_CFG), $(foreach libpath, . $(BOOST_ROOT)/lib, $(wildcard $(libpath)/lib$(lib).a)))
+
+#----------------------------------------------------------------------------
+#       Local targets
+#----------------------------------------------------------------------------
+
+all: __prebuild__ $(BIN) __postbuild__
+
+$(BIN): $(OBJS) $(DEPLIBS)
+	@$(TESTDIRSTART) "$(BTARGETDIR)" $(TESTDIREND) $(MKDIR) "$(BTARGETDIR)"
+	$(LINK.cc) $(OBJS) $(LDLIBS) $(OUTPUT_OPTION)
+
+generated: __prebuild__ $(GENERATED_DIRTY)
+	@-:
+
+TTableIndex$(OBJEXT): TTableIndex.cpp
+	$(COMPILE.cc) $(EXPORTFLAGS) $(OUTPUT_OPTION) TTableIndex.cpp
+
+clean:
+	-$(RM) $(OBJS)
+
+realclean: clean
+	-$(RM) $(BIN)
+
+check-syntax:
+	$(COMPILE.cc) $(EXPORTFLAGS) -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
+
+__prebuild__:
+	@rm -f ./test_exe
+
+__postbuild__: $(BIN)
+	@./test_exe
+
+#----------------------------------------------------------------------------
+#       Dependencies
+#----------------------------------------------------------------------------
+
+
+depend:
+	-$(MPC_ROOT)/depgen.pl  $(CFLAGS) $(CCFLAGS) $(CPPFLAGS) -f $(DEPENDENCIES) $(SRC) 2> $(NUL)
+
+-include $(DEPENDENCIES)

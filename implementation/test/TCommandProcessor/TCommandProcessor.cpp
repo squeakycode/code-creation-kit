@@ -1,28 +1,44 @@
-//   Copyright (C) 2011-2012 Andreas Gau
+//  Copyright (c) 2011-2015 Andreas Gau
+//  All rights reserved.
 //
-//   This file is part of the code-creation-kit.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//        notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//        notice, this list of conditions and the following disclaimer in the
+//        documentation and/or other materials provided with the distribution.
+//      * Neither the name of the copyright holder nor the
+//        names of contributors may be used to endorse or promote products
+//        derived from this software without specific prior written permission.
 //
-//   The code-creation-kit is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 2 of the License, or
-//   (at your option) any later version.
-//
-//   The code-creation-kit is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
+#ifndef _MSC_VER
+#   define BOOST_TEST_DYN_LINK
+#endif
 #include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <vector>
 #include <list>
+
+///externally provided exception class showing that an error has been printed
+class CErrorPrinted{};
+
 #include "CommandProcessor.h"
 #include "CTargetFile.h"
+using namespace code_creation_kit;
 
 class LogFileT;
 
@@ -30,16 +46,13 @@ class LogFileT;
 #pragma warning( push )
 #pragma warning( disable : 4512 )
 #pragma warning( disable : 4702 )
+#endif
 #include <boost/assign.hpp>
 #include <boost/lexical_cast.hpp>
-#endif
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
 #include <boost/foreach.hpp>
-
-///externally provided exception class showing that an error has been printed
-class CErrorPrinted{};
 
 ///stub for the generator
 template <typename StringT>
@@ -417,9 +430,9 @@ void runTest()
         //test set comment chars
         GeneratorT generator;
         generator.m_setCsvCommentChars = true;
-        generator.setCsvCommentCharsExpected( "#'");
+        generator.setCsvCommentCharsExpected( "#+");
         std::vector<std::string> args;
-        args += "-c", "--csv-comment-chars #'";
+        args += "-c", "--csv-comment-chars #+";
         process<StringT>( args, generator);
     }
 
@@ -490,9 +503,9 @@ void runTest()
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
         generator.m_recycle = true;
-        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("'''"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
+        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args;
-        args += "-c", "-s a.txt --inlined -b ''' -c >>> -d <<< --inline-pad 56 -y";
+        args += "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y";
         process<StringT>( args, generator);
     }
 
@@ -585,5 +598,7 @@ void runTest()
 BOOST_AUTO_TEST_CASE( TCommandProcessor)
 {
     runTest<std::string>();
+#ifdef _MSC_VER
     runTest<std::wstring>();
+#endif
 }

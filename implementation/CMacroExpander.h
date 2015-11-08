@@ -1,26 +1,29 @@
-//   Copyright (C) 2011-2012 Andreas Gau
+//  Copyright (c) 2011-2015 Andreas Gau
+//  All rights reserved.
 //
-//   This file is part of the code-creation-kit.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//        notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//        notice, this list of conditions and the following disclaimer in the
+//        documentation and/or other materials provided with the distribution.
+//      * Neither the name of the copyright holder nor the
+//        names of contributors may be used to endorse or promote products
+//        derived from this software without specific prior written permission.
 //
-//   The code-creation-kit is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 2 of the License, or
-//   (at your option) any later version.
-//
-//   The code-creation-kit is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef INCLUDED_CMACROEXPANDER_H_7409784
-#define INCLUDED_CMACROEXPANDER_H_7409784
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <boost/foreach.hpp>
 
@@ -41,302 +44,286 @@
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
-///defines exceptions thrown by CMacroExpander for template argument independent access
-class CMacroExpanderExceptions
+namespace code_creation_kit
 {
-public:
-    template <typename StringT>
-    class ExErrorTagExpanded : public std::runtime_error 
-    { 
-    public: 
-        ExErrorTagExpanded( const StringT& message) 
-            : std::runtime_error( "An error tag has been triggered.") 
-            , m_message( message)
-        {
-        }
-        ~ExErrorTagExpanded() throw()
-        {
-        }
-        const StringT& getMessage()
-        {
-            return m_message;
-        }
-    private:
-        StringT m_message;
-    };
-};
-
-///uses the macro data structure, a table index and a table index to create the expanded macro
-template <typename MacroT, typename TableIndexT, typename TableT>
-class CMacroExpander : public CMacroExpanderExceptions
-{
-public:
-    typedef CMacroExpander<MacroT,TableIndexT,TableT> MacroExpanderT;
-    typedef typename TableT::value_type::value_type StringT;
-    typedef typename MacroT::IndexT IndexT;
-    typedef typename MacroT::MacroExpressionT MacroExpressionT;
-    typedef StringT ExpandedMacroT;
-    typedef bool (*ConstraintFunctionT) ( typename MacroT::SubstitutionT&, const StringT&);
-    typedef void (*ConversionFunctionT) ( typename MacroT::SubstitutionT&, const StringT&, StringT&);
-
-
-    CMacroExpander( const MacroT& macro, const TableT& dummy)
-        : m_macro(macro)
-        , m_table(dummy) //will not be touched as the list of indices is empty
+    ///defines exceptions thrown by CMacroExpander for template argument independent access
+    class CMacroExpanderExceptions
     {
-        m_canExpand = true;
-        //create internal vector for substitution data
-        m_substitutions.resize( macro.getSubstitutions().size());
-    }
-
-    CMacroExpander( const TableIndexT& tableIndex, const MacroT& macro, const TableT& table, bool topDown)
-        : m_macro(macro)
-        , m_table(table)
-    {
-        m_canExpand = true;
-        //create internal vector for substitution data
-        m_substitutions.resize( macro.getSubstitutions().size());
-
-        //for each substitution
-        for( IndexT i = 0; i < m_substitutions.size(); ++i)
-        {
-            if ( !macro.getSubstitutions()[ i ].noLookUp())
+    public:
+        template <typename StringT>
+        class ExErrorTagExpanded : public std::runtime_error 
+        { 
+        public: 
+            ExErrorTagExpanded( const StringT& message) 
+                : std::runtime_error( "An error tag has been triggered.") 
+                , m_message( message)
             {
-                const typename MacroT::SubstitutionT& substitutionData = m_macro.getSubstitutions()[ i ];
-
-                //get vector of column indices
-                m_substitutions[ i ].indexVector = tableIndex.lookUp( substitutionData.entryName());
-                //check expansion using required reading direction is possible
-                bool topDownSet = substitutionData.topDown();
-                bool leftToRightSet = substitutionData.leftToRight();
-                bool directionOk = (!topDownSet && !leftToRightSet) || (topDownSet && topDown) || (leftToRightSet && !topDown);
-                //check expansion is possible
-                m_canExpand = m_canExpand && (!m_substitutions[ i ].indexVector.empty() || substitutionData.volatil()) && directionOk;
             }
-        }
-    }
-
-    //return true if all requirements are met
-    bool canExpand()
-    {
-        return m_canExpand;
-    }
-
-    ///perform expansion, return true on success
-    bool expand( IndexT row, ExpandedMacroT& expandedMacro, IndexT count, bool lastTime)
-    {
-        expandedMacro.clear();
-        if ( !expandExpression( m_macro.getExpression(), row, expandedMacro, count, lastTime))
-        {
-            //expansion failed clear output
-            expandedMacro.clear();
-            return false;
-        }
-        return true;
-    }
-
-private:
-    ///performs expansion for the expression tree recursivly
-    bool expandExpression( const MacroExpressionT& expression, IndexT row, ExpandedMacroT& expandedMacro, IndexT count, bool lastTime)
-    {
-        bool ok = false;
-
-        if ( !expression.isLeaf()) //if list of expressions
-        {
-            //remember starting point
-            std::size_t pos = expandedMacro.size();
-            if ( expression.isOred() ) //handle ored case
+            ~ExErrorTagExpanded() throw()
             {
-                BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
+            }
+            const StringT& getMessage()
+            {
+                return m_message;
+            }
+        private:
+            StringT m_message;
+        };
+    };
+
+    ///uses the macro data structure, a table index and a table index to create the expanded macro
+    template <typename MacroT, typename TableIndexT, typename TableT>
+    class CMacroExpander : public CMacroExpanderExceptions
+    {
+    public:
+        typedef CMacroExpander<MacroT,TableIndexT,TableT> MacroExpanderT;
+        typedef typename TableT::value_type::value_type StringT;
+        typedef typename MacroT::IndexT IndexT;
+        typedef typename MacroT::MacroExpressionT MacroExpressionT;
+        typedef StringT ExpandedMacroT;
+        typedef bool (*ConstraintFunctionT) ( typename MacroT::SubstitutionT&, const StringT&);
+        typedef void (*ConversionFunctionT) ( typename MacroT::SubstitutionT&, const StringT&, StringT&);
+
+
+        CMacroExpander( const MacroT& macro, const TableT& dummy)
+            : m_macro(macro)
+            , m_table(dummy) //will not be touched as the list of indices is empty
+        {
+            m_canExpand = true;
+            //create internal vector for substitution data
+            m_substitutions.resize( macro.getSubstitutions().size());
+        }
+
+        CMacroExpander( const TableIndexT& tableIndex, const MacroT& macro, const TableT& table, bool topDown)
+            : m_macro(macro)
+            , m_table(table)
+        {
+            m_canExpand = true;
+            //create internal vector for substitution data
+            m_substitutions.resize( macro.getSubstitutions().size());
+
+            //for each substitution
+            for( IndexT i = 0; i < m_substitutions.size(); ++i)
+            {
+                if ( !macro.getSubstitutions()[ i ].noLookUp())
                 {
-                    if ( expandExpression( subExpression, row, expandedMacro, count, lastTime))
-                    {
-                        ok = true;
-                        break;
-                    }
-                    //failed to expand reset expanded macro
-                    expandedMacro.resize( pos);
+                    const typename MacroT::SubstitutionT& substitutionData = m_macro.getSubstitutions()[ i ];
+
+                    //get vector of column indices
+                    m_substitutions[ i ].indexVector = tableIndex.lookUp( substitutionData.entryName());
+                    //check expansion using required reading direction is possible
+                    bool topDownSet = substitutionData.topDown();
+                    bool leftToRightSet = substitutionData.leftToRight();
+                    bool directionOk = (!topDownSet && !leftToRightSet) || (topDownSet && topDown) || (leftToRightSet && !topDown);
+                    //check expansion is possible
+                    m_canExpand = m_canExpand && (!m_substitutions[ i ].indexVector.empty() || substitutionData.volatil()) && directionOk;
                 }
             }
-            else //handle sequential list of expressions
+        }
+
+        //return true if all requirements are met
+        bool canExpand()
+        {
+            return m_canExpand;
+        }
+
+        ///perform expansion, return true on success
+        bool expand( IndexT row, ExpandedMacroT& expandedMacro, IndexT count, bool lastTime)
+        {
+            expandedMacro.clear();
+            if ( !expandExpression( m_macro.getExpression(), row, expandedMacro, count, lastTime))
             {
-                ok = true;
-                BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
+                //expansion failed clear output
+                expandedMacro.clear();
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        ///performs expansion for the expression tree recursivly
+        bool expandExpression( const MacroExpressionT& expression, IndexT row, ExpandedMacroT& expandedMacro, IndexT count, bool lastTime)
+        {
+            bool ok = false;
+
+            if ( !expression.isLeaf()) //if list of expressions
+            {
+                //remember starting point
+                std::size_t pos = expandedMacro.size();
+                if ( expression.isOred() ) //handle ored case
                 {
-                    if ( !expandExpression( subExpression, row, expandedMacro, count, lastTime))
+                    BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
                     {
+                        if ( expandExpression( subExpression, row, expandedMacro, count, lastTime))
+                        {
+                            ok = true;
+                            break;
+                        }
                         //failed to expand reset expanded macro
                         expandedMacro.resize( pos);
-                        ok = false;
-                        break;
                     }
                 }
-            }
-        }
-        else
-        {
-            if ( expression.isTextLeaf())
-            {
-                //if text leaf just add the text
-                expandedMacro += expression.getText();
-                ok = true;
-            }
-            else
-            {
-                //handle substitution
-                ok = substitution( expression.getIndex(), row, expandedMacro, count, lastTime);
-            }
-        }
-
-        return ok;
-    }
-
-    ///performs the expansion for a substitution
-    bool substitution( IndexT indexOfSubstitution, IndexT row, StringT& expandedMacro, IndexT count, bool lastTime)
-    {
-        //get substitution data
-        const typename MacroT::SubstitutionT& substitutionData = m_macro.getSubstitutions()[ indexOfSubstitution ];
-        const Substitution& localSubstitutionData = m_substitutions[ indexOfSubstitution ];
-
-        //variables holding the result of the substitution
-        std::vector<StringT> output;
-        bool success = false;
-
-        if ( substitutionData == MacroT::SubstitutionT::eError_)
-        {
-            throw ExErrorTagExpanded<StringT>( substitutionData.errorMessage());
-        }
-        else if ( substitutionData == MacroT::SubstitutionT::eFirstTime)
-        {
-            success = (count == 0) != substitutionData.not_();
-        }
-        else if ( substitutionData == MacroT::SubstitutionT::eLastTime)
-        {
-            success = lastTime != substitutionData.not_();
-        }
-        else if (  substitutionData == MacroT::SubstitutionT::eCount)
-        {
-            StringT result = boost::lexical_cast<StringT>( count + 1);
-            success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
-            if ( !substitutionData.if_())
-            {
-                output.push_back( result);
-            }
-        }
-        else if ( substitutionData == MacroT::SubstitutionT::eIndex)
-        {
-            StringT result = boost::lexical_cast<StringT>( row + 1);
-            success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
-            if ( !substitutionData.if_())
-            {
-                output.push_back( result);
-            }
-        }
-        else if ( substitutionData == MacroT::SubstitutionT::eEntry)
-        {
-            success = expandSubstitution( substitutionData.getConstraints(), localSubstitutionData.indexVector, output, row, substitutionData.if_()) != substitutionData.not_();
-        }
-        else
-        {
-            throw std::runtime_error( "Cannot expand unknown substitution.");
-        }
-
-        if ( success)
-        {
-            if ( !output.empty() && !substitutionData.getConversions().empty())
-            {
-                const typename MacroT::SubstitutionT::ConversionListT& conversions = substitutionData.getConversions();
-                BOOST_FOREACH( const typename MacroT::SubstitutionT::ConversionListT::value_type& conversion, conversions)
+                else //handle sequential list of expressions
                 {
-                    conversion->modify( output);
-                }
-            }
-            BOOST_FOREACH( const StringT& text, output)
-            {
-                expandedMacro += text;
-            }
-        }
-        return success;
-    }
-
-
-    template <typename ConstraintListT>
-    bool checkConstraints( const ConstraintListT& constraintList, const StringT& text)
-    {
-        typedef const typename ConstraintListT::value_type ConstraintT;
-
-        //check if any constraint is matched
-        BOOST_FOREACH( ConstraintT& constraint, constraintList)
-        {
-            if ( constraint->matchesConstraint( text))
-            {
-                //constraints are ored
-                return true;
-            }
-        }
-
-        //default is not equals empty string if no constraints are given
-        return constraintList.empty();
-    }
-
-    template <typename ConstraintListT, typename IndexVectorT, typename OutputT>
-    bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
-    {
-        typedef const typename ConstraintListT::value_type ConstraintT;
-        bool flush = false;
-
-        if ( constraintList.empty())
-        {
-            //default no constraints, output non empty entries
-            output.reserve( indexVector.size());
-            BOOST_FOREACH( IndexT column, indexVector)
-            {
-                const StringT& entry = m_table[ column ][ row ];
-                if ( !entry.empty())
-                {
-                    if ( suppressOutput)
+                    ok = true;
+                    BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
                     {
-                        return true;
-                    }
-                    output.push_back( entry);
-                }
-            }
-        }
-        else
-        {
-            // check constraints with flush flag first, if one entry meets the constraint the 
-            BOOST_FOREACH( ConstraintT& constraint, constraintList)
-            {
-                if ( constraint->flush() && !constraint->forAll())
-                {
-                    BOOST_FOREACH( IndexT column, indexVector)
-                    {
-                        if ( constraint->matchesConstraint( m_table[ column ][ row ]))
+                        if ( !expandExpression( subExpression, row, expandedMacro, count, lastTime))
                         {
-                            flush = true;
+                            //failed to expand reset expanded macro
+                            expandedMacro.resize( pos);
+                            ok = false;
                             break;
                         }
                     }
-                    if ( flush)
-                    {
-                        break;
-                    }
+                }
+            }
+            else
+            {
+                if ( expression.isTextLeaf())
+                {
+                    //if text leaf just add the text
+                    expandedMacro += expression.getText();
+                    ok = true;
+                }
+                else
+                {
+                    //handle substitution
+                    ok = substitution( expression.getIndex(), row, expandedMacro, count, lastTime);
                 }
             }
 
-            // if not already flush everything is set check for all constraints
-            if ( !flush)
+            return ok;
+        }
+
+        ///performs the expansion for a substitution
+        bool substitution( IndexT indexOfSubstitution, IndexT row, StringT& expandedMacro, IndexT count, bool lastTime)
+        {
+            //get substitution data
+            const typename MacroT::SubstitutionT& substitutionData = m_macro.getSubstitutions()[ indexOfSubstitution ];
+            const Substitution& localSubstitutionData = m_substitutions[ indexOfSubstitution ];
+
+            //variables holding the result of the substitution
+            std::vector<StringT> output;
+            bool success = false;
+
+            if ( substitutionData == MacroT::SubstitutionT::eError_)
             {
+                throw ExErrorTagExpanded<StringT>( substitutionData.errorMessage());
+            }
+            else if ( substitutionData == MacroT::SubstitutionT::eFirstTime)
+            {
+                success = (count == 0) != substitutionData.not_();
+            }
+            else if ( substitutionData == MacroT::SubstitutionT::eLastTime)
+            {
+                success = lastTime != substitutionData.not_();
+            }
+            else if (  substitutionData == MacroT::SubstitutionT::eCount)
+            {
+                StringT result = boost::lexical_cast<StringT>( count + 1);
+                success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
+                if ( !substitutionData.if_())
+                {
+                    output.push_back( result);
+                }
+            }
+            else if ( substitutionData == MacroT::SubstitutionT::eIndex)
+            {
+                StringT result = boost::lexical_cast<StringT>( row + 1);
+                success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
+                if ( !substitutionData.if_())
+                {
+                    output.push_back( result);
+                }
+            }
+            else if ( substitutionData == MacroT::SubstitutionT::eEntry)
+            {
+                success = expandSubstitution( substitutionData.getConstraints(), localSubstitutionData.indexVector, output, row, substitutionData.if_()) != substitutionData.not_();
+            }
+            else
+            {
+                throw std::runtime_error( "Cannot expand unknown substitution.");
+            }
+
+            if ( success)
+            {
+                if ( !output.empty() && !substitutionData.getConversions().empty())
+                {
+                    const typename MacroT::SubstitutionT::ConversionListT& conversions = substitutionData.getConversions();
+                    BOOST_FOREACH( const typename MacroT::SubstitutionT::ConversionListT::value_type& conversion, conversions)
+                    {
+                        conversion->modify( output);
+                    }
+                }
+                BOOST_FOREACH( const StringT& text, output)
+                {
+                    expandedMacro += text;
+                }
+            }
+            return success;
+        }
+
+
+        template <typename ConstraintListT>
+        bool checkConstraints( const ConstraintListT& constraintList, const StringT& text)
+        {
+            typedef const typename ConstraintListT::value_type ConstraintT;
+
+            //check if any constraint is matched
+            BOOST_FOREACH( ConstraintT& constraint, constraintList)
+            {
+                if ( constraint->matchesConstraint( text))
+                {
+                    //constraints are ored
+                    return true;
+                }
+            }
+
+            //default is not equals empty string if no constraints are given
+            return constraintList.empty();
+        }
+
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4456 ) // warning C4456: declaration of '_foreach_cur' hides previous local declaration
+#endif
+
+        template <typename ConstraintListT, typename IndexVectorT, typename OutputT>
+        bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
+        {
+            typedef const typename ConstraintListT::value_type ConstraintT;
+            bool flush = false;
+
+            if ( constraintList.empty())
+            {
+                //default no constraints, output non empty entries
+                output.reserve( indexVector.size());
+                BOOST_FOREACH( IndexT column, indexVector)
+                {
+                    const StringT& entry = m_table[ column ][ row ];
+                    if ( !entry.empty())
+                    {
+                        if ( suppressOutput)
+                        {
+                            return true;
+                        }
+                        output.push_back( entry);
+                    }
+                }
+            }
+            else
+            {
+                // check constraints with flush flag first, if one entry meets the constraint the 
                 BOOST_FOREACH( ConstraintT& constraint, constraintList)
                 {
-                    if ( constraint->forAll())
+                    if ( constraint->flush() && !constraint->forAll())
                     {
-                        flush = true;
                         BOOST_FOREACH( IndexT column, indexVector)
                         {
-                            if ( !constraint->matchesConstraint( m_table[ column ][ row ]))
+                            if ( constraint->matchesConstraint( m_table[ column ][ row ]))
                             {
-                                flush = false;
+                                flush = true;
                                 break;
                             }
                         }
@@ -346,69 +333,95 @@ private:
                         }
                     }
                 }
-            }
 
-            // if not already flush everything is set check constraint for each table entry
-            if ( !flush)
-            {
-                //try to find a matching constraint for every entry
-                BOOST_FOREACH( IndexT column, indexVector)
+                // if not already flush everything is set check for all constraints
+                if ( !flush)
                 {
-                    const StringT& entry = m_table[ column ][ row ];
                     BOOST_FOREACH( ConstraintT& constraint, constraintList)
                     {
-                        if (   !constraint->forAll()
-                            && !constraint->flush() 
-                            && constraint->matchesConstraint( entry))
+                        if ( constraint->forAll())
                         {
-                            if ( suppressOutput)
+                            flush = true;
+                            BOOST_FOREACH( IndexT column, indexVector)
                             {
-                                return true;
+                                if ( !constraint->matchesConstraint( m_table[ column ][ row ]))
+                                {
+                                    flush = false;
+                                    break;
+                                }
                             }
-
-                            output.push_back( entry);
-                            break;
+                            if ( flush)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                if ( suppressOutput)
-                {
-                    return true;
-                }
 
-                //flush every entry to the output
-                output.reserve( indexVector.size());
-                BOOST_FOREACH( IndexT column, indexVector)
+                // if not already flush everything is set check constraint for each table entry
+                if ( !flush)
                 {
-                    output.push_back( m_table[ column ][ row ]);
+                    //try to find a matching constraint for every entry
+                    BOOST_FOREACH( IndexT column, indexVector)
+                    {
+                        const StringT& entry = m_table[ column ][ row ];
+                        BOOST_FOREACH( ConstraintT& constraint, constraintList)
+                        {
+                            if (   !constraint->forAll()
+                                && !constraint->flush() 
+                                && constraint->matchesConstraint( entry))
+                            {
+                                if ( suppressOutput)
+                                {
+                                    return true;
+                                }
+
+                                output.push_back( entry);
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if ( suppressOutput)
+                    {
+                        return true;
+                    }
+
+                    //flush every entry to the output
+                    output.reserve( indexVector.size());
+                    BOOST_FOREACH( IndexT column, indexVector)
+                    {
+                        output.push_back( m_table[ column ][ row ]);
+                    }
                 }
             }
+
+            return !output.empty();
         }
-
-        return !output.empty();
-    }
-
-private:
-
-    const MacroT& m_macro; ///<data structure representing a macro, created from parsed macro
-    const TableT& m_table; ///<the data table with data to insert
-    bool m_canExpand; ///<indicates that useful expansion is possible
-
-    //holds local substitution data
-    struct Substitution
-    {
-        typedef typename TableIndexT::IndexVectorT IndexVectorT;
-        IndexVectorT indexVector;
-    };
-
-    std::vector<Substitution> m_substitutions; ///<local substitution data
-};
 
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
 
-#endif /* INCLUDED_CMACROEXPANDER_H_7409784 */
+    private:
+
+        const MacroT& m_macro; ///<data structure representing a macro, created from parsed macro
+        const TableT& m_table; ///<the data table with data to insert
+        bool m_canExpand; ///<indicates that useful expansion is possible
+
+        //holds local substitution data
+        struct Substitution
+        {
+            typedef typename TableIndexT::IndexVectorT IndexVectorT;
+            IndexVectorT indexVector;
+        };
+
+        std::vector<Substitution> m_substitutions; ///<local substitution data
+    };
+
+#ifdef _MSC_VER
+#pragma warning( pop ) 
+#endif
+}

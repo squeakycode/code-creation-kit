@@ -1,21 +1,29 @@
 Attribute VB_Name = "MainModule"
-Option Explicit
-'   Copyright (C) 2011 Andreas Gau
+Option Explicit On
+' Copyright (c) 2011-2015 Andreas Gau
+' All rights reserved.
 '
-'   This file is part of the code-creation-kit.
+' Redistribution And use in source And binary forms, with Or without
+' modification, are permitted provided that the following conditions are met:
+'     * Redistributions of source code must retain the above copyright
+'       notice, this list of conditions And the following disclaimer.
+'     * Redistributions in binary form must reproduce the above copyright
+'       notice, this list of conditions And the following disclaimer in the
+'       documentation And/Or other materials provided with the distribution.
+'     * Neither the name of the copyright holder nor the
+'       names of contributors may be used to endorse Or promote products
+'       derived from this software without specific prior written permission.
 '
-'   The code-creation-kit is free software: you can redistribute it and/or modify
-'   it under the terms of the GNU General Public License as published by
-'   the Free Software Foundation, either version 2 of the License, or
-'   (at your option) any later version.
-'
-'   The code-creation-kit is distributed in the hope that it will be useful,
-'   but WITHOUT ANY WARRANTY; without even the implied warranty of
-'   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'   GNU General Public License for more details.
-'
-'   You should have received a copy of the GNU General Public License
-'   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+' THIS SOFTWARE Is PROVIDED BY THE COPYRIGHT HOLDERS And CONTRIBUTORS "AS IS" And
+' ANY EXPRESS Or IMPLIED WARRANTIES, INCLUDING, BUT Not LIMITED TO, THE IMPLIED
+' WARRANTIES OF MERCHANTABILITY And FITNESS FOR A PARTICULAR PURPOSE ARE
+' DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+' DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, Or CONSEQUENTIAL DAMAGES
+' (INCLUDING, BUT Not LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS Or SERVICES;
+' LOSS OF USE, DATA, Or PROFITS; Or BUSINESS INTERRUPTION) HOWEVER CAUSED And
+' ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, Or TORT
+' (INCLUDING NEGLIGENCE Or OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+' SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Private Sub DisplayUsage()

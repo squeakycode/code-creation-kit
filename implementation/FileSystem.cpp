@@ -1,19 +1,27 @@
-//   Copyright (C) 2011-2012 Andreas Gau
+//  Copyright (c) 2011-2015 Andreas Gau
+//  All rights reserved.
 //
-//   This file is part of the code-creation-kit.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//        notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//        notice, this list of conditions and the following disclaimer in the
+//        documentation and/or other materials provided with the distribution.
+//      * Neither the name of the copyright holder nor the
+//        names of contributors may be used to endorse or promote products
+//        derived from this software without specific prior written permission.
 //
-//   The code-creation-kit is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 2 of the License, or
-//   (at your option) any later version.
-//
-//   The code-creation-kit is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FileSystem.h"
 #include <vector>
@@ -23,43 +31,46 @@
 #include <Shellapi.h>
 #endif
 
-namespace FileSystem
+namespace code_creation_kit
 {
-    bool recycleFile( const std::string& location)
+    namespace FileSystem
     {
+        bool recycleFile( const std::string& location)
+        {
 #ifdef WIN32
-        std::vector<std::string::value_type> temp( location.size() + 2, 0);
-        memcpy( &temp[0], location.c_str(), location.size());
-        SHFILEOPSTRUCTA fileOps;
-        ::ZeroMemory(&fileOps, sizeof(fileOps));
-        fileOps.wFunc = FO_DELETE;
-        fileOps.pFrom = &temp[0];
-        fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+            std::vector<std::string::value_type> temp( location.size() + 2, 0);
+            memcpy( &temp[0], location.c_str(), location.size());
+            SHFILEOPSTRUCTA fileOps;
+            ::ZeroMemory(&fileOps, sizeof(fileOps));
+            fileOps.wFunc = FO_DELETE;
+            fileOps.pFrom = &temp[0];
+            fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
 
-        HRESULT res = SHFileOperationA( &fileOps);
-        return SUCCEEDED( res);
+            HRESULT res = SHFileOperationA( &fileOps);
+            return SUCCEEDED( res);
 #else
-        (void) location;
-        return false;
+            (void) location;
+            return false;
 #endif
-    }
+        }
 
-    bool recycleFile( const std::wstring& location)
-    {
+        bool recycleFile( const std::wstring& location)
+        {
 #ifdef WIN32
-        std::vector<std::wstring::value_type> temp( location.size() + 2, 0);
-        memcpy( &temp[0], location.c_str(), location.size());
-        SHFILEOPSTRUCTW fileOps;
-        ::ZeroMemory(&fileOps, sizeof(fileOps));
-        fileOps.wFunc = FO_DELETE;
-        fileOps.pFrom = &temp[0];
-        fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+            std::vector<std::wstring::value_type> temp( location.size() + 2, 0);
+            memcpy( &temp[0], location.c_str(), location.size());
+            SHFILEOPSTRUCTW fileOps;
+            ::ZeroMemory(&fileOps, sizeof(fileOps));
+            fileOps.wFunc = FO_DELETE;
+            fileOps.pFrom = &temp[0];
+            fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
 
-        HRESULT res = SHFileOperationW( &fileOps);
-        return SUCCEEDED( res);
+            HRESULT res = SHFileOperationW( &fileOps);
+            return SUCCEEDED( res);
 #else
-        (void) location;
-        return false;
+            (void) location;
+            return false;
 #endif
+        }
     }
 }

@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
         [MACRO_BEGIN][TRIM]
         if ( parser.[ENTRY]["Option Name Identifier"]Passed())
         {
-            std::cout << "Option [BEGIN][ENTRY]["Option Name"][OR][ENTRY]["Short Option Name"][END] passed."
+            std::cout << "Option [BEGIN][ENTRY]["Option Name"][TO_CSTRING][OR][ENTRY]["Short Option Name"][TO_CSTRING][END] passed."
             [BEGIN][IF][ENTRY]["Data Type"][TRIM]
                       << " Value = " << parser.[ENTRY]["Option Name Identifier"]Value()
             [OR][END][TRIM]

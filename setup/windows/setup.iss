@@ -1,38 +1,47 @@
-;   Copyright (C) 2011, Andreas Gau
+;  Copyright (c) 2011-2015 Andreas Gau
+;  All rights reserved.
 ;
-;   This file is part of the code-creation-kit.
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions are met:
+;      * Redistributions of source code must retain the above copyright
+;        notice, this list of conditions and the following disclaimer.
+;      * Redistributions in binary form must reproduce the above copyright
+;        notice, this list of conditions and the following disclaimer in the
+;        documentation and/or other materials provided with the distribution.
+;      * Neither the name of the copyright holder nor the
+;        names of contributors may be used to endorse or promote products
+;        derived from this software without specific prior written permission.
 ;
-;   The code-creation-kit is free software: you can redistribute it and/or modify
-;   it under the terms of the GNU General Public License as published by
-;   the Free Software Foundation, either version 2 of the License, or
-;   (at your option) any later version.
-;
-;   The code-creation-kit is distributed in the hope that it will be useful,
-;   but WITHOUT ANY WARRANTY; without even the implied warranty of
-;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;   GNU General Public License for more details.
-;
-;   You should have received a copy of the GNU General Public License
-;   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+;  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+;  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+;  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+;  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+;  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+;  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define PackageName "code-creation-kit"
-#define PackageCopyright ReadIni("..\..\version\version.gen.ini", "version", "copyrightinfo")
-#define PackageVersion ReadIni("..\..\version\version.gen.ini", "version", "versiontext")
-#define PackageReleaseType ReadIni("..\..\version\version.gen.ini", "version", "versiontype")
+#define PackageCopyright ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "copyrightinfo")
+#define PackageVersion ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontext")
+#define PackageVersionRaw ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontextraw")
+#define PackageReleaseType ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontype")
 
 [Messages]
 SetupAppTitle={#PackageName} {#PackageVersion}
 
 [Setup]
 OutputDir=current_release
-VersionInfoVersion={#PackageVersion}
+VersionInfoVersion={#PackageVersionRaw}
 VersionInfoCopyright={#PackageCopyright}
 Compression=lzma/ultra
 VersionInfoProductName={#PackageName}
-VersionInfoProductVersion={#PackageVersion}
+VersionInfoProductVersion={#PackageVersionRaw}
 AppCopyright={#PackageCopyright}
 AppName={#PackageName}
-LicenseFile=..\..\license\gpl\gpl-2.0.txt
+LicenseFile=..\..\license\modified_bsd\modified_bsd_license_for_setup.txt
 ChangesAssociations=true
 ChangesEnvironment=true
 AppVerName={#PackageName} {#PackageReleaseType} {#PackageVersion}
@@ -58,7 +67,7 @@ Name: support; Description: Support Files; Types: full custom
 
 [Files]
 ;license
-Source: ..\..\license\gpl\gpl-2.0.txt; DestDir: {app}; Flags: ignoreversion uninsremovereadonly; DestName: LICENSE.TXT; Components: program
+Source: ..\..\license\modified_bsd\modified_bsd_license.txt; DestDir: {app}; Flags: ignoreversion uninsremovereadonly; DestName: LICENSE.TXT; Components: program
 ;bin
 Source: ..\..\output\bin\ccktc.exe; DestDir: {app}\bin; Flags: ignoreversion overwritereadonly uninsremovereadonly; Components: program
 Source: ..\..\icons\explosion.ico; DestDir: {app}\bin; Flags: ignoreversion uninsremovereadonly; DestName: tccmd.ico; Components: program
@@ -90,7 +99,8 @@ Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\Dependencies\
 
 [Icons]
 Name: {group}\CCK Help; Filename: {app}\html\index.html; Components: help
-Name: {group}\Examples; Filename: {app}\examples; Components: examples
+Name: {group}\CCK Examples; Filename: {app}\examples; Components: examples
+Name: {group}\code-creation-kit Project Home; FileName: "http://sourceforge.net/projects/cck";
 Name: {group}\{cm:UninstallProgram, {#PackageName}}; Filename: {uninstallexe}
 
 [Run]

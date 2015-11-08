@@ -1,0 +1,5 @@
+Parameter Format Name;Description
+Plain;The parameter string consists of the path and name enclosed in double quotes.
+CStyle;"The parameter string consists of the parameter text enclosed in double quotes. Use \"" express a double quote character. Use \\ to express a backslash character. Use \t to express the tab character. Use \n to express the new line character."
+Regex;The parameter string consists of the parameter text enclosed in single quotes. Use two single quotes express a single quote character.
+UInt;Unsigned Integer Number.

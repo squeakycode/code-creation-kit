@@ -1,19 +1,27 @@
-//   Copyright (C) 2011-2012 Andreas Gau
+//  Copyright (c) 2011-2015 Andreas Gau
+//  All rights reserved.
 //
-//   This file is part of the code-creation-kit.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//        notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//        notice, this list of conditions and the following disclaimer in the
+//        documentation and/or other materials provided with the distribution.
+//      * Neither the name of the copyright holder nor the
+//        names of contributors may be used to endorse or promote products
+//        derived from this software without specific prior written permission.
 //
-//   The code-creation-kit is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 2 of the License, or
-//   (at your option) any later version.
-//
-//   The code-creation-kit is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//
-//   You should have received a copy of the GNU General Public License
-//   along with the code-creation-kit. If not, see <http://www.gnu.org/licenses/>.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 //  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
@@ -27,185 +35,188 @@
 #include <set>
 #include "StringLiteral.h"
 
-class CErrorPrinted{};
+namespace code_creation_kit
+{
+    class CErrorPrinted{};
 
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4512 ) // assignment operator could not be generated
 #endif
 
-template <typename StringT, typename GeneratorT>
-class CErrorPrinter
-{
-public:
-    typedef boost::basic_format< typename StringT::value_type> FormatT;
-    typedef typename StringT::value_type CharT; 
-
-    CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
-
-    template <typename ParameterListT>
-    void generate(
-        const StringT& templateFileName,
-        const StringT& targetFileName,
-        bool useIntermediateFile,
-        bool recycle,
-        const StringT& intermediateFileName,
-        bool append,
-        const ParameterListT& parameters,
-        const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
-    )
+    template <typename StringT, typename GeneratorT>
+    class CErrorPrinter
     {
-        try
+    public:
+        typedef boost::basic_format< typename StringT::value_type> FormatT;
+        typedef typename StringT::value_type CharT; 
+
+        CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
+
+        template <typename ParameterListT>
+        void generate(
+            const StringT& templateFileName,
+            const StringT& targetFileName,
+            bool useIntermediateFile,
+            bool recycle,
+            const StringT& intermediateFileName,
+            bool append,
+            const ParameterListT& parameters,
+            const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+        )
         {
-            m_generator.generate( 
-                templateFileName,
-                targetFileName,
-                useIntermediateFile,
-                recycle,
-                intermediateFileName,
-                append,
-                parameters,
-                inlineTemplateParameters);
-        }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
-        [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
-        [MACRO_END][TRIM]
-    }
-
-    void reset()
-    {
-        m_generator.reset();
-    }
-
-    ///set delimiter for next csv table to load
-    void setCsvDelimiter( CharT delimiter)
-    {
-        try
-        {
-            m_generator.setCsvDelimiter( delimiter);
-        }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
-        [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
-        [MACRO_END][TRIM]
-    }
-
-    ///set list of characters as string that mark commented lines for next csv table to load
-    void setCsvCommentChars( const StringT& commentChars)
-    {
-        try
-        {
-            m_generator.setCsvCommentChars( commentChars);
-        }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
-        [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
-        [MACRO_END][TRIM]
-    }
-
-    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
-    {
-        m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
-    }
-
-    void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
-    {
-        try
-        {
-            m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
-        }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
-        [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
-        [MACRO_END][TRIM]
-    }
-
-    void unloadTable( const StringT& label)
-    {
-        try
-        {
-            m_generator.unloadTable( label);
-        }
-        [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
-        [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
-        [MACRO_END][TRIM]
-    }
-
-    ///sets new tag markup
-    void setMarkup( const StringT& prefix, const StringT& postfix)
-    {
-        m_generator.setMarkup( prefix, postfix);
-    }
-
-    ///adds an include directory to the list
-    void addIncludeDirectory( const StringT& directory)
-    {
-        m_generator.addIncludeDirectory( directory);
-    }
-
-    typedef std::set<StringT> FileSetT;
-
-    ///get list of loaded tables, statistic only
-    const FileSetT& getTableFiles() const
-    {
-        return m_generator.getTableFiles();
-    }
-
-    ///get list of generated files, statistic only
-    const FileSetT& getGeneratedFiles() const
-    {
-        return m_generator.getGeneratedFiles();
-    }
-
-    ///get list of template files, statistic only
-    const FileSetT& getTemplateFiles() const
-    {
-        return m_generator.getTemplateFiles();
-    }
-
-    ///connect log output stream
-    template <typename LogOutputStreamT>
-    void connectLogOutputStream( LogOutputStreamT* stream)
-    {
-        m_generator.connectLogOutputStream( stream);
-    }
-private:
-    void toErrorStream( std::string text)
-    {
-        std::cerr << text;
-    }
-
-    void toErrorStream( std::wstring text)
-    {
-        std::wcerr << text;
-    }
-
-    unsigned int getCurrentLineNumber()
-    {
-        const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-        if ( list.empty())
-        {
-            return 1;
-        }
-        return list.back().line;
-    }
-
-    StringT getCurrentFileName()
-    {
-        const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-        if ( list.empty())
-        {
-            return STRING_LITERAL("???");
+            try
+            {
+                m_generator.generate( 
+                    templateFileName,
+                    targetFileName,
+                    useIntermediateFile,
+                    recycle,
+                    intermediateFileName,
+                    append,
+                    parameters,
+                    inlineTemplateParameters);
+            }
+            [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
+            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [MACRO_END][TRIM]
         }
 
-        return list.back().name;
-    }
+        void reset()
+        {
+            m_generator.reset();
+        }
 
-    StringT addPath( const StringT& location)
-    {
-        return FileSystem::determineDependentLocation( location);
-    }
+        ///set delimiter for next csv table to load
+        void setCsvDelimiter( CharT delimiter)
+        {
+            try
+            {
+                m_generator.setCsvDelimiter( delimiter);
+            }
+            [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
+            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [MACRO_END][TRIM]
+        }
 
-    GeneratorT& m_generator;
-};
+        ///set list of characters as string that mark commented lines for next csv table to load
+        void setCsvCommentChars( const StringT& commentChars)
+        {
+            try
+            {
+                m_generator.setCsvCommentChars( commentChars);
+            }
+            [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
+            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [MACRO_END][TRIM]
+        }
+
+        void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+        {
+            m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+        }
+
+        void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
+        {
+            try
+            {
+                m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
+            }
+            [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
+            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [MACRO_END][TRIM]
+        }
+
+        void unloadTable( const StringT& label)
+        {
+            try
+            {
+                m_generator.unloadTable( label);
+            }
+            [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
+            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [MACRO_END][TRIM]
+        }
+
+        ///sets new tag markup
+        void setMarkup( const StringT& prefix, const StringT& postfix)
+        {
+            m_generator.setMarkup( prefix, postfix);
+        }
+
+        ///adds an include directory to the list
+        void addIncludeDirectory( const StringT& directory)
+        {
+            m_generator.addIncludeDirectory( directory);
+        }
+
+        typedef std::set<StringT> FileSetT;
+
+        ///get list of loaded tables, statistic only
+        const FileSetT& getTableFiles() const
+        {
+            return m_generator.getTableFiles();
+        }
+
+        ///get list of generated files, statistic only
+        const FileSetT& getGeneratedFiles() const
+        {
+            return m_generator.getGeneratedFiles();
+        }
+
+        ///get list of template files, statistic only
+        const FileSetT& getTemplateFiles() const
+        {
+            return m_generator.getTemplateFiles();
+        }
+
+        ///connect log output stream
+        template <typename LogOutputStreamT>
+        void connectLogOutputStream( LogOutputStreamT* stream)
+        {
+            m_generator.connectLogOutputStream( stream);
+        }
+    private:
+        void toErrorStream( std::string text)
+        {
+            std::cerr << text;
+        }
+
+        void toErrorStream( std::wstring text)
+        {
+            std::wcerr << text;
+        }
+
+        unsigned int getCurrentLineNumber()
+        {
+            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
+            if ( list.empty())
+            {
+                return 1;
+            }
+            return list.back().line;
+        }
+
+        StringT getCurrentFileName()
+        {
+            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
+            if ( list.empty())
+            {
+                return STRING_LITERAL("???");
+            }
+
+            return list.back().name;
+        }
+
+        StringT addPath( const StringT& location)
+        {
+            return FileSystem::determineDependentLocation( location);
+        }
+
+        GeneratorT& m_generator;
+    };
 
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
+}

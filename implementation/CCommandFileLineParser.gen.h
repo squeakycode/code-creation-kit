@@ -5,12 +5,7 @@
 */
 //------------------------------------------------------------------------------
 
-#ifndef INCLUDED_CCommandFileLineParser_H
-#define INCLUDED_CCommandFileLineParser_H
-
-#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
 #pragma once
-#endif
 
 #include <iostream>
 
@@ -1031,4 +1026,3 @@ private:
 #pragma warning( pop ) 
 #endif
 
-#endif /* INCLUDED_CCommandFileLineParser_H */

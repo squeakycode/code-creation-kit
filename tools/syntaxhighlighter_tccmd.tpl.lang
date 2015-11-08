@@ -1,14 +1,16 @@
-# Generator template language definition file
-#
-# Author: Andreas Gau
-#   Date: 23.01.2010
-# ----------
+Description="code-creation-kit template language definition file"
 
-$DESCRIPTION=Generator template language definition file
+Keywords={
+  {  Id=1,
+     Regex=[[ ([MACRO_BEGIN]-[ENTRY]["Shortcut"]|[MACRO_END][MACRO_BEGIN]--[ENTRY]["Name"][BEGIN][IF][LAST_TIME][OR]|[END][MACRO_END]) ]]
+  }
+}
 
-$KEYWORDS(kwb)=[BEGIN] -[ENTRY]["Shortcut"][END]
---[ENTRY]["Name"]
+Comments = {
+   {
+     Block=false,
+     Delimiter = { [[ # ]] }
+   }
+}
 
-$IDENTIFIER=regex(-[a-zA-Z0-9\-]+)
-$SL_COMMENT=#
-$IGNORECASE=false
+IgnoreCase=false

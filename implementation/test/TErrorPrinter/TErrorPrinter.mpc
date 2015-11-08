@@ -1,0 +1,5 @@
+project(*) : test_base {
+    after += implementation
+    libs += implementation
+    libpaths += ../../../implementation
+}
