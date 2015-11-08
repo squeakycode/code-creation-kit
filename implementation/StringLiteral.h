@@ -50,4 +50,4 @@ namespace code_creation_kit
     }
 }
 
-#define STRING_LITERAL( stringLiteral) getStringLiteral( stringLiteral, BOOST_PP_CAT(L, stringLiteral), (CharT*)0)
+#define STRING_LITERAL( stringLiteral) code_creation_kit::getStringLiteral( stringLiteral, BOOST_PP_CAT(L, stringLiteral), (CharT*)0)
