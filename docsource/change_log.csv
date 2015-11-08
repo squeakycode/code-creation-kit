@@ -1,5 +1,8 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Release;;"This release adds a few tags and fixes a few bugs. The code-creation-kit can now be build under linux.
+
+The code-creation-kit has proven itself to be a very helpful and stable tool for a class of programming tasks that involve a lot repetition. Furthermore it allows to solve programming problems that could otherwise not be solved without introducing a lot of maintenance overhead.";0.4;2015-11-08
 Improvement;;Updated documentation.;;
 Bugfix;;Fixed TRIM_LEFT.;;
 New Feature;;Added TRIM_RIGHT.;;
