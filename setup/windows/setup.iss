@@ -99,7 +99,8 @@ Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\Dependencies\
 
 [Icons]
 Name: {group}\CCK Help; Filename: {app}\html\index.html; Components: help
-Name: {group}\Examples; Filename: {app}\examples; Components: examples
+Name: {group}\CCK Examples; Filename: {app}\examples; Components: examples
+Name: {group}\code-creation-kit Project Home; FileName: "http://sourceforge.net/projects/cck";
 Name: {group}\{cm:UninstallProgram, {#PackageName}}; Filename: {uninstallexe}
 
 [Run]
