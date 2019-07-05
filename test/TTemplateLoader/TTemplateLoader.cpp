@@ -29,7 +29,6 @@
 #include "CTemplateLoader.h"
 #include <string>
 #include <sstream>
-#include <boost/foreach.hpp>
 #include "TTemplateLoaderTestFiles.h"
 
 #ifdef _MSC_VER
@@ -109,7 +108,7 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         std::string expected[] = {CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest4.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest5.txt"};
 
         int count = 0;
-        BOOST_FOREACH( const LoaderT::FileDataListT::value_type& filedata, loader.getInclusionHierarchy())
+        for ( const LoaderT::FileDataListT::value_type& filedata : loader.getInclusionHierarchy())
         {
             BOOST_CHECK( filedata.name == expected[count++]);
         }

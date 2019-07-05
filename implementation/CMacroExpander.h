@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
-
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
@@ -153,7 +151,7 @@ namespace code_creation_kit
                 std::size_t pos = expandedMacro.size();
                 if ( expression.isOred() ) //handle ored case
                 {
-                    BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
+                    for (const MacroExpressionT& subExpression : expression.getSubExpressions())
                     {
                         if ( expandExpression( subExpression, row, expandedMacro, count, lastTime))
                         {
@@ -167,7 +165,7 @@ namespace code_creation_kit
                 else //handle sequential list of expressions
                 {
                     ok = true;
-                    BOOST_FOREACH( const MacroExpressionT& subExpression, expression.getSubExpressions())
+                    for (const MacroExpressionT& subExpression : expression.getSubExpressions())
                     {
                         if ( !expandExpression( subExpression, row, expandedMacro, count, lastTime))
                         {
@@ -252,12 +250,12 @@ namespace code_creation_kit
                 if ( !output.empty() && !substitutionData.getConversions().empty())
                 {
                     const typename MacroT::SubstitutionT::ConversionListT& conversions = substitutionData.getConversions();
-                    BOOST_FOREACH( const typename MacroT::SubstitutionT::ConversionListT::value_type& conversion, conversions)
+                    for (const typename MacroT::SubstitutionT::ConversionListT::value_type& conversion : conversions)
                     {
                         conversion->modify( output);
                     }
                 }
-                BOOST_FOREACH( const StringT& text, output)
+                for (const StringT& text : output)
                 {
                     expandedMacro += text;
                 }
@@ -272,7 +270,7 @@ namespace code_creation_kit
             typedef const typename ConstraintListT::value_type ConstraintT;
 
             //check if any constraint is matched
-            BOOST_FOREACH( ConstraintT& constraint, constraintList)
+            for (ConstraintT& constraint : constraintList)
             {
                 if ( constraint->matchesConstraint( text))
                 {
@@ -285,10 +283,6 @@ namespace code_creation_kit
             return constraintList.empty();
         }
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4456 ) // warning C4456: declaration of '_foreach_cur' hides previous local declaration
-#endif
 
         template <typename ConstraintListT, typename IndexVectorT, typename OutputT>
         bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
@@ -300,7 +294,7 @@ namespace code_creation_kit
             {
                 //default no constraints, output non empty entries
                 output.reserve( indexVector.size());
-                BOOST_FOREACH( IndexT column, indexVector)
+                for (IndexT column : indexVector)
                 {
                     const StringT& entry = m_table[ column ][ row ];
                     if ( !entry.empty())
@@ -316,11 +310,11 @@ namespace code_creation_kit
             else
             {
                 // check constraints with flush flag first, if one entry meets the constraint the 
-                BOOST_FOREACH( ConstraintT& constraint, constraintList)
+                for (ConstraintT& constraint : constraintList)
                 {
                     if ( constraint->flush() && !constraint->forAll())
                     {
-                        BOOST_FOREACH( IndexT column, indexVector)
+                        for (IndexT column : indexVector)
                         {
                             if ( constraint->matchesConstraint( m_table[ column ][ row ]))
                             {
@@ -338,12 +332,12 @@ namespace code_creation_kit
                 // if not already flush everything is set check for all constraints
                 if ( !flush)
                 {
-                    BOOST_FOREACH( ConstraintT& constraint, constraintList)
+                    for (ConstraintT& constraint : constraintList)
                     {
                         if ( constraint->forAll())
                         {
                             flush = true;
-                            BOOST_FOREACH( IndexT column, indexVector)
+                            for (IndexT column : indexVector)
                             {
                                 if ( !constraint->matchesConstraint( m_table[ column ][ row ]))
                                 {
@@ -363,10 +357,10 @@ namespace code_creation_kit
                 if ( !flush)
                 {
                     //try to find a matching constraint for every entry
-                    BOOST_FOREACH( IndexT column, indexVector)
+                    for (IndexT column : indexVector)
                     {
                         const StringT& entry = m_table[ column ][ row ];
-                        BOOST_FOREACH( ConstraintT& constraint, constraintList)
+                        for (ConstraintT& constraint : constraintList)
                         {
                             if (   !constraint->forAll()
                                 && !constraint->flush() 
@@ -392,7 +386,7 @@ namespace code_creation_kit
 
                     //flush every entry to the output
                     output.reserve( indexVector.size());
-                    BOOST_FOREACH( IndexT column, indexVector)
+                    for (IndexT column : indexVector)
                     {
                         output.push_back( m_table[ column ][ row ]);
                     }
@@ -401,10 +395,6 @@ namespace code_creation_kit
 
             return !output.empty();
         }
-
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
 
     private:
 

@@ -27,7 +27,6 @@
 
 #include "CMacro.h"
 #include <vector>
-#include <boost/foreach.hpp>
 
 namespace code_creation_kit
 {
@@ -269,7 +268,7 @@ namespace code_creation_kit
         ///check is text only
         bool parseTextOnly()
         {
-            BOOST_FOREACH( const TokenT& token, m_stack)
+            for (const TokenT& token : m_stack)
             {
                 if (   token != TokenT::eFullLineWithoutTags
                     && token != TokenT::eTextFragment
@@ -287,7 +286,7 @@ namespace code_creation_kit
         void outputText(const StackT& stack, TextOutputT* output)
         {
             //output the text fragments
-            BOOST_FOREACH( const TokenT& token, stack)
+            for (const TokenT& token : stack)
             {
                 token.toStream( *output);
             }
@@ -300,7 +299,7 @@ namespace code_creation_kit
             if ( m_logOutputStream)
             {
                 *m_logOutputStream << "Found macro (level " << m_level << "):\n";
-                BOOST_FOREACH( const TokenT& token, m_stack)
+                for (const TokenT& token : m_stack)
                 {
                     token.sourceTextToStream( *m_logOutputStream);
                 }
@@ -458,7 +457,7 @@ namespace code_creation_kit
             if ( pos->getStringList())
             {
                 const typename TokenT::StringListT& textList = *(pos->getStringList());
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     expression.add( text.begin(), text.end());
                 }

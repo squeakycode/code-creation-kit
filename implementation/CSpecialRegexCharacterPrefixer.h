@@ -36,8 +36,6 @@
 
 #include "StringLiteral.h"
 
-#include <boost/foreach.hpp>
-
 namespace code_creation_kit
 {
     ///handles prefixing of special regular expression characters with /
@@ -50,7 +48,7 @@ namespace code_creation_kit
         {
             typedef typename StringT::value_type CharT;
             StringT result;
-            BOOST_FOREACH( typename StringT::value_type c, text)
+            for (typename StringT::value_type c : text)
             {
                 if ( boost::is_any_of( STRING_LITERAL(".[]{}()\\*+?|^$") )(c))
                 {
@@ -73,7 +71,7 @@ namespace code_creation_kit
         template <typename ContainerT>
         static void prefixSpecialCharactersContainer( ContainerT& container)
         {
-            BOOST_FOREACH( typename ContainerT::value_type& item, container)
+            for (typename ContainerT::value_type& item : container)
             {
                 prefixSpecialCharacters( item);
             }

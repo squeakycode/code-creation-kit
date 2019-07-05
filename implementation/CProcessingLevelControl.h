@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include <stdexcept>
 
 namespace code_creation_kit
@@ -94,7 +93,7 @@ namespace code_creation_kit
         void connectOutputStream( OutputStreamT* stream)
         {
             m_outputStream = stream;
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.lineCollector.connectOutputStream( stream);
             }
@@ -103,7 +102,7 @@ namespace code_creation_kit
         ///attaches the macro processor for the next level
         void connectMacroProcessor( MacroProcessorT* processor)
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.parser.connectOutputStream( processor);
             }
@@ -112,7 +111,7 @@ namespace code_creation_kit
         ///connect log output stream
         void connectLogOutputStream( LogOutputStreamT* stream)
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.parser.connectLogOutputStream( stream, &levelBlock - m_levelBlocks);
             }
@@ -162,7 +161,7 @@ namespace code_creation_kit
                     if ( stringList)
                     {
                         const typename TokenT::StringListT& strings = *stringList;
-                        BOOST_FOREACH( const StringT& text, strings)
+                        for (const StringT& text : strings)
                         {
                             if ( !text.empty())
                             {
@@ -249,7 +248,7 @@ namespace code_creation_kit
             m_level = m_levelBlocks;
             m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
 
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.lineCollector.reset();
                 levelBlock.parser.reset();
@@ -266,7 +265,7 @@ namespace code_creation_kit
         ///close all blocks flushing the content
         void close()
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 if ( &levelBlock >= &m_levelBlocks[ m_cMaxNumLevel ])
                 {

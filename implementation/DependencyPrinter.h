@@ -26,7 +26,6 @@
 #pragma once
 
 #include <string.h>
-#include <boost/foreach.hpp>
 #include "FileSystem.h"
 
 namespace code_creation_kit
@@ -36,7 +35,7 @@ namespace code_creation_kit
         template <typename ContainerT, typename StringT>
         void concatenate( const ContainerT& container, typename StringT::value_type quote, typename StringT::value_type delimiter, StringT& result)
         {
-            BOOST_FOREACH( const typename ContainerT::value_type& item, container)
+            for (const typename ContainerT::value_type& item : container)
             {
                 bool needsQuotes = std::find( item.begin(), item.end(), delimiter) != item.end();
                 if ( !result.empty())
@@ -59,7 +58,7 @@ namespace code_creation_kit
         ContainerT toRelativePosition( const ContainerT& container, const StringT& baseLocation)
         {
             ContainerT result;
-            BOOST_FOREACH( const typename ContainerT::value_type& item, container)
+            for (const typename ContainerT::value_type& item : container)
             {
                 result.insert( FileSystem::determineRelativeLocation( baseLocation, item));
             }

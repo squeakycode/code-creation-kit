@@ -43,8 +43,6 @@
     namespace regex_namespace = boost;
 #endif
 
-#include <boost/foreach.hpp>
-
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code

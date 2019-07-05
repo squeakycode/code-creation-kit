@@ -180,7 +180,7 @@ namespace code_creation_kit
 
             if ( !macro.noLookUp()) //if something to look up in tables
             {
-                BOOST_FOREACH( const Table& table, m_tableList)
+                for (const Table& table : m_tableList)
                 {
                     if( table.table )
                     {

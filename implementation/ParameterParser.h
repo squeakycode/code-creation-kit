@@ -37,7 +37,6 @@
 #pragma warning( pop ) 
 #endif
 
-#include <boost/foreach.hpp>
 #include <stdexcept>
 
 namespace code_creation_kit
@@ -60,7 +59,7 @@ namespace code_creation_kit
             //create list of values from one parameter
             ParameterMapT map;
             indexOfLastProcessedParameter = 0;
-            BOOST_FOREACH( const StringT& parameter, parameterList)
+            for (const StringT& parameter : parameterList)
             {
                 typename StringT::const_iterator it = parameter.begin();
                 for(; it != parameter.end(); ++it)
@@ -81,7 +80,7 @@ namespace code_creation_kit
             ///determine the maximum list size and count the parameters
             SizeT max = 0;
             SizeT count = 0;
-            BOOST_FOREACH( const PairT& pair, map)
+            for (const PairT& pair : map)
             {
                 if ( pair.second.size() > max)
                 {
@@ -99,29 +98,21 @@ namespace code_creation_kit
                 table[i].resize( max + 1); //plus one for the name
             }
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4456 ) // warning C4456: declaration of '_foreach_cur' hides previous local declaration
-#endif
-
             //transfer the values
             SizeT indexColumn = 0;
-            BOOST_FOREACH( PairT& pair, map)
+            for (PairT& pair : map)
             {
                 typename TableT::value_type& column = table[ indexColumn ];
                 ValueListT& valueList = pair.second;
                 column[ 0 ] = pair.first;
                 SizeT indexRow = 1;
-                BOOST_FOREACH( StringT& value, valueList)
+                for (StringT& value : valueList)
                 {
                     column[ indexRow ].swap( value);
                     ++indexRow;
                 }
                 ++indexColumn;
             }
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
         }
     }
 }

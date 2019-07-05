@@ -28,7 +28,6 @@
 #include "CComparableSharedObject.h"
 #include <boost/shared_ptr.hpp>
 #include <vector>
-#include <boost/foreach.hpp>
 
 namespace code_creation_kit
 {
@@ -139,7 +138,7 @@ namespace code_creation_kit
             {
                 size_t result = 0;
                 const StringListT& textList = *m_stringList;
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     result += text.size();
                 }
@@ -154,7 +153,7 @@ namespace code_creation_kit
             if ( m_stringList)
             {
                 const StringListT& textList = *m_stringList;
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     stream << text;
                 }
@@ -167,7 +166,7 @@ namespace code_creation_kit
             if ( m_sourceText || m_stringList)
             {
                 const StringListT& textList = *(m_sourceText ? m_sourceText : m_stringList);
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     stream << text;
                 }

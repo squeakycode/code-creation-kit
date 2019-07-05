@@ -51,7 +51,6 @@ class LogFileT;
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
-#include <boost/foreach.hpp>
 
 ///stub for the generator
 template <typename StringT>
@@ -280,7 +279,7 @@ void process( ContainerT& container, GeneratorT& generator)
     argsString.push_back( boost::lexical_cast<StringT>( "exename"));
     args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
 
-    BOOST_FOREACH( const typename ContainerT::value_type& arg, container)
+    for( const typename ContainerT::value_type& arg : container)
     {
         argsString.push_back( boost::lexical_cast<StringT>( arg.c_str()));
         args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));

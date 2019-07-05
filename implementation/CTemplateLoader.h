@@ -30,7 +30,6 @@
 #include "FileSystem.h"
 #include "CSourceFile.h"
 #include "CNul.h"
-#include <boost/foreach.hpp>
 
 namespace code_creation_kit
 {
@@ -100,7 +99,7 @@ namespace code_creation_kit
             //if file exists use it, otherwise check in include directories
             if ( !FileSystem::isRegularFile( resolvedName))
             {
-                BOOST_FOREACH( const StringT& includeDirectory, m_includeDirectories)
+                for (const StringT& includeDirectory : m_includeDirectories)
                 {
                     resolvedName = FileSystem::determineDependentLocation( includeDirectory, filename, false);
                     if ( FileSystem::isRegularFile( resolvedName))

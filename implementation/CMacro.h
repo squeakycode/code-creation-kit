@@ -28,7 +28,6 @@
 #include "CMacroExpression.h"
 #include "CSubstitution.h"
 #include <vector>
-#include <boost/foreach.hpp>
 
 namespace code_creation_kit
 {
@@ -80,7 +79,7 @@ namespace code_creation_kit
         ///returns true if macro requires no table look up
         bool noLookUp() const
         {
-            BOOST_FOREACH( const SubstitutionT& substitution, m_substitutions)
+            for (const SubstitutionT& substitution : m_substitutions)
             {
                 if ( !substitution.noLookUp())
                 {
@@ -93,7 +92,7 @@ namespace code_creation_kit
         ///returns true if macro contains a last time keyword
         bool lastTime() const
         {
-            BOOST_FOREACH( const SubstitutionT& substitution, m_substitutions)
+            for (const SubstitutionT& substitution : m_substitutions)
             {
                 if ( substitution == SubstitutionT::eLastTime)
                 {

@@ -27,7 +27,6 @@
 
 #include <string>
 #include "CCommandLineParser.gen.h"
-#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "CSourceFile.h"
 #include "FileSystem.h"
@@ -70,7 +69,7 @@ namespace code_creation_kit
                 else if ( CCommandLineParser<StringT>::eExecuteCommand == command )
                 {
                     std::vector<StringT> commands = parser.getCommands();
-                    BOOST_FOREACH( const StringT& generatorCommand, commands)
+                    for (const StringT& generatorCommand : commands)
                     {
                         generatorCommandProcessor.processCommand(generatorCommand, generator, StringT(), logFile);
                     }
@@ -94,7 +93,7 @@ namespace code_creation_kit
                     }
 
                     std::vector<StringT> commandFiles = parser.getCommandFiles();
-                    BOOST_FOREACH( const StringT& commandFileName, commandFiles)
+                    for (const StringT& commandFileName : commandFiles)
                     {
                         //output names of the files processed to show what is processed
                         if ( prompt && parser.hasPrompt())
@@ -127,7 +126,7 @@ namespace code_creation_kit
                     }
 
                     std::vector<StringT> commandFiles = parser.getCommandFiles();
-                    BOOST_FOREACH( const StringT& commandFileName, commandFiles)
+                    for (const StringT& commandFileName : commandFiles)
                     {
                         //reset the generator for every command file
                         generatorStatistic.reset();

@@ -27,7 +27,6 @@
 
 #include "ConversionDirectives.gen.h"
 #include "StringLiteral.h"
-#include <boost/foreach.hpp>
 #include <stdexcept>
 
 #if defined(CCK_USE_STD_REGEX)
@@ -96,7 +95,7 @@ namespace code_creation_kit
 
         virtual void modify( StringListT& textList) const
         {
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 if ( m_ignoreCase)
                 {
@@ -176,7 +175,7 @@ namespace code_creation_kit
 
         virtual void modify( StringListT& textList) const
         {
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 if ( m_ignoreCase)
                 {
@@ -229,7 +228,7 @@ namespace code_creation_kit
         {
             StringT merged;
             bool first = true;
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 if ( first)
                 {
@@ -267,7 +266,7 @@ namespace code_creation_kit
 
         virtual void modify( StringListT& textList) const
         {
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 boost::to_lower( text);
             }
@@ -293,7 +292,7 @@ namespace code_creation_kit
 
         virtual void modify( StringListT& textList) const
         {
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 boost::to_upper( text);
             }
@@ -325,7 +324,7 @@ namespace code_creation_kit
             const CharT* specialCharLiteral = STRING_LITERAL( "\'\"\?\\abfnrtv");
 
             StringT result;
-            BOOST_FOREACH( CharT c, text)
+            for (CharT c : text)
             {
                 for ( const CharT* p = specialChars; *p; ++p)
                 {
@@ -343,7 +342,7 @@ namespace code_creation_kit
 
         virtual void modify( StringListT& textList) const
         {
-            BOOST_FOREACH( StringT& text, textList)
+            for (StringT& text : textList)
             {
                 text = convertSpecialCharacters( text);
             }
@@ -401,7 +400,7 @@ namespace code_creation_kit
 
             // iterate all chars of text
             StringT result;
-            BOOST_FOREACH(CharT c, text)
+            for (CharT c : text)
             {
                 //check for characters to escape
                 const SCharTable* p = table;
@@ -434,7 +433,7 @@ namespace code_creation_kit
 
         virtual void modify(StringListT& textList) const
         {
-            BOOST_FOREACH(StringT& text, textList)
+            for (StringT& text : textList)
             {
                 text = convertSpecialCharacters(text);
             }
@@ -673,7 +672,7 @@ namespace code_creation_kit
         {
             if (this->m_padChar)
             {
-                BOOST_FOREACH(StringT& text, textList)
+                for (StringT& text : textList)
                 {
                     text = this->pad(text, true);
                 }
@@ -714,7 +713,7 @@ namespace code_creation_kit
         {
             if (this->m_padChar)
             {
-                BOOST_FOREACH(StringT& text, textList)
+                for (StringT& text : textList)
                 {
                     text = this->pad(text, false);
                 }
@@ -843,7 +842,7 @@ namespace code_creation_kit
         {
             if (m_blockWidth)
             {
-                BOOST_FOREACH(StringT& text, textList)
+                for (StringT& text : textList)
                 {
                     text = blockFormat(text);
                 }

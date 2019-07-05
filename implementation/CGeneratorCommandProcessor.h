@@ -26,7 +26,6 @@
 #pragma once
 
 #include "CCommandFileLineParser.gen.h"
-#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
@@ -149,7 +148,7 @@ namespace code_creation_kit
             else if ( command == ParserT::eUnloadTable)
             {
                 std::vector<StringT> labels = m_parser.getLabelsOfTableFilesToUnload();
-                BOOST_FOREACH( const StringT& label, labels)
+                for (const StringT& label : labels)
                 {
                     generator.unloadTable( label);
                 }
@@ -165,7 +164,7 @@ namespace code_creation_kit
             {
                 //add include directories relative to command file
                 std::vector<StringT> includeDirectories = m_parser.getIncludeDirectories();
-                BOOST_FOREACH( const StringT& directory, includeDirectories)
+                for (const StringT& directory : includeDirectories)
                 {
                     generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
                 }
