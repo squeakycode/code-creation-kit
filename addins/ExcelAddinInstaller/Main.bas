@@ -1,6 +1,6 @@
 Attribute VB_Name = "MainModule"
 Option Explicit On
-' Copyright (c) 2011-2015 Andreas Gau
+' Copyright (c) 2011-2019 Andreas Gau
 ' All rights reserved.
 '
 ' Redistribution And use in source And binary forms, with Or without

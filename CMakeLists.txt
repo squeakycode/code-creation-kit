@@ -1,4 +1,4 @@
-#  Copyright (c) 2011-2018 Andreas Gau
+#  Copyright (c) 2011-2019 Andreas Gau
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without

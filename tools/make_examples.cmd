@@ -1,5 +1,5 @@
 @echo off
-rem  Copyright (c) 2011-2015 Andreas Gau
+rem  Copyright (c) 2011-2019 Andreas Gau
 rem  All rights reserved.
 rem
 rem  Redistribution and use in source and binary forms, with or without
