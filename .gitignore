@@ -37,20 +37,44 @@ ipch/
 /output
 /docsource/temp
 /setup/windows/current_release
-test.exe
-/implementation/test/TErrorPrinter/TargetFile.txt
-/implementation/test/TErrorPrinter/TargetFile.txt.intermediate
-/implementation/test/TGenerator/LogOutput.txt
-/implementation/test/TGenerator/LogTest1.gen.txt
-/implementation/test/TGenerator/LogTest2.tpl.intermediate
-/implementation/test/TGenerator/NeedsPadding.gen.csv
-/implementation/test/TGenerator/TAppend.gen.txt
-/implementation/test/TGenerator/TDataflow.gen.txt
-/implementation/test/TGenerator/TGeneratorOut.txt
-/implementation/test/TGenerator/TGeneratorOutIntermediateUsed.txt
+/.vs
+#cmake files
+CMakeFiles
+Makefile
+cmake_install.cmake
+generate.stamp
+generate.stamp.depend
+CMakeCache.txt
 #gcc files
 *.o
 *.a
 test_exe
+#output files
+/.cproject
+/.project
+/ccktc/ccktc
+/implementation/test/TCommandProcessor/TCommandProcessor
+/implementation/test/TConstraints/TConstraints
+/implementation/test/TConversions/TConversions
+/implementation/test/TCsvParser/TCsvParser
+/implementation/test/TDependencyPrinter/TDependencyPrinter
+/implementation/test/TErrorPrinter/TErrorPrinter
+/implementation/test/TFileSystem/TFileSystem
+/implementation/test/TFilesBinaryEqual/TFilesBinaryEqual
+/implementation/test/TGenerator/TGenerator
+/implementation/test/TGeneratorStatistic/TGeneratorStatistic
+/implementation/test/TKeywordParameterParser/TKeywordParameterParser
+/implementation/test/TLineCollector/TLineCollector
+/implementation/test/TParameterParser/TParameterParser
+/implementation/test/TSourceFile/TSourceFile
+/implementation/test/TSpecialRegexCharacterPrefixer/TSpecialRegexCharacterPrefixer
+/implementation/test/TSystem/TSystem
+/implementation/test/TTableIndex/TTableIndex
+/implementation/test/TTemplateLoader/TTemplateLoader
+/implementation/test/TTemplateProcessor/TTemplateProcessor
+/implementation/test/TTokenizer/TTokenizer
+/implementation/test/TVerticalTableBuilder/TVerticalTableBuilder
 #gedit temp files
 *~
+#test input files
+TestInputFile_*

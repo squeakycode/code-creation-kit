@@ -24,14 +24,12 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <sstream>
 #include "CGenerator.h"
+#include "TGeneratorTestFiles.h"
 
 using namespace code_creation_kit;
 
@@ -39,16 +37,18 @@ class LogFileT;
 
 BOOST_AUTO_TEST_CASE( TGenerator)
 {
+    BOOST_CHECK_NO_THROW(CreateTGeneratorFiles());
+
     {
         CGenerator<std::string> generator;
 
         generator.setCsvCommentChars("#");
 
         //load a table
-        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
+        generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
 
         //test unload feature
-        generator.loadTable( "TGenerator.xls.csv", "LabelB", true, true, 1, 1, false);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TGenerator.xls.csv", "LabelB", true, true, 1, 1, false);
         generator.unloadTable( "LabelB");
 
         //create parameter list
@@ -57,16 +57,16 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         parameterList.push_back("b=5");
 
         //generate the output
-        generator.generate( "../TGenerator/TGeneratorTemplate.txt", "TGeneratorOut.txt", false, parameterList);
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", false, parameterList);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOut.txt", "TGeneratorOutExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
 
         //generate the output using intermediate file
-        generator.generate( "TGeneratorTemplate.txt", "TGeneratorOutIntermediateUsed.txt", true, false, "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
+        generator.generate(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", true, false, CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "TGeneratorOutIntermediateUsed.txt", "TGeneratorOutExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
     }
 
     //data flow test
@@ -74,27 +74,27 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         CGenerator<std::string, std::ostream> generator;
 
         //load a table
-        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
+        generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
-        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TDataflow.gen.txt");
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt");
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "TDataflow.gen.txt", "TDataflowExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
     }
 
     //test append
     {
         CGenerator<std::string> generator;
         //load a table
-        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
-        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TAppend.gen.txt", false);
-        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TAppend.gen.txt", true);
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", false);
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", true);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "TAppend.gen.txt", "TAppendExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppendExpected.txt"));
     }
 
     //test streams
@@ -143,57 +143,57 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.setCsvCommentChars("#");
 
         //load a table
-        generator.loadTable( "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TGenerator.xls.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
         generator.generate(
-            "../TGenerator/TGeneratorTemplateInline.txt",
-            "../TGenerator/TGeneratorTemplateInline.txt",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt",
             true,
             false,
-            "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
             itp);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/TGeneratorTemplateInline.txt", "TGeneratorOutInlineExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected.txt"));
 
         parameterList.push_back("a=4");
         parameterList.push_back("b=5");
 
         //generate the output
         generator.generate(
-            "../TGenerator/TGeneratorTemplateInline.txt",
-            "../TGenerator/TGeneratorTemplateInline.txt",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt",
             true,
             false,
-            "../TGenerator/TGeneratorTemplateInline.txt.intermediate",
+            "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
             itp);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/TGeneratorTemplateInline.txt", "TGeneratorOutInlineExpected2.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected2.txt"));
     }
 
     //table with padding test
     {
         CGenerator<std::string> generator;
         //load a table
-        generator.loadTable( "NeedsPadding.csv", "LabelA", true, true, 0, 0, true);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.csv", "LabelA", true, true, 0, 0, true);
 
         //generate the output
-        generator.generate( "../TGenerator/NeedsPaddingDuplicate.tpl", "NeedsPadding.gen.csv");
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "NeedsPaddingDuplicate.tpl", CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.gen.csv");
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "NeedsPadding.csv", "NeedsPadding.gen.csv"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.csv", CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.gen.csv"));
     }
 
     //log test
     {
         CGenerator<std::string, std::ostream> generator;
-        CTargetFile<std::string, LogFileT> logFile("LogOutput.txt", false);
+        CTargetFile<std::string, LogFileT> logFile(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", false);
 
         //connecting log stream
         generator.connectLogOutputStream( &logFile.get());
@@ -220,25 +220,25 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.setMarkup( "[", "]");
 
         //load a table
-        generator.loadTable( "TDataflow.csv", "LabelB", true, true, 1, 1, false);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelB", true, true, 1, 1, false);
         generator.unloadTable( "LabelB");
-        generator.loadTable( "TDataflow.csv", "LabelA", true, true, 1, 1, false);
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
         //generate the output
-        generator.generate( "../TGenerator/TDataflow.tpl.txt", "TDataflow.gen.txt");
+        generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt");
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "TDataflow.gen.txt", "TDataflowExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
 
         //check extended error output
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest1.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.gen.txt"), std::exception);
         CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest2.tpl", "../TGenerator/LogTest2.tpl", true, false, "../TGenerator/LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/LogTest3.tpl", "../TGenerator/LogTest1.gen.txt"), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest3.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest1.gen.txt"), std::exception);
 
         generator.connectLogOutputStream( NULL);
         logFile.close();
 #ifdef _MSC_VER //TODO
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "LogOutput.txt", "LogOutputExpected.txt"));
+        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", CCK_TEST_INPUT_FILE_PREFIX "LogOutputExpected.txt"));
 #endif
     }
 }

@@ -24,14 +24,13 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 
 #include <string>
 #include <vector>
 #include <list>
+
+#include "TCommandProcessorTestFiles.h"
 
 ///externally provided exception class showing that an error has been printed
 class CErrorPrinted{};
@@ -64,26 +63,10 @@ public:
     typedef std::set<StringT> FileSetT;
 
     TTestGenerator() 
-        : m_reset(false)
-        , m_loadTable(false)
-        , m_unloadTable(false)
-        , m_generate(false)
-
-        , m_topDown(false)
-        , m_leftToRight(false)
-        , m_useIntermediateFile(false)
-        , m_addIncludeDirectory(false)
-        , m_setCsvDelimiter(false)
-        , m_setCsvCommentChars(false)
-        , m_setCsvIgnoreDoubleQuotes(false)
-        , m_csvIgnoreDoubleQuotes(false)
-        , m_delimiter(0)
-        , m_rowHeaderIndex(0)
-        , m_columnHeaderIndex(0)
-        , m_padRows(false)
-        , m_append(false)
-        , m_logStream(false)
-        , m_recycle(false)
+        : m_reset(false)        , m_loadTable(false)        , m_unloadTable(false)        , m_generate(false)
+        , m_topDown(false)        , m_leftToRight(false)        , m_useIntermediateFile(false)        , m_addIncludeDirectory(false)        , m_setCsvDelimiter(false)        , m_setCsvCommentChars(false)        , m_setCsvIgnoreDoubleQuotes(false)        , m_csvIgnoreDoubleQuotes(false)        , m_setLogStream(false)
+        , m_rowHeaderIndex(0)        , m_columnHeaderIndex(0)        , m_padRows(false)
+        , m_append(false)        , m_logStream(false)        , m_recycle(false)        , m_delimiter(0)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
@@ -303,7 +286,7 @@ void process( ContainerT& container, GeneratorT& generator)
         args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
     }
 
-    CommandProcessor::processCommandLine( args.size(), &args[0], generator, generator, logFile);
+    CommandProcessor::processCommandLine( static_cast<int>(args.size()), &args[0], generator, generator, logFile);
 }
 
 ///runs the test for given string type
@@ -581,7 +564,7 @@ void runTest()
         generator.m_loadTable = true;
         generator.setParameter( "a=\"b\"");
         std::vector<std::string> args;
-        args += "-f", "CommandFile.tccmd";
+        args += "-f", CCK_TEST_INPUT_FILE_PREFIX "CommandFile.tccmd";
         process<StringT>( args, generator);
     }
 
@@ -597,6 +580,8 @@ void runTest()
 
 BOOST_AUTO_TEST_CASE( TCommandProcessor)
 {
+    BOOST_CHECK_NO_THROW(CreateTCommandProcessorFiles());
+
     runTest<std::string>();
 #ifdef _MSC_VER
     runTest<std::wstring>();

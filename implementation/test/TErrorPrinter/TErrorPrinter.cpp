@@ -24,18 +24,18 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include "CGenerator.h"
 #include "CErrorPrinter.gen.h"
+#include "TErrorPrinterTestFiles.h"
 
 using namespace code_creation_kit;
 
 BOOST_AUTO_TEST_CASE( TErrorPrinter)
 {
+    BOOST_CHECK_NO_THROW(CreateTErrorPrinterFiles());
+
     typedef std::string StringT;
     typedef std::vector<StringT> ParameterListT;
 
@@ -48,52 +48,53 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.setCsvDelimiter( '\"'), CErrorPrinted);
     generator.setCsvDelimiter( ';');
     //require delimiting char
-    BOOST_CHECK_THROW( generator.loadTable( "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //unexpected quote
-    BOOST_CHECK_THROW( generator.loadTable( "UnexpectedQuote.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "UnexpectedQuote.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //cannot open table file
-    BOOST_CHECK_THROW( generator.loadTable( "NotThere.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "NotThere.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row overflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowOverflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RowOverflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row underflow
-    BOOST_CHECK_THROW( generator.loadTable( "RowUnderflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RowUnderflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
 
     //unloaded file not found
     BOOST_CHECK_THROW( generator.unloadTable( "not there"), CErrorPrinted);
 
     //cannot open template file
-    BOOST_CHECK_THROW( generator.generate( "NotThere.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "NotThere.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open target file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "Template.tpl.txt", "BadDir/TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //cannot open intermediate output file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", true, false, "BadDir/TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "Template.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", true, false, "BadDir/TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
     //failed to move intermediate file
-    BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "BadDir/TargetFile.txt", true, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "Template.tpl.txt", "BadDir/TargetFile.txt", true, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //bad parameter
     {
         ParameterListT parameterList;
         parameterList.push_back("a=4");
         parameterList.push_back("b-5");
-        BOOST_CHECK_THROW( generator.generate( "Template.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "Template.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
     }
 
-    BOOST_CHECK_THROW( generator.generate( "CyclicInclusion.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    //cyclix inclusion
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "CyclicInclusion.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //infinite loop
     {
         ParameterListT parameterList;
         parameterList.push_back("loop=[ENTRY][\"loop\"]");
-        BOOST_CHECK_THROW( generator.generate( "InfiniteLoop.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
+        BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "InfiniteLoop.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, parameterList), CErrorPrinted);
         generator.reset();
     }
 
-    BOOST_CHECK_THROW( generator.generate( "PrefixLeadingWS.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "PostfixTrailingWS.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "ErrorTag.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
-    BOOST_CHECK_THROW( generator.generate( "BadSetRecursionLevelLimit.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "PrefixLeadingWS.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "PostfixTrailingWS.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "ErrorTag.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW( generator.generate( CCK_TEST_INPUT_FILE_PREFIX "BadSetRecursionLevelLimit.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 
     //bad chars passed for padding
-    BOOST_CHECK_THROW(generator.generate("BadCharsPassedForPadding.tpl.txt", "TargetFile.txt", false, false, "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+    BOOST_CHECK_THROW(generator.generate( CCK_TEST_INPUT_FILE_PREFIX "BadCharsPassedForPadding.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
 }
 

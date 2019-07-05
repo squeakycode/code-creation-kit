@@ -25,7 +25,14 @@
 
 #pragma once
 
-#include <boost/regex.hpp> 
+#if defined(CCK_USE_STD_REGEX)
+#   include <regex>
+    namespace regex_namespace = std;
+#else
+#   include <boost/regex.hpp>
+    namespace regex_namespace = boost;
+#endif
+
 #include "StringLiteral.h"
 #include <stdlib.h>
 
@@ -60,6 +67,7 @@ namespace code_creation_kit
 #ifdef WIN32
                 return _wgetenv( name);
 #else
+                (void)name; //unused
                 //TODO
                 throw std::runtime_error( "Reading Unicode encoded environment variable is not implemented.");
 #endif
@@ -77,10 +85,10 @@ namespace code_creation_kit
         StringT expandEnvironmentVariables( const StringT& text)
         {
             typedef typename StringT::value_type CharT;
-            typedef boost::basic_regex<CharT, boost::regex_traits<CharT> > RegexT;
+            typedef regex_namespace::basic_regex<CharT, regex_namespace::regex_traits<CharT> > RegexT;
 
             RegexT searchExpression( STRING_LITERAL( "\\$\\(([_a-zA-Z]+[_a-zA-Z0-9]*)\\)"));
-            boost::match_results<typename StringT::const_iterator> what; 
+            regex_namespace::match_results<typename StringT::const_iterator> what;
             typename StringT::const_iterator start = text.begin();
             typename StringT::const_iterator end = text.end(); 
             StringT result;

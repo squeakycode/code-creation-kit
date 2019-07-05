@@ -196,7 +196,7 @@ namespace code_creation_kit
             m_separator = true; 
         }
         const StringT& separatorText() const { return m_separatorText; }
-        const bool separator() const { return m_separator; }
+        bool separator() const { return m_separator; }
 
         ///volatil
         void volatil( bool volatil) 

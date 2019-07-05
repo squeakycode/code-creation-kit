@@ -24,9 +24,6 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 
 #include <string>
@@ -34,6 +31,7 @@
 #include <sstream>
 #include "CCsvParser.h"
 #include "CPositionTracker.h"
+#include "TCsvParserTestFiles.h"
 
 using namespace code_creation_kit;
 
@@ -79,7 +77,7 @@ namespace test_data
 ///table builder test stub 
 struct TCsvParserTableBuilder
 {
-    TCsvParserTableBuilder() : col(0), row(0), items(0), finishedCount(0) {}
+    TCsvParserTableBuilder() : row(0), col(0), items(0), finishedCount(0) {}
 
     ///checks data and positions
     void addItem( const std::string& item)
@@ -121,7 +119,7 @@ struct TCsvParserTableBuilder
 ///table builder test stub 
 struct TCsvParserTableBuilderDoubleQuote
 {
-    TCsvParserTableBuilderDoubleQuote() : col(0), row(0), items(0), finishedCount(0) {}
+    TCsvParserTableBuilderDoubleQuote() : row(0), col(0), items(0), finishedCount(0) {}
 
     ///checks data and positions
     void addItem( const std::string& item)
@@ -159,8 +157,10 @@ struct TCsvParserTableBuilderDoubleQuote
 
 BOOST_AUTO_TEST_CASE( TCsvParser)
 {
+    BOOST_CHECK_NO_THROW(CreateTCsvParserFiles());
+
     //open test file
-    std::ifstream file( "TCsvParser.csv");
+    std::ifstream file( CCK_TEST_INPUT_FILE_PREFIX "TCsvParser.csv");
     BOOST_CHECK( file.good() );
 
     //create parser

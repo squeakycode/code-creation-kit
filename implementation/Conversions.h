@@ -29,11 +29,20 @@
 #include "StringLiteral.h"
 #include <boost/foreach.hpp>
 #include <stdexcept>
-#include <boost/regex.hpp>
+
+#if defined(CCK_USE_STD_REGEX)
+#   include <regex>
+    namespace regex_namespace = std;
+#else
+#   include <boost/regex.hpp>
+    namespace regex_namespace = boost;
+#endif
+
 
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
+#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
 #endif
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -117,7 +126,7 @@ namespace code_creation_kit
     class CRegexReplaceConversion : public ConversionDirectives<StringT>, public CRegexReplaceConversionExceptions
     {
     public:
-        typedef boost::basic_regex<typename StringT::value_type, boost::regex_traits<typename StringT::value_type> > RegexT;
+        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
         typedef CRegexReplaceConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
@@ -129,7 +138,7 @@ namespace code_creation_kit
             try
             {
                 m_regexReplace = RegexT( m_replace);
-                m_regexReplaceIgnoreCase = RegexT( m_replace, boost::regex::icase);
+                m_regexReplaceIgnoreCase = RegexT( m_replace, regex_namespace::regex::icase);
             }
             catch(...)
             {
@@ -171,11 +180,11 @@ namespace code_creation_kit
             {
                 if ( m_ignoreCase)
                 {
-                    text = boost::regex_replace( text, m_regexReplaceIgnoreCase, m_with);
+                    text = regex_namespace::regex_replace( text, m_regexReplaceIgnoreCase, m_with);
                 }
                 else
                 {
-                    text = boost::regex_replace( text, m_regexReplace, m_with);
+                    text = regex_namespace::regex_replace( text, m_regexReplace, m_with);
                 }
             }
         }
@@ -791,7 +800,7 @@ namespace code_creation_kit
                         //there is whitespace in the parsed text
                         //whitespace is replaced by new line
 
-                        if (it != text.end() && *it == space || *it == tab)
+                        if (it != text.end() && (*it == space || *it == tab))
                         {
                             //next char is space anyway
                             result += StringT(lineStart, it);

@@ -1,5 +1,8 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Improvement;;Examples use the Visual Studio 2010 solution format instead of the Visual Studio 2005 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
+Bugfix;;Fixed issue in processing of BLOCK_FORMAT.;;
+Bugfix;;Fixed an issue in tag parsing that could cause processing invalid tag combinations.;;
 Release;;"This release adds a few tags and fixes a few bugs. The code-creation-kit can now be build under linux.
 
 The code-creation-kit has proven itself to be a very helpful and stable tool for a class of programming tasks that involve a lot repetition. Furthermore it allows to solve programming problems that could otherwise not be solved without introducing a lot of maintenance overhead.";0.4;2015-11-08

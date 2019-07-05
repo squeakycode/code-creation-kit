@@ -68,7 +68,7 @@ namespace code_creation_kit
         while ( a == b && fileA && fileB);
 
         //check that the streams have not failed reading
-        if ( !fileA && !fileA.eof() || !fileB && !fileB.eof())
+        if ( (!fileA && !fileA.eof()) || (!fileB && !fileB.eof()))
         {
             throw FilesBinaryEqualExceptions::ExStreamBad();
         }

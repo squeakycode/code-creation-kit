@@ -87,9 +87,13 @@ namespace code_creation_kit
                 switch( appliedItem)
                 {
                 case TokenT::e[ENTRY..]["Tag Name Capital"][IF..][ENTRY..]["Tag Name"][EQUALS..]["[ENTRY.]["[ENTRY]["Tag Name"]"]"][IF.][ENTRY.]["Tag Name"][EQUALS.]["Applyable"]: return true;
+                default: return false;
                 }
             }
             [MACRO_END][TRIM]
+        default:
+            //results in return false
+            break;
         }
         return false;
     }
@@ -100,7 +104,6 @@ namespace code_creation_kit
     bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][IF][ENTRY]["Validation Error"], ETokenT parentItem[OR][END])
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["substitution"][TRIM]
         bool if_ = false;
@@ -143,8 +146,8 @@ namespace code_creation_kit
             [MACRO_BEGIN.][TRIM.]
             case TokenT::e[ENTRY.]["Tag Name Capital"][IF.][ENTRY.]["Subtype"][EQUALS.]["[ENTRY]["Subtype"]"]:
                 {
-                    [ENTRY]["Action"][REGEX_REPLACE]['\n', '\n                ']
-                    PosT newParentItem = pos;
+                    [ENTRY]["Action"][REGEX_REPLACE]['\n', '\n                    ']
+                    PosT newParentItem = pos;[IF..][FIRST_TIME..][IF..][ENTRY..]["[ENTRY]["Subtype"]"][IF..][ENTRY..]["Subtype"][EQUALS..]["Parse"]
                     ++pos;
                     parse[ENTRY..]["[ENTRY]["Subtype"]"][IF..][ENTRY..]["Subtype"][EQUALS..]["Parse"]( pos, end, newItem, newParentItem->getToken());
                 }

@@ -24,11 +24,9 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 #include "CSourceFile.h"
+#include "TSourceFileTestFiles.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -60,6 +58,8 @@ class TestFile;
 template <typename StringT>
 void run_test()
 {
+    BOOST_CHECK_NO_THROW(CreateTSourceFileFiles());
+
     typedef TStreamHelper<StringT> SinkT;
     typedef CSourceFile<StringT,TestFile> FileT;
 
@@ -67,7 +67,7 @@ void run_test()
         SinkT result;
         SinkT expected;
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>("a.txt")).feedLineSink( result, true, counter);
+        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "a.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 0);
         BOOST_CHECK( result.result == expected.result);
     }
@@ -76,46 +76,35 @@ void run_test()
         SinkT expected;
         expected << "a";
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>("b.txt")).feedLineSink( result, true, counter);
+        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "b.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 1);
         BOOST_CHECK( result.result == expected.result);
     }
     {
         SinkT result;
         SinkT expected;
-#ifdef _MSC_VER //TODO
         expected << "a\n";
-#else
-        expected << "a\r\n";
-#endif
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>("c.txt")).feedLineSink( result, true, counter);
+        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "c.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 1);
         BOOST_CHECK( result.result == expected.result);
     }
     {
         SinkT result;
         SinkT expected;
-#ifdef _MSC_VER //TODO
         expected << "a\n" << "b";
-#else
-        expected << "a\r\n" << "b";
-#endif
+
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>("d.txt")).feedLineSink( result, true, counter);
+        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 2);
         BOOST_CHECK( result.result == expected.result);
     }
     {
         SinkT result;
         SinkT expected;
-#ifdef _MSC_VER //TODO
         expected << "a" << "b";
-#else
-        expected << "a\r" << "b";
-#endif
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>("d.txt")).feedLineSink( result, false, counter);
+        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, false, counter);
         BOOST_CHECK( counter == 2);
         BOOST_CHECK( result.result == expected.result);
     }

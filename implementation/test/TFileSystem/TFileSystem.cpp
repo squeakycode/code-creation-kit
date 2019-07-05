@@ -24,9 +24,6 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 #include "FileSystem.h"
 #include <iostream>
@@ -81,13 +78,13 @@ BOOST_AUTO_TEST_CASE( TFileSystem)
 
     std::cout << FileSystem::determineDependentLocation<std::string>( "dir\\a.txt");
 
-    BOOST_CHECK( FileSystem::isRegularFile( std::string("TFileSystem.cpp")));
-    BOOST_CHECK( !FileSystem::isRegularFile( std::string("NotExistant.cpp")));
-
     //create test file
     {
         std::ofstream("_temp_test_file_.txt");
     }
+
+    BOOST_CHECK( FileSystem::isRegularFile( std::string("_temp_test_file_.txt")));
+    BOOST_CHECK( !FileSystem::isRegularFile( std::string("NotExistant.cpp")));
 
     BOOST_CHECK( FileSystem::isRegularFile( std::string("_temp_test_file_.txt")));
     FileSystem::moveFile( std::string("_temp_test_file_.txt"), std::string("_temp_test_file_moved_.txt"));

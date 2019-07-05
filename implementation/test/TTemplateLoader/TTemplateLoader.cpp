@@ -24,15 +24,13 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define BOOST_TEST_MAIN
-#ifndef _MSC_VER
-#   define BOOST_TEST_DYN_LINK
-#endif
 #include <boost/test/unit_test.hpp>
 
 #include "CTemplateLoader.h"
 #include <string>
 #include <sstream>
 #include <boost/foreach.hpp>
+#include "TTemplateLoaderTestFiles.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -61,6 +59,9 @@ public:
 
 BOOST_AUTO_TEST_CASE( TTemplateLoader)
 {
+    BOOST_REQUIRE(CreateDirForTesting("InclusionTest"));
+    BOOST_CHECK_NO_THROW(CreateTTemplateLoaderFiles());
+
     typedef std::string StringT;
     {
         CTemplateLoader<std::stringstream, StringT> loader;
@@ -69,13 +70,9 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         {
             std::stringstream str;
             loader.connectOutputStream(&str);
-            loader.loadTemplateFile("TemplateLoaderTest1.txt");
+            loader.loadTemplateFile(CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest1.txt");
             StringT s = str.str();
-#ifdef _MSC_VER //TODO
             BOOST_CHECK(s == "a\nb\nc\n");
-#else
-            BOOST_CHECK(s == "a\r\nb\r\nc\r\n");
-#endif
             BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
         }
 
@@ -83,13 +80,9 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         {
             std::stringstream str;
             loader.connectOutputStream(&str);
-            loader.loadTemplateFile("TemplateLoaderTest2.txt");
+            loader.loadTemplateFile(CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest2.txt");
             StringT s = str.str();
-#ifdef _MSC_VER //TODO
             BOOST_CHECK(s == "x\ny\nz");
-#else
-            BOOST_CHECK(s == "x\r\ny\r\nz");
-#endif
             BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
         }
 
@@ -98,9 +91,9 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
             std::stringstream str;
             loader.connectOutputStream(&str);
             loader.addIncludeDirectory("InclusionTest");
-            loader.loadTemplateFile("TemplateLoaderTest5.txt");
+            loader.loadTemplateFile(CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest5.txt");
             StringT s = str.str();
-            BOOST_CHECK(s == "TemplateLoaderTest4.txt");
+            BOOST_CHECK(s == CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest4.txt");
             BOOST_CHECK(loader.getInclusionHierarchy().size() == 0);
         }
     }
@@ -111,9 +104,9 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         CTemplateLoader<TestHelper, StringT> loader;
         TestHelper helper( loader);
         loader.connectOutputStream( &helper);
-        BOOST_CHECK_THROW( loader.loadTemplateFile( "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);
+        BOOST_CHECK_THROW( loader.loadTemplateFile( CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);
         BOOST_REQUIRE( loader.getInclusionHierarchy().size() == 3 );
-        std::string expected[] = {"TemplateLoaderTest3.txt", "InclusionTest/TemplateLoaderTest4.txt", "InclusionTest/TemplateLoaderTest5.txt"};
+        std::string expected[] = {CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest4.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest5.txt"};
 
         int count = 0;
         BOOST_FOREACH( const LoaderT::FileDataListT::value_type& filedata, loader.getInclusionHierarchy())
@@ -122,6 +115,6 @@ BOOST_AUTO_TEST_CASE( TTemplateLoader)
         }
 
         loader.reset();
-        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0);        
+        BOOST_CHECK( loader.getInclusionHierarchy().size() == 0);
     }
 }

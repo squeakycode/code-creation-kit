@@ -35,7 +35,14 @@
 #include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
 
-#include <boost/regex.hpp> 
+#if defined(CCK_USE_STD_REGEX)
+#   include <regex>
+    namespace regex_namespace = std;
+#else
+#   include <boost/regex.hpp>
+    namespace regex_namespace = boost;
+#endif
+
 #include <boost/foreach.hpp>
 
 #ifdef _MSC_VER
@@ -66,7 +73,7 @@ namespace code_creation_kit
     public:
         typedef CBackEndTokenizer<TokenT, StringT, OutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
-        typedef boost::basic_regex<typename StringT::value_type, boost::regex_traits<typename StringT::value_type> > RegexT;
+        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
         typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
 
@@ -235,7 +242,7 @@ namespace code_creation_kit
         ThisT& operator <<( const StringT& line)
         {
             bool trimmedRight = false;
-            boost::match_results<typename StringT::const_iterator> what; 
+            regex_namespace::match_results<typename StringT::const_iterator> what;
             typename StringT::const_iterator start = line.begin();
             typename StringT::const_iterator fullLineStart = line.begin();
             typename StringT::const_iterator end = line.end(); 

@@ -174,6 +174,7 @@ namespace code_creation_kit
                 case TokenT::eFlush: return true;
                 case TokenT::eForAll: return true;
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eCount:
@@ -189,6 +190,7 @@ namespace code_creation_kit
                 case TokenT::ePadRight: return true;
                 case TokenT::eReplace: return true;
                 case TokenT::eRegexReplace: return true;
+                default: return false;
                 }
             }
         case TokenT::eEndsWith:
@@ -198,6 +200,7 @@ namespace code_creation_kit
                 case TokenT::eFlush: return true;
                 case TokenT::eForAll: return true;
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eEntry:
@@ -223,6 +226,7 @@ namespace code_creation_kit
                 case TokenT::eToLower: return true;
                 case TokenT::eToUpper: return true;
                 case TokenT::eToCString: return true;
+                default: return false;
                 }
             }
         case TokenT::eMatches:
@@ -232,6 +236,7 @@ namespace code_creation_kit
                 case TokenT::eFlush: return true;
                 case TokenT::eForAll: return true;
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eIndex:
@@ -247,6 +252,7 @@ namespace code_creation_kit
                 case TokenT::ePadRight: return true;
                 case TokenT::eReplace: return true;
                 case TokenT::eRegexReplace: return true;
+                default: return false;
                 }
             }
         case TokenT::eRegexMatches:
@@ -256,6 +262,7 @@ namespace code_creation_kit
                 case TokenT::eFlush: return true;
                 case TokenT::eForAll: return true;
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eRegexReplace:
@@ -263,6 +270,7 @@ namespace code_creation_kit
                 switch( appliedItem)
                 {
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eReplace:
@@ -270,6 +278,7 @@ namespace code_creation_kit
                 switch( appliedItem)
                 {
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
         case TokenT::eStartsWith:
@@ -279,8 +288,12 @@ namespace code_creation_kit
                 case TokenT::eFlush: return true;
                 case TokenT::eForAll: return true;
                 case TokenT::eIgnoreCase: return true;
+                default: return false;
                 }
             }
+        default:
+            //results in return false
+            break;
         }
         return false;
     }
@@ -290,7 +303,6 @@ namespace code_creation_kit
     bool parseDirectiveForConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool success = false;
         while ( pos != end && isDirectiveForConstraint( pos)) 
@@ -306,14 +318,13 @@ namespace code_creation_kit
             case TokenT::eFlush:
                 {
                     if ( item.flush())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.flush( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.flush( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -321,14 +332,13 @@ namespace code_creation_kit
             case TokenT::eForAll:
                 {
                     if ( item.forAll())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.forAll( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.forAll( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -336,14 +346,13 @@ namespace code_creation_kit
             case TokenT::eIgnoreCase:
                 {
                     if ( item.ignoreCase())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.ignoreCase( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.ignoreCase( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -361,7 +370,6 @@ namespace code_creation_kit
     bool parseConstraint( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool not_ = false;
         if ( pos != end && *pos == TokenT::eNot_)
@@ -383,10 +391,11 @@ namespace code_creation_kit
             {
             case TokenT::eAny:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CAnyConstraint<StringT>* constraint = newItem0<CAnyConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -395,10 +404,11 @@ namespace code_creation_kit
 
             case TokenT::eContains:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CContainsConstraint<StringT>* constraint = newItem1<CContainsConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -407,10 +417,11 @@ namespace code_creation_kit
 
             case TokenT::eEndsWith:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CEndsWithConstraint<StringT>* constraint = newItem1<CEndsWithConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -419,10 +430,11 @@ namespace code_creation_kit
 
             case TokenT::eMatches:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CMatchesConstraint<StringT>* constraint = newItem1<CMatchesConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -431,10 +443,11 @@ namespace code_creation_kit
 
             case TokenT::eRegexMatches:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CRegexMatchesConstraint<StringT>* constraint = newItem1<CRegexMatchesConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -443,10 +456,11 @@ namespace code_creation_kit
 
             case TokenT::eStartsWith:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CStartsWithConstraint<StringT>* constraint = newItem1<CStartsWithConstraint<StringT> >( pos);
-                item.attach( constraint);
-                ConstraintDirectives<StringT>& newItem = *constraint;
-                if ( not_ ) constraint->not_( not_);
+                    item.attach( constraint);
+                    ConstraintDirectives<StringT>& newItem = *constraint;
+                    if ( not_ ) constraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -477,7 +491,6 @@ namespace code_creation_kit
     bool parseDirectiveForConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool success = false;
         while ( pos != end && isDirectiveForConversion( pos)) 
@@ -493,14 +506,13 @@ namespace code_creation_kit
             case TokenT::eIgnoreCase:
                 {
                     if ( item.ignoreCase())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.ignoreCase( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.ignoreCase( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -518,7 +530,6 @@ namespace code_creation_kit
     bool parseConversion( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool success = false;
         while ( pos != end && isConversion( pos)) 
@@ -533,9 +544,10 @@ namespace code_creation_kit
             {
             case TokenT::eBlockFormat:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CBlockFormatConversion<StringT>* conversion = newItem1<CBlockFormatConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -544,9 +556,10 @@ namespace code_creation_kit
 
             case TokenT::eHtmlEscape:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CHtmlEscapeConversion<StringT>* conversion = newItem0<CHtmlEscapeConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -555,9 +568,10 @@ namespace code_creation_kit
 
             case TokenT::eMerge:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CMergeConversion<StringT>* conversion = newItem1<CMergeConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -566,9 +580,10 @@ namespace code_creation_kit
 
             case TokenT::ePadLeft:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CPadLeftConversion<StringT>* conversion = newItem2VariableArguments<CPadLeftConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -577,9 +592,10 @@ namespace code_creation_kit
 
             case TokenT::ePadRight:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CPadRightConversion<StringT>* conversion = newItem2VariableArguments<CPadRightConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -588,9 +604,10 @@ namespace code_creation_kit
 
             case TokenT::eRegexReplace:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CRegexReplaceConversion<StringT>* conversion = newItem2<CRegexReplaceConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -599,9 +616,10 @@ namespace code_creation_kit
 
             case TokenT::eReplace:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CReplaceConversion<StringT>* conversion = newItem2<CReplaceConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -610,9 +628,10 @@ namespace code_creation_kit
 
             case TokenT::eToCString:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CToCStringConversion<StringT>* conversion = newItem0<CToCStringConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -621,9 +640,10 @@ namespace code_creation_kit
 
             case TokenT::eToLower:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CToLowerConversion<StringT>* conversion = newItem0<CToLowerConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -632,9 +652,10 @@ namespace code_creation_kit
 
             case TokenT::eToUpper:
                 {
+                    typedef typename TokenT::StringListT::value_type StringT;
                     CToUpperConversion<StringT>* conversion = newItem0<CToUpperConversion<StringT> >( pos);
-                item.attach( conversion);
-                ConversionDirectives<StringT>& newItem = *conversion;
+                    item.attach( conversion);
+                    ConversionDirectives<StringT>& newItem = *conversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -654,7 +675,6 @@ namespace code_creation_kit
     bool parseDirectiveForSubstitution( PosT& pos, PosT& end, ItemT& item, ETokenT parentItem)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool success = false;
         while ( pos != end && isDirectiveForSubstitution( pos)) 
@@ -670,14 +690,13 @@ namespace code_creation_kit
             case TokenT::eVolatil:
                 {
                     if ( item.volatil())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.volatil( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.volatil( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -685,14 +704,13 @@ namespace code_creation_kit
             case TokenT::eLeftToRight:
                 {
                     if ( item.leftToRight())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.leftToRight( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.leftToRight( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -700,14 +718,13 @@ namespace code_creation_kit
             case TokenT::eTopDown:
                 {
                     if ( item.topDown())
-                {
-                    throw CParserExceptions::ExDirectiveAlreadyApplied();
-                }
-                else
-                {
-                    item.topDown( true);
-                }
-                    PosT newParentItem = pos;
+                    {
+                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                    }
+                    else
+                    {
+                        item.topDown( true);
+                    }
                     ++pos;
                 }
                 break;
@@ -725,7 +742,6 @@ namespace code_creation_kit
     bool parseSubstitution( PosT& pos, PosT& end, ItemT& item)
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         bool if_ = false;
         bool not_ = false;
@@ -750,10 +766,10 @@ namespace code_creation_kit
             case TokenT::eCount:
                 {
                     item = ItemT( ItemT::eCount, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -765,10 +781,10 @@ namespace code_creation_kit
             case TokenT::eEntry:
                 {
                     item = ItemT( ItemT::eEntry, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -780,10 +796,10 @@ namespace code_creation_kit
             case TokenT::eError_:
                 {
                     item = ItemT( ItemT::eError_, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -795,10 +811,10 @@ namespace code_creation_kit
             case TokenT::eFirstTime:
                 {
                     item = ItemT( ItemT::eFirstTime, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -810,10 +826,10 @@ namespace code_creation_kit
             case TokenT::eIndex:
                 {
                     item = ItemT( ItemT::eIndex, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());
@@ -825,10 +841,10 @@ namespace code_creation_kit
             case TokenT::eLastTime:
                 {
                     item = ItemT( ItemT::eLastTime, pos->getStringList());
-                ItemT& newItem = item;
-                if ( if_ ) newItem.if_( if_);
-                if_ = false;
-                if ( not_ ) newItem.not_( not_);
+                    ItemT& newItem = item;
+                    if ( if_ ) newItem.if_( if_);
+                    if_ = false;
+                    if ( not_ ) newItem.not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForSubstitution( pos, end, newItem, newParentItem->getToken());

@@ -31,7 +31,10 @@ set SOLUTION_NAME=%~1
 set PrgFiles=%ProgramFiles%
 if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
 
-call "%PrgFiles%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
+pushd %CD%
+rem call "%PrgFiles%\Microsoft Visual Studio 14.2\Common7\Tools\vsvars32.bat"
+call "%PrgFiles%\Microsoft Visual Studio\2019\Professional\Common7\Tools\VsDevCmd.bat"
+popd
 devenv "%SOLUTION_NAME%" /Build "Release|Win32"
 
 exit /b %errorlevel%

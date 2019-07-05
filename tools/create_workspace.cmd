@@ -24,22 +24,9 @@ rem  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 rem  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 rem  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set IDE_TYPE=%~1
-
-set MPC_DEPENDENCY_COMBINED_STATIC_LIBRARY=Yes
-
-set PrgFiles=%ProgramFiles%
-if defined ProgramFiles(x86) set PrgFiles=%ProgramFiles(x86)%
-
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 14.0" set IDE_TYPE=vc14
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 12.0" set IDE_TYPE=vc12
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 11.0" set IDE_TYPE=vc11
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 10.0" set IDE_TYPE=vc10
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 9.0" set IDE_TYPE=vc9
-if not defined IDE_TYPE if exist "%PrgFiles%\Microsoft Visual Studio 8" set IDE_TYPE=vc8
 
 pushd ..
-%MPC_ROOT%\mwc.pl -type %IDE_TYPE% -include mpc -features boost=1 -value_template add_references=1 -static cck.mwc
+cmake -G "Visual Studio 16 2019" -A Win32
 if %errorlevel% neq 0 popd & goto :exit_failure
 popd
 

@@ -30,6 +30,7 @@
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
+#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
 #endif
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
