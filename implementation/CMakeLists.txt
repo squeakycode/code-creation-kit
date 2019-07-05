@@ -158,10 +158,10 @@ if (CCK_TCCMD_EXECUTABLE)
 
     #Tokens.tccmd >> CBackEndTokenizer.gen.h CTokenizer.gen.h ETokens.gen.h test/TTokenizer/TokenizerTest.gen.h << "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h test/TTokenizer/TokenizerTest.tpl.h 
     add_custom_command(
-        OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CBackEndTokenizer.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/CTokenizer.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/ETokens.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/test/TTokenizer/TokenizerTest.gen.h"
+        OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CBackEndTokenizer.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/CTokenizer.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/ETokens.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/../test/TTokenizer/TokenizerTest.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Tokens.tccmd"
         MAIN_DEPENDENCY Tokens.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h test/TTokenizer/TokenizerTest.tpl.h 
+        DEPENDS "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h ../test/TTokenizer/TokenizerTest.tpl.h 
         COMMENT "Generating Tokens.tccmd"
     )
 

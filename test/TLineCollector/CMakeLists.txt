@@ -1,4 +1,4 @@
-#  Copyright (c) 2011-2015 Andreas Gau
+#  Copyright (c) 2011-2019 Andreas Gau
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -23,9 +23,19 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"..\requirements\Tag Specification.csv"
-
--s ETokens.tpl.h -o ETokens.gen.h
--s CTokenizer.tpl.h -o CTokenizer.gen.h -p Tokenizer=CTokenizer
--s CTokenizer.tpl.h -o CBackEndTokenizer.gen.h -p Tokenizer=CBackEndTokenizer
--s ../test/TTokenizer/TokenizerTest.tpl.h -o ../test/TTokenizer/TokenizerTest.gen.h
+add_executable(TLineCollector TLineCollector.cpp)
+add_dependencies(TLineCollector cck_implementation)
+target_link_libraries(TLineCollector
+    Boost::unit_test_framework
+)
+target_include_directories(TLineCollector
+    PRIVATE
+    ${Boost_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
+)
+custom_target_use_highest_warning_level(TLineCollector)
+#run the test
+add_custom_command(TARGET TLineCollector
+                   POST_BUILD
+                   COMMAND $<TARGET_FILE:TLineCollector>
+)
