@@ -27,7 +27,6 @@
 
 #include <set>
 #include "CTemplateLoader.h"
-#include <boost/noncopyable.hpp>
 #include "ETokens.gen.h"
 #include "CToken.h"
 #include "CTokenizer.gen.h"
@@ -45,7 +44,7 @@ namespace code_creation_kit
 
     ///serves generator stub and creating a statistic of the used files
     template <typename StringT>
-    class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisticExceptions
+    class CGeneratorStatistic : public CGeneratorStatisticExceptions
     {
         typedef CGeneratorStatistic<StringT> ThisT;
         typedef CToken<Tokens, StringT> TokenT;
@@ -73,6 +72,10 @@ namespace code_creation_kit
             m_preprocessor.connectTemplateLoader( this);
             m_templateLoader.connectOutputStream( &m_tokenizer);
         }
+
+        //noncopyable
+        CGeneratorStatistic(const CGeneratorStatistic&) = delete;
+        CGeneratorStatistic& operator=(const CGeneratorStatistic&) = delete;
 
         ///set delimiter for next csv table to load
         void setCsvDelimiter( CharT delimiter)

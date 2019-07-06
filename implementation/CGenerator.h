@@ -36,7 +36,6 @@
 #include "CPositionTracker.h"
 #include "CSourceFile.h"
 #include "CTargetFile.h"
-#include <boost/noncopyable.hpp>
 #include <memory>
 #include "FileSystem.h"
 
@@ -71,7 +70,7 @@ namespace code_creation_kit
 
     ///sets up and operates all building blocks needed for generating
     template <typename StringT, typename LogOutputStreamT = CNul >
-    class CGenerator : public boost::noncopyable, public CGeneratorExceptions
+    class CGenerator : public CGeneratorExceptions
     {
         class TemplateLoader;
         typedef typename StringT::value_type CharT;
@@ -183,6 +182,10 @@ namespace code_creation_kit
             , m_logOutputStream(0)
         {
         }
+
+        //noncopyable
+        CGenerator(const CGenerator&) = delete;
+        CGenerator& operator=(const CGenerator&) = delete;
 
         ///set delimiter for next csv table to load
         void setCsvDelimiter( CharT delimiter)
