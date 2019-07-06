@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <boost/preprocessor/cat.hpp>
-
 namespace code_creation_kit
 {
     inline const char* getStringLiteral( const char* a, const wchar_t*, const char*)
@@ -50,4 +48,4 @@ namespace code_creation_kit
     }
 }
 
-#define STRING_LITERAL( stringLiteral) code_creation_kit::getStringLiteral( stringLiteral, BOOST_PP_CAT(L, stringLiteral), (CharT*)0)
+#define STRING_LITERAL( stringLiteral) code_creation_kit::getStringLiteral( stringLiteral, L##stringLiteral, (CharT*)0)
