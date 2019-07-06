@@ -27,16 +27,6 @@
 
 #include <map>
 #include <list>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
 #include <stdexcept>
 
 namespace code_creation_kit
