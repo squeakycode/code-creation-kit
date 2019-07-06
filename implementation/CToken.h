@@ -26,7 +26,7 @@
 #pragma once
 
 #include "CComparableSharedObject.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 
 namespace code_creation_kit
@@ -37,8 +37,8 @@ namespace code_creation_kit
     public:
         typedef typename ETokenHolderT::token_type ETokenT;
         typedef std::vector<StringT> StringListT;
-        typedef boost::shared_ptr<StringListT> SharedStringListT;
-        typedef boost::shared_ptr<const StringListT> ConstSharedStringListT;
+        typedef std::shared_ptr<StringListT> SharedStringListT;
+        typedef std::shared_ptr<const StringListT> ConstSharedStringListT;
 
         CToken()
             : m_token((ETokenT)0)
@@ -65,21 +65,21 @@ namespace code_creation_kit
 
         CToken( ETokenT token, const StringT& textA)
             : m_token( token)
-            , m_stringList( new StringListT(1))
+            , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->front() = textA;
         }
 
         CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
             : m_token( token)
-            , m_stringList( new StringListT(1))
+            , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->back().assign( start, end);
         }
 
         CToken( ETokenT token, const StringT& textA, const StringT& textB)
             : m_token( token)
-            , m_stringList( new StringListT(2))
+            , m_stringList(std::make_shared<StringListT>(2))
         {
             m_stringList->front() = textA;
             m_stringList->back() = textB;

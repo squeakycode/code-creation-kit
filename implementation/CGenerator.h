@@ -37,7 +37,7 @@
 #include "CSourceFile.h"
 #include "CTargetFile.h"
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "FileSystem.h"
 
 #include "ParameterParser.h"
@@ -134,7 +134,7 @@ namespace code_creation_kit
             {
             }
 
-            TableData( boost::shared_ptr<const TableT> aTable)
+            TableData( std::shared_ptr<const TableT> aTable)
                 : table(aTable)
             {
             }
@@ -152,7 +152,7 @@ namespace code_creation_kit
             }
 
             ///access the table data read only
-            boost::shared_ptr<const TableT> getTable() const
+            std::shared_ptr<const TableT> getTable() const
             {
                 return table;
             }
@@ -165,7 +165,7 @@ namespace code_creation_kit
 
         private:
             TableProperties properties; ///<properties used when loading
-            boost::shared_ptr<const TableT> table; ///<the loaded table data
+            std::shared_ptr<const TableT> table; ///<the loaded table data
         };
 
 
@@ -278,7 +278,7 @@ namespace code_creation_kit
                 typedef CVerticalTableBuilder<TableT> TableBuilderT;
                 TableT* tableToLoad = new TableT;
                 TableBuilderT tableBuidler( *tableToLoad, padRows);
-                typename TableListT::value_type tableData( properties, tableToLoad);
+                typename TableListT::value_type tableData( properties, tableToLoad);  //takes ownership of tableToLoad and deletes it later
 
                 try
                 {
@@ -319,8 +319,8 @@ namespace code_creation_kit
             typedef CVerticalTableBuilder<TableT> TableBuilderT;
             TableT* tableToLoad = new TableT;
             TableBuilderT tableBuidler( *tableToLoad, padRows);
-            boost::shared_ptr<const TableT> psTableToLoad( tableToLoad);
-            typename TableListT::value_type tableData( psTableToLoad);
+            std::shared_ptr<const TableT> psTableToLoad( tableToLoad);
+            typename TableListT::value_type tableData( psTableToLoad); //takes ownership of tableToLoad and deletes it later
 
             try
             {
@@ -338,7 +338,7 @@ namespace code_creation_kit
         }
 
         ///load another table for generation, see also unloadTable
-        void loadTable( boost::shared_ptr<const TableT> table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+        void loadTable( std::shared_ptr<const TableT> table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
         {
             //log
             if ( m_logOutputStream)

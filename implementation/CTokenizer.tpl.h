@@ -278,14 +278,14 @@ namespace code_creation_kit
             pos = pos * 2 - 1;
             if ( (what[ pos ].second - what[ pos ].first) > 0 )
             {
-                typename TokenT::SharedStringListT list( new typename TokenT::StringListT(2));
+                typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(2);
                 list->front().assign( what[ pos - 1 ].first, what[ pos ].first);
                 list->back().assign( what[ pos ].first + 1, endPos);
                 return list;
             }
             --pos;
             [MACRO_END][TRIM]
-            typename TokenT::SharedStringListT list( new typename TokenT::StringListT(1));
+            typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(1);
             list->front().assign( what[ pos ].first, endPos);
             return list;
         }
@@ -417,7 +417,7 @@ namespace code_creation_kit
                         continue;
                     }
                     [MACRO_END.][TRIM]
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                     [BEGIN][TRIM]

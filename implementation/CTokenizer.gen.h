@@ -264,7 +264,7 @@ namespace code_creation_kit
         template <typename WhatT>
         typename TokenT::SharedStringListT getSourceText( WhatT& what, int pos, typename StringT::const_iterator& endPos)
         {
-            typename TokenT::SharedStringListT list( new typename TokenT::StringListT(1));
+            typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(1);
             list->front().assign( what[ pos ].first, endPos);
             return list;
         }
@@ -391,7 +391,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eInclude) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -419,7 +419,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eMarkup) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(2);
@@ -535,7 +535,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eBlockFormat) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -563,7 +563,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eContains) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -613,7 +613,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eEndsWith) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -641,7 +641,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eEntry) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -669,7 +669,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eMatches) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -697,7 +697,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eError_) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -835,7 +835,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eRegexMatches) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -863,7 +863,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eMerge) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);
@@ -913,7 +913,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::ePadLeft) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(start, end, *list);
@@ -941,7 +941,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::ePadRight) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(start, end, *list);
@@ -991,7 +991,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eRegexReplace) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(2);
@@ -1019,7 +1019,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eReplace) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(2);
@@ -1047,7 +1047,7 @@ namespace code_creation_kit
                 }
                 else if ( what[ (TokenT::eStartsWith) ].matched )
                 {
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                         list->resize(1);

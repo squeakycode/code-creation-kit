@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         std::stringstream in;
         std::stringstream out;
         std::stringstream csv, csv2;
-        boost::shared_ptr<TableT> psTable( new TableT(2));
+        std::shared_ptr<TableT> psTable( new TableT(2));
 
         (*psTable)[0].push_back("b");
         (*psTable)[0].push_back("7");

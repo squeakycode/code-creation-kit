@@ -35,27 +35,27 @@
 namespace code_creation_kit
 {
     template <typename T, typename PosT>
-    T* newItem0( PosT&)
+    std::shared_ptr<T> newItem0(PosT&)
     {
-        return new T();
+        return std::make_shared<T>();
     }
 
     template <typename T, typename PosT>
-    T* newItem1( PosT& pos)
+    std::shared_ptr<T> newItem1(PosT& pos)
     {
-        return new T( pos->getStringList()->front());
+        return std::make_shared<T>(pos->getStringList()->front());
     }
 
     template <typename T, typename PosT>
-    T* newItem2( PosT& pos)
+    std::shared_ptr<T> newItem2(PosT& pos)
     {
-        return new T( pos->getStringList()->front(), pos->getStringList()->back());
+        return std::make_shared<T>(pos->getStringList()->front(), pos->getStringList()->back());
     }
 
     template <typename T, typename PosT>
-    T* newItem2VariableArguments(PosT& pos)
+    std::shared_ptr<T> newItem2VariableArguments(PosT& pos)
     {
-        return new T(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
+        return std::make_shared<T>(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
     }
 
 
@@ -392,10 +392,10 @@ namespace code_creation_kit
             case TokenT::eAny:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CAnyConstraint<StringT>* constraint = newItem0<CAnyConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CAnyConstraint<StringT> > ptrConstraint = newItem0<CAnyConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -405,10 +405,10 @@ namespace code_creation_kit
             case TokenT::eContains:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CContainsConstraint<StringT>* constraint = newItem1<CContainsConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CContainsConstraint<StringT> > ptrConstraint = newItem1<CContainsConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -418,10 +418,10 @@ namespace code_creation_kit
             case TokenT::eEndsWith:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CEndsWithConstraint<StringT>* constraint = newItem1<CEndsWithConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CEndsWithConstraint<StringT> > ptrConstraint = newItem1<CEndsWithConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -431,10 +431,10 @@ namespace code_creation_kit
             case TokenT::eMatches:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CMatchesConstraint<StringT>* constraint = newItem1<CMatchesConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CMatchesConstraint<StringT> > ptrConstraint = newItem1<CMatchesConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -444,10 +444,10 @@ namespace code_creation_kit
             case TokenT::eRegexMatches:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CRegexMatchesConstraint<StringT>* constraint = newItem1<CRegexMatchesConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CRegexMatchesConstraint<StringT> > ptrConstraint = newItem1<CRegexMatchesConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -457,10 +457,10 @@ namespace code_creation_kit
             case TokenT::eStartsWith:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CStartsWithConstraint<StringT>* constraint = newItem1<CStartsWithConstraint<StringT> >( pos);
-                    item.attach( constraint);
-                    ConstraintDirectives<StringT>& newItem = *constraint;
-                    if ( not_ ) constraint->not_( not_);
+                    std::shared_ptr<CStartsWithConstraint<StringT> > ptrConstraint = newItem1<CStartsWithConstraint<StringT> >( pos);
+                    item.attach( ptrConstraint);
+                    ConstraintDirectives<StringT>& newItem = *ptrConstraint;
+                    if ( not_ ) ptrConstraint->not_( not_);
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConstraint( pos, end, newItem, newParentItem->getToken());
@@ -545,9 +545,10 @@ namespace code_creation_kit
             case TokenT::eBlockFormat:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CBlockFormatConversion<StringT>* conversion = newItem1<CBlockFormatConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CBlockFormatConversion<StringT> > ptrConversion = newItem1<CBlockFormatConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -557,9 +558,10 @@ namespace code_creation_kit
             case TokenT::eHtmlEscape:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CHtmlEscapeConversion<StringT>* conversion = newItem0<CHtmlEscapeConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CHtmlEscapeConversion<StringT> > ptrConversion = newItem0<CHtmlEscapeConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -569,9 +571,10 @@ namespace code_creation_kit
             case TokenT::eMerge:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CMergeConversion<StringT>* conversion = newItem1<CMergeConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CMergeConversion<StringT> > ptrConversion = newItem1<CMergeConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -581,9 +584,10 @@ namespace code_creation_kit
             case TokenT::ePadLeft:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CPadLeftConversion<StringT>* conversion = newItem2VariableArguments<CPadLeftConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CPadLeftConversion<StringT> > ptrConversion = newItem2VariableArguments<CPadLeftConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -593,9 +597,10 @@ namespace code_creation_kit
             case TokenT::ePadRight:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CPadRightConversion<StringT>* conversion = newItem2VariableArguments<CPadRightConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CPadRightConversion<StringT> > ptrConversion = newItem2VariableArguments<CPadRightConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -605,9 +610,10 @@ namespace code_creation_kit
             case TokenT::eRegexReplace:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CRegexReplaceConversion<StringT>* conversion = newItem2<CRegexReplaceConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CRegexReplaceConversion<StringT> > ptrConversion = newItem2<CRegexReplaceConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -617,9 +623,10 @@ namespace code_creation_kit
             case TokenT::eReplace:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CReplaceConversion<StringT>* conversion = newItem2<CReplaceConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CReplaceConversion<StringT> > ptrConversion = newItem2<CReplaceConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -629,9 +636,10 @@ namespace code_creation_kit
             case TokenT::eToCString:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CToCStringConversion<StringT>* conversion = newItem0<CToCStringConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CToCStringConversion<StringT> > ptrConversion = newItem0<CToCStringConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -641,9 +649,10 @@ namespace code_creation_kit
             case TokenT::eToLower:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CToLowerConversion<StringT>* conversion = newItem0<CToLowerConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CToLowerConversion<StringT> > ptrConversion = newItem0<CToLowerConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
@@ -653,9 +662,10 @@ namespace code_creation_kit
             case TokenT::eToUpper:
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
-                    CToUpperConversion<StringT>* conversion = newItem0<CToUpperConversion<StringT> >( pos);
-                    item.attach( conversion);
-                    ConversionDirectives<StringT>& newItem = *conversion;
+                    
+                    std::shared_ptr<CToUpperConversion<StringT> > ptrConversion = newItem0<CToUpperConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
                     ++pos;
                     parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());

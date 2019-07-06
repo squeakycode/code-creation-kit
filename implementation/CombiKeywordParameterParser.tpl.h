@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <cassert>
 #include "KeywordParameterParser.h"
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -49,7 +50,7 @@ namespace code_creation_kit
             [BEGIN][TRIM]
             {
                 typename ContainerT::iterator it = parameters.begin();
-                C[ENTRY]["Fixed Part"][REPLACE][";", "ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;\n            C"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
+                C[ENTRY]["Fixed Part"][REPLACE][";", "ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;\n                C"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
                 assert(it == parameters.end());
             }
             [OR][END][TRIM]

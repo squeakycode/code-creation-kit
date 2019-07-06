@@ -35,27 +35,27 @@
 namespace code_creation_kit
 {
     template <typename T, typename PosT>
-    T* newItem0( PosT&)
+    std::shared_ptr<T> newItem0(PosT&)
     {
-        return new T();
+        return std::make_shared<T>();
     }
 
     template <typename T, typename PosT>
-    T* newItem1( PosT& pos)
+    std::shared_ptr<T> newItem1(PosT& pos)
     {
-        return new T( pos->getStringList()->front());
+        return std::make_shared<T>(pos->getStringList()->front());
     }
 
     template <typename T, typename PosT>
-    T* newItem2( PosT& pos)
+    std::shared_ptr<T> newItem2(PosT& pos)
     {
-        return new T( pos->getStringList()->front(), pos->getStringList()->back());
+        return std::make_shared<T>(pos->getStringList()->front(), pos->getStringList()->back());
     }
 
     template <typename T, typename PosT>
-    T* newItem2VariableArguments(PosT& pos)
+    std::shared_ptr<T> newItem2VariableArguments(PosT& pos)
     {
-        return new T(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
+        return std::make_shared<T>(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
     }
 
 
