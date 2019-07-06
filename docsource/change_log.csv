@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added PART, PART_BEGIN, PART_END, PART_REMOVE for defining fragments of a template or macro. This allows to write better readable template files by avoiding large macros and repetition.;;
 Improvement;;Examples use the Visual Studio 2010 solution format instead of the Visual Studio 2005 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
 Bugfix;;Fixed issue in processing of BLOCK_FORMAT.;;
 Bugfix;;Fixed an issue in tag parsing that could cause processing invalid tag combinations.;;

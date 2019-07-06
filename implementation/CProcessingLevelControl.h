@@ -80,7 +80,10 @@ namespace code_creation_kit
             , m_inlineTemplateMode(false)
             , m_numInlinePad(0)
         {
-
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
+            {
+                levelBlock.parser.connectPartMap(&m_partMap);
+            }
         }
 
         ///attaches stream for the final output
@@ -247,6 +250,7 @@ namespace code_creation_kit
         {
             m_level = m_levelBlocks;
             m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+            m_partMap.clear();
 
             for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
@@ -301,6 +305,7 @@ namespace code_creation_kit
             m_outputStream->setBypassMode( false);
             m_level = m_levelBlocks;
             m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+            m_partMap.clear();
         }
 
         ///return maximum number of recursion levels
@@ -329,6 +334,7 @@ namespace code_creation_kit
         StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
         StringT m_inlineGeneratedPostfixAndCarriageReturnNewLine; ///< marks a generated line
         size_t m_numInlinePad; ///< if a line has less chars than this value then pad with spaces
+        typename ParserT::PartMapT m_partMap;
 
         ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
     };

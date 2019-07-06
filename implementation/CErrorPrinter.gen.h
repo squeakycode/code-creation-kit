@@ -651,6 +651,90 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
+            catch( CParserExceptions::ExPartBlocksCannotBeNested& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1840: Part blocks cannot be nested.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1840: Part blocks cannot be nested.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExMissingPartBegin& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1841: Missing begin part marker.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1841: Missing begin part marker.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExMissingPartEnd& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1842: Missing part end marker.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1842: Missing part end marker.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExPartAlreadyDefined& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1843: Part already defined. Cannot add a second part with the same label.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1843: Part already defined. Cannot add a second part with the same label.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExPartNotDefined& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1844: Part not defined. Cannot expand part.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1844: Part not defined. Cannot expand part.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExPossibleInfiniteLoop& e)
+            {
+                (void) e;
+                
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1845: Recursion exceeded the maximum of allowed levels while expanding part.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1845: Recursion exceeded the maximum of allowed levels while expanding part.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
             catch( CParserExceptions::ExMacroTooLarge& e)
             {
                 (void) e;

@@ -170,7 +170,7 @@ void testMacroProcessing()
 
     processor.connectTable( &table, "label A", true, true, 1, 1);
 
-    //error handling    
+    //error handling
     BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
     BOOST_CHECK_THROW( test( processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
     BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
@@ -187,6 +187,16 @@ void testMacroProcessing()
     BOOST_CHECK_THROW( test( processor, "a[INDEX][TO_UPPER]", ""), CParserExceptions::ExCannotApplyConversionToSubstitution);
     BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
     BOOST_CHECK_THROW( test( processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
+
+    //parts
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingPartEnd);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_END]b)", ""), CParserExceptions::ExMissingPartBegin);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_BEGIN]["l2"]c)", ""), CParserExceptions::ExPartBlocksCannotBeNested);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_BEGIN]["l1"]d[PART_END]e)", ""), CParserExceptions::ExPartAlreadyDefined);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_REMOVE]["l1"]d[PART]["l1"]e)", ""), CParserExceptions::ExPartNotDefined);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART]["l1"]b)", ""), CParserExceptions::ExPartNotDefined);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"][PART]["l1"][PART_END]c[PART]["l1"]d)", ""), CParserExceptions::ExPossibleInfiniteLoop);
+    BOOST_CHECK_THROW(test(processor, R"(a[MACRO_BEGIN]a[PART_BEGIN]["l1"])", ""), CParserExceptions::ExMissingMacroEnd);
 
     //something still in parser
     BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
@@ -364,6 +374,20 @@ void testMacroProcessing()
 
     //block format
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\" \"][BLOCK_FORMAT][5]>", "<descr\niptio\nn\n&more>"));
+
+    //parts
+    //standard fragment
+    BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
+    //part begin forces macro evaluation inside a line just like MACRO_BEGIN
+    BOOST_CHECK(test(processor, R"(<[ENTRY]["Type"]>#[PART_BEGIN]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "<int>#<double>#<bool>#<bool>#<int><double+><bool+><bool+>"));
+    //empty part
+    BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][PART_END]<[ENTRY]["Type"][BEGIN][IF][NOT][INDEX][EQUALS]["2"][PART]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
+    //part remove does never complain if no part is found
+    BOOST_CHECK(test(processor, R"(#[PART_REMOVE]["labelxyz"]>)", "#>"));
+    //remove part while expanding, not exactly good style but we handle the case
+    BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][PART_REMOVE]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
+    //on and a half macro in part, bonus: remove twice
+    BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"]a[MACRO_BEGIN]<[ENTRY]["Type"]>[MACRO_END]b[MACRO_BEGIN]{[ENTRY]["Type"]}[PART_END]-[PART]["labelxyz"][MACRO_END]c[PART_REMOVE]["labelxyz"][PART_REMOVE]["labelxyz"]d)", "#-a<int><double><bool><bool>b{int}{double}{bool}{bool}cd"));
 
     //connect more tables for testing unloading
     TableT anotherTableA;

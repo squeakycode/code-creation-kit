@@ -202,6 +202,10 @@ namespace code_creation_kit
             expression += front + STRING_LITERAL("TRIM") + back;
             expression += front + STRING_LITERAL("TRIM_LEFT") + back;
             expression += front + STRING_LITERAL("TRIM_RIGHT") + back;
+            expression += front + STRING_LITERAL("PART") + back;
+            expression += front + STRING_LITERAL("PART_BEGIN") + back;
+            expression += front + STRING_LITERAL("PART_END") + back;
+            expression += front + STRING_LITERAL("PART_REMOVE") + back;
             expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
             expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
             expression += front + STRING_LITERAL("ANY") + back;
@@ -476,6 +480,101 @@ namespace code_creation_kit
                     else
                     {
                         *m_outputStream << TokenT( TokenT::eTrimRight);
+                    }
+                }
+                else if ( what[ (TokenT::ePart) ].matched )
+                {
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        list->resize(1);
+                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePart, list, getSourceText( what, TokenT::ePart, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePart, list);
+                    }
+                }
+                else if ( what[ (TokenT::ePartBegin) ].matched )
+                {
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        list->resize(1);
+                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartBegin, list, getSourceText( what, TokenT::ePartBegin, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartBegin, list);
+                    }
+                }
+                else if ( what[ (TokenT::ePartEnd) ].matched )
+                {
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartEnd, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::ePartEnd, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartEnd);
+                    }
+                }
+                else if ( what[ (TokenT::ePartRemove) ].matched )
+                {
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        list->resize(1);
+                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartRemove, list, getSourceText( what, TokenT::ePartRemove, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartRemove, list);
                     }
                 }
                 else if ( what[ (TokenT::eSetRecursionLevelLimit) ].matched )
