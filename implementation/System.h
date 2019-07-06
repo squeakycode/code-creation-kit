@@ -35,18 +35,9 @@
 
 #include "StringLiteral.h"
 #include <stdlib.h>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
 #include <stdexcept>
-namespace code_creation_kit
+
+    namespace code_creation_kit
 {
     namespace System
     {
@@ -110,7 +101,7 @@ namespace code_creation_kit
                     if ( getenvResult)
                     {
                         //expand
-                        result += boost::lexical_cast<StringT>( getenvResult);
+                        result += getenvResult;
                     }
                     else
                     {

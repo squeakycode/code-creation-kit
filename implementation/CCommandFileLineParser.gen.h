@@ -653,14 +653,14 @@ public:
         return m_vmap["template-source-file"].as<StringT >();
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("") as default
+    ///returns the provided value or STRING_LITERAL("") as default
     StringT getOutputFile() const
     {
         if ( hasOutputFile())
         {
             return m_vmap["output-file"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("");
+        return STRING_LITERAL("");
     }
     
     ///returns the provided value or std::vector<StringT>() as default
@@ -683,34 +683,34 @@ public:
         return false;
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>(".intermediate") as default
+    ///returns the provided value or STRING_LITERAL(".intermediate") as default
     StringT getIntermediateOutputFileExtension() const
     {
         if ( hasIntermediateOutputFileExtension())
         {
             return m_vmap["intermediate-file-extension"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>(".intermediate");
+        return STRING_LITERAL(".intermediate");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("[") as default
+    ///returns the provided value or STRING_LITERAL("[") as default
     StringT getMarkupPrefix() const
     {
         if ( hasMarkupPrefix())
         {
             return m_vmap["markup-prefix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("[");
+        return STRING_LITERAL("[");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("]") as default
+    ///returns the provided value or STRING_LITERAL("]") as default
     StringT getMarkupPostfix() const
     {
         if ( hasMarkupPostfix())
         {
             return m_vmap["markup-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("]");
+        return STRING_LITERAL("]");
     }
     
     ///returns the provided value
@@ -735,34 +735,34 @@ public:
         return m_vmap["inlined"].as<bool >();
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("//<>") as default
+    ///returns the provided value or STRING_LITERAL("//<>") as default
     StringT getInlinePrefix() const
     {
         if ( hasInlinePrefix())
         {
             return m_vmap["inline-prefix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("//<>");
+        return STRING_LITERAL("//<>");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("") as default
+    ///returns the provided value or STRING_LITERAL("") as default
     StringT getInlinePostfix() const
     {
         if ( hasInlinePostfix())
         {
             return m_vmap["inline-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("");
+        return STRING_LITERAL("");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("//$") as default
+    ///returns the provided value or STRING_LITERAL("//$") as default
     StringT getInlineGeneratedPostfix() const
     {
         if ( hasInlineGeneratedPostfix())
         {
             return m_vmap["inline-generated-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("//$");
+        return STRING_LITERAL("//$");
     }
     
     ///returns the provided value or 0 as default

@@ -35,6 +35,7 @@
 #include "CBackEndTokenizer.gen.h"
 #include "CProcessingLevelControl.h"
 #include "CInlineTemplateParameters.h"
+#include "StringLiteral.h"
 
 namespace code_creation_kit
 {
@@ -146,12 +147,6 @@ namespace code_creation_kit
         }
 
         ///sets new keyword markup, may be called during processing
-        void setMarkup( const char* prefix, const char* postfix)
-        {
-            setMarkup( boost::lexical_cast<StringT>(prefix), boost::lexical_cast<StringT>(postfix));
-        }
-
-        ///sets new keyword markup, may be called during processing
         void setMarkup( const StringT& prefix, const StringT& postfix)
         {
             m_preprocessor.setPrefix( prefix);
@@ -207,7 +202,8 @@ namespace code_creation_kit
         ///set default markup
         void setDefaultMarkup()
         {
-            setMarkup( boost::lexical_cast<StringT>("["), boost::lexical_cast<StringT>("]"));
+            typedef typename StringT::value_type CharT;
+            setMarkup( STRING_LITERAL("["), STRING_LITERAL("]"));
         }
 
         TokenizerT m_tokenizer; ///<splits input lines into tokens
