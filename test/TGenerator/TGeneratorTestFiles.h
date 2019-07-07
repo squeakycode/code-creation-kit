@@ -251,6 +251,38 @@ Expanding at index 2:
 Expanding at index 3:
 ->start10<3>end10
 
+Found part (level 0):
+[PART_BEGIN]["partLabel"] <[ENTRY.]["row3"]>{[ENTRY]["row2"]}
+[PART_END]
+Adding part with label: partLabel
+Expanding part with label: partLabel
+Found macro (level 0):
+ <[ENTRY.]["row3"]>{[ENTRY]["row2"]}
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+ <[ENTRY.]["row3"]>{2}
+
+Found macro (level 1):
+ <[ENTRY]["row3"]>{2}
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+ <3>{2}
+
+Expanding at index 3:
+ <3>{2}
+
+Removing part with label: partLabel
+Part to remove not found with label: partLabel
 Found macro (level 1):
 <[ENTRY]["row3"]>1/1
 
@@ -448,6 +480,9 @@ start9
 ->start10<3>end10
 end9
 
+ <3>{2}
+ <3>{2}
+
 <[ENTRY]["row3"]>0/1
 <3>1/1
 <3>1/1
@@ -492,6 +527,9 @@ start9
 ->start10<3>end10
 ->start10<3>end10
 end9
+
+ <3>{2}
+ <3>{2}
 
 <[ENTRY]["row3"]>0/1
 <3>1/1
@@ -560,6 +598,13 @@ start9
 ->[MACRO_END]start10<[ENTRY.]["row3"]>end10
 end9
 
+[PART_BEGIN]["partLabel"][TRIM]
+ <[ENTRY.]["row3"]>{[ENTRY]["row2"]}
+[PART_END][TRIM]
+[PART]["partLabel"][TRIM]
+[PART_REMOVE]["partLabel"][TRIM]
+[PART_REMOVE]["partLabel"][TRIM]
+
 [COMMENT] recursion level limit test
 [SET_RECURSION_LEVEL_LIMIT][TRIM]
 <[ENTRY.]["row3"]>0/1
@@ -619,6 +664,9 @@ start9
 ->start10<3>end10
 ->start10<3>end10
 end9
+
+ <3>{2}
+ <3>{2}
 
 <[ENTRY]["row3"]>0/1
 <3>1/1

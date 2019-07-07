@@ -237,8 +237,6 @@ BOOST_AUTO_TEST_CASE( TGenerator)
 
         generator.connectLogOutputStream( NULL);
         logFile.close();
-#ifdef _MSC_VER //TODO
         BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", CCK_TEST_INPUT_FILE_PREFIX "LogOutputExpected.txt"));
-#endif
     }
 }
