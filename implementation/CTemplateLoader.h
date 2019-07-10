@@ -27,9 +27,11 @@
 
 #include <list>
 #include <stdexcept>
+#include <cassert>
 #include "FileSystem.h"
 #include "CSourceFile.h"
 #include "CNul.h"
+#include "StringLiteral.h"
 
 namespace code_creation_kit
 {
@@ -56,6 +58,17 @@ namespace code_creation_kit
         ///holds the data of currently processed file
         struct FileData
         {
+            FileData()
+                : name()
+                , line(0)
+                , canResolveFileName(false)
+            {
+            }
+
+            ~FileData()
+            {
+            }
+
             bool operator == ( const StringT& aName)
             {
                 return name == aName;
@@ -86,7 +99,14 @@ namespace code_creation_kit
             m_logOutputStream = stream;
         }
 
-        ///resolve file name
+        ///resolve filename for loaded table
+        StringT resolveFileNameForTableToLoad(const StringT& filename)
+        {
+            StringT resolvedFilename = resolveFileName(filename);
+            return resolvedFilename;
+        }
+
+        ///resolve filename
         StringT resolveFileName( const StringT& filename)
         {
             StringT resolvedName = filename;
@@ -121,14 +141,19 @@ namespace code_creation_kit
             }
 
             //add data for error information
-            FileData filedata = { STRING_LITERAL("Input Stream"), 0, true};
+            FileData filedata;
+            filedata.name = STRING_LITERAL("Input Stream");
+            filedata.line = 0;
+            filedata.canResolveFileName = false;
+
             m_openedFiles.push_back( filedata);
-            unsigned int& lineNumber = m_openedFiles.back().line;    
+            unsigned int& lineNumber = m_openedFiles.back().line;
         
             //read the stream
             InputFileT::feedLineSink( inputStream, *m_outputStream, true, lineNumber);
 
             //remove data
+            m_previousFileProcessed = m_openedFiles.back();
             m_openedFiles.pop_back();
         }
 
@@ -136,7 +161,10 @@ namespace code_creation_kit
         ///reads the template file forwards the data, checks for cyclic inclusion
         void loadTemplateFile( const StringT& filename, bool useCinInstead = false)
         {
-            FileData filedata = { useCinInstead ? STRING_LITERAL("stdin") : resolveFileName( filename), 0, !useCinInstead};
+            FileData filedata;
+            filedata.name = useCinInstead ? STRING_LITERAL("stdin") : resolveFileName(filename);
+            filedata.line = 0;
+            filedata.canResolveFileName = !useCinInstead;
 
             //check if already loading the file
             if ( std::find( m_openedFiles.begin(), m_openedFiles.end(), filedata.name) != m_openedFiles.end())
@@ -144,7 +172,7 @@ namespace code_creation_kit
                 throw ExCyclicInclusion();
             }
 
-            //note file name for cyclic inclusion check
+            //note filename for cyclic inclusion check
             m_openedFiles.push_back( filedata);
             unsigned int& lineNumber = m_openedFiles.back().line;
 
@@ -169,13 +197,20 @@ namespace code_creation_kit
             }
 
             //remove file from check list
-            m_openedFiles.erase( std::find( m_openedFiles.begin(), m_openedFiles.end(), filedata.name));
+            auto pos = std::find(m_openedFiles.begin(), m_openedFiles.end(), filedata.name);
+            assert(pos != m_openedFiles.end());
+            if (pos != m_openedFiles.end())
+            {
+                m_previousFileProcessed = *pos;
+                m_openedFiles.erase(pos);
+            }
         }
 
         ///resets the list of currently open files
         void resetInclusionHierarchy()
         {
             m_openedFiles.clear();
+            m_previousFileProcessed = FileData();
         }
 
         ///reset state
@@ -183,6 +218,7 @@ namespace code_creation_kit
         {
             m_openedFiles.clear();
             m_includeDirectories.clear();
+            m_previousFileProcessed = FileData();
         }
 
         ///adds an include directory to the list
@@ -197,10 +233,24 @@ namespace code_creation_kit
             return m_openedFiles;
         }
 
+        ///used for error reporting
+        const FileData& getLastFileProcessed() const
+        {
+            if (!m_openedFiles.empty())
+            {
+                return m_openedFiles.back();
+            }
+            else
+            {
+                return m_previousFileProcessed;
+            }
+        }
+
     private:
         OutputStreamT* m_outputStream; ///<data sink
         FileDataListT m_openedFiles; ///<list of currently open files
         IncludeDirectoryListT m_includeDirectories; ///<list
         LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
+        FileData m_previousFileProcessed;
     };
 }

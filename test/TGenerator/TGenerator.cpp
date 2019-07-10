@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
 
         //generate the output using intermediate file
-        generator.generate(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", true, false, CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList);
+        generator.generate(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", true, false, CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList, false);
 
         //check output is as expected
         BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
@@ -154,6 +154,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
+            false,
             itp);
 
         //check output is as expected
@@ -171,6 +172,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt.intermediate",
             false,
             parameterList,
+            false,
             itp);
 
         //check output is as expected
@@ -232,7 +234,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //check extended error output
         BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.gen.txt"), std::exception);
         CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), itp), std::exception);
+        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), false, itp), std::exception);
         BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest3.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest1.gen.txt"), std::exception);
 
         generator.connectLogOutputStream( NULL);

@@ -62,6 +62,7 @@ namespace code_creation_kit
             const StringT& intermediateFileName,
             bool append,
             const ParameterListT& parameters,
+            bool canChangeTableList = false,
             const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
         )
         {
@@ -75,6 +76,7 @@ namespace code_creation_kit
                     intermediateFileName,
                     append,
                     parameters,
+                    canChangeTableList,
                     inlineTemplateParameters);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
@@ -189,23 +191,28 @@ namespace code_creation_kit
 
         unsigned int getCurrentLineNumber()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if (fileData.line == 0) //uninitialized?
             {
                 return 1;
             }
-            return list.back().line;
+            return fileData.line;
         }
 
         StringT getCurrentFileName()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if ( fileData.name.empty()) //uninitialized?
             {
                 return STRING_LITERAL("???");
             }
 
-            return list.back().name;
+            return fileData.name;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return m_generator.getTableLoadFileNameWithFailure();
         }
 
         StringT addPath( const StringT& location)

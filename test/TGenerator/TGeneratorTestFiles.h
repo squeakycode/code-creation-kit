@@ -72,8 +72,10 @@ Read left to right=1
 Row header index=1
 Column header index=1
 Pad rows=0
+Adding table with label: LabelB
 Unloading table:
 Label=LabelB
+Removing table with label: LabelB
 Loading table:
 Table file=TestInputFile_TDataflow.csv
 Label=LabelA
@@ -82,6 +84,7 @@ Read left to right=1
 Row header index=1
 Column header index=1
 Pad rows=0
+Adding table with label: LabelA
 Processing file:
 Template file=../TGenerator/TestInputFile_TDataflow.tpl.txt
 Target file=TestInputFile_TDataflow.gen.txt
@@ -283,6 +286,65 @@ Expanding at index 3:
 
 Removing part with label: partLabel
 Part to remove not found with label: partLabel
+Loading table from template provided stream:
+Label=labelxyz
+Csv Delimiter (first char used)=;
+Csv Comment Chars=#
+Properties=left-to-right;top-down
+Adding table with label: labelxyz
+Found macro (level 0):
+<[ENTRY]["Numbers"]>
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table top down:
+Label=labelxyz
+Start reading table left to right:
+Label=labelxyz
+Expanding at index 2:
+<n1>
+
+Expanding at index 3:
+<n2>
+
+Expanding at index 4:
+<n5>
+
+Removing table with label: labelxyz
+Loading table initiated from template:
+TableFileName=../TGenerator/TestInputFile_TDataflow.csv
+Label=labelxyz
+Csv Delimiter (first char used)=;
+Csv Comment Chars=#
+Properties=left-to-right
+Adding table with label: labelxyz
+Found macro (level 1):
+<[ENTRY]["row3"]>
+
+Start reading table top down:
+Label=LabelA
+Entries or reading direction do not match macro.
+Start reading table left to right:
+Label=LabelA
+Expanding at index 2:
+<3>
+
+Expanding at index 3:
+<3>
+
+Start reading table left to right:
+Label=labelxyz
+Expanding at index 2:
+<3>
+
+Expanding at index 3:
+<3>
+
+Removing table with label: labelxyz
 Found macro (level 1):
 <[ENTRY]["row3"]>1/1
 
@@ -483,6 +545,15 @@ end9
  <3>{2}
  <3>{2}
 
+<n1>
+<n2>
+<n5>
+
+<3>
+<3>
+<3>
+<3>
+
 <[ENTRY]["row3"]>0/1
 <3>1/1
 <3>1/1
@@ -530,6 +601,15 @@ end9
 
  <3>{2}
  <3>{2}
+
+<n1>
+<n2>
+<n5>
+
+<3>
+<3>
+<3>
+<3>
 
 <[ENTRY]["row3"]>0/1
 <3>1/1
@@ -605,6 +685,14 @@ end9
 [PART_REMOVE]["partLabel"][TRIM]
 [PART_REMOVE]["partLabel"][TRIM]
 
+[TABLE_BEGIN]["labelxyz", ";", "#", "left-to-right;top-down"]Numbers;n1;n2;n5[TABLE_END][TRIM]
+<[ENTRY]["Numbers"]>
+[TABLE_REMOVE]["labelxyz"][TRIM]
+
+[TABLE_LOAD]["TestInputFile_TDataflow.csv","labelxyz", ";", "#", "left-to-right"][TRIM]
+<[ENTRY.]["row3"]>
+[TABLE_REMOVE]["labelxyz"][TRIM]
+
 [COMMENT] recursion level limit test
 [SET_RECURSION_LEVEL_LIMIT][TRIM]
 <[ENTRY.]["row3"]>0/1
@@ -667,6 +755,15 @@ end9
 
  <3>{2}
  <3>{2}
+
+<n1>
+<n2>
+<n5>
+
+<3>
+<3>
+<3>
+<3>
 
 <[ENTRY]["row3"]>0/1
 <3>1/1

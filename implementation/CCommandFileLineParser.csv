@@ -21,12 +21,13 @@ Example;;;;;;;;;;;;;;;;;;;;;;;
 ;;;markup-postfix;;;;;;"STRING_LITERAL(""]"")";StringT;MarkupPostfix;Sets the initial tag markup postfix.;don't care;don't care;don't care;no;no;no;no;no;no;no;no
 ;;;markup;m;;;;;;StringT;Markup;Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.;don't care;don't care;don't care;no;no;no;no;no;no;no;no
 ;;;append-to-file;;yes;;;;false;bool;AppendToFile;The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.;don't care;no;don't care;no;no;no;no;no;no;no;no
-;;;inlined;;yes;;;;;bool;Inline;Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. WARNING: Use this option carefully to prevent data loss. Consider using the recycle option.;no;no;yes;no;no;no;no;no;no;no;no
+;;;inlined;;yes;;;;;bool;Inline;Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. Use this option carefully to prevent data loss. Consider using the recycle option.;no;no;yes;no;no;no;no;no;no;no;no
 ;;;inline-prefix;b;;;;;"STRING_LITERAL(""//<>"")";StringT;InlinePrefix;A prefix that marks a line of an inline template file as template content. This string must not be empty.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;inline-postfix;c;;;;;"STRING_LITERAL("""")";StringT;InlinePostfix;A postfix that marks a line of an inline template file as template content. This string can be empty.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;inline-generated-postfix;d;;;;;"STRING_LITERAL(""//$"")";StringT;InlineGeneratedPostfix;A postfix that marks a line of an inline template file as generated content. This string must not be empty.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;inline-pad;;;;;;0;unsigned int;InlinePad;The number of characters a generated line is padded up to with spaces before the generated postfix is appended.;no;no;don't care;no;no;no;no;no;no;no;no
 ;;;recycle;y;yes;;;;false;bool;Recycle;Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ;no;no;don't care;no;no;no;no;no;no;no;no
+;;;can-change-table-list;;yes;;;;false;bool;CanChangeTableList;Allows a template to change the table list provided to the generator, e.g. by adding or removing tables. The default setting is off. A template can always use temporary tables during processing.;don't care;don't care;don't care;no;no;no;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;;no;no
 ;ResetGenerator;Reset Generator;reset;r;yes;;;;;bool;Reset;Reset the generator to defaults.;no;no;no;yes;no;no;no;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;;no;no

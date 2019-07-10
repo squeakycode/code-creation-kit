@@ -100,6 +100,23 @@ namespace code_creation_kit
             return *this;
         }
 
+        CToken<ETokenHolderT, StringT> cloneChangingParameter(StringT parameter0) const
+        {
+            CToken<ETokenHolderT, StringT> clone;
+            clone.m_token = m_token;
+            clone.m_stringList = std::make_shared<StringListT>(*m_stringList);
+            clone.m_sourceText = m_sourceText;
+            if (!clone.m_stringList->empty())
+            {
+                clone.m_stringList->front() = parameter0;
+            }
+            else
+            {
+                clone.m_stringList->push_back(parameter0);
+            }
+            return clone;
+        }
+
         bool operator == ( ETokenT token) const
         {
             return m_token == token;
@@ -131,6 +148,13 @@ namespace code_creation_kit
         {
             return m_stringList;
         }
+
+        ConstSharedStringListT getSourceTextList() const
+        {
+            return m_sourceText;
+        }
+
+
 
         size_t getTextSize() const
         {
@@ -173,7 +197,7 @@ namespace code_creation_kit
             }
         }
 
-    public:
+    private:
         ETokenT m_token;
         CComparableSharedObject<StringListT> m_stringList;
         CComparableSharedObject<StringListT> m_sourceText;

@@ -105,7 +105,7 @@ namespace code_creation_kit
                     inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
                     inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
 
-                    //if no output file name has been passed source is also target
+                    //if no output filename has been passed source is also target
                     if ( outputFileName.empty())
                     {
                         outputFileName = m_parser.getTemplateFile();
@@ -121,14 +121,15 @@ namespace code_creation_kit
                 {
                     generator.setMarkup( m_parser.getMarkupPrefix(), m_parser.getMarkupPostfix());
                 }
-                generator.generate( 
-                    prepareFileName( m_parser.getTemplateFile(), commandFileName),
-                    prepareFileName( outputFileName, commandFileName), 
+                generator.generate(
+                    prepareFileName(m_parser.getTemplateFile(), commandFileName),
+                    prepareFileName(outputFileName, commandFileName),
                     useIntermediateFile,
                     m_parser.getRecycle(),
-                    prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                    prepareFileName(outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
                     m_parser.getAppendToFile(),
                     m_parser.getParameters(),
+                    m_parser.getCanChangeTableList(),
                     inlineTemplateParameters);
             }
             else if ( command == ParserT::eLoadTable )

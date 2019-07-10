@@ -37,7 +37,7 @@ namespace code_creation_kit
     {
         ///parse parameter range, extract values
         template <typename IteratorT, typename ContainerT>
-        void getParametersCombiCStyleUIntUIntRepeat(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        void getParametersCombi1CStyle1UIntRepeatUIntOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
         {
             parameters.clear();
             parameters.resize(2);
@@ -51,7 +51,7 @@ namespace code_creation_kit
                 assert(it == parameters.end());
             }
 
-            for (size_t i = 1; i < SIZE_MAX; ++i)
+            for (size_t i = 0; i < SIZE_MAX; ++i)
             {
                 IteratorT temp(start);
                 if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
@@ -61,6 +61,73 @@ namespace code_creation_kit
                 start = temp;
                 typename ContainerT::value_type parameterValue;
                 CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+            }
+
+            //parse closing parentheses
+            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+        }
+
+
+        ///parse parameter range, extract values
+        template <typename IteratorT, typename ContainerT>
+        void getParametersCombi1Plain3CStyleOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        {
+            parameters.clear();
+            parameters.resize(1);
+
+            //parse opening parentheses
+            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            {
+                typename ContainerT::iterator it = parameters.begin();
+                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
+                assert(it == parameters.end());
+            }
+
+            for (size_t i = 0; i < 3; ++i)
+            {
+                IteratorT temp(start);
+                if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                {
+                    break;
+                }
+                start = temp;
+                typename ContainerT::value_type parameterValue;
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+            }
+
+            //parse closing parentheses
+            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+        }
+
+
+        ///parse parameter range, extract values
+        template <typename IteratorT, typename ContainerT>
+        void getParametersCombi2Plain3CStyleOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        {
+            parameters.clear();
+            parameters.resize(2);
+
+            //parse opening parentheses
+            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            {
+                typename ContainerT::iterator it = parameters.begin();
+                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;
+                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
+                assert(it == parameters.end());
+            }
+
+            for (size_t i = 0; i < 3; ++i)
+            {
+                IteratorT temp(start);
+                if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                {
+                    break;
+                }
+                start = temp;
+                typename ContainerT::value_type parameterValue;
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
             }
 

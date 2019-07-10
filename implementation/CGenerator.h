@@ -60,9 +60,6 @@ namespace code_creation_kit
         class ExCannotMoveIntermediateFile : public std::runtime_error 
         { public: ExCannotMoveIntermediateFile() : std::runtime_error( "Failed to move intermediate file.") {}};
 
-        class ExFailedToUnloadTable : public std::runtime_error 
-        { public: ExFailedToUnloadTable() : std::runtime_error( "Cannot find table to unload.") {}};
-
         class ExIntermediateFileRequired : public std::runtime_error  //not in error printer table
         { public: ExIntermediateFileRequired() : std::runtime_error( "Use of an intermediate file is required for in place inline processing.") {}};
     };
@@ -77,6 +74,8 @@ namespace code_creation_kit
         typedef CTargetFile< StringT, GeneratedFileT> TargetFileT;
         typedef CTargetFile< StringT, IntermediateFileT> IntermediateTargetFileT;
         typedef std::vector<std::vector<StringT> > TableT;
+        typedef std::shared_ptr<TableT> SharedTableT;
+        typedef std::shared_ptr<const TableT> SharedConstTableT;
         typedef typename TableT::size_type SizeT;
         typedef CTemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoader, LogOutputStreamT> TemplateProcessorT;
         typedef CTemplateLoader<TemplateProcessorT, StringT, LogOutputStreamT> TemplateLoaderT;
@@ -84,95 +83,11 @@ namespace code_creation_kit
         typedef typename TargetFileT::OutputStreamT OutputStreamT;
         typedef typename TemplateLoaderT::InputStreamT InputStreamT;
 
-        ///holds the properties and the data of currently loaded tables
-        class TableData
-        {
-        public:
-            ///the properties a table can have
-            struct TableProperties
-            {
-                TableProperties()
-                    : csvDelimiter(0)
-                    , neverEquals(true)
-                {
-                }
-
-                TableProperties( const StringT& aFileName, CharT aCsvDelimiter, const StringT& aCsvCommentChars, bool setNeverEquals)
-                    : csvDelimiter( aCsvDelimiter)    
-                    , filename( aFileName)
-                    , csvComment( aCsvCommentChars)
-                    , neverEquals( setNeverEquals)
-                {
-                }
-
-                bool operator == ( const TableProperties& rhs) const
-                {
-                    bool equal = csvDelimiter == rhs.csvDelimiter 
-                        && filename == rhs.filename
-                        && csvComment == rhs.csvComment
-                        && !neverEquals
-                        && !rhs.neverEquals
-                        ;
-
-                    return equal;
-                }
-
-                CharT csvDelimiter; ///<used when loading
-                StringT filename; ///<used when loading
-                StringT csvComment; ///<used when loading
-                bool neverEquals;  ///<used when loading
-            };
-
-            TableData(){}
-            TableData( 
-                const TableProperties& theProperties, 
-                TableT* aTable
-                ) 
-                : properties(theProperties)
-                , table(aTable)
-            {
-            }
-
-            TableData( std::shared_ptr<const TableT> aTable)
-                : table(aTable)
-            {
-            }
-
-            ///used for finding the table in a container
-            bool operator == ( const TableProperties& rhs) const
-            {
-                return properties == rhs;
-            }
-
-            ///used for finding the table in a container
-            bool operator == ( const TableT* rhs) const
-            {
-                return table.get() == rhs;
-            }
-
-            ///access the table data read only
-            std::shared_ptr<const TableT> getTable() const
-            {
-                return table;
-            }
-
-            ///access the properties read only
-            const TableProperties& getProperties() const
-            {
-                return properties;
-            }
-
-        private:
-            TableProperties properties; ///<properties used when loading
-            std::shared_ptr<const TableT> table; ///<the loaded table data
-        };
-
-
-        typedef std::list<TableData > TableListT;
         class TemplateLoader: public TemplateLoaderT {};
 
     public:
         typedef typename TemplateLoaderT::FileDataListT FileDataListT;
+        typedef typename TemplateLoaderT::FileData FileDataT;
 
         CGenerator()
             : m_lastRowNumberWithFailure(1)
@@ -262,42 +177,26 @@ namespace code_creation_kit
                 *m_logOutputStream << "Pad rows=" << padRows << "\n";
             }
 
-            bool useCinAsInput = tableFileName == STRING_LITERAL("-");
-            //assemble the properties of the table
-            typename TableData::TableProperties properties( tableFileName, getCsvDelimiter(), getCsvCommentChars(), useCinAsInput);
+            //load the table
+            m_lastRowNumberWithFailure = 0;
 
-            //try to find the table among the already loaded tables
-            typename TableListT::iterator pos = std::find( m_tableList.begin(), m_tableList.end(), properties);
-            if ( pos != m_tableList.end())
+            //create table and table builder
+            typedef CVerticalTableBuilder<TableT> TableBuilderT;
+            SharedTableT ptrTableToLoad = std::make_shared<TableT>();
+            TableBuilderT tableBuidler( *ptrTableToLoad, padRows);
+            try
             {
-                //use the already loaded table
-                m_templateProcessor.connectTable( pos->getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+                //open table file
+                CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
+                //parse the table file
+                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
+                //connect table to processor and keep reference in list
+                m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
-            else //table not found, need to load the table
+            catch(...)
             {
-                m_lastRowNumberWithFailure = 0;
-
-                //create table and table builder
-                typedef CVerticalTableBuilder<TableT> TableBuilderT;
-                TableT* tableToLoad = new TableT;
-                TableBuilderT tableBuidler( *tableToLoad, padRows);
-                typename TableListT::value_type tableData( properties, tableToLoad);  //takes ownership of tableToLoad and deletes it later
-
-                try
-                {
-                    //open table file
-                    CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
-                    //parse the table file
-                    CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
-                    //connect table to processor and keep reference in list
-                    m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
-                    m_tableList.push_back( tableData);
-                }
-                catch(...)
-                {
-                    m_lastRowNumberWithFailure = tableData.getTable()->size() ? (*tableData.getTable())[0].size() : 1;
-                    throw;
-                }
+                m_lastRowNumberWithFailure = ptrTableToLoad->size() ? (*ptrTableToLoad)[0].size() : 1;
+                throw;
             }
         }
 
@@ -320,22 +219,19 @@ namespace code_creation_kit
 
             //create table and table builder
             typedef CVerticalTableBuilder<TableT> TableBuilderT;
-            TableT* tableToLoad = new TableT;
-            TableBuilderT tableBuidler( *tableToLoad, padRows);
-            std::shared_ptr<const TableT> psTableToLoad( tableToLoad);
-            typename TableListT::value_type tableData( psTableToLoad); //takes ownership of tableToLoad and deletes it later
+            SharedTableT ptrTableToLoad = std::make_shared<TableT>();
+            TableBuilderT tableBuidler( *ptrTableToLoad, padRows);
 
             try
             {
                 //parse the table file
                 CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
                 //connect table to processor and keep reference in list
-                m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
-                m_tableList.push_back( tableData);
+                m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
             catch(...)
             {
-                m_lastRowNumberWithFailure = tableData.getTable()->size() ? (*tableData.getTable())[0].size() : 1;
+                m_lastRowNumberWithFailure = ptrTableToLoad->size() ? (*ptrTableToLoad)[0].size() : 1;
                 throw;
             }
         }
@@ -354,9 +250,7 @@ namespace code_creation_kit
                 *m_logOutputStream << "Column header index=" << columnHeaderIndex << "\n";
             }
 
-            typename TableListT::value_type tableData( table);
-            m_templateProcessor.connectTable( tableData.getTable().get(), label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
-            m_tableList.push_back( tableData);
+            m_templateProcessor.connectTable( table, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
         }
             
         ///generates output by processing a template file, no parameters, no intermediate file
@@ -369,19 +263,20 @@ namespace code_creation_kit
         template <typename ParameterListT>
         void generate( const StringT& templateFileName, const StringT& targetFileName, bool append, const ParameterListT& parameters)
         {
-            generate( templateFileName, targetFileName, false, false, StringT(), append, parameters);
+            generate( templateFileName, targetFileName, false, false, StringT(), append, parameters, false);
         }
 
         ///generates output by processing a template file
         template <typename ParameterListT>
-        void generate( 
-            const StringT& templateFileName, 
-            const StringT& targetFileName, 
-            bool useIntermediateFile, 
+        void generate(
+            const StringT& templateFileName,
+            const StringT& targetFileName,
+            bool useIntermediateFile,
             bool recycle,
-            const StringT& intermediateFileName, 
-            bool append, 
+            const StringT& intermediateFileName,
+            bool append,
             const ParameterListT& parameters,
+            bool canChangeTableList,
             const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
             )
         {
@@ -417,12 +312,12 @@ namespace code_creation_kit
             }
 
             //create parameter table
-            TableT parameterTable;
-            ParameterParser::parse( parameters, parameterTable, m_indexOfLastProcessedParameter, STRING_LITERAL('='));
+            SharedTableT ptrParameterTable = std::make_shared<TableT>();
+            ParameterParser::parse( parameters, *ptrParameterTable, m_indexOfLastProcessedParameter, STRING_LITERAL('='));
             //connect parameter table if not empty
-            if ( !parameterTable.empty())
+            if ( !ptrParameterTable->empty())
             {
-                m_templateProcessor.connectTable( &parameterTable, STRING_LITERAL("Internal Parameter Table"), true, false, 1, 1);
+                m_templateProcessor.connectTable(ptrParameterTable, STRING_LITERAL("__UserProvidedParameterTable"), true, false, 1, 1, true /*temporary*/);
             }
 
             //create output file
@@ -442,41 +337,45 @@ namespace code_creation_kit
                 generatedFile.open( targetFileName, useCoutInstead, append);
             }
 
-            //reset the loader
-            m_templateLoader.resetInclusionHierarchy();
-            //open the template processor
-            m_templateProcessor.open();
-            //connect the objects
-            m_templateLoader.connectOutputStream( &m_templateProcessor);
-            m_templateProcessor.connectOutputStream( useIntermediateFile ? &intermediateFile.get() : &generatedFile.get());
-            m_templateProcessor.connectTemplateLoader( &m_templateLoader);
-            m_templateProcessor.setInlineTemplateParameters( inlineTemplateParameters);
-            //start processing the template file
-            m_templateLoader.loadTemplateFile( templateFileName, templateFileName == STRING_LITERAL("-"));
-            //close everything
-            m_templateProcessor.close();
-            if ( useIntermediateFile )
+            try
             {
-                intermediateFile.checkGood();
-                intermediateFile.close();
-            }
-            else
-            {
-                generatedFile.checkGood();
-                generatedFile.close();
-            }
-            //clean up
-            m_templateProcessor.connectOutputStream(0);
-
-            //disconnect parameter table if not empty
-            if ( !parameterTable.empty())
-            {
-                const TableT* disconnectedTable = 0;
-                if ( !m_templateProcessor.disconnectTable( STRING_LITERAL("Internal Parameter Table"), disconnectedTable))
+                //control whether the templates can add tables during processing or remove tables loaded with loadTable()
+                m_templateProcessor.setCanChangeNonTemporaryTableList(canChangeTableList);
+                //reset the loader
+                m_templateLoader.resetInclusionHierarchy();
+                //open the template processor
+                m_templateProcessor.open();
+                //connect the objects
+                m_templateLoader.connectOutputStream(&m_templateProcessor);
+                m_templateProcessor.connectOutputStream(useIntermediateFile ? &intermediateFile.get() : &generatedFile.get());
+                m_templateProcessor.connectTemplateLoader(&m_templateLoader);
+                m_templateProcessor.setInlineTemplateParameters(inlineTemplateParameters);
+                //start processing the template file
+                m_templateLoader.loadTemplateFile(templateFileName, templateFileName == STRING_LITERAL("-"));
+                //close everything
+                m_templateProcessor.close();
+                if (useIntermediateFile)
                 {
-                    throw std::runtime_error("Cannot disconnect temporary parameter table");
+                    intermediateFile.checkGood();
+                    intermediateFile.close();
                 }
-                assert( disconnectedTable == &parameterTable);
+                else
+                {
+                    generatedFile.checkGood();
+                    generatedFile.close();
+                }
+                //clean up
+                m_templateProcessor.connectOutputStream(0);
+                m_templateProcessor.setCanChangeNonTemporaryTableList(true);
+            }
+            catch (...)
+            {
+                m_templateProcessor.setCanChangeNonTemporaryTableList(true);
+
+                //update possible position data in case csv table parsing caused the error
+                m_lastRowNumberWithFailure = m_templateProcessor.getLastCsvRowNumberWithFailure();
+                m_positionTracker = m_templateProcessor.getCsvPositionWithFailure();
+                throw;
             }
 
             if ( useIntermediateFile)
@@ -516,20 +415,35 @@ namespace code_creation_kit
                 *m_logOutputStream << "Processing stream.\n";
             }
             
-            //reset the loader
-            m_templateLoader.resetInclusionHierarchy();
-            //open the template processor
-            m_templateProcessor.open();
-            //connect the objects
-            m_templateLoader.connectOutputStream( &m_templateProcessor);
-            m_templateProcessor.connectOutputStream( &outputStream);
-            m_templateProcessor.connectTemplateLoader( &m_templateLoader);
-            //start processing the template file
-            m_templateLoader.loadTemplateStream( inputStream);
-            //close everything
-            m_templateProcessor.close();
-            //clean up
-            m_templateProcessor.connectOutputStream(0);
+            try
+            {
+                //control whether the templates can add tables during processing or remove tables loaded with loadTable()
+                m_templateProcessor.setCanChangeNonTemporaryTableList(false);
+                //reset the loader
+                m_templateLoader.resetInclusionHierarchy();
+                //open the template processor
+                m_templateProcessor.open();
+                //connect the objects
+                m_templateLoader.connectOutputStream(&m_templateProcessor);
+                m_templateProcessor.connectOutputStream(&outputStream);
+                m_templateProcessor.connectTemplateLoader(&m_templateLoader);
+                //start processing the template file
+                m_templateLoader.loadTemplateStream(inputStream);
+                //close everything
+                m_templateProcessor.close();
+                //clean up
+                m_templateProcessor.connectOutputStream(0);
+                m_templateProcessor.setCanChangeNonTemporaryTableList(true);
+            }
+            catch (...)
+            {
+                m_templateProcessor.setCanChangeNonTemporaryTableList(true);
+
+                //update possible position data in case csv table parsing caused the error
+                m_lastRowNumberWithFailure = m_templateProcessor.getLastCsvRowNumberWithFailure();
+                m_positionTracker = m_templateProcessor.getCsvPositionWithFailure();
+                throw;
+            }
         }
 
         //resets the generator building blocks
@@ -541,13 +455,6 @@ namespace code_creation_kit
                 *m_logOutputStream << "Resetting:\n";
             }
             m_templateProcessor.reset();
-
-            //log
-            if ( m_logOutputStream)
-            {
-                *m_logOutputStream << "Clearing table list.\n";
-            }
-            m_tableList.clear();
 
             //log
             if ( m_logOutputStream)
@@ -573,20 +480,9 @@ namespace code_creation_kit
                 *m_logOutputStream << "Label=" << label << "\n";
             }
 
-            const TableT* disconnectedTable = 0;
-            if ( m_templateProcessor.disconnectTable( label, disconnectedTable) )
-            {
-                typename TableListT::iterator pos = std::find( m_tableList.begin(), m_tableList.end(), disconnectedTable);
-                if ( pos != m_tableList.end())
-                {
-                    //if fully disconnected discard the table
-                    m_tableList.erase( pos);
-                }
-                else
-                {
-                    throw ExFailedToUnloadTable();
-                }
-            }
+            SharedConstTableT disconnectedTable;
+            m_templateProcessor.disconnectTable( label, true, disconnectedTable);
+            assert(disconnectedTable);
         }
 
         ///sets new tag markup
@@ -622,6 +518,12 @@ namespace code_creation_kit
         ///index of last processed parameter for error output
         SizeT getIndexOfLastProcessedParameter() { return m_indexOfLastProcessedParameter; }
 
+        ///is empty when currently not loading, this is used to report error information
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return m_templateProcessor.getTableLoadFileNameWithFailure();
+        }
+
         ///last column of table or template file with failure for error output
         unsigned int getLastColumnWithFailure() { return m_positionTracker.getColumn();}
 
@@ -632,6 +534,12 @@ namespace code_creation_kit
         const FileDataListT& getInclusionHierarchy()
         {
             return m_templateLoader.getInclusionHierarchy();
+        }
+
+        ///can be used for error reporting
+        const FileDataT& getLastTemplateFileProcessed() const
+        {
+            return m_templateLoader.getLastFileProcessed();
         }
 
         ///return maximum number of recursion levels
@@ -697,7 +605,6 @@ namespace code_creation_kit
         }
 
     private:
-        TableListT m_tableList; ///<table data held in smart pointer, table meta data
         TemplateProcessorT m_templateProcessor; ///<does the work
         TemplateLoader m_templateLoader; ///<the loader
         CPositionTracker m_positionTracker; ///<used by csv parser

@@ -86,12 +86,13 @@ public:
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
             ("append-to-file", value<bool >()->zero_tokens(), "The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.")
-            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. WARNING: Use this option carefully to prevent data loss. Consider using the recycle option.")
+            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. Use this option carefully to prevent data loss. Consider using the recycle option.")
             ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string must not be empty.")
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
             ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string must not be empty.")
             ("inline-pad", value<unsigned int >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
             ("recycle,y", value<bool >()->zero_tokens(), "Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ")
+            ("can-change-table-list", value<bool >()->zero_tokens(), "Allows a template to change the table list provided to the generator, e.g. by adding or removing tables. The default setting is off. A template can always use temporary tables during processing.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -177,6 +178,7 @@ public:
         bool providedInlineGeneratedPostfix = hasInlineGeneratedPostfix();
         bool providedInlinePad = hasInlinePad();
         bool providedRecycle = hasRecycle();
+        bool providedCanChangeTableList = hasCanChangeTableList();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
         bool providedDelimiter = hasDelimiter();
@@ -290,6 +292,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == true
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -325,6 +328,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -354,6 +358,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -389,6 +394,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == true
             && providedDelimiter == false
@@ -424,6 +430,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == true
@@ -459,6 +466,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -494,6 +502,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -529,6 +538,7 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
             && providedDelimiter == false
@@ -565,6 +575,7 @@ public:
             && !providedInlineGeneratedPostfix
             && !providedInlinePad
             && !providedRecycle
+            && !providedCanChangeTableList
             && !providedReset
             && !providedIncludeDirectories
             && !providedDelimiter
@@ -785,6 +796,16 @@ public:
         return false;
     }
     
+    ///returns the provided value or false as default
+    bool getCanChangeTableList() const
+    {
+        if ( hasCanChangeTableList())
+        {
+            return m_vmap["can-change-table-list"].as<bool >();
+        }
+        return false;
+    }
+    
     ///returns the provided value
     bool getReset() const
     {
@@ -958,6 +979,12 @@ public:
     bool hasRecycle() const
     {
         return m_vmap.count( "recycle") != 0;
+    }
+    
+    ///indicates that the option can-change-table-list has been provided
+    bool hasCanChangeTableList() const
+    {
+        return m_vmap.count( "can-change-table-list") != 0;
     }
     
     ///indicates that the option reset has been provided

@@ -67,10 +67,10 @@ public:
 #pragma warning( pop ) 
 #endif
 
-const unsigned int rows = 5;
-const unsigned int columns = 7;
+static const unsigned int rows = 5;
+static const unsigned int columns = 7;
 
-const char* itemTable[rows][columns] =
+static const char* cItemTable[rows][columns] =
 {
     {"Item","Type","Name","Array Maximum","Default","Description","Description"},
     {"a","int","valueCount","","0","",""},
@@ -84,7 +84,7 @@ template <typename StringT>
 class TestTemplateLoader
 {
 public:
-    TestTemplateLoader(): m_count(0) {}
+    TestTemplateLoader(): m_count(0), m_csvCount(0) {}
 
     ///dummy with no functionality
     void loadTemplateFile( const StringT& filename)
@@ -92,8 +92,20 @@ public:
         m_count++;
         m_filename = filename;
     }
+
+    ///used when a CSV table is loaded using TABLE_LOAD
+    StringT resolveFileNameForTableToLoad(const StringT& filename)
+    {
+        m_csvFilename = filename;
+        ++m_csvCount;
+        return m_csvFilename;
+    }
+
     int m_count;
     StringT m_filename;
+
+    int m_csvCount;
+    StringT m_csvFilename;
 };
 
 template< typename ProcessorT>
@@ -146,16 +158,18 @@ void testMacroProcessing()
     typedef std::vector<std::vector<StringT> > TableT;
     typedef std::stringstream StreamT;
     typedef CTemplateProcessor<TableT, StreamT> ProcessorT;
+    typedef std::shared_ptr<TableT> SharedTableT;
+    typedef std::shared_ptr<const TableT> SharedConstTableT;
 
-    TableT table;
+    SharedTableT ptrTable = std::make_shared<TableT>();
 
-    table.resize( columns);
-    for ( unsigned int col = 0; col < columns; ++col)
+    ptrTable->resize(columns);
+    for (unsigned int col = 0; col < columns; ++col)
     {
-        table[col].resize( rows);
-        for ( unsigned int row = 0; row < rows; ++row)
+        (*ptrTable)[col].resize(rows);
+        for (unsigned int row = 0; row < rows; ++row)
         {
-            table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
+            (*ptrTable)[col][row] = boost::lexical_cast<StringT>(cItemTable[row][col]);
         }
     }
 
@@ -168,7 +182,7 @@ void testMacroProcessing()
         BOOST_CHECK_THROW( test( processor, largeString, ""), CParserExceptions::ExMacroTooLarge);
     }
 
-    processor.connectTable( &table, "label A", true, true, 1, 1);
+    processor.connectTable( ptrTable, "label A", true, true, 1, 1, false);
 
     //error handling
     BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
@@ -198,6 +212,41 @@ void testMacroProcessing()
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"][PART]["l1"][PART_END]c[PART]["l1"]d)", ""), CParserExceptions::ExPossibleInfiniteLoop);
     BOOST_CHECK_THROW(test(processor, R"(a[MACRO_BEGIN]a[PART_BEGIN]["l1"])", ""), CParserExceptions::ExMissingMacroEnd);
 
+    //tables
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","pad-rows;unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadCommentChars);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz","\n",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadDelimiter);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;2";5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExUnexpectedQuote);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;"2"a;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExRequireDelimitingChar);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["label A"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CMacroProcessorExceptions::ExTableLabelAlreadyDefined);
+    BOOST_CHECK_THROW(test(processor, R"(a[TABLE_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingTableEnd);
+    BOOST_CHECK_THROW(test(processor, R"(a[TABLE_BEGIN]["l"]b[ENTRY]["c"])", ""), CParserExceptions::ExMissingTableEnd);
+    BOOST_CHECK_THROW(test(processor, R"(a[TABLE_END]b)", ""), CParserExceptions::ExMissingTableBegin);
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK_THROW(test(processor, input, "", true), CVerticalTableBuilderExceptions::ExUnderflow);
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;over;flow
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK_THROW(test(processor, input, "", true), CVerticalTableBuilderExceptions::ExOverflow);
+    }
+    {
+        processor.setCanChangeNonTemporaryTableList(false);
+        BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","permanent"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CMacroProcessorExceptions::ExCannotChangeTableList);
+        BOOST_CHECK_THROW(test(processor, R"([TABLE_REMOVE]["label A"])", ""), CMacroProcessorExceptions::ExCannotChangeTableList);
+        processor.setCanChangeNonTemporaryTableList(true);
+    }
+    BOOST_CHECK_THROW(test(processor, R"([TABLE_LOAD]["", "label A"])", ""), CTemplatePreprocessorExceptions::ExTableLoadingNotSupported);
+
     //something still in parser
     BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in line collector
@@ -210,14 +259,14 @@ void testMacroProcessing()
     { public: ExCannotApplyConversionToSubstitution() : std::runtime_error( "Conversion cannot be applied to this substitution.") {}};
 
     processor.reset();
-    processor.connectTable( &table, "label A", true, true, 1, 1);
+    processor.connectTable( ptrTable, "label A", true, true, 1, 1, false);
 
     //no keyword
     BOOST_CHECK( test( processor, "a", "a"));
     //simple block parsing
     BOOST_CHECK( test( processor, "a[BEGIN]b[END]c", "abc"));
     //empty pipeline on close
-    BOOST_CHECK( test( processor, "a[BEGIN][BEGIN.][BEGIN..][BEGIN...]b[END...][END..][END.][END]c", "abc"));    
+    BOOST_CHECK( test( processor, "a[BEGIN][BEGIN.][BEGIN..][BEGIN...]b[END...][END..][END.][END]c", "abc"));
     //advanced block parsing
     BOOST_CHECK( test( processor, "a[MACRO_BEGIN]b[BEGIN]c[BEGIN]d[OR]e[END]f[OR]g[END]h[OR]i[MACRO_END]j", "abcdfhj"));
 
@@ -389,34 +438,120 @@ void testMacroProcessing()
     //on and a half macro in part, bonus: remove twice
     BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"]a[MACRO_BEGIN]<[ENTRY]["Type"]>[MACRO_END]b[MACRO_BEGIN]{[ENTRY]["Type"]}[PART_END]-[PART]["labelxyz"][MACRO_END]c[PART_REMOVE]["labelxyz"][PART_REMOVE]["labelxyz"]d)", "#-a<int><double><bool><bool>b{int}{double}{bool}{bool}cd"));
 
+    //tables
+    BOOST_CHECK(test(processor, R"(#[TABLE_BEGIN]["labelxyz"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", "#<1><2><5>"));
+    BOOST_CHECK(test(processor, R"(#[TABLE_BEGIN]["labelxyz","#"]Numbers#1#2#5[TABLE_END]<[ENTRY]["Numbers"]>)", "#<1><2><5>"));
+    //table begin forces macro evaluation inside a line just like MACRO_BEGIN
+    BOOST_CHECK(test(processor, R"(<[ENTRY]["Type"]>#[TABLE_BEGIN]["labelxyz"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", "<int>#<double>#<bool>#<bool>#<1><2><5>"));
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz","#","+-"][TRIM]
++This is a comment
+Numbers#1#2#5
+-This is a comment
+[TABLE_END][TRIM]
+<[ENTRY]["Numbers"]>)";
+    BOOST_CHECK(test(processor, input, "#<1><2><5>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", ""]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK(test(processor, input, "#<row1><row2><row3><col1><col2><col3>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz",";","","top-down"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK(test(processor, input, "#<row1><row2><row3>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "left-to-right"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK(test(processor, input, "#<col1><col2><col3>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "left-to-right;top-down"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK(test(processor, input, "#<row1><row2><row3><col1><col2><col3>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "pad-rows"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["row2"]>)";
+    BOOST_CHECK(test(processor, input, "#<2,1>", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "csv-ignore-quotes"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;"2,1";""";"
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["row2"]>)";
+    BOOST_CHECK(test(processor, input, R"(#<"2,1"><"""><">)", true));
+    }
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "permanent"]m;col1;col2;col3
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["m"]>)";
+    BOOST_CHECK(test(processor, input, "#<row1><row2><row3><col1><col2><col3>", true));
+    BOOST_CHECK(test(processor, R"(<[ENTRY]["m"]>)", "<row1><row2><row3><col1><col2><col3>"));
+    BOOST_CHECK(test(processor, R"(#[TABLE_REMOVE]["labelxyz"]<[ENTRY]["m"]>)", ""));
+    //removing twice or non existent table is silent
+    BOOST_CHECK(test(processor, R"(#[TABLE_REMOVE]["labelxyz"]<[ENTRY]["m"]>)", ""));
+    }
+    //can disconnect all tables
+    BOOST_CHECK(test(processor, R"(#[TABLE_REMOVE]["label A"]<[ENTRY]["Type"]>)", ""));
+    processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
+    { const char* input =
+        R"(#[TABLE_BEGIN]["labelxyz", "", "", "csv-ignore-quotes"]FullLinesAnyContent
+row1;1,1;1,2;1,3
+row2;2,1;2,2;2,3
+row3;3,1;3,2;3,3
+[TABLE_END]<[ENTRY]["FullLinesAnyContent"]>)";
+    BOOST_CHECK(test(processor, input, "#<row1;1,1;1,2;1,3><row2;2,1;2,2;2,3><row3;3,1;3,2;3,3>", true));
+    }
+
+
     //connect more tables for testing unloading
-    TableT anotherTableA;
-    TableT anotherTableB;
-    processor.connectTable( &anotherTableA, "label C", true, true, 0, 0);
-    processor.connectTable( &anotherTableB, "label C", true, true, 0, 0);
+    SharedTableT ptrAnotherTableA = std::make_shared<TableT>();
+    SharedTableT ptrAnotherTableB = std::make_shared<TableT>();
+    processor.connectTable(ptrAnotherTableA, "label C", true, true, 0, 0, false);
+    processor.connectTable(ptrAnotherTableB, "label D", true, true, 0, 0, false);
     //connect table again
-    processor.connectTable( &table, "label B", true, true, 2, 4);
-    //check return false table still in use, with above connection
-    const TableT* disconnectedTable = 0;
-    BOOST_CHECK( !processor.disconnectTable( "label A", disconnectedTable));
-    BOOST_CHECK( disconnectedTable == &table);
+    processor.connectTable( ptrTable, "label B", true, true, 2, 4, false);
+    SharedConstTableT ptrDisconnectedTable;
+    BOOST_CHECK( processor.disconnectTable( "label A", false, ptrDisconnectedTable));
+    BOOST_CHECK( ptrDisconnectedTable == ptrTable);
     //check as expected with changed headers
     BOOST_CHECK( test( processor, "<[ENTRY][\"bool\"]>", "<bool><validtest><falsefalse>"));
     //check return true table can be freed
-    disconnectedTable = 0;
-    BOOST_CHECK( processor.disconnectTable( "label B", disconnectedTable));
-    BOOST_CHECK( disconnectedTable == &table);
+    ptrDisconnectedTable.reset();
+    BOOST_CHECK( processor.disconnectTable( "label B", false, ptrDisconnectedTable));
+    BOOST_CHECK( ptrDisconnectedTable == ptrTable);
     //disconnect unloading test tables
-    disconnectedTable = 0;
-    BOOST_CHECK( processor.disconnectTable( "label C", disconnectedTable));
-    BOOST_CHECK( disconnectedTable == &anotherTableB);
-    disconnectedTable = 0;
-    BOOST_CHECK( processor.disconnectTable( "label C", disconnectedTable));
-    BOOST_CHECK( disconnectedTable == &anotherTableA);
+    ptrDisconnectedTable.reset();
+    BOOST_CHECK( processor.disconnectTable( "label C", false, ptrDisconnectedTable));
+    BOOST_CHECK( ptrDisconnectedTable == ptrAnotherTableA);
+    ptrDisconnectedTable.reset();
+    BOOST_CHECK( processor.disconnectTable( "label D", false, ptrDisconnectedTable));
+    BOOST_CHECK( ptrDisconnectedTable == ptrAnotherTableB);
 
-    BOOST_CHECK_NO_THROW( processor.connectTable( &table, "label B", true, true, 7, 5));
-    BOOST_CHECK_THROW( processor.connectTable( &table, "label B", true, true, 2, 6), CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds);
-    BOOST_CHECK_THROW( processor.connectTable( &table, "label B", true, true, 8, 4), CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds);
+    BOOST_CHECK_NO_THROW( processor.connectTable(ptrTable, "label B", true, true, 7, 5, false));
+    BOOST_CHECK_THROW( processor.connectTable(ptrTable, "label C", true, true, 2, 6, false), CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds);
+    BOOST_CHECK_THROW( processor.connectTable(ptrTable, "label D", true, true, 8, 4, false), CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds);
 }
 
 
@@ -428,16 +563,16 @@ void testTemplateProcessor()
     typedef TStreamHelper<StringT> StreamT;
     typedef TestTemplateLoader<StringT> TemplateLoaderT;
     typedef CTemplateProcessor<TableT, StreamT, TemplateLoaderT> ProcessorT;
+    typedef std::shared_ptr<TableT> SharedTableT;
+    SharedTableT ptrTable = std::make_shared<TableT>();
 
-    TableT table;
-
-    table.resize( columns);
+    ptrTable->resize( columns);
     for ( unsigned int col = 0; col < columns; ++col)
     {
-        table[col].resize( rows);
+        (*ptrTable)[col].resize( rows);
         for ( unsigned int row = 0; row < rows; ++row)
         {
-            table[col][row] = boost::lexical_cast<StringT>(itemTable[row][col]);
+            (*ptrTable)[col][row] = boost::lexical_cast<StringT>(cItemTable[row][col]);
         }
     }
 
@@ -449,50 +584,49 @@ void testTemplateProcessor()
     TStreamConversionWrapper<StringT, ProcessorT> wrappedProcessor( processor);
 
     processor.connectTemplateLoader( &loader);
-    processor.connectTable( &table, boost::lexical_cast<StringT>( "label"), true, true, 1, 1);
+    processor.connectTable( ptrTable, boost::lexical_cast<StringT>("label"), true, true, 1, 1, false);
     processor.connectOutputStream( &output);
 
     processor.open();
 
-    wrappedProcessor << "text";
+    wrappedProcessor
+        << "start\n"
+        << "  [SET_MARKUP][\"???\",\"!!!\"][TRIM]\t\n" //the markup does not change for a line
+        << "???COMMENT!!! This is a comment.\n"
+        << "???BEGIN!!!???IF!!!???FIRST_TIME!!!->???OR!!!???END!!!<???ENTRY!!![\"Type\"]>\n"
+        << "???BEGIN!!!???IF!!!???FIRST_TIME!!!->???OR!!!???END!!!<???ENTRY.!!![\"Type\"]>\n"
+        << "   text???TRIM!!!  \n"
+        << "   ???INCLUDE!!![\"templatefile.name \"]  " // include does not add chars
+        << "\nend"
+        ;
+    
+    processor.close();
 
-    //wrappedProcessor
-    //    << "start\n"
-    //    << "  [MARKUP_PREFIX][\"???\"]\t\n"
-    //    << "???MARKUP_POSTFIX][\"!!!\"]\n"
-    //    << "???COMMENT!!! This is a comment.\n"
-    //    << "???BEGIN!!!???FIRST_TIME!!!->???OR!!!???END!!!<???ENTRY!!![\"Type\"]>\n"
-    //    << "???BEGIN!!!???FIRST_TIME!!!->???OR!!!???END!!!<???ENTRY.!!![\"Type\"]>\n"
-    //    << "   text???TRIM!!!  \n"
-    //    << "   ???INCLUDE!!![\"templatefile.name \"]  "
-    //    << "\nend"
-    //    ;
-    //
-    //processor.close();
+    expectedOutput
+        << "start\n"
+        << "-><int>\n"
+        << "<double>\n"
+        << "<bool>\n"
+        << "<bool>\n"
+        << "-><int>\n"
+        << "-><double>\n"
+        << "-><bool>\n"
+        << "-><bool>\n"
+        << "text     \n"
+        << "end"
+        ;
 
-    //expectedOutput
-    //    << "start\n"
-    //    << "-><int>\n"
-    //    << "<double>\n"
-    //    << "<bool>\n"
-    //    << "<bool>\n"
-    //    << "-><int>\n"
-    //    << "-><double>\n"
-    //    << "-><bool>\n"
-    //    << "-><bool>\n"
-    //    << "text\n"
-    //    << "end"
-    //    ;
-
-    //BOOST_CHECK( output.result == expectedOutput.result);
-    //BOOST_CHECK( loader.m_count == 1);
-    //BOOST_CHECK( loader.m_filename == boost::lexical_cast<StringT>("templatefile.name ") );
+    BOOST_CHECK( output.result == expectedOutput.result);
+    BOOST_CHECK( loader.m_count == 1);
+    BOOST_CHECK( loader.m_filename == boost::lexical_cast<StringT>("templatefile.name ") );
 }
 
 BOOST_AUTO_TEST_CASE( TTemplateProcessor)
 {
     testTemplateProcessor<std::string>();
+#ifdef _MSC_VER
     testTemplateProcessor<std::wstring>();
+#endif 
 
     testMacroProcessing<std::string>();
 }

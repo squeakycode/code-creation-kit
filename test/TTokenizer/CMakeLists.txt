@@ -23,7 +23,11 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-add_executable(TTokenizer TTokenizer.cpp)
+add_executable(TTokenizer
+    TTokenizer.cpp
+    TokenizerTest.tpl.h
+    TokenizerTest.gen.h
+)
 add_dependencies(TTokenizer cck_implementation)
 target_link_libraries(TTokenizer
     Boost::unit_test_framework

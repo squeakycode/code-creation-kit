@@ -62,6 +62,7 @@ namespace code_creation_kit
             const StringT& intermediateFileName,
             bool append,
             const ParameterListT& parameters,
+            bool canChangeTableList = false,
             const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
         )
         {
@@ -75,12 +76,13 @@ namespace code_creation_kit
                     intermediateFileName,
                     append,
                     parameters,
+                    canChangeTableList,
                     inlineTemplateParameters);
             }
             catch( CSourceFileExceptions<TemplateFileT>::ExCannotOpenFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1060: Cannot open template file: %1%\n"));
@@ -94,7 +96,7 @@ namespace code_creation_kit
             catch( CSourceFileExceptions<TemplateFileT>::ExCannotReadFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1061: An error occured reading template file: %1%\n"));
@@ -108,7 +110,7 @@ namespace code_creation_kit
             catch( CTargetFileExceptions<GeneratedFileT>::ExCannotOpenFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1070: Cannot open target file: %1%\n"));
@@ -122,7 +124,7 @@ namespace code_creation_kit
             catch( CTargetFileExceptions<GeneratedFileT>::ExCannotWriteToFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1071: An error occured writing to target file: %1%\n"));
@@ -136,7 +138,7 @@ namespace code_creation_kit
             catch( CTargetFileExceptions<IntermediateFileT>::ExCannotOpenFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1080: Cannot open intermediate file: %1%\n"));
@@ -150,7 +152,7 @@ namespace code_creation_kit
             catch( CTargetFileExceptions<IntermediateFileT>::ExCannotWriteToFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1081: An error occured writing to intermediate file: %1%\n"));
@@ -164,7 +166,7 @@ namespace code_creation_kit
             catch( FilesBinaryEqualExceptions::ExStreamBad& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1090: Failed to compare intermediate file '%1%' with target file '%2%'\n"));
@@ -178,7 +180,7 @@ namespace code_creation_kit
             catch( CGeneratorExceptions::ExFailedToDeleteTempFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1100: Failed to delete intermediate output file: %1%\n"));
@@ -192,7 +194,7 @@ namespace code_creation_kit
             catch( CGeneratorExceptions::ExFailedToDeleteOldTargetFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1101: Failed to delete old version of target file '%1%' for replacement with intermediate file.\n"));
@@ -206,7 +208,7 @@ namespace code_creation_kit
             catch( CGeneratorExceptions::ExCannotMoveIntermediateFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1102: Failed to move intermediate file '%1%' to target file '%2%'\n"));
@@ -220,7 +222,7 @@ namespace code_creation_kit
             catch( KeywordParameterParser::ExParameterStartExpected& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1206: Parameter is missing or syntax is incorrect,  '[' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -234,7 +236,7 @@ namespace code_creation_kit
             catch( KeywordParameterParser::ExParameterSeparatorExpected& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1207: Less parameters then expected or syntax is incorrect, ',' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -248,7 +250,7 @@ namespace code_creation_kit
             catch( KeywordParameterParser::ExParameterEndExpected& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1208: More parameters then expected or syntax is incorrect, ']' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -262,7 +264,7 @@ namespace code_creation_kit
             catch( KeywordParameterParser::ExParameterValueExpected& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1209: Parameter value is missing or syntax is incorrect. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -276,7 +278,7 @@ namespace code_creation_kit
             catch( KeywordParameterParser::ExCharsUsedForPaddingNotSupported& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1215: The text passed for padding contains unsupported characters. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -290,7 +292,7 @@ namespace code_creation_kit
             catch( CProcessingLevelControlExceptions::ExPossibleInfiniteLoop& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1250: Recursion exceeded the maximum of %3% levels while expanding macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -304,7 +306,7 @@ namespace code_creation_kit
             catch( CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1251: The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -318,7 +320,7 @@ namespace code_creation_kit
             catch( CTemplateLoaderExceptions::ExCyclicInclusion& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1300: Cyclic inclusion detected.\n"));
@@ -332,7 +334,7 @@ namespace code_creation_kit
             catch( ParameterParser::ExMissingDelimiterInParameterDescription& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1400: Syntax bad for parameter option number %1%, expecting name=value but is: %2%\n"));
@@ -346,7 +348,7 @@ namespace code_creation_kit
             catch( CRegexMatchesConstraintExceptions::ExRegexSyntaxError& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -360,7 +362,7 @@ namespace code_creation_kit
             catch( CRegexReplaceConversionExceptions::ExRegexSyntaxError& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -374,7 +376,7 @@ namespace code_creation_kit
             catch( CTemplatePreprocessorExceptions::ExPrefixLeadingWhiteSpace& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1602: Leading white space for markup prefix is not allowed.\n"));
@@ -388,7 +390,7 @@ namespace code_creation_kit
             catch( CTemplatePreprocessorExceptions::ExPostfixTrailingWhiteSpace& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1603: Trailing white space for markup postfix is not allowed.\n"));
@@ -402,7 +404,7 @@ namespace code_creation_kit
             catch( CTemplatePreprocessorExceptions::ExBadlyPlacedTrim& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1604: Trim directives are expected at the end of a line. Trailing whitespace is allowed.\n"));
@@ -416,7 +418,7 @@ namespace code_creation_kit
             catch( CTemplatePreprocessorExceptions::ExBadlyPlacedComment& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1605: COMMENT is expected at the beginning of a line. Leading whitespace is allowed.\n"));
@@ -430,7 +432,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingBlockBegin& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1801: Missing begin block marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -444,7 +446,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingMacroBegin& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1802: Missing begin macro marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -458,7 +460,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingBlockEnd& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1803: Missing block end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -472,7 +474,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingMacroEnd& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1804: Missing macro end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -486,7 +488,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExUnexpectedKeyword& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1810: Syntax error. Unexpected keyword found. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -500,7 +502,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExUnexpectedEndOfMacro& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1805: Unexpected end of macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -514,7 +516,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExDirectiveAlreadyApplied& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1820: Directive has been applied already. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -528,7 +530,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExConstraintExpectedAfterNot& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1821: Constraint following not expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -542,7 +544,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExSubstitutionExpectedAfterIf& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1822: Substitution following if expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -556,7 +558,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExCannotApplyDirectiveToSubstitution& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1823: Directive cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -570,7 +572,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExCannotApplyDirectiveToConstraint& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1824: Directive cannot be applied to this constraint. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -584,7 +586,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExCannotApplyDirectiveToConversion& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1825: Directive cannot be applied to this conversion. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -598,7 +600,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExCannotApplyConstraintToSubstitution& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1826: Constraint cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -612,7 +614,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExCannotApplyConversionToSubstitution& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1827: Conversion cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -626,7 +628,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExSubstitutionParsingBadOrder& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1828: Extensions fo a substitution are expected in the order directives, constraints, conversions. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -640,7 +642,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExSubstitutionRequiresIf& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1829: Substitution requires if. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -651,10 +653,24 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
+            catch( CParserExceptions::ExMacroTooLarge& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % (m_generator.getMaxMacroTextSizeBytes() / 1024);
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
             catch( CParserExceptions::ExPartBlocksCannotBeNested& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1840: Part blocks cannot be nested.\n"));
@@ -668,7 +684,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingPartBegin& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1841: Missing begin part marker.\n"));
@@ -682,7 +698,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExMissingPartEnd& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1842: Missing part end marker.\n"));
@@ -696,7 +712,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExPartAlreadyDefined& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1843: Part already defined. Cannot add a second part with the same label.\n"));
@@ -710,7 +726,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExPartNotDefined& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1844: Part not defined. Cannot expand part.\n"));
@@ -724,7 +740,7 @@ namespace code_creation_kit
             catch( CParserExceptions::ExPossibleInfiniteLoop& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1845: Recursion exceeded the maximum of allowed levels while expanding part.\n"));
@@ -735,24 +751,276 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMacroTooLarge& e)
+            catch( CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
-                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1860: Unexpected table property found for template-provided table.\n"));
 #else
-                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1860: Unexpected table property found for template-provided table.\n"));
 #endif
-                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % (m_generator.getMaxMacroTextSizeBytes() / 1024);
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExMissingTableBegin& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1861: Missing begin table marker.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1861: Missing begin table marker.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CParserExceptions::ExMissingTableEnd& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1862: Missing table end marker.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1862: Missing table end marker.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CMacroProcessorExceptions::ExCannotChangeTableList& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1863: Changing the table list permanently is disabled. Only temporary tables can be added or removed.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1863: Changing the table list permanently is disabled. Only temporary tables can be added or removed.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CTemplateProvidedTableLoaderExceptions::ExTableLoadFileNameMustNotBeEmpty& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1864: Table filename must not be empty.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1864: Table filename must not be empty.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExBadDelimiter& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1001: Provided character cannot be used as delimiting character. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1001: Provided character cannot be used as delimiting character. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExRequireDelimitingChar& e)
+            {
+                (void) e;
+
+                if (!getTableLoadFileNameWithFailure().empty())
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1002: New line or delimiter at the end of item in quotes is expected.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : error TC1002: New line or delimiter at the end of item in quotes is expected.\n"));
+#endif
+                    formatter% addPath( getTableLoadFileNameWithFailure()) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                else
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1002: New line or delimiter at the end of item in quotes is expected. CSV table source line %4% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1002: New line or delimiter at the end of item in quotes is expected. CSV table source line %4% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                    formatter% addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastLineWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExUnexpectedQuote& e)
+            {
+                (void) e;
+
+                if (!getTableLoadFileNameWithFailure().empty())
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1003: Unexpected quote.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : error TC1003: Unexpected quote.\n"));
+#endif
+                    formatter% addPath( getTableLoadFileNameWithFailure()) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                else
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1003: Unexpected quote. CSV table source line %4%  column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1003: Unexpected quote. CSV table source line %4%  column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                    formatter% addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastLineWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExStreamBad& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1004: An error occured reading table.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1004: An error occured reading table.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CSourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotOpenFile& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1010: Cannot open table file: %1%\n"));
+#else
+                FormatT formatter(STRING_LITERAL(" Error TC1010: Cannot open table file: %1%\n"));
+#endif
+                formatter % addPath(getTableLoadFileNameWithFailure());
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CSourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotReadFile& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1011: An error occured reading table file: %1%\n"));
+#else
+                FormatT formatter(STRING_LITERAL(" Error TC1011: An error occured reading table file: %1%\n"));
+#endif
+                formatter % addPath(getTableLoadFileNameWithFailure());
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CVerticalTableBuilderExceptions::ExUnderflow& e)
+            {
+                (void) e;
+
+                if (!getTableLoadFileNameWithFailure().empty())
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1020: Table row %4% contains less items than first row.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : error TC1020: Table row %4% contains less items than first row.\n"));
+#endif
+                    formatter% addPath( getTableLoadFileNameWithFailure()) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                else
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1020: Table row %4% contains less items than first row. CSV table source line %5% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1020: Table row %4% contains less items than first row. CSV table source line %5% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                    formatter% addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure() % m_generator.getLastLineWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                throw CErrorPrinted();
+            }
+            catch( CVerticalTableBuilderExceptions::ExOverflow& e)
+            {
+                (void) e;
+
+                if (!getTableLoadFileNameWithFailure().empty())
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1021: Table row %4% contains more items than first row.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : error TC1021: Table row %4% contains more items than first row.\n"));
+#endif
+                    formatter% addPath( getTableLoadFileNameWithFailure()) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                else
+                {
+                    //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1021: Table row %4% contains more items than first row. CSV table source line %5% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                    FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1021: Table row %4% contains more items than first row. CSV table source line %5% column %3%. The source file line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                    formatter% addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure() % m_generator.getLastLineWithFailure();
+                    toErrorStream(formatter.str());
+                }
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExBadCommentChars& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1030: The CSV comment char list contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1030: The CSV comment char list contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CMacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1053: Table label already defined. Cannot add a second table with the same label.\n"));
+#else
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : error TC1053: Table label already defined. Cannot add a second table with the same label.\n"));
+#endif
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
             catch( CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : just_testing TC1900: Error tag triggered: %3%\n"));
@@ -780,7 +1048,7 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1001: '%1%' cannot be used as delimiting character.\n"));
@@ -803,12 +1071,12 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadCommentChars& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
-                FormatT formatter(STRING_LITERAL(" Just_Testing TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote and the delimiter.\n"));
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
 #else
-                FormatT formatter(STRING_LITERAL(" Error TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote and the delimiter.\n"));
+                FormatT formatter(STRING_LITERAL(" Error TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
 #endif
                 formatter % commentChars;
                 toErrorStream( formatter.str());
@@ -830,7 +1098,7 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1001: '%1%' cannot be used as delimiting character.\n"));
@@ -844,7 +1112,7 @@ namespace code_creation_kit
             catch( CCsvParser::ExRequireDelimitingChar& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1002: New line or delimiter at the end of item in quotes is expected.\n"));
@@ -858,7 +1126,7 @@ namespace code_creation_kit
             catch( CCsvParser::ExUnexpectedQuote& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1003: Unexpected quote.\n"));
@@ -872,7 +1140,7 @@ namespace code_creation_kit
             catch( CCsvParser::ExStreamBad& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1004: An error occured reading table file: %1%\n"));
@@ -886,7 +1154,7 @@ namespace code_creation_kit
             catch( CSourceFileExceptions<CsvFileT>::ExCannotOpenFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1010: Cannot open table file: %1%\n"));
@@ -900,7 +1168,7 @@ namespace code_creation_kit
             catch( CSourceFileExceptions<CsvFileT>::ExCannotReadFile& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1011: An error occured reading table file: %1%\n"));
@@ -914,7 +1182,7 @@ namespace code_creation_kit
             catch( CVerticalTableBuilderExceptions::ExUnderflow& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1020: Table row %4% contains less items than first row.\n"));
@@ -928,7 +1196,7 @@ namespace code_creation_kit
             catch( CVerticalTableBuilderExceptions::ExOverflow& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : just_testing TC1021: Table row %4% contains more items than first row.\n"));
@@ -942,12 +1210,12 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadCommentChars& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
-                FormatT formatter(STRING_LITERAL(" Just_Testing TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote and the delimiter.\n"));
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
 #else
-                FormatT formatter(STRING_LITERAL(" Error TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote and the delimiter.\n"));
+                FormatT formatter(STRING_LITERAL(" Error TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
 #endif
                 formatter % m_generator.getCsvCommentChars();
                 toErrorStream( formatter.str());
@@ -956,7 +1224,7 @@ namespace code_creation_kit
             catch( CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1051: Row header index %1% exceeds the bounds of the table.\n"));
@@ -970,7 +1238,7 @@ namespace code_creation_kit
             catch( CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
                 FormatT formatter(STRING_LITERAL(" Just_Testing TC1052: Column header index  %1% exceeds the bounds of the table.\n"));
@@ -978,6 +1246,20 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" Error TC1052: Column header index  %1% exceeds the bounds of the table.\n"));
 #endif
                 formatter % columnHeaderIndex;
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CMacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
+            {
+                (void) e;
+
+                //prevent test output to be listed as error
+#if defined BOOST_TEST_MAIN
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1053: Table label '%1%' already defined. Cannot add a second table with the same label.\n"));
+#else
+                FormatT formatter(STRING_LITERAL(" Error TC1053: Table label '%1%' already defined. Cannot add a second table with the same label.\n"));
+#endif
+                formatter % label;
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
@@ -989,29 +1271,15 @@ namespace code_creation_kit
             {
                 m_generator.unloadTable( label);
             }
-            catch( CGeneratorExceptions::ExFailedToUnloadTable& e)
-            {
-                (void) e;
-                
-                //prevent test output to be listed as error
-#if defined BOOST_TEST_MAIN
-                FormatT formatter(STRING_LITERAL(" Just_Testing TC1700: A table entry with the specified label '%1%' does not exist.\n"));
-#else
-                FormatT formatter(STRING_LITERAL(" Error TC1700: A table entry with the specified label '%1%' does not exist.\n"));
-#endif
-                formatter % label;
-                toErrorStream( formatter.str());
-                throw CErrorPrinted();
-            }
             catch( CMacroProcessorExceptions::ExTableNotFound& e)
             {
                 (void) e;
-                
+
                 //prevent test output to be listed as error
 #if defined BOOST_TEST_MAIN
-                FormatT formatter(STRING_LITERAL(" Just_Testing TC1701: A table entry with the specified label '%1%' does not exist.\n"));
+                FormatT formatter(STRING_LITERAL(" Just_Testing TC1701: A table entry with the provided label '%1%' does not exist.\n"));
 #else
-                FormatT formatter(STRING_LITERAL(" Error TC1701: A table entry with the specified label '%1%' does not exist.\n"));
+                FormatT formatter(STRING_LITERAL(" Error TC1701: A table entry with the provided label '%1%' does not exist.\n"));
 #endif
                 formatter % label;
                 toErrorStream( formatter.str());
@@ -1070,23 +1338,28 @@ namespace code_creation_kit
 
         unsigned int getCurrentLineNumber()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if (fileData.line == 0) //uninitialized?
             {
                 return 1;
             }
-            return list.back().line;
+            return fileData.line;
         }
 
         StringT getCurrentFileName()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if ( fileData.name.empty()) //uninitialized?
             {
                 return STRING_LITERAL("???");
             }
 
-            return list.back().name;
+            return fileData.name;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return m_generator.getTableLoadFileNameWithFailure();
         }
 
         StringT addPath( const StringT& location)

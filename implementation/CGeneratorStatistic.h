@@ -55,6 +55,7 @@ namespace code_creation_kit
     public:
         typedef typename StringT::value_type CharT;
         typedef typename TemplateLoaderT::FileDataListT FileDataListT;
+        typedef typename TemplateLoaderT::FileData FileDataT;
         typedef std::set<StringT> FileSetT;
 
         CGeneratorStatistic()
@@ -121,6 +122,14 @@ namespace code_creation_kit
             m_templateLoader.loadTemplateFile( filename, useCinInstead);
         }
 
+        ///used when a CSV table is loaded using TABLE_LOAD
+        StringT resolveFileNameForTableToLoad(const StringT& filename)
+        {
+            StringT resolvedFileName = m_templateLoader.resolveFileName(filename);
+            m_tables.insert(resolvedFileName);
+            return resolvedFileName;
+        }
+
         ///generates output by processing a template file
         template <typename ParameterListT>
         void generate( 
@@ -131,6 +140,7 @@ namespace code_creation_kit
             const StringT& , 
             bool , 
             const ParameterListT& ,
+            bool ,
             const CInlineTemplateParameters<StringT>& p
             )
         {
@@ -191,6 +201,12 @@ namespace code_creation_kit
             return m_templateLoader.getInclusionHierarchy();
         }
 
+        ///can be used for error reporting
+        const FileDataT& getLastTemplateFileProcessed() const
+        {
+            return m_templateLoader.getLastFileProcessed();
+        }
+
         ///get list of loaded tables
         const FileSetT& getTableFiles() const
         {
@@ -207,6 +223,11 @@ namespace code_creation_kit
         const FileSetT& getTemplateFiles() const
         {
             return m_templateFiles;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return StringT();
         }
 
         ///dummy only:

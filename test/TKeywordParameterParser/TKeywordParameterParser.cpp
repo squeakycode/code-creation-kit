@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
         {
             std::string text("[\" \" , 99]");
             std::string::iterator it = text.begin();
-            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
             BOOST_CHECK(it == text.end());
             BOOST_CHECK(expectedParameters == parsedParameters);
         }
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
         {
             std::string text("[ \" \" , 99, 22 ]");
             std::string::iterator it = text.begin();
-            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
             BOOST_CHECK(it == text.end());
             BOOST_CHECK(expectedParameters == parsedParameters);
         }
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
         {
             std::string text("[\" \",99,22,+42]");
             std::string::iterator it = text.begin();
-            KeywordParameterParser::getParametersCombiCStyleUIntUIntRepeat(it, text.end(), parsedParameters);
+            KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
             BOOST_CHECK(it == text.end());
             BOOST_CHECK(expectedParameters == parsedParameters);
         }

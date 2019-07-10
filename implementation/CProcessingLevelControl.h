@@ -41,13 +41,14 @@ namespace code_creation_kit
     };
 
 
-    template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
+    template <typename ParserT, typename TemplateProvidedTableLoaderT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
     class CProcessingLevelControl : public CProcessingLevelControlExceptions
     {
         ///represents a processing stage in the processing spiral
         ///holds the processing blocks having a state
-        struct ProcessingLevelBlocks
+        class ProcessingLevelBlocks
         {
+        public:
             ProcessingLevelBlocks()
                 : nextLevelIsProcessing(false)
             {
@@ -67,7 +68,7 @@ namespace code_creation_kit
         };
 
     public:
-        typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
+        typedef CProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
         typedef typename ParserT::ParserTokenT TokenT;
         typedef typename ParserT::ParserStringT StringT;
         typedef typename StringT::value_type CharT;
@@ -108,6 +109,15 @@ namespace code_creation_kit
             for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.parser.connectOutputStream( processor);
+            }
+        }
+
+        ///attaches the template processor for the next level
+        void connectTemplateProvidedTableLoader(TemplateProvidedTableLoaderT* pTemplateProvidedTableLoader)
+        {
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
+            {
+                levelBlock.parser.connectTemplateProvidedTableLoader(pTemplateProvidedTableLoader);
             }
         }
 

@@ -99,6 +99,7 @@ add_library(cck_implementation STATIC
     StringLiteral.h
     Substitutions.tccmd
     System.h
+    CTemplateProvidedTableLoader.h
 )
 
 target_include_directories(cck_implementation

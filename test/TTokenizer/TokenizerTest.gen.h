@@ -131,6 +131,38 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//TABLE_BEGIN
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TABLE_BEGIN%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eTableBegin, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_END
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TABLE_END%end");
+        expected[1] = TokenT( TokenT::eTableEnd);
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_LOAD
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TABLE_LOAD%[\"parameter1\",\"parameter2\"]end");
+        expected[1] = TokenT( TokenT::eTableLoad, STRING_LITERAL("parameter1"), STRING_LITERAL("parameter2"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_REMOVE
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TABLE_REMOVE%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eTableRemove, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//ANY
         result.clear();
         tokenizer << STRING_LITERAL("start%ANY%end");
@@ -505,6 +537,38 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%PART_REMOVE.%end") : STRING_LITERAL("start%PART_REMOVE..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%PART_REMOVE"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_BEGIN
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TABLE_BEGIN.%end") : STRING_LITERAL("start%TABLE_BEGIN..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TABLE_BEGIN"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_END
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TABLE_END.%end") : STRING_LITERAL("start%TABLE_END..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TABLE_END"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_LOAD
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TABLE_LOAD.%end") : STRING_LITERAL("start%TABLE_LOAD..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TABLE_LOAD"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TABLE_REMOVE
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TABLE_REMOVE.%end") : STRING_LITERAL("start%TABLE_REMOVE..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TABLE_REMOVE"));
         BOOST_CHECK( expected == result);
     }
 

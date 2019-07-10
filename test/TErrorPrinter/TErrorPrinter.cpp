@@ -57,6 +57,12 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RowOverflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //row underflow
     BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RowUnderflow.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
+    //label already in use
+    {
+        BOOST_CHECK_NO_THROW(generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "RowUnderflow.csv", "LabelA", true, true, 1, 1, true /*pad-rows*/));
+        BOOST_CHECK_THROW(generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "RowUnderflow.csv", "LabelA", true, true, 1, 1, true /*pad-rows*/), CErrorPrinted);
+        BOOST_CHECK_NO_THROW(generator.unloadTable("LabelA"));
+    }
 
     //unloaded file not found
     BOOST_CHECK_THROW( generator.unloadTable( "not there"), CErrorPrinted);
@@ -96,5 +102,21 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
 
     //bad chars passed for padding
     BOOST_CHECK_THROW(generator.generate( CCK_TEST_INPUT_FILE_PREFIX "BadCharsPassedForPadding.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+
+    //table block errors
+    {
+        for (int i = 1; i <= 18; ++i)
+        {
+            if (i == 2 || i == 7 || i == 9) //gaps
+            {
+                continue;
+            }
+
+            generator.setMarkup(std::string("<") + std::to_string(i) + ":>", std::string("<:") + std::to_string(i) + ">");
+            BOOST_CHECK_THROW(generator.generate(CCK_TEST_INPUT_FILE_PREFIX "TableBlockErrors.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt", false, false, CCK_TEST_INPUT_FILE_PREFIX "TargetFile.txt.intermediate", false, ParameterListT()), CErrorPrinted);
+        }
+        generator.setMarkup("[", "]");
+    }
+
 }
 

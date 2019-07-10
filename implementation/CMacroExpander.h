@@ -58,7 +58,7 @@ namespace code_creation_kit
                 , m_message( message)
             {
             }
-            ~ExErrorTagExpanded() throw()
+            ~ExErrorTagExpanded()
             {
             }
             const StringT& getMessage()

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
         generator.loadTable( "a", "LabelA", true, true, 1, 1, false);
         generator.loadTable( "a", "LabelB", true, true, 1, 1, false);
         generator.addIncludeDirectory("IncludeDirectory");
-        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, CInlineTemplateParameters<StringT>());
+        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>());
 
         BOOST_REQUIRE( generator.getTableFiles().size() == 1);
         BOOST_REQUIRE( generator.getGeneratedFiles().size() == 1);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
         generator.loadTable( "a", "LabelA", true, true, 1, 1, false);
         generator.loadTable( "a", "LabelB", true, true, 1, 1, false);
         generator.addIncludeDirectory("IncludeDirectory");
-        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, CInlineTemplateParameters<StringT>( true, "$$$", "", "&&&&", 0));
+        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>( true, "$$$", "", "&&&&", 0));
 
         BOOST_REQUIRE( generator.getTableFiles().size() == 1);
         BOOST_REQUIRE( generator.getGeneratedFiles().size() == 1);

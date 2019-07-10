@@ -62,10 +62,32 @@ public:
     typedef std::set<StringT> FileSetT;
 
     TTestGenerator() 
-        : m_reset(false)        , m_loadTable(false)        , m_unloadTable(false)        , m_generate(false)
-        , m_topDown(false)        , m_leftToRight(false)        , m_useIntermediateFile(false)        , m_addIncludeDirectory(false)        , m_setCsvDelimiter(false)        , m_setCsvCommentChars(false)        , m_setCsvIgnoreDoubleQuotes(false)        , m_csvIgnoreDoubleQuotes(false)        , m_setLogStream(false)
-        , m_rowHeaderIndex(0)        , m_columnHeaderIndex(0)        , m_padRows(false)
-        , m_append(false)        , m_logStream(false)        , m_recycle(false)        , m_delimiter(0)
+        : m_reset(false)
+        , m_loadTable(false)
+        , m_unloadTable(false)
+        , m_generate(false)
+
+        , m_topDown(false)
+        , m_leftToRight(false)
+        , m_useIntermediateFile(false)
+        , m_addIncludeDirectory(false)
+        , m_setCsvDelimiter(false)
+        , m_setCsvCommentChars(false)
+        , m_setCsvIgnoreDoubleQuotes(false)
+        , m_csvIgnoreDoubleQuotes(false)
+        , m_setLogStream(false)
+
+
+        , m_rowHeaderIndex(0)
+        , m_columnHeaderIndex(0)
+        , m_padRows(false)
+
+        , m_append(false)
+        , m_logStream(false)
+        , m_recycle(false)
+        , m_canChangeTableList(false)
+
+        , m_delimiter(0)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
@@ -77,7 +99,9 @@ public:
         bool useIntermediateFile,
         bool recycle,
         const StringT& intermediateFile,
-        bool append, const ParameterListT& parameters,
+        bool append,
+        const ParameterListT& parameters,
+        bool canChangeTableList,
         const CInlineTemplateParameters<StringT>& inlineTemplateParameters
         )
     {
@@ -90,6 +114,7 @@ public:
         BOOST_CHECK( m_parameters == parameters);
         BOOST_CHECK( m_append == append);
         BOOST_CHECK( m_inlineTemplateParameters == inlineTemplateParameters);
+        BOOST_CHECK(m_canChangeTableList == canChangeTableList);
     }
 
     void reset()
@@ -176,6 +201,7 @@ public:
     bool m_append;
     bool m_logStream;
     bool m_recycle;
+    bool m_canChangeTableList;
 
     void setTemplateFile( const char* text)
     {
@@ -475,6 +501,20 @@ void runTest()
         process<StringT>( args, generator);
     }
 
+    {
+        //test generate with can-change-table-list
+        GeneratorT generator;
+        generator.setTemplateFile("a.txt");
+        generator.setTargetFile("b.txt");
+        generator.m_useIntermediateFile = false;
+        generator.m_canChangeTableList = true;
+        generator.setIntermediateFileName("b.txt.intermediate");
+        generator.m_generate = true;
+        std::vector<std::string> args;
+        args += "-c", "-s a.txt -o b.txt --can-change-table-list";
+        process<StringT>(args, generator);
+    }
+    
     {
         //test generate inline
         GeneratorT generator;

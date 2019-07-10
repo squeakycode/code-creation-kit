@@ -29,6 +29,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <sstream>
 
 namespace code_creation_kit
 {
@@ -150,6 +151,16 @@ namespace code_creation_kit
         {
         public: ExPossibleInfiniteLoop() : std::runtime_error("Possible infinite loop detected while expanding part.") {}
         };
+
+        class ExMissingTableBegin : public std::runtime_error
+        {
+        public: ExMissingTableBegin() : std::runtime_error("Missing begin table marker.") {}
+        };
+
+        class ExMissingTableEnd : public std::runtime_error
+        {
+        public: ExMissingTableEnd() : std::runtime_error("Missing table end marker.") {}
+        };
     };
 }
 
@@ -157,11 +168,11 @@ namespace code_creation_kit
 
 namespace code_creation_kit
 {
-    template <typename OutputStreamT, typename TokenT, typename StringT, typename LogOutputStreamT = CNul >
+    template <typename OutputStreamT, typename TemplateProvidedTableLoaderT, typename TokenT, typename StringT, typename LogOutputStreamT = CNul >
     class CParser : public CParserExceptions
     {
     public:
-        typedef CParser<OutputStreamT, TokenT, StringT, LogOutputStreamT> ThisT;
+        typedef CParser<OutputStreamT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ThisT;
         typedef CMacro<StringT> MacroT;
         typedef std::vector<TokenT> StackT;
         typedef typename StackT::const_iterator PosT;
@@ -181,7 +192,14 @@ namespace code_creation_kit
             , m_partExpansionRecursionLevel(0)
             , m_pLogOutputStream(nullptr)
             , m_pPartMap(nullptr)
+            , m_pTemplateProvidedTableLoader(nullptr)
         {
+        }
+
+        ///attaches the loader for tables provided by template keywords TABLE_BEGIN and TABLE_END
+        void connectTemplateProvidedTableLoader(TemplateProvidedTableLoaderT* pTemplateProvidedTableLoader)
+        {
+            m_pTemplateProvidedTableLoader = pTemplateProvidedTableLoader;
         }
 
         ///attaches the map for part blocks defined by PART_BEGIN and PART_END
@@ -242,7 +260,21 @@ namespace code_creation_kit
                 throw ExMacroTooLarge();
             }
 
-            if (!m_stack.empty() && m_stack.front() == TokenT::ePartBegin) //if inside part block
+            if (!m_stack.empty() && m_stack.front() == TokenT::eTableBegin) //if inside table block
+            {
+                if (!isTextOnly(token)) //eTableEnd if correct otherwise something else
+                {
+                    //we transfer the processing to parseStack()->parseTableBlock()
+                    //done, we can add the part to the part map
+                    m_stack.push_back(token);
+                    parseStack();
+                }
+                else //collect any other token
+                {
+                    m_stack.push_back(token);
+                }
+            }
+            else if (!m_stack.empty() && m_stack.front() == TokenT::ePartBegin) //if inside part block
             {
                 if (token == TokenT::ePartBegin)
                 {
@@ -280,6 +312,25 @@ namespace code_creation_kit
             {
                 parseStack();
                 m_stack.push_back(token);
+            }
+            else if (token == TokenT::eTableEnd)
+            {
+                throw ExMissingTableBegin();
+            }
+            else if (token == TokenT::eTableBegin)
+            {
+                parseStack();
+                m_stack.push_back(token);
+            }
+            else if (token == TokenT::eTableLoad)
+            {
+                parseStack(); //push the stack here to let it behave like a table block
+                processTableLoadToken(token);
+            }
+            else if (token == TokenT::eTableRemove)
+            {
+                //remove a previously defined defined from the part map
+                processTableRemoveToken(token);
             }
             else if ( token == TokenT::eMacroBegin)
             {
@@ -479,6 +530,133 @@ namespace code_creation_kit
         }
 
 
+        ///processes a table remove token
+        void processTableRemoveToken(const TokenT& token)
+        {
+            if (m_pTemplateProvidedTableLoader)
+            {
+                //get the table label
+                const StringT& label = token.getStringList()->at(0);
+
+                //remove the table
+                typename TemplateProvidedTableLoaderT::SharedConstTableT ptrDisconnectedTable;
+                m_pOutputStream->disconnectTable(label, false /*throwIfNotFound*/, ptrDisconnectedTable);
+                (void)ptrDisconnectedTable; //unused
+            }
+        }
+
+
+        ///helper for getting table parameters
+        void getTableTokenParameters(
+            const TokenT& token,
+            size_t offset,
+            StringT& label,
+            StringT& csvDelimiter,
+            StringT& csvCommentChars,
+            StringT& properties
+        )
+        {
+            typedef typename StringT::value_type CharT;
+            label = token.getStringList()->at(0 + offset);
+            csvDelimiter = token.getStringList()->size() > (1 + offset) ? token.getStringList()->at(1 + offset) : STRING_LITERAL(";");
+            csvCommentChars = token.getStringList()->size() > (2 + offset) ? token.getStringList()->at(2 + offset) : STRING_LITERAL("");
+            properties = token.getStringList()->size() > (3 + offset) ? token.getStringList()->at(3 + offset) : STRING_LITERAL("");
+        }
+
+
+        ///processes a part remove token
+        void processTableLoadToken(const TokenT& token)
+        {
+            //template provided tables may not be available in different configuration of the code
+            if (!m_pTemplateProvidedTableLoader)
+            {
+                throw std::runtime_error("Internal error. Table loader is not available.");
+            }
+
+            //get the parameters
+            StringT tableFileName = token.getStringList()->at(0);
+            //parameters are offset by one due to filename
+            StringT label, csvDelimiter, csvCommentChars, properties;
+            getTableTokenParameters(token, 1, label, csvDelimiter, csvCommentChars, properties);
+
+            //load the table
+            typename TemplateProvidedTableLoaderT::TableData tableData = m_pTemplateProvidedTableLoader->loadTable(
+                tableFileName,
+                label,
+                csvDelimiter,
+                csvCommentChars,
+                properties
+            );
+
+            //announce the table
+            m_pOutputStream->connectTable(
+                tableData.ptrTable,
+                label,
+                tableData.topDown,
+                tableData.leftRight,
+                tableData.rowHeaderIndex,
+                tableData.columnHeaderIndex,
+                !tableData.permanent
+            );
+        }
+
+
+        ///processes a table block
+        void parseTableBlock()
+        {
+            if (!m_stack.empty())
+            {
+                if (m_stack.size() >= 2 && m_stack.front() == TokenT::eTableBegin && m_stack.back() == TokenT::eTableEnd)
+                {
+                    //template provided tables may not be available in different configuration of the code
+                    if (!m_pTemplateProvidedTableLoader)
+                    {
+                        throw std::runtime_error("Internal error. Table loader is not available.");
+                    }
+
+                    //get the table as string stream
+                    typedef typename StringT::value_type CharT;
+                    typedef std::basic_stringstream< CharT, std::char_traits<CharT> > StringStreamT;
+                    StringStreamT stringStream;
+                    auto itBegin = m_stack.cbegin() + 1; //remove begin marker
+                    auto itEnd = m_stack.cend() - 1; //remove end marker
+                    for (auto it = itBegin; it != itEnd; ++it)
+                    {
+                        it->toStream(stringStream);
+                    }
+
+                    //get the parameters
+                    StringT label, csvDelimiter, csvCommentChars, properties;
+                    getTableTokenParameters(m_stack.front(), 0, label, csvDelimiter, csvCommentChars, properties);
+
+                    //load the table
+                    typename TemplateProvidedTableLoaderT::TableData tableData = m_pTemplateProvidedTableLoader->loadTable(
+                        stringStream,
+                        label,
+                        csvDelimiter,
+                        csvCommentChars,
+                        properties
+                    );
+
+                    //announce the table
+                    m_pOutputStream->connectTable(
+                        tableData.ptrTable,
+                        label,
+                        tableData.topDown,
+                        tableData.leftRight,
+                        tableData.rowHeaderIndex,
+                        tableData.columnHeaderIndex,
+                        !tableData.permanent
+                    );
+                }
+                else //if we are here a table block has been started but it never got closed
+                {
+                    throw ExMissingTableEnd();
+                }
+            }
+        }
+
+
         ///parses the tokens on the stack
         void parseStack()
         {
@@ -487,6 +665,11 @@ namespace code_creation_kit
                 if (m_stack.front() == TokenT::ePartBegin)
                 {
                     parsePartBlock();
+                    m_stack.clear();
+                }
+                else if (m_stack.front() == TokenT::eTableBegin)
+                {
+                    parseTableBlock();
                     m_stack.clear();
                 }
                 else if ( parseTextOnly())
@@ -507,15 +690,27 @@ namespace code_creation_kit
             }
         }
 
+
+        ///check is text only
+        bool isTextOnly(const TokenT& token)
+        {
+            if (token != TokenT::eFullLineWithoutTags
+                && token != TokenT::eTextFragment
+                && token != TokenT::eNewLine
+                )
+            {
+                return false;
+            }
+            return true;
+        }
+
+
         ///check is text only
         bool parseTextOnly()
         {
             for (const TokenT& token : m_stack)
             {
-                if (   token != TokenT::eFullLineWithoutTags
-                    && token != TokenT::eTextFragment
-                    && token != TokenT::eNewLine 
-                    )
+                if (!isTextOnly(token))
                 {
                     return false;
                 }
@@ -722,6 +917,7 @@ namespace code_creation_kit
         static const size_t m_partExpansionRecursionLevelLimit = 32; ///<user can use parts in a way that caused endless recursion
         LogOutputStreamT* m_pLogOutputStream; ///<used for logging purposes; NULL if not logging
         PartMapT* m_pPartMap;
+        TemplateProvidedTableLoaderT* m_pTemplateProvidedTableLoader;
         static const size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
     };
 }

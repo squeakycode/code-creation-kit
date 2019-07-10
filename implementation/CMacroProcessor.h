@@ -26,6 +26,7 @@
 #pragma once
 
 #include <list>
+#include <memory.h>
 #include "CTableIndex.h"
 #include "CVerticalTableRotator.h"
 #include "CMacro.h"
@@ -39,8 +40,18 @@ namespace code_creation_kit
     public:
         class ExTableNotFound : public std::runtime_error 
         { public: ExTableNotFound() : std::runtime_error( "A table with the specified label does not exist") {}};
+        
+        class ExTableLabelAlreadyDefined : public std::runtime_error
+        {
+        public: ExTableLabelAlreadyDefined() : std::runtime_error("Table label already defined. Cannot add a second table with the same label.") {}
+        };
 
-        class ExRowHeaderIndexOutOfBounds : public std::overflow_error 
+        class ExCannotChangeTableList : public std::runtime_error
+        {
+        public: ExCannotChangeTableList() : std::runtime_error("Changing the table list permanently is disabled. Only temporary tables can be added or removed.") {}
+        };
+
+        class ExRowHeaderIndexOutOfBounds : public std::overflow_error
         { public: ExRowHeaderIndexOutOfBounds() : std::overflow_error( "Row header index exceeds bounds") {}};
 
         class ExColumnHeaderIndexOutOfBounds : public std::overflow_error 
@@ -59,19 +70,20 @@ namespace code_creation_kit
         typedef CVerticalTableRotator<TableT> TableRotatorT;
         typedef CTableIndex<TableT, ExColumnHeaderIndexOutOfBounds> TableIndexT;
         typedef CTableIndex<TableRotatorT, ExRowHeaderIndexOutOfBounds> RotatedTableIndexT;
+        typedef std::shared_ptr<const TableT> SharedConstTableT;
+        typedef std::shared_ptr<TableRotatorT> SharedTableRotatorT;
 
         ///represents a table internally
-        struct Table
+        struct TableData
         {
-            Table()
-                : table(0)
-                , rotatedTable(0)
+            TableData()
+                : isTemporaryFlag(false)
             {
             }
 
-            bool operator == ( const TableT* rhs) const
+            bool operator == ( const SharedConstTableT& ptrRhs) const
             {
-                return table == rhs;
+                return ptrTable == ptrRhs;
             }
 
             bool operator == ( const StringT& rhs) const
@@ -79,77 +91,171 @@ namespace code_creation_kit
                 return label == rhs;
             }
 
-            void connectTable( const TableT* connectedTable, const StringT& theLabel, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+            void connectTable(
+                const SharedConstTableT& ptrConnectedTable,
+                const StringT& theLabel,
+                bool topDown,
+                bool leftToRight,
+                unsigned int rowHeaderIndex,
+                unsigned int columnHeaderIndex,
+                bool isTemporary
+            )
             {
                 label = theLabel;
+                isTemporaryFlag = isTemporary;
 
-                table = topDown ? connectedTable : 0;
-                tableIndex.connectTable( table);
+                ptrTable = topDown ? ptrConnectedTable : SharedConstTableT();
+                tableIndex.connectTable( ptrTable.get());
                 tableIndex.readTable( columnHeaderIndex);
 
-                rotatedTable = leftToRight ? new TableRotatorT( connectedTable) : 0;
-                rotatedTableIndex.connectTable( rotatedTable);
+                if (!ptrTable)
+                {
+                    ptrSourceTable = ptrConnectedTable; //keep holding a reference to the table
+                }
+
+                ptrRotatedTable = leftToRight ? std::make_shared<TableRotatorT>( ptrConnectedTable.get()) : SharedTableRotatorT();
+                rotatedTableIndex.connectTable( ptrRotatedTable.get());
                 rotatedTableIndex.readTable( rowHeaderIndex);
             }
 
-            ~Table()
+            ~TableData()
             {
-                delete rotatedTable;
             }
 
             const StringT& getLabel() const
             {
                 return label;
             }
+            
+            bool isTemporary() const
+            {
+                return isTemporaryFlag;
+            }
 
+            SharedConstTableT ptrTable;
+            SharedTableRotatorT ptrRotatedTable;
             TableIndexT tableIndex;
             RotatedTableIndexT rotatedTableIndex;
-            const TableT* table;
-            TableRotatorT* rotatedTable;
         private:
+            SharedConstTableT ptrSourceTable; //ptrTable can not be set if reading only left to right so we must keep holding a reference to the table here
+            bool isTemporaryFlag;
             StringT label; ///<label identifying the table
         };
 
         //types used:
-        typedef std::list<Table> TableListT;
+        typedef std::list<TableData> TableListT; ///<tables are processed in the order they are connected
         typedef CMacro<StringT> MacroT;
 
     public:
         CMacroProcessor()
             : m_outputStream(0)
-            , m_logOutputStream(0)
+            , m_pLogOutputStream(0)
+            , m_canChangeNonTemporaryTableList(true)
         {
+        }
+
+        ///this allows controlling the changes made by a template
+        void setCanChangeNonTemporaryTableList(bool canChangeNonTemporaryTableList)
+        {
+            m_canChangeNonTemporaryTableList = canChangeNonTemporaryTableList;
         }
 
         ///attaches a table, does not take ownership of the table
-        void connectTable( const TableT* table, const StringT& label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+        void connectTable(
+            const SharedConstTableT& ptrConnectedTable,
+            const StringT& label,
+            bool topDown,
+            bool leftRight,
+            unsigned int rowHeaderIndex,
+            unsigned int columnHeaderIndex,
+            bool isTemporary //provided temporarily during processing
+        )
         {
-            if ( table )
+            //log that we are about to add the table with the given label
+            if (m_pLogOutputStream)
             {
-                m_tableList.push_back( Table());
-                m_tableList.back().connectTable( table, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+                *m_pLogOutputStream << "Adding table with label: " << label << "\n";
+            }
+
+            //block any declaring of tables added permanently
+            if (!m_canChangeNonTemporaryTableList && !isTemporary)
+            {
+                throw ExCannotChangeTableList();
+            }
+
+            typename TableListT::reverse_iterator pos = std::find( m_tableList.rbegin(), m_tableList.rend(), label);
+            if (pos != m_tableList.rend())
+            {
+                throw ExTableLabelAlreadyDefined();
+            }
+            
+            if (ptrConnectedTable)
+            {
+                m_tableList.push_back(TableData());
+                m_tableList.back().connectTable( ptrConnectedTable, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, isTemporary);
             }
         }
 
-        ///detaches a table, returns true if the table is not used by the processor anymore, returns pointer to table removed
-        bool disconnectTable( const StringT& label, const TableT*& table /*out*/)
+        ///detaches a table
+        bool disconnectTable(const StringT& label, bool throwIfNotFound, SharedConstTableT& ptrDisconnectedTable)
         {
-            table = 0;
+            bool result = false;
+            ptrDisconnectedTable.reset();
             typename TableListT::reverse_iterator pos = std::find( m_tableList.rbegin(), m_tableList.rend(), label);
             if ( pos != m_tableList.rend())
             {
-                table = pos->table;
+                //log that we are about to remove the table with the given label
+                if (m_pLogOutputStream)
+                {
+                    *m_pLogOutputStream << "Removing table with label: " << label << "\n";
+                }
+
+                //block any removing of tables added permanently
+                if (!m_canChangeNonTemporaryTableList && !pos->isTemporary())
+                {
+                    throw ExCannotChangeTableList();
+                }
+
+                ptrDisconnectedTable = pos->ptrTable;
                 m_tableList.erase( --pos.base());
+                result = true;
             }
-            else
+            else if (throwIfNotFound)
             {
                 throw ExTableNotFound();
             }
-            pos = std::find( m_tableList.rbegin(), m_tableList.rend(), table);
-            bool tableNotUsedAnymore = pos == m_tableList.rend();
-            return tableNotUsedAnymore;
+            else
+            {
+                //if the table is not found consider it removed.
+                if (m_pLogOutputStream)
+                {
+                    *m_pLogOutputStream << "Template-provided table to remove not found with label: " << label << "\n";
+                }
+            }
+            return result;
         }
-
+        
+        ///removed tables provided temporarily during processing
+        void removeTemporaryTables()
+        {
+            for (auto it = m_tableList.begin(); it != m_tableList.end();)
+            {
+                if (it->isTemporary())
+                {
+                    //log that we are about to remove the table with the given label
+                    if (m_pLogOutputStream)
+                    {
+                        *m_pLogOutputStream << "Removing table with label: " << it->getLabel() << "\n";
+                    }
+                    it = m_tableList.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+        
         ///attaches output stream as sink for expanded macros
         void connectOutputStream( OutputStreamT* stream)
         {
@@ -159,7 +265,7 @@ namespace code_creation_kit
         ///connect log output stream
         void connectLogOutputStream( LogOutputStreamT* stream)
         {
-            m_logOutputStream = stream;
+            m_pLogOutputStream = stream;
         }
 
         ///forward text of a line surrounding a macro, see definition of macro
@@ -180,27 +286,27 @@ namespace code_creation_kit
 
             if ( !macro.noLookUp()) //if something to look up in tables
             {
-                for (const Table& table : m_tableList)
+                for (const TableData& listTableEntry : m_tableList)
                 {
-                    if( table.table )
+                    if( listTableEntry.ptrTable )
                     {
                         //log
-                        if ( m_logOutputStream)
+                        if ( m_pLogOutputStream)
                         {
-                            *m_logOutputStream << "Start reading table top down:\n";
-                            *m_logOutputStream << "Label=" << table.getLabel() << "\n";
+                            *m_pLogOutputStream << "Start reading table top down:\n";
+                            *m_pLogOutputStream << "Label=" << listTableEntry.getLabel() << "\n";
                         }
-                        processMacro( *table.table, table.tableIndex, macro, true, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
+                        processMacro( *listTableEntry.ptrTable, listTableEntry.tableIndex, macro, true, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
                     }
-                    if( table.rotatedTable)
+                    if( listTableEntry.ptrRotatedTable)
                     {
                         //log
-                        if ( m_logOutputStream)
+                        if ( m_pLogOutputStream)
                         {
-                            *m_logOutputStream << "Start reading table left to right:\n";
-                            *m_logOutputStream << "Label=" << table.getLabel() << "\n";
+                            *m_pLogOutputStream << "Start reading table left to right:\n";
+                            *m_pLogOutputStream << "Label=" << listTableEntry.getLabel() << "\n";
                         }
-                        processMacro( *table.rotatedTable, table.rotatedTableIndex, macro, false, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
+                        processMacro( *listTableEntry.ptrRotatedTable, listTableEntry.rotatedTableIndex, macro, false, count, expandedMacro, expandedLastTime, lastTime, lastTimeExpanded);
                     }
                 }
 
@@ -209,10 +315,10 @@ namespace code_creation_kit
                     if ( lastTime && lastTimeExpanded ) //last time keyword and expansion ok
                     {
                         //log
-                        if ( m_logOutputStream)
+                        if ( m_pLogOutputStream)
                         {
-                            *m_logOutputStream << "Expanding with last time option (replaces previous expansion):\n";
-                            *m_logOutputStream << expandedLastTime << "\n";
+                            *m_pLogOutputStream << "Expanding with last time option (replaces previous expansion):\n";
+                            *m_pLogOutputStream << expandedLastTime << "\n";
                         }
                         if ( !expandedLastTime.empty())
                         {
@@ -234,10 +340,10 @@ namespace code_creation_kit
                     if ( !expandedMacro.empty()) //macro expanded
                     {
                         //log
-                        if ( m_logOutputStream)
+                        if ( m_pLogOutputStream)
                         {
-                            *m_logOutputStream << "Expanding:\n";
-                            *m_logOutputStream << expandedMacro << "\n";
+                            *m_pLogOutputStream << "Expanding:\n";
+                            *m_pLogOutputStream << expandedMacro << "\n";
                         }
                         *m_outputStream << expandedMacro;
                     }
@@ -250,6 +356,12 @@ namespace code_creation_kit
         ///reset state
         void reset()
         {
+            //log
+            if (m_pLogOutputStream)
+            {
+                *m_pLogOutputStream << "Clearing table list.\n";
+            }
+
             m_tableList.clear();
         }
 
@@ -282,10 +394,10 @@ namespace code_creation_kit
                     if ( expander.expand( i, expandedMacroLocal, count, false))
                     {
                         //log
-                        if ( m_logOutputStream)
+                        if ( m_pLogOutputStream)
                         {
-                            *m_logOutputStream << "Expanding at index " << (i + 1) << ":\n";
-                            *m_logOutputStream << expandedMacroLocal << "\n";
+                            *m_pLogOutputStream << "Expanding at index " << (i + 1) << ":\n";
+                            *m_pLogOutputStream << expandedMacroLocal << "\n";
                         }
                         if ( !expandedMacro.empty())
                         {
@@ -305,16 +417,17 @@ namespace code_creation_kit
             else
             {
                 //log
-                if ( m_logOutputStream)
+                if ( m_pLogOutputStream)
                 {
-                    *m_logOutputStream << "Entries or reading direction do not match macro." << "\n";
+                    *m_pLogOutputStream << "Entries or reading direction do not match macro." << "\n";
                 }
             }
         }
 
     private:
         OutputStreamT* m_outputStream; ///<sink for expanded macros
-        LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
+        LogOutputStreamT* m_pLogOutputStream; ///< used for logging purposes; NULL if not logging
         TableListT m_tableList; ///<list of attached tables
+        bool m_canChangeNonTemporaryTableList;
     };
 }

@@ -56,7 +56,7 @@ namespace code_creation_kit
             [OR][END][TRIM]
 
             [BEGIN][TRIM]
-            for (size_t i = 1; i < [ENTRY]["Variable Part Maximum Count"]; ++i)
+            for (size_t i = 0; i < [ENTRY]["Variable Part Maximum Count"]; ++i)
             {
                 IteratorT temp(start);
                 if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
