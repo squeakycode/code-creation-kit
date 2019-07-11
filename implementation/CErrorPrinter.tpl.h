@@ -35,6 +35,36 @@
 #include <set>
 #include "StringLiteral.h"
 
+#if defined BOOST_TEST_MAIN
+//prevent test output to be listed as error
+#   define CODE_CREATION_KIT_ERROR_TAG1 "just_testing"
+#   define CODE_CREATION_KIT_ERROR_TAG2 "Just_Testing"
+#else
+#   define CODE_CREATION_KIT_ERROR_TAG1 "error"
+#   define CODE_CREATION_KIT_ERROR_TAG2 "Error"
+#endif
+[PART_BEGIN]["print error message"][TRIM]
+FormatT formatter(STRING_LITERAL("[BEGIN][ENTRY]["Prefix"] : " CODE_CREATION_KIT_ERROR_TAG1 " [OR] " CODE_CREATION_KIT_ERROR_TAG2 " [END]TC[ENTRY]["Error Number"]: [ENTRY]["Description"]\n"));
+formatter % [ENTRY]["Source"][MERGE][" % "];
+toErrorStream( formatter.str());[PART_END][TRIM]
+[PART_BEGIN]["error handler catch"][TRIM]
+            catch( [ENTRY]["Scope"]::[ENTRY]["Exception Name"]& e)
+            {
+                (void) e; //unused
+[BEGIN][IF][ENTRY]["Condition"][TRIM]
+                [MACRO_BEGIN.][IF.][ENTRY.]["Scope"][EQUALS.]["[ENTRY]["Scope"]"][IF.][ENTRY.]["Exception Name"][EQUALS.]["[ENTRY]["Exception Name"]"][IF.][ENTRY.]["Condition Group"][EQUALS.]["[ENTRY]["Condition Group"]"][TRIM.]
+                [BEGIN.]if ([ENTRY.]["Condition"])[OR.]else[END.]
+                {
+                    [PART.]["print error message", " ", 20]
+                }
+                [MACRO_END.][TRIM.]
+[OR][TRIM]
+                [PART]["print error message", " ", 16]
+[END][TRIM]
+                throw CErrorPrinted();
+            }
+[PART_END][TRIM]
+
 namespace code_creation_kit
 {
     class CErrorPrinted{};
@@ -80,7 +110,7 @@ namespace code_creation_kit
                     inlineTemplateParameters);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"][TRIM]
             [MACRO_END][TRIM]
         }
 
@@ -97,7 +127,7 @@ namespace code_creation_kit
                 m_generator.setCsvDelimiter( delimiter);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"][TRIM]
             [MACRO_END][TRIM]
         }
 
@@ -109,7 +139,7 @@ namespace code_creation_kit
                 m_generator.setCsvCommentChars( commentChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"][TRIM]
             [MACRO_END][TRIM]
         }
 
@@ -125,7 +155,7 @@ namespace code_creation_kit
                 m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"][TRIM]
             [MACRO_END][TRIM]
         }
 
@@ -136,7 +166,7 @@ namespace code_creation_kit
                 m_generator.unloadTable( label);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"][TRIM]
             [MACRO_END][TRIM]
         }
 
@@ -226,4 +256,7 @@ namespace code_creation_kit
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
+
+#undef CODE_CREATION_KIT_ERROR_TAG1
+#undef CODE_CREATION_KIT_ERROR_TAG2
 }

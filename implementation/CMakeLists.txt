@@ -77,7 +77,6 @@ add_library(cck_implementation STATIC
     CVerticalTableBuilder.h
     CVerticalTableRotator.h
     DependencyPrinter.h
-    ErrorPrinterCatch.tpl.h
     ESubstitutions.gen.h
     ESubstitutions.tpl.h
     ETokens.gen.h
@@ -130,12 +129,12 @@ if (CCK_TCCMD_EXECUTABLE)
         COMMENT "Generating CCommandLineParser.tccmd"
     )
 
-    #CErrorPrinter.tccmd >> CErrorPrinter.gen.h << Exceptions.csv CErrorPrinter.tpl.h ErrorPrinterCatch.tpl.h 
+    #CErrorPrinter.tccmd >> CErrorPrinter.gen.h << Exceptions.csv CErrorPrinter.tpl.h
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.tccmd"
         MAIN_DEPENDENCY CErrorPrinter.tccmd
-        DEPENDS Exceptions.csv CErrorPrinter.tpl.h ErrorPrinterCatch.tpl.h
+        DEPENDS Exceptions.csv CErrorPrinter.tpl.h
         COMMENT "Generating CErrorPrinter.tccmd"
     )
 
