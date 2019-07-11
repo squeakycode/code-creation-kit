@@ -402,6 +402,25 @@ namespace code_creation_kit
                     *m_pLogOutputStream << "Expanding part with label: " << partLabel << "\n";
                 }
 
+                //check the parameters if left padding is needed
+                bool applyLeftPadding = false;
+                typename TokenT::SharedStringListT paddingStringList;
+                if (token.getStringList()->size() > 1) //padding text supplied
+                {
+                    StringT padding = token.getStringList()->at(1);
+                    if (token.getStringList()->size() > 2 && !padding.empty()) //padding width supplied
+                    {
+                        StringT padWidth = token.getStringList()->at(2);
+                        padding = CPadLeftConversion<StringT>::getStaticExtendingPadLeftText(padding, padWidth);
+                    }
+                    if (!padding.empty())
+                    {
+                        applyLeftPadding = true;
+                        paddingStringList = std::make_shared<typename TokenT::StringListT>();
+                        paddingStringList->push_back(padding);
+                    }
+                }
+
                 //try to remove the part from the part map
                 auto pos = m_pPartMap->find(partLabel);
                 if (pos != m_pPartMap->end())
@@ -417,6 +436,13 @@ namespace code_creation_kit
                         for (auto it = itBegin; it != itEnd; ++it)
                         {
                             (*this) << *it; //feed back the tokens of the part for parsing
+                            //apply padding if needed
+                            if (applyLeftPadding && *it == TokenT::eNewLine && it->getStringList() /*not trimmed? note: if new line has been trimmed this ptr is null*/)
+                            {
+                                
+                                TokenT paddingToken(TokenT::eTextFragment, paddingStringList, paddingStringList);
+                                (*this) << paddingToken;
+                            }
                         }
                     }
                 }

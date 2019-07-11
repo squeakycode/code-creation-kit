@@ -538,7 +538,7 @@ namespace code_creation_kit
                         padInfo = m_padWidthInfos.back();
                     }
 
-                    if (padInfo.padWidth == 0) //if pad width == 0 do not pad
+                    if (padInfo.padWidth == 0 && m_padChar) //if pad width == 0 do not pad
                     {
                         result.append(lineStart, it);
                     }
@@ -666,6 +666,27 @@ namespace code_creation_kit
                 return true;
             }
             return false;
+        }
+
+        template <typename StringLocalT>
+        static StringLocalT getStaticExtendingPadLeftText(const StringLocalT& padText, const StringLocalT& padWidthFirst)
+        {
+            typedef typename StringLocalT::value_type CharT;
+            typename CPadLeftConversion<StringLocalT>::StringListT dummy; //no additional width values
+            if (padWidthFirst.empty()) //nothing provided
+            {
+                CPadLeftConversion<StringLocalT> helper(padText, padWidthFirst, dummy.begin(), dummy.end());
+                dummy.resize(1); //modify an empty sting to get the result
+                helper.modify(dummy);
+            }
+            else
+            {
+                //use the special extending behavior used when the width is having the + sign prepended
+                CPadLeftConversion<StringLocalT> helper(padText, ((padWidthFirst[0] == STRING_LITERAL('+')) ? padWidthFirst : (STRING_LITERAL('+') + padWidthFirst)), dummy.begin(), dummy.end());
+                dummy.resize(1); //modify an empty sting to get the result
+                helper.modify(dummy);
+            }
+            return dummy.front();
         }
 
         virtual void modify(StringListT& textList) const

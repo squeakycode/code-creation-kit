@@ -437,6 +437,113 @@ row3;3,1;3,2;3,3
     BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][PART_REMOVE]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
     //on and a half macro in part, bonus: remove twice
     BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"]a[MACRO_BEGIN]<[ENTRY]["Type"]>[MACRO_END]b[MACRO_BEGIN]{[ENTRY]["Type"]}[PART_END]-[PART]["labelxyz"][MACRO_END]c[PART_REMOVE]["labelxyz"][PART_REMOVE]["labelxyz"]d)", "#-a<int><double><bool><bool>b{int}{double}{bool}{bool}cd"));
+    //part with padding left
+    { const char* input =
+R"(#[PART_BEGIN]["labelxyz"]
+<a><[ENTRY]["Type"]>
+<b>
+<c>[PART_END][TRIM]
+[PART]["labelxyz", "abc"]
+#
+)";
+    const char* result =
+R"(#
+abc<a><int>
+abc<a><double>
+abc<a><bool>
+abc<a><bool>
+abc<b>
+abc<c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
+    //part with padding left and padding width, bonus: ignore trimmed lines
+    { const char* input =
+R"(#[PART_BEGIN]["labelxyz"][TRIM]
+
+<a><[ENTRY]["Type"]>
+    [TRIM]
+<b>
+<c>[PART_END][TRIM]
+[PART]["labelxyz", "abc", 5]
+#
+)";
+    const char* result =
+R"(#
+abccc<a><int>
+abccc<a><double>
+abccc<a><bool>
+abccc<a><bool>
+abccc<b>
+abccc<c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
+    //part with padding left and padding width, padding width very small, leaving only fixed part
+    { const char* input =
+R"(#[PART_BEGIN]["labelxyz"]
+<a><[ENTRY]["Type"]>
+<b>
+<c>[PART_END][TRIM]
+[PART]["labelxyz", "abc", 1]
+#
+)";
+    const char* result =
+R"(#
+ab<a><int>
+ab<a><double>
+ab<a><bool>
+ab<a><bool>
+ab<b>
+ab<c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
+    //part with padding left and padding width, padding width = 0 is off
+    { const char* input =
+        R"(#[PART_BEGIN]["labelxyz"]
+<a><[ENTRY]["Type"]>
+<b>
+<c>[PART_END][TRIM]
+[PART]["labelxyz", "abc", 0]
+#
+)";
+    const char* result =
+        R"(#
+<a><int>
+<a><double>
+<a><bool>
+<a><bool>
+<b>
+<c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
+    //part with padding left and padding width, padding chars empty is off
+    { const char* input =
+        R"(#[PART_BEGIN]["labelxyz"]
+<a><[ENTRY]["Type"]>
+<b>
+<c>[PART_END][TRIM]
+[PART]["labelxyz", "", 5]
+#
+)";
+    const char* result =
+        R"(#
+<a><int>
+<a><double>
+<a><bool>
+<a><bool>
+<b>
+<c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
 
     //tables
     BOOST_CHECK(test(processor, R"(#[TABLE_BEGIN]["labelxyz"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", "#<1><2><5>"));
