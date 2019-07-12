@@ -28,6 +28,7 @@ cmake_minimum_required(VERSION 3.8)
 #we only need debug and release configurations
 set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
 set(CCK_WITH_TESTS ON CACHE BOOL "Generate code-creation-kit test projects.")
+set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
 set(CCK_WITH_WIN32_STATIC_RUNTIME ON CACHE BOOL "Generate code-creation-kit with static runtime under Windows.")
 set(CCK_WITH_BOOST_STATIC_LIBS ON CACHE BOOL "Generate code-creation-kit link boost statically.")
 set(CCK_USE_STD_REGEX OFF CACHE BOOL "Generate code-creation-kit using std::regex instead of boost::regex. std::regex is much slower for MSVC.")
@@ -47,7 +48,7 @@ if(MSVC)
 endif()
 
 #if the code creation kit is installed use it for building, otherwise use pre generated files, that are checked in
-if (DEFINED ENV{CCK_ROOT})
+if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
     if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc.exe")
         message(STATUS "Found installed ccktc executable. It will be used for building.")
         set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc.exe")
