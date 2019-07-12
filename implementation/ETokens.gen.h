@@ -47,6 +47,8 @@ namespace code_creation_kit
             ePart,
             ePartBegin,
             ePartEnd,
+            ePartLazy,
+            ePartPadding,
             ePartRemove,
             eSetRecursionLevelLimit,
             eSetRecursionLevelLimitOff,

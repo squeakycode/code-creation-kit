@@ -512,6 +512,14 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
+            catch( CParserExceptions::ExUnexpectedPartPadding& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1865: The part padding directives can only be used inside a part block.\n"));
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused

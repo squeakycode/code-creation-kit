@@ -205,6 +205,8 @@ namespace code_creation_kit
             expression += front + STRING_LITERAL("PART") + back;
             expression += front + STRING_LITERAL("PART_BEGIN") + back;
             expression += front + STRING_LITERAL("PART_END") + back;
+            expression += front + STRING_LITERAL("PART_LAZY") + back;
+            expression += front + STRING_LITERAL("PART_PADDING") + back;
             expression += front + STRING_LITERAL("PART_REMOVE") + back;
             expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
             expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
@@ -550,6 +552,44 @@ namespace code_creation_kit
                     else
                     {
                         *m_outputStream << TokenT( TokenT::ePartEnd);
+                    }
+                }
+                else if ( what[ (TokenT::ePartLazy) ].matched )
+                {
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional(start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartLazy, list, getSourceText( what, TokenT::ePartLazy, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartLazy, list);
+                    }
+                }
+                else if ( what[ (TokenT::ePartPadding) ].matched )
+                {
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartPadding, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::ePartPadding, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::ePartPadding);
                     }
                 }
                 else if ( what[ (TokenT::ePartRemove) ].matched )

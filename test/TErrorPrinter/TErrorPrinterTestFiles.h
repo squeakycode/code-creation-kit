@@ -260,6 +260,9 @@ CVerticalTableBuilderExceptions::ExUnderflow
 
 #<18:>TABLE_LOAD<:18>["","labelxyz"]
 CTemplateProvidedTableLoaderExceptions::ExTableLoadFileNameMustNotBeEmpty
+
+#   <19:>PART_PADDING<:19>
+CParserExceptions::ExUnexpectedPartPadding
 )";
 
         WriteTestInputFile(CCK_TEST_INPUT_FILE_PREFIX "TableBlockErrors.tpl.txt", fileData);

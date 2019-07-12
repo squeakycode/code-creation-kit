@@ -147,6 +147,11 @@ namespace code_creation_kit
         public: ExPartNotDefined() : std::runtime_error("Part not defined. Cannot expand part.") {}
         };
 
+        class ExUnexpectedPartPadding : public std::runtime_error
+        {
+        public: ExUnexpectedPartPadding() : std::runtime_error("The part padding directives can only be used inside a part block.") {}
+        };
+
         class ExPossibleInfiniteLoop : public std::runtime_error
         {
         public: ExPossibleInfiniteLoop() : std::runtime_error("Possible infinite loop detected while expanding part.") {}
@@ -289,12 +294,18 @@ namespace code_creation_kit
                     m_stack.push_back(token);
                     parseStack();
                 }
+                else if (token == TokenT::ePart)
+                {
+                    //expand a previously defined part here
+                    //this is need for nested padding to work
+                    processPartToken(token);
+                }
                 else //collect any other token
                 {
                     m_stack.push_back(token);
                 }
             }
-            else if (token == TokenT::ePart)
+            else if (token == TokenT::ePart || token == TokenT::ePartLazy)
             {
                 //expand a previously defined part here
                 processPartToken(token);
@@ -312,6 +323,10 @@ namespace code_creation_kit
             {
                 parseStack();
                 m_stack.push_back(token);
+            }
+            else if (token == TokenT::ePartPadding)
+            {
+                throw ExUnexpectedPartPadding();
             }
             else if (token == TokenT::eTableEnd)
             {
@@ -435,7 +450,20 @@ namespace code_creation_kit
                         auto itEnd = localStack->cend() - 1; //remove end marker
                         for (auto it = itBegin; it != itEnd; ++it)
                         {
-                            (*this) << *it; //feed back the tokens of the part for parsing
+                            if (*it == TokenT::ePartPadding)
+                            {
+                                //if not padding drop the token otherwise forward the padding
+                                if (applyLeftPadding)
+                                {
+                                    TokenT paddingToken(TokenT::eTextFragment, paddingStringList, paddingStringList);
+                                    (*this) << paddingToken;
+                                }
+                            }
+                            else
+                            {
+                                (*this) << *it; //feed back the tokens of the part for parsing
+                            }
+
                             //apply padding if needed
                             if (applyLeftPadding && *it == TokenT::eNewLine && it->getStringList() /*not trimmed? note: if new line has been trimmed this ptr is null*/)
                             {

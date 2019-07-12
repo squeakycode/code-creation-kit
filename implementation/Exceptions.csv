@@ -67,6 +67,7 @@ generate;;CParserExceptions;ExMissingTableBegin;;%1%(%2%);1861;Missing begin tab
 generate;;CParserExceptions;ExMissingTableEnd;;%1%(%2%);1862;Missing table end marker.;;addPath( getCurrentFileName());getCurrentLineNumber();;;
 generate;;CMacroProcessorExceptions;ExCannotChangeTableList;;%1%(%2%);1863;Changing the table list permanently is disabled. Only temporary tables can be added or removed.;;addPath( getCurrentFileName());getCurrentLineNumber();;;
 generate;;CTemplateProvidedTableLoaderExceptions;ExTableLoadFileNameMustNotBeEmpty;;%1%(%2%);1864;Table filename must not be empty.;;addPath( getCurrentFileName());getCurrentLineNumber();;;
+generate;;CParserExceptions;ExUnexpectedPartPadding;;%1%(%2%);1865;The part padding directives can only be used inside a part block.;;addPath( getCurrentFileName());getCurrentLineNumber();;;
 ;;;;;;;;;;;;;
 generate;;CCsvParser;ExBadDelimiter;;%1%(%2%);1001;Provided character cannot be used as delimiting character.; The line number shown corresponds to the last read line. This may not be the line causing the error.;addPath( getCurrentFileName());getCurrentLineNumber();;;
 generate;A;CCsvParser;ExRequireDelimitingChar;!getTableLoadFileNameWithFailure().empty();%1%(%2%,%3%);1002;New line or delimiter at the end of item in quotes is expected.;;addPath( getTableLoadFileNameWithFailure());m_generator.getLastLineWithFailure();m_generator.getLastColumnWithFailure();;

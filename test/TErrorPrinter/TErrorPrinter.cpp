@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
 
     //table block errors
     {
-        for (int i = 1; i <= 18; ++i)
+        for (int i = 1; i <= 19; ++i)
         {
             if (i == 2 || i == 7 || i == 9) //gaps
             {

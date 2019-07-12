@@ -48,23 +48,21 @@ FormatT formatter(STRING_LITERAL("[BEGIN][ENTRY]["Prefix"] : " CODE_CREATION_KIT
 formatter % [ENTRY]["Source"][MERGE][" % "];
 toErrorStream( formatter.str());[PART_END][TRIM]
 [PART_BEGIN]["error handler catch"][TRIM]
-            catch( [ENTRY]["Scope"]::[ENTRY]["Exception Name"]& e)
-            {
-                (void) e; //unused
+catch( [ENTRY]["Scope"]::[ENTRY]["Exception Name"]& e)
+{
+    (void) e; //unused
 [BEGIN][IF][ENTRY]["Condition"][TRIM]
-                [MACRO_BEGIN.][IF.][ENTRY.]["Scope"][EQUALS.]["[ENTRY]["Scope"]"][IF.][ENTRY.]["Exception Name"][EQUALS.]["[ENTRY]["Exception Name"]"][IF.][ENTRY.]["Condition Group"][EQUALS.]["[ENTRY]["Condition Group"]"][TRIM.]
-                [BEGIN.]if ([ENTRY.]["Condition"])[OR.]else[END.]
-                {
-                    [PART.]["print error message", " ", 20]
-                }
-                [MACRO_END.][TRIM.]
+    [MACRO_BEGIN.][IF.][ENTRY.]["Scope"][EQUALS.]["[ENTRY]["Scope"]"][IF.][ENTRY.]["Exception Name"][EQUALS.]["[ENTRY]["Exception Name"]"][IF.][ENTRY.]["Condition Group"][EQUALS.]["[ENTRY]["Condition Group"]"][TRIM.]
+    [BEGIN.]if ([ENTRY.]["Condition"])[OR.]else[END.]
+    {
+        [PART.]["print error message", "[PART_PADDING]        "]
+    }
+    [MACRO_END.][TRIM.]
 [OR][TRIM]
-                [PART]["print error message", " ", 16]
+    [PART]["print error message", " ", 4]
 [END][TRIM]
-                throw CErrorPrinted();
-            }
-[PART_END][TRIM]
-
+    throw CErrorPrinted();
+}[PART_END]
 namespace code_creation_kit
 {
     class CErrorPrinted{};
@@ -110,7 +108,7 @@ namespace code_creation_kit
                     inlineTemplateParameters);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
-            [PART]["error handler catch"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -127,7 +125,7 @@ namespace code_creation_kit
                 m_generator.setCsvDelimiter( delimiter);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
-            [PART]["error handler catch"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -139,7 +137,7 @@ namespace code_creation_kit
                 m_generator.setCsvCommentChars( commentChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
-            [PART]["error handler catch"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -155,7 +153,7 @@ namespace code_creation_kit
                 m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
-            [PART]["error handler catch"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -166,7 +164,7 @@ namespace code_creation_kit
                 m_generator.unloadTable( label);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
-            [PART]["error handler catch"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 

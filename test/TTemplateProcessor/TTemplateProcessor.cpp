@@ -205,11 +205,12 @@ void testMacroProcessing()
     //parts
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingPartEnd);
     BOOST_CHECK_THROW(test(processor, R"(a[PART_END]b)", ""), CParserExceptions::ExMissingPartBegin);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_PADDING]b)", ""), CParserExceptions::ExUnexpectedPartPadding);
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_BEGIN]["l2"]c)", ""), CParserExceptions::ExPartBlocksCannotBeNested);
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_BEGIN]["l1"]d[PART_END]e)", ""), CParserExceptions::ExPartAlreadyDefined);
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_REMOVE]["l1"]d[PART]["l1"]e)", ""), CParserExceptions::ExPartNotDefined);
     BOOST_CHECK_THROW(test(processor, R"(a[PART]["l1"]b)", ""), CParserExceptions::ExPartNotDefined);
-    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"][PART]["l1"][PART_END]c[PART]["l1"]d)", ""), CParserExceptions::ExPossibleInfiniteLoop);
+    BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l1"][PART_LAZY]["l1"][PART_END]c[PART]["l1"]d)", ""), CParserExceptions::ExPossibleInfiniteLoop);
     BOOST_CHECK_THROW(test(processor, R"(a[MACRO_BEGIN]a[PART_BEGIN]["l1"])", ""), CParserExceptions::ExMissingMacroEnd);
 
     //tables
@@ -427,6 +428,7 @@ row3;3,1;3,2;3,3
     //parts
     //standard fragment
     BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
+    BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART_LAZY]["labelxyz"]+[OR][END]>)", "#<int><double+><bool+><bool+>"));
     //part begin forces macro evaluation inside a line just like MACRO_BEGIN
     BOOST_CHECK(test(processor, R"(<[ENTRY]["Type"]>#[PART_BEGIN]["labelxyz"][NOT][INDEX][EQUALS]["2"][PART_END]<[ENTRY]["Type"][BEGIN][IF][PART]["labelxyz"]+[OR][END]>)", "<int>#<double>#<bool>#<bool>#<int><double+><bool+><bool+>"));
     //empty part
@@ -523,11 +525,11 @@ ab<c>
 )";
     BOOST_CHECK(test(processor, input, result, true));
     }
-    //part with padding left and padding width, padding chars empty is off
+    //part with padding left and padding width, padding chars empty is off, [PART_PADDING] does nothing
     { const char* input =
         R"(#[PART_BEGIN]["labelxyz"]
 <a><[ENTRY]["Type"]>
-<b>
+<b>[PART_PADDING]
 <c>[PART_END][TRIM]
 [PART]["labelxyz", "", 5]
 #
@@ -540,6 +542,27 @@ ab<c>
 <a><bool>
 <b>
 <c>
+#
+)";
+    BOOST_CHECK(test(processor, input, result, true));
+    }
+    { const char* input =
+        R"(#[PART_BEGIN]["labelxyz"]
+<a><[PART_LAZY]["labelxyz2"]>
+<b>[PART_PADDING]
+<c>[PART_END][TRIM]
+[PART_BEGIN]["labelxyz2"][ENTRY]["Type"][PART_END][TRIM]
+[PART]["labelxyz", "abc"]
+#
+)";
+    const char* result =
+        R"(#
+abc<a><int>
+abc<a><double>
+abc<a><bool>
+abc<a><bool>
+abc<b>abc
+abc<c>
 #
 )";
     BOOST_CHECK(test(processor, input, result, true));
