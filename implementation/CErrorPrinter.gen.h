@@ -256,6 +256,22 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
+            catch( CCalcConversionExceptions::ExDivisionByZero& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1510: Division by zero. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CCalcConversionExceptions::ExArithmeticExpressionSyntaxError& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1511: Syntax error in arithmetic expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
             catch( CTemplatePreprocessorExceptions::ExPrefixLeadingWhiteSpace& e)
             {
                 (void) e; //unused

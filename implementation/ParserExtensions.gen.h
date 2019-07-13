@@ -112,6 +112,7 @@ namespace code_creation_kit
     {
         if (
                *pos == PosT::value_type::eBlockFormat
+            || *pos == PosT::value_type::eCalc
             || *pos == PosT::value_type::eHtmlEscape
             || *pos == PosT::value_type::eMerge
             || *pos == PosT::value_type::ePadLeft
@@ -186,6 +187,7 @@ namespace code_creation_kit
                 case TokenT::eRegexMatches: return true;
                 case TokenT::eStartsWith: return true;
                 case TokenT::eEndsWith: return true;
+                case TokenT::eCalc: return true;
                 case TokenT::ePadLeft: return true;
                 case TokenT::ePadRight: return true;
                 case TokenT::eReplace: return true;
@@ -217,6 +219,7 @@ namespace code_creation_kit
                 case TokenT::eStartsWith: return true;
                 case TokenT::eEndsWith: return true;
                 case TokenT::eBlockFormat: return true;
+                case TokenT::eCalc: return true;
                 case TokenT::eHtmlEscape: return true;
                 case TokenT::eMerge: return true;
                 case TokenT::ePadLeft: return true;
@@ -248,6 +251,7 @@ namespace code_creation_kit
                 case TokenT::eRegexMatches: return true;
                 case TokenT::eStartsWith: return true;
                 case TokenT::eEndsWith: return true;
+                case TokenT::eCalc: return true;
                 case TokenT::ePadLeft: return true;
                 case TokenT::ePadRight: return true;
                 case TokenT::eReplace: return true;
@@ -547,6 +551,19 @@ namespace code_creation_kit
                     typedef typename TokenT::StringListT::value_type StringT;
                     
                     std::shared_ptr<CBlockFormatConversion<StringT> > ptrConversion = newItem1<CBlockFormatConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
+                    PosT newParentItem = pos;
+                    ++pos;
+                    parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+                }
+                break;
+
+            case TokenT::eCalc:
+                {
+                    typedef typename TokenT::StringListT::value_type StringT;
+                    
+                    std::shared_ptr<CCalcConversion<StringT> > ptrConversion = newItem1<CCalcConversion<StringT> >( pos);
                     item.attach( ptrConversion);
                     ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;

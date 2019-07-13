@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added CALC conversion tag for computing arithmetic expressions.;;
 Bugfix;;Fixed an issue where multiple of either PAD_LEFT, PAD_RIGHT or BLOCK_FORMAT tags failed to work as expected.;;
 Improvement;;Improved the documentation for INCLUDE;;
 Bugfix;;Fixed an issue where filename and line was not reported correctly at the end of a template file.;;

@@ -154,6 +154,7 @@ namespace code_creation_kit
             expression += front + STRING_LITERAL("AS_VOLATILE") + back;
             expression += front + STRING_LITERAL("BEGIN") + back;
             expression += front + STRING_LITERAL("BLOCK_FORMAT") + back;
+            expression += front + STRING_LITERAL("CALC") + back;
             expression += front + STRING_LITERAL("CONTAINS") + back;
             expression += front + STRING_LITERAL("COUNT") + back;
             expression += front + STRING_LITERAL("END") + back;
@@ -842,6 +843,38 @@ namespace code_creation_kit
                     else
                     {
                         *m_outputStream << TokenT( TokenT::eBlockFormat, list);
+                    }
+                }
+                else if ( what[ (TokenT::eCalc-1)*2 ].matched )
+                {
+                    if ( removeTick( what, (TokenT::eCalc * 2) - 1))
+                    {
+                        continue;
+                    }
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        list->resize(1);
+                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::eCalc, list, getSourceText( what, TokenT::eCalc, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::eCalc, list);
                     }
                 }
                 else if ( what[ (TokenT::eContains-1)*2 ].matched )

@@ -211,6 +211,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//CALC
+        result.clear();
+        tokenizer << STRING_LITERAL("start%CALC%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eCalc, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//CONTAINS
         result.clear();
         tokenizer << STRING_LITERAL("start%CONTAINS%[\"parameter1\"]end");
@@ -633,6 +641,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%BLOCK_FORMAT.%end") : STRING_LITERAL("start%BLOCK_FORMAT..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%BLOCK_FORMAT"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//CALC
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%CALC.%end") : STRING_LITERAL("start%CALC..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%CALC"));
         BOOST_CHECK( expected == result);
     }
 

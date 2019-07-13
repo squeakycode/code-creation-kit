@@ -60,6 +60,7 @@ namespace code_creation_kit
             eVolatil,
             eBegin,
             eBlockFormat,
+            eCalc,
             eContains,
             eCount,
             eEnd,

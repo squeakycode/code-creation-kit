@@ -248,6 +248,10 @@ row3;3,1;3,2;3,3
     }
     BOOST_CHECK_THROW(test(processor, R"([TABLE_LOAD]["", "label A"])", ""), CTemplatePreprocessorExceptions::ExTableLoadingNotSupported);
 
+    //calc
+    BOOST_CHECK_THROW(test(processor, "a[INDEX][CALC][\"#\"]", ""), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(test(processor, "a[INDEX][CALC][\"a/0\"]", ""), CCalcConversionExceptions::ExDivisionByZero);
+
     //something still in parser
     BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in line collector
@@ -654,6 +658,10 @@ row3;3,1;3,2;3,3
     BOOST_CHECK(test(processor, input, "#<row1;1,1;1,2;1,3><row2;2,1;2,2;2,3><row3;3,1;3,2;3,3>", true));
     }
 
+    //calc
+    BOOST_CHECK(test(processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"][CALC][\"5+a*2\"]>", "<,65>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][COUNT][CALC][\"5+a*2\"][CALC][\"a-5\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int2,><double4,><bool6,><bool8>"));
+    BOOST_CHECK(test(processor, "<[IF][ENTRY][\"a\"][INDEX][CALC][\"5+a*-3\"][CALC][\"a-5\"]>", "<-6><-9><-15>"));
 
     //connect more tables for testing unloading
     SharedTableT ptrAnotherTableA = std::make_shared<TableT>();
