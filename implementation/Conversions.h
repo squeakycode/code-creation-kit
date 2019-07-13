@@ -77,13 +77,13 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 if ( 
-                    m_ignoreCase != m->m_ignoreCase
-                    || m_replace != m->m_replace
-                    || m_with != m->m_with
+                    m_ignoreCase != pConversionRhs->m_ignoreCase
+                    || m_replace != pConversionRhs->m_replace
+                    || m_with != pConversionRhs->m_with
                     )
                 {
                     return false;
@@ -157,13 +157,13 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 if ( 
-                    m_ignoreCase != m->m_ignoreCase
-                    || m_replace != m->m_replace
-                    || m_with != m->m_with
+                    m_ignoreCase != pConversionRhs->m_ignoreCase
+                    || m_replace != pConversionRhs->m_replace
+                    || m_with != pConversionRhs->m_with
                     )
                 {
                     return false;
@@ -210,11 +210,11 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 if ( 
-                    m_separator != m->m_separator
+                    m_separator != pConversionRhs->m_separator
                     )
                 {
                     return false;
@@ -256,8 +256,8 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 return true;
             }
@@ -282,8 +282,8 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 return true;
             }
@@ -309,8 +309,8 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if ( m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if ( pConversionRhs)
             {
                 return true;
             }
@@ -365,8 +365,8 @@ namespace code_creation_kit
 
         virtual bool operator==(const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if (m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
             {
                 return true;
             }
@@ -614,11 +614,32 @@ namespace code_creation_kit
             return result;
         }
 
-        StringT m_extensionText;
-        CharT m_padChar;
-
-        struct SPadWidthInfo
+        bool baseEquals(const CPadConversionBase<StringT>& rhs) const
         {
+            if (m_extensionText != rhs.m_extensionText
+                || m_padChar != rhs.m_padChar
+                || m_padWidthInfos.size() != rhs.m_padWidthInfos.size()
+                )
+            {
+                return false;
+            }
+            //direct comparison triggers MSVC Compiler Error C2672: 'operator __surrogate_func': no matching overloaded function found
+            auto itA = m_padWidthInfos.cbegin();
+            auto itAEnd = m_padWidthInfos.cend();
+            auto itB = rhs.m_padWidthInfos.cbegin();
+            for (; itA != itAEnd; ++itA, ++itB)
+            {
+                if (*itA != *itB)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        class SPadWidthInfo
+        {
+        public:
             SPadWidthInfo(size_t padWidth_ = 0, bool extend_ = false)
                 : padWidth(padWidth_)
                 , extend(extend_)
@@ -631,9 +652,22 @@ namespace code_creation_kit
             {
             }
 
+            ~SPadWidthInfo()
+            {
+            }
+
+            bool operator != (const SPadWidthInfo& rhs) const
+            {
+                bool result = padWidth != rhs.padWidth || extend != rhs.extend;
+                return result;
+            }
+
             size_t padWidth;
             bool extend;
         };
+
+        StringT m_extensionText;
+        CharT m_padChar;
         std::vector<SPadWidthInfo> m_padWidthInfos;
         static const size_t cTabSize = 4;
     };
@@ -660,10 +694,14 @@ namespace code_creation_kit
 
         virtual bool operator==(const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if (m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
             {
-                return true;
+                if (pConversionRhs)
+                {
+                    bool result = this->baseEquals(*pConversionRhs);
+                    return result;
+                }
             }
             return false;
         }
@@ -722,10 +760,11 @@ namespace code_creation_kit
 
         virtual bool operator==(const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if (m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
             {
-                return true;
+                bool result = this->baseEquals(*pConversionRhs);
+                return result;
             }
             return false;
         }
@@ -757,9 +796,13 @@ namespace code_creation_kit
 
         virtual bool operator==(const IConversion<StringT>& conversion) const
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&conversion);
-            if (m)
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
             {
+                if (this->m_blockWidth != pConversionRhs->m_blockWidth)
+                {
+                    return false;
+                }
                 return true;
             }
             return false;
