@@ -1,5 +1,5 @@
 Identifier;Mandatory Parameter Count;Fixed Part;Optional Parameter Count;Optional Part;Repeat Part;Repeat Part Maximum Count
 Combi1CStyle1UIntRepeatUIntOptional;2;"CStyle;UInt";;;UInt;SIZE_MAX
-Combi1Plain2CStyleOptional1PlainOptional;1;Plain;3;"CStyle;CStyle;Plain";;
-Combi2Plain2CStyleOptional1PlainOptional;2;"Plain;Plain";3;"CStyle;CStyle;Plain";;
+Combi1Plain2CStyleOptional1PlainOptional1CStyleOptional;1;Plain;4;"CStyle;CStyle;Plain;CStyle";;
+Combi2Plain2CStyleOptional1PlainOptional1CStyleOptional;2;"Plain;Plain";4;"CStyle;CStyle;Plain;CStyle";;
 Combi1Plain1CStyleOptional1UIntOptional;1;Plain;2;"CStyle;UInt";;

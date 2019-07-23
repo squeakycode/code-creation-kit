@@ -39,12 +39,6 @@ Resetting:
 Clearing table list.
 Clearing set include paths.
 Setting CSV Delimiter:
-CSV Delimiter=;
-Setting CSV Comment Chars:
-CSV Comment Chars=
-Setting CSV Ignore Double Quotes=:
-CSV Ignore Double Quotes=0
-Setting CSV Delimiter:
 CSV Delimiter=:
 Setting CSV Delimiter:
 CSV Delimiter=;
@@ -52,10 +46,10 @@ Setting CSV Comment Chars:
 CSV Comment Chars=#*
 Setting CSV Comment Chars:
 CSV Comment Chars=
-Setting CSV Ignore Double Quotes=:
-CSV Ignore Double Quotes=1
-Setting CSV Ignore Double Quotes=:
-CSV Ignore Double Quotes=0
+Setting CSV Quote Chars:
+CSV Quote Chars='l
+Setting CSV Quote Chars:
+CSV Quote Chars="
 Adding include directory:
 Include directory=IncludeDirectoryThatDoesNotExist
 Setting markup:
@@ -289,6 +283,7 @@ Part to remove not found with label: partLabel
 Loading table from template provided stream:
 Label=labelxyz
 Csv Delimiter (first char used)=;
+Csv Quote Chars="
 Csv Comment Chars=#
 Properties=left-to-right;top-down
 Adding table with label: labelxyz
@@ -319,6 +314,7 @@ Loading table initiated from template:
 TableFileName=../TGenerator/TestInputFile_TDataflow.csv
 Label=labelxyz
 Csv Delimiter (first char used)=;
+Csv Quote Chars="
 Csv Comment Chars=#
 Properties=left-to-right
 Adding table with label: labelxyz
@@ -689,7 +685,7 @@ end9
 <[ENTRY]["Numbers"]>
 [TABLE_REMOVE]["labelxyz"][TRIM]
 
-[TABLE_LOAD]["TestInputFile_TDataflow.csv","labelxyz", ";", "#", "left-to-right"][TRIM]
+[TABLE_LOAD]["TestInputFile_TDataflow.csv","labelxyz", ";", "#", "left-to-right", "\""][TRIM]
 <[ENTRY.]["row3"]>
 [TABLE_REMOVE]["labelxyz"][TRIM]
 

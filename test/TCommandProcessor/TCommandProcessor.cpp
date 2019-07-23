@@ -71,10 +71,9 @@ public:
         , m_leftToRight(false)
         , m_useIntermediateFile(false)
         , m_addIncludeDirectory(false)
-        , m_setCsvDelimiter(false)
+        , m_setCsvDelimiterChars(false)
         , m_setCsvCommentChars(false)
-        , m_setCsvIgnoreDoubleQuotes(false)
-        , m_csvIgnoreDoubleQuotes(false)
+        , m_setCsvQuoteChars(false)
         , m_setLogStream(false)
 
 
@@ -86,8 +85,6 @@ public:
         , m_logStream(false)
         , m_recycle(false)
         , m_canChangeTableList(false)
-
-        , m_delimiter(0)
     {
         setMarkupPrefix( "[");
         setMarkupPostfix( "]");
@@ -153,10 +150,10 @@ public:
         BOOST_CHECK( m_includeDirectory == directory);
     }
 
-    void setCsvDelimiter( CharT delimiter)
+    void setCsvDelimiterChars( StringT delimiter)
     {
-        BOOST_CHECK( m_setCsvDelimiter);
-        BOOST_CHECK( m_delimiter == delimiter);
+        BOOST_CHECK( m_setCsvDelimiterChars);
+        BOOST_CHECK( m_csvDelimiterChars == delimiter);
     }
 
     void setCsvCommentChars( const StringT& commentChars)
@@ -165,10 +162,10 @@ public:
         BOOST_CHECK( m_csvCommentChars == commentChars);
     }
 
-    void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+    void setCsvQuoteChars( StringT quoteChars) 
     {
-        BOOST_CHECK( m_setCsvIgnoreDoubleQuotes);
-        BOOST_CHECK( m_csvIgnoreDoubleQuotes == ignoreDoubleQuotes);
+        BOOST_CHECK( m_setCsvQuoteChars);
+        BOOST_CHECK( m_csvQuoteChars == quoteChars);
     }
 
     void connectLogOutputStream( const void* stream)
@@ -186,10 +183,9 @@ public:
     bool m_leftToRight;
     bool m_useIntermediateFile;
     bool m_addIncludeDirectory;
-    bool m_setCsvDelimiter;
+    bool m_setCsvDelimiterChars;
     bool m_setCsvCommentChars;
-    bool m_setCsvIgnoreDoubleQuotes;
-    bool m_csvIgnoreDoubleQuotes;
+    bool m_setCsvQuoteChars;
     bool m_setLogStream;
 
     unsigned int m_rowHeaderIndex;
@@ -258,9 +254,14 @@ public:
         m_includeDirectory = FileSystem::determineDependentLocation( m_includeDirectory);
     }
 
-    void setDelimiter( const char delimiter)
+    void setSetCsvDelimiterCharsExpected(const char* text)
     {
-        m_delimiter = boost::lexical_cast<CharT>(delimiter);
+        m_csvDelimiterChars = boost::lexical_cast<StringT>(text);
+    }
+
+    void setCsvQuoteCharsExpected(const char* text)
+    {
+        m_csvQuoteChars = boost::lexical_cast<StringT>(text);
     }
 
     const FileSetT& getTableFiles() const
@@ -279,7 +280,7 @@ public:
     }
 
 private:
-    CharT m_delimiter;
+    StringT m_csvDelimiterChars;
     StringT m_templateFile;
     StringT m_targetFile;
     StringT m_tableFileName;
@@ -288,6 +289,7 @@ private:
     StringT m_markupPostfix;
     StringT m_includeDirectory;
     StringT m_csvCommentChars;
+    StringT m_csvQuoteChars;
     StringT m_label;
     ParameterListT m_parameters;
     FileSetT m_dummy;
@@ -427,10 +429,14 @@ void runTest()
     {
         //test set delimiter
         GeneratorT generator;
-        generator.m_setCsvDelimiter = true;
-        generator.setDelimiter( '\t');
+        generator.m_setCsvDelimiterChars = true;
+        generator.setSetCsvDelimiterCharsExpected( "\t");
         std::vector<std::string> args;
-        args += "-c", "--csv-delimiter tab";
+#ifdef _MSC_VER
+        args += "-c", "--csv-delimiter \\t";
+#else
+        args += "-c", "--csv-delimiter \"\t\"";
+#endif
         process<StringT>( args, generator);
     }
 
@@ -445,22 +451,12 @@ void runTest()
     }
 
     {
-        //test ignore double quotes off
+        //test set quote chars
         GeneratorT generator;
-        generator.m_setCsvIgnoreDoubleQuotes = true;
-        generator.m_csvIgnoreDoubleQuotes = false;
+        generator.m_setCsvQuoteChars = true;
+        generator.setCsvQuoteCharsExpected( "#-");
         std::vector<std::string> args;
-        args += "-c", "--csv-ignore-quotes off";
-        process<StringT>( args, generator);
-    }
-
-    {
-        //test ignore double quotes on
-        GeneratorT generator;
-        generator.m_setCsvIgnoreDoubleQuotes = true;
-        generator.m_csvIgnoreDoubleQuotes = true;
-        std::vector<std::string> args;
-        args += "-c", "--csv-ignore-quotes on";
+        args += "-c", "--csv-quote-chars #-";
         process<StringT>( args, generator);
     }
 

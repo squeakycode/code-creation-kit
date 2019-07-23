@@ -1,4 +1,4 @@
-Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ProcessInlineTemplateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiter;CsvCommentChars;CsvIgnoreDoubleQuotes;SetLogFile
+Program Options;Group Name;Group Description;Name;Shortcut;Zero-Token;Multi-Token;Positional;Positional Count;Default;C++ Type;C++ Name;Description;Generate;GenerateUsingIntermediateFile;ProcessInlineTemplateFile;ResetGenerator;UnloadTable;LoadTable;AddIncludeDirectory;CsvDelimiterChars;CsvCommentChars;CsvQuoteChars;SetLogFile
 Combination;;;;;;;;;;;;;yes;yes;yes;yes;yes;yes;yes;yes;yes;yes;yes
 Example Description;;;;;;;;;;;;;;;;;;;;;;;
 Example;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,7 +33,7 @@ Example;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;no;no
 ;AddIncludeDirectories;Add Include Directories;add-include-directory;i;;yes;;;;std::vector<StringT>;IncludeDirectories;Adds an include directory. This option accepts multiple parameters.;no;no;no;no;no;no;yes;no;no;no;no
 ;;;;;;;;;;;;;;;;;;;;;;;
-;CsvTableProperties;CSV Table Properties;csv-delimiter;;;;;;;StringT;Delimiter;Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items. Use an empty string for no delimiter.;no;no;no;no;no;no;no;yes;no;no;no
-;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.;no;no;no;no;no;no;no;no;yes;no;no
-;;;csv-ignore-quotes;;;;;;;StringT;CsvIgnoreDoubleQuotes;Double quotes in table entries are treated as normal character when on. Valid values are 'on' and 'off'. The default setting is 'off'. ;no;no;no;no;no;no;no;no;no;yes;no
+;CsvTableProperties;CSV Table Properties;csv-delimiter-chars;;;;;;;StringT;CsvDelimiterChars;"Specifies a list of delimiter characters for the next CSV-files to load. Use ""\t"" for tab separated items. Use an empty string for no delimiter.";no;no;no;no;no;no;no;yes;no;no;no
+;;;csv-comment-chars;;;;;;;StringT;CsvCommentChars;Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line. The default is no commenting characters used.;no;no;no;no;no;no;no;no;yes;no;no
+;;;csv-quote-chars;;;;;;;StringT;CsvQuoteChars;Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.;no;no;no;no;no;no;no;no;no;yes;no
 ;Logging;Logging;log-file;;;;;;;StringT;LogFile;Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.;no;no;no;no;no;no;no;no;no;no;yes

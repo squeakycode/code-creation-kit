@@ -668,7 +668,7 @@ namespace code_creation_kit
                     typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
-                        KeywordParameterParser::getParametersCombi1Plain2CStyleOptional1PlainOptional(start, end, *list);
+                        KeywordParameterParser::getParametersCombi1Plain2CStyleOptional1PlainOptional1CStyleOptional(start, end, *list);
                     }
                     catch(...)
                     {
@@ -714,7 +714,7 @@ namespace code_creation_kit
                     typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
-                        KeywordParameterParser::getParametersCombi2Plain2CStyleOptional1PlainOptional(start, end, *list);
+                        KeywordParameterParser::getParametersCombi2Plain2CStyleOptional1PlainOptional1CStyleOptional(start, end, *list);
                     }
                     catch(...)
                     {

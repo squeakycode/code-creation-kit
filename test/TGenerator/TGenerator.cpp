@@ -207,12 +207,12 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.reset();
 
         //csv options
-        generator.setCsvDelimiter( ':');
-        generator.setCsvDelimiter( ';');
-        generator.setCsvCommentChars( "#*");
-        generator.setCsvCommentChars( "");
-        generator.setCsvIgnoreDoubleQuotes( true);
-        generator.setCsvIgnoreDoubleQuotes( false);
+        BOOST_CHECK_NO_THROW(generator.setCsvDelimiterChars( ":"));
+        BOOST_CHECK_NO_THROW(generator.setCsvDelimiterChars( ";"));
+        BOOST_CHECK_NO_THROW(generator.setCsvCommentChars( "#*"));
+        BOOST_CHECK_NO_THROW(generator.setCsvCommentChars( ""));
+        BOOST_CHECK_NO_THROW(generator.setCsvQuoteChars("\'l"));
+        BOOST_CHECK_NO_THROW(generator.setCsvQuoteChars( "\""));
 
         //include
         generator.addIncludeDirectory("IncludeDirectoryThatDoesNotExist");

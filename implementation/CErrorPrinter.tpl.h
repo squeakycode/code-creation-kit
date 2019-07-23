@@ -118,11 +118,11 @@ namespace code_creation_kit
         }
 
         ///set delimiter for next csv table to load
-        void setCsvDelimiter( CharT delimiter)
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
         {
             try
             {
-                m_generator.setCsvDelimiter( delimiter);
+                m_generator.setCsvDelimiterChars(csvDelimiterChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
             [PART]["error handler catch"," ",12]
@@ -130,20 +130,26 @@ namespace code_creation_kit
         }
 
         ///set list of characters as string that mark commented lines for next csv table to load
-        void setCsvCommentChars( const StringT& commentChars)
+        void setCsvCommentChars( const StringT& csvCommentChars)
         {
             try
             {
-                m_generator.setCsvCommentChars( commentChars);
+                m_generator.setCsvCommentChars( csvCommentChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
             [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
-        void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
         {
-            m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+            try
+            {
+                m_generator.setCsvQuoteChars(csvQuoteChars);
+            }
+            [MACRO_BEGIN] [IF][ENTRY]["Operation"][EQUALS]["setCsvQuoteChars"][TRIM]
+                [PART]["error handler catch", " ", 12]
+                [MACRO_END][TRIM]
         }
 
         void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)

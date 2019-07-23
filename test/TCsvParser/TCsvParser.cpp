@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
     (void) parser;
 
     //parse the file
-    parser.parse( file, helper, ';', "#'", false, helper.positionTracker);
+    parser.parse( file, helper, ";", "\"", "#'", helper.positionTracker);
 
     //check parsing ok
     BOOST_CHECK( helper.row == test_data::rows );
@@ -180,17 +180,28 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
     {
         std::stringstream s;
         s << "a\"a"; //a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "", false), CCsvParser::ExUnexpectedQuote);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExUnexpectedQuote);
     }
     {
         std::stringstream s;
         s << "\"a\"a"; //"a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "", false), CCsvParser::ExRequireDelimitingChar);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExRequireDelimitingChar);
     }
     {
         std::stringstream s;
-        BOOST_CHECK_THROW( parser.parse( s, helper, ';', "\"", false), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW( parser.checkCharsUsedForCommenting<std::string>( ";", ';', false, s), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", "\n"), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW( parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CCsvParser::ExBadCommentChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CCsvParser::ExBadDelimiter);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CCsvParser::ExBadDelimiter);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CCsvParser::ExBadDelimiter);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CCsvParser::ExBadDelimiter);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CCsvParser::ExBadQuoteChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CCsvParser::ExBadQuoteChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CCsvParser::ExBadQuoteChars);
+        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CCsvParser::ExBadQuoteChars);
     }
 
     //check ignore double quotes
@@ -198,7 +209,7 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
         TCsvParserTableBuilderDoubleQuote helperDoubleQuote;
         std::stringstream s;
         s << "\"a1;b\"1;c1\"\n\"x;y\";z";
-        parser.parse( s, helperDoubleQuote, ';', "", true);
+        parser.parse( s, helperDoubleQuote, ";", "", "");
 
         //check parsing ok
         BOOST_CHECK( helperDoubleQuote.row == 1 );

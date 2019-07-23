@@ -72,7 +72,7 @@ public:
     ///sets up the option description used by boost program options library
     [ENTRY]["Parser Name"]()
       : m_description("[ENTRY]["Heading"]")
-      , m_description[ENTRY]["Group Name"]("[ENTRY]["Group Description"]")
+      , m_description[ENTRY]["Group Name"]("[ENTRY]["Group Description"][TO_CSTRING]")
     {
         // Declare the supported options.
         [MACRO_BEGIN][IF][ENTRY]["Group Description"][OR][IF][LAST_TIME]m_description.add_options()[MACRO_END]
@@ -80,7 +80,7 @@ public:
         ;
         m_description[ENTRY]["Group Name"].add_options() //("[ENTRY]["Group Description"]")
         [OR][END][TRIM]
-            ("[ENTRY]["Name"][BEGIN],[ENTRY]["Shortcut"][OR][END]"[BEGIN], value<[ENTRY]["C++ Type"] >()[BEGIN]->zero_tokens()[IF][ENTRY]["Zero-Token"][OR]->multitoken()[IF][ENTRY]["Multi-Token"][OR][END][OR][END], "[ENTRY]["Description"]")
+            ("[ENTRY]["Name"][BEGIN],[ENTRY]["Shortcut"][OR][END]"[BEGIN], value<[ENTRY]["C++ Type"] >()[BEGIN]->zero_tokens()[IF][ENTRY]["Zero-Token"][OR]->multitoken()[IF][ENTRY]["Multi-Token"][OR][END][OR][END], "[ENTRY]["Description"][TO_CSTRING]")
         [MACRO_END][TRIM]
             ;
         [MACRO_BEGIN][TRIM]

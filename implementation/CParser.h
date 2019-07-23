@@ -605,20 +605,22 @@ namespace code_creation_kit
             const TokenT& token,
             size_t offset,
             StringT& label,
-            StringT& csvDelimiter,
+            StringT& csvDelimiterChars,
+            StringT& csvQuoteChars,
             StringT& csvCommentChars,
             StringT& properties
         )
         {
             typedef typename StringT::value_type CharT;
             label = token.getStringList()->at(0 + offset);
-            csvDelimiter = token.getStringList()->size() > (1 + offset) ? token.getStringList()->at(1 + offset) : STRING_LITERAL(";");
+            csvDelimiterChars = token.getStringList()->size() > (1 + offset) ? token.getStringList()->at(1 + offset) : STRING_LITERAL(";");
+            csvQuoteChars = token.getStringList()->size() > (4 + offset) ? token.getStringList()->at(4 + offset) : STRING_LITERAL("\"");
             csvCommentChars = token.getStringList()->size() > (2 + offset) ? token.getStringList()->at(2 + offset) : STRING_LITERAL("");
             properties = token.getStringList()->size() > (3 + offset) ? token.getStringList()->at(3 + offset) : STRING_LITERAL("");
         }
 
 
-        ///processes a part remove token
+        ///processes a load table token
         void processTableLoadToken(const TokenT& token)
         {
             //template provided tables may not be available in different configuration of the code
@@ -630,14 +632,15 @@ namespace code_creation_kit
             //get the parameters
             StringT tableFileName = token.getStringList()->at(0);
             //parameters are offset by one due to filename
-            StringT label, csvDelimiter, csvCommentChars, properties;
-            getTableTokenParameters(token, 1, label, csvDelimiter, csvCommentChars, properties);
+            StringT label, csvDelimiterChars, csvQuoteChars, csvCommentChars, properties;
+            getTableTokenParameters(token, 1, label, csvDelimiterChars, csvQuoteChars, csvCommentChars, properties);
 
             //load the table
             typename TemplateProvidedTableLoaderT::TableData tableData = m_pTemplateProvidedTableLoader->loadTable(
                 tableFileName,
                 label,
-                csvDelimiter,
+                csvDelimiterChars,
+                csvQuoteChars,
                 csvCommentChars,
                 properties
             );
@@ -680,14 +683,15 @@ namespace code_creation_kit
                     }
 
                     //get the parameters
-                    StringT label, csvDelimiter, csvCommentChars, properties;
-                    getTableTokenParameters(m_stack.front(), 0, label, csvDelimiter, csvCommentChars, properties);
+                    StringT label, csvDelimiter, csvQuoteChars, csvCommentChars, properties;
+                    getTableTokenParameters(m_stack.front(), 0, label, csvDelimiter, csvQuoteChars, csvCommentChars, properties);
 
                     //load the table
                     typename TemplateProvidedTableLoaderT::TableData tableData = m_pTemplateProvidedTableLoader->loadTable(
                         stringStream,
                         label,
                         csvDelimiter,
+                        csvQuoteChars,
                         csvCommentChars,
                         properties
                     );

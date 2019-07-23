@@ -216,7 +216,7 @@ void testMacroProcessing()
     //tables
     BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
     BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","pad-rows;unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
-    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadCommentChars);
+    BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","\n"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadCommentChars);
     BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz","\n",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadDelimiter);
     BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;2";5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExUnexpectedQuote);
     BOOST_CHECK_THROW(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;"2"a;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExRequireDelimitingChar);
@@ -603,10 +603,10 @@ row3;3,1;3,2;3,3
     BOOST_CHECK(test(processor, input, "#<row1><row2><row3>", true));
     }
     { const char* input =
-        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "left-to-right"]m;col1;col2;col3
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "left-to-right", "\\'"]m;col1;col2;'col3'
 row1;1,1;1,2;1,3
 row2;2,1;2,2;2,3
-row3;3,1;3,2;3,3
+row3;3,1;3,2;'3,3'
 [TABLE_END]<[ENTRY]["m"]>)";
     BOOST_CHECK(test(processor, input, "#<col1><col2><col3>", true));
     }
@@ -626,8 +626,9 @@ row3;3,1;3,2;3,3
 [TABLE_END]<[ENTRY]["row2"]>)";
     BOOST_CHECK(test(processor, input, "#<2,1>", true));
     }
+    ////test delimiter ; no commenting; no quotes
     { const char* input =
-        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "csv-ignore-quotes"]m;col1;col2;col3
+        R"(#[TABLE_BEGIN]["labelxyz", ";", "", "", ""]m;col1;col2;col3
 row1;1,1;1,2;1,3
 row2;"2,1";""";"
 row3;3,1;3,2;3,3
@@ -649,8 +650,9 @@ row3;3,1;3,2;3,3
     //can disconnect all tables
     BOOST_CHECK(test(processor, R"(#[TABLE_REMOVE]["label A"]<[ENTRY]["Type"]>)", ""));
     processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
+    //test no delimiters; no commenting; no quotes
     { const char* input =
-        R"(#[TABLE_BEGIN]["labelxyz", "", "", "csv-ignore-quotes"]FullLinesAnyContent
+        R"(#[TABLE_BEGIN]["labelxyz", "", "", "", ""]FullLinesAnyContent
 row1;1,1;1,2;1,3
 row2;2,1;2,2;2,3
 row3;3,1;3,2;3,3

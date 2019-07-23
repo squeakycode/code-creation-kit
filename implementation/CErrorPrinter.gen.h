@@ -639,7 +639,15 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
-                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1030: The CSV comment char list contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1030: The CSV comment char list contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExBadQuoteChars& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1031: The CSV quote char list contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
@@ -668,42 +676,53 @@ namespace code_creation_kit
         }
 
         ///set delimiter for next csv table to load
-        void setCsvDelimiter( CharT delimiter)
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
         {
             try
             {
-                m_generator.setCsvDelimiter( delimiter);
+                m_generator.setCsvDelimiterChars(csvDelimiterChars);
             }
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused
-                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting character.\n"));
-                formatter % delimiter;
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
+                formatter % csvDelimiterChars;
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
         }
 
         ///set list of characters as string that mark commented lines for next csv table to load
-        void setCsvCommentChars( const StringT& commentChars)
+        void setCsvCommentChars( const StringT& csvCommentChars)
         {
             try
             {
-                m_generator.setCsvCommentChars( commentChars);
+                m_generator.setCsvCommentChars( csvCommentChars);
             }
             catch( CCsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
-                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
-                formatter % commentChars;
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
+                formatter % csvCommentChars;
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
         }
 
-        void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
         {
-            m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+            try
+            {
+                m_generator.setCsvQuoteChars(csvQuoteChars);
+            }
+                 catch( CCsvParser::ExBadQuoteChars& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
+                formatter % csvQuoteChars;
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
         }
 
         void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
@@ -715,8 +734,8 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused
-                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting character.\n"));
-                formatter % m_generator.getCsvDelimiter();
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
+                formatter % m_generator.getCsvDelimiterChars();
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
@@ -779,8 +798,16 @@ namespace code_creation_kit
             catch( CCsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
-                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines. e.g. double quote or the delimiter.\n"));
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
                 formatter % m_generator.getCsvCommentChars();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
+            catch( CCsvParser::ExBadQuoteChars& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
+                formatter % m_generator.getCsvQuoteChars();
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }

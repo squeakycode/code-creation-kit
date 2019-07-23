@@ -1,5 +1,7 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Improvement;;Renamed command file parameter csv-delimiter to csv-delimiter-chars. Multiple delimiters can be supplied.;;
+Improvement;;Replaced  command file parameter csv-ignore-quotes with csv-quote-chars. You can pass an empty string to ignore quotes.;;
 New Feature;;Added CALC conversion tag for computing arithmetic expressions.;;
 Bugfix;;Fixed an issue where multiple of either PAD_LEFT, PAD_RIGHT or BLOCK_FORMAT tags failed to work as expected.;;
 Improvement;;Improved the documentation for INCLUDE;;

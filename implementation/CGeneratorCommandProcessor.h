@@ -31,6 +31,7 @@
 #include "StringLiteral.h"
 #include "System.h"
 #include "CInlineTemplateParameters.h"
+#include "KeywordParameterParser.h"
 
 namespace code_creation_kit
 {
@@ -48,9 +49,6 @@ namespace code_creation_kit
     public:
         class ExInvalidCommandOptions : public std::runtime_error 
         { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
-
-        class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
-        { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
 
         ///process a stream of commands
         template <typename InputStreamT, typename GeneratorT, typename LogFileT>
@@ -170,59 +168,28 @@ namespace code_creation_kit
                     generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
                 }
             }
-            else if ( command == ParserT::eCsvDelimiter )
+            else if ( command == ParserT::eCsvDelimiterChars )
             {
-                CharT delimiterChar = STRING_LITERAL(';');
-
-                if ( m_parser.hasDelimiter())
+                StringT delimiterChars(m_parser.getCsvDelimiterChars());
+                if(delimiterChars.size() > 1) //something escaped?
                 {
-                    StringT delimiter = m_parser.getDelimiter();
-                    if ( delimiter == STRING_LITERAL("tab"))
+                    StringT delimiterCharsQuoted = STRING_LITERAL("\"") + delimiterChars + STRING_LITERAL("\"");
+                    StringT result;
+                    auto itBegin = delimiterCharsQuoted.cbegin();
+                    if (CCStyleParameterPolicy::parseParameterValue<ExInvalidCommandOptions, typename StringT::const_iterator, StringT>(itBegin, delimiterCharsQuoted.cend(), result, true))
                     {
-                        delimiterChar = STRING_LITERAL('\t');
-                    }
-                    else if ( delimiter.size())
-                    {
-                        delimiterChar = delimiter[0];
-                    }
-                    else
-                    {
-                        delimiterChar = 0;
+                        delimiterChars = result;
                     }
                 }
-                else
-                {
-                    throw ExInvalidCommandOptions();
-                }
-
-                generator.setCsvDelimiter( delimiterChar);
+                generator.setCsvDelimiterChars( delimiterChars);
             }
             else if ( command == ParserT::eCsvCommentChars )
             {
                 generator.setCsvCommentChars( m_parser.getCsvCommentChars());
             }
-            else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+            else if (command == ParserT::eCsvQuoteChars)
             {
-                if ( m_parser.hasCsvIgnoreDoubleQuotes())
-                {
-                    StringT val = m_parser.getCsvIgnoreDoubleQuotes();
-                    if ( val == STRING_LITERAL("on"))
-                    {
-                        generator.setCsvIgnoreDoubleQuotes( true);
-                    }
-                    else if ( val == STRING_LITERAL("off"))
-                    {
-                        generator.setCsvIgnoreDoubleQuotes( false);
-                    }
-                    else
-                    {
-                        throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
-                    }
-                }
-                else
-                {
-                    throw ExInvalidCommandOptions();
-                }
+                generator.setCsvQuoteChars(m_parser.getCsvQuoteChars());
             }
             else if ( command == ParserT::eSetLogFile )
             {

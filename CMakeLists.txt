@@ -32,7 +32,7 @@ set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable
 set(CCK_WITH_WIN32_STATIC_RUNTIME ON CACHE BOOL "Generate code-creation-kit with static runtime under Windows.")
 set(CCK_WITH_BOOST_STATIC_LIBS ON CACHE BOOL "Generate code-creation-kit link boost statically.")
 set(CCK_USE_STD_REGEX OFF CACHE BOOL "Generate code-creation-kit using std::regex instead of boost::regex. std::regex is much slower for MSVC.")
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 

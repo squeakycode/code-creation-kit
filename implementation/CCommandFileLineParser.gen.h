@@ -42,9 +42,9 @@ public:
         eUnloadTable,
         eLoadTable,
         eAddIncludeDirectory,
-        eCsvDelimiter,
+        eCsvDelimiterChars,
         eCsvCommentChars,
-        eCsvIgnoreDoubleQuotes,
+        eCsvQuoteChars,
         eSetLogFile,
         eNoOptionsGiven,
         eOptionsInvalid
@@ -81,7 +81,7 @@ public:
             ("output-file,o", value<StringT >(), "Specifies the file to output to.")
             ("parameter,p", value<std::vector<StringT> >()->multitoken(), "Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.")
             ("use-intermediate-output-file,u", value<bool >()->zero_tokens(), "Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.")
-            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.")
+            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to \'.intermediate\' when omitted.")
             ("markup-prefix", value<StringT >(), "Sets the initial tag markup prefix.")
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
@@ -101,12 +101,12 @@ public:
             ("add-include-directory,i", value<std::vector<StringT> >()->multitoken(), "Adds an include directory. This option accepts multiple parameters.")
         ;
         m_descriptionCsvTableProperties.add_options() //("CSV Table Properties")
-            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items. Use an empty string for no delimiter.")
-            ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
-            ("csv-ignore-quotes", value<StringT >(), "Double quotes in table entries are treated as normal character when on. Valid values are 'on' and 'off'. The default setting is 'off'. ")
+            ("csv-delimiter-chars", value<StringT >(), "Specifies a list of delimiter characters for the next CSV-files to load. Use \"\\t\" for tab separated items. Use an empty string for no delimiter.")
+            ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line. The default is no commenting characters used.")
+            ("csv-quote-chars", value<StringT >(), "Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.")
         ;
         m_descriptionLogging.add_options() //("Logging")
-            ("log-file", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
+            ("log-file", value<StringT >(), "Sets up logging as follows: \'none\' is off, \'-\' is log to stdout, and any other parameter value is the name of a log file.")
             ;
         // Add the positional descriptions
         m_positionalDescription.add( "load-table", 1);
@@ -181,9 +181,9 @@ public:
         bool providedCanChangeTableList = hasCanChangeTableList();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
-        bool providedDelimiter = hasDelimiter();
+        bool providedCsvDelimiterChars = hasCsvDelimiterChars();
         bool providedCsvCommentChars = hasCsvCommentChars();
-        bool providedCsvIgnoreDoubleQuotes = hasCsvIgnoreDoubleQuotes();
+        bool providedCsvQuoteChars = hasCsvQuoteChars();
         bool providedLogFile = hasLogFile();
     
         if (
@@ -207,9 +207,9 @@ public:
             && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -237,9 +237,9 @@ public:
             && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -259,9 +259,9 @@ public:
             && providedInline == true
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -295,9 +295,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == true
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -331,9 +331,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -361,9 +361,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -397,9 +397,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == true
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -433,13 +433,13 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == true
+            && providedCsvDelimiterChars == true
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
-            return eCsvDelimiter;
+            return eCsvDelimiterChars;
         }
         
         if (
@@ -469,9 +469,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == true
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -505,13 +505,13 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == true
+            && providedCsvQuoteChars == true
             && providedLogFile == false
         )
         {
-            return eCsvIgnoreDoubleQuotes;
+            return eCsvQuoteChars;
         }
         
         if (
@@ -541,9 +541,9 @@ public:
             && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == true
         )
         {
@@ -578,9 +578,9 @@ public:
             && !providedCanChangeTableList
             && !providedReset
             && !providedIncludeDirectories
-            && !providedDelimiter
+            && !providedCsvDelimiterChars
             && !providedCsvCommentChars
-            && !providedCsvIgnoreDoubleQuotes
+            && !providedCsvQuoteChars
             && !providedLogFile
         )
         {
@@ -819,9 +819,9 @@ public:
     }
     
     ///returns the provided value
-    StringT getDelimiter() const
+    StringT getCsvDelimiterChars() const
     {
-        return m_vmap["csv-delimiter"].as<StringT >();
+        return m_vmap["csv-delimiter-chars"].as<StringT >();
     }
     
     ///returns the provided value
@@ -831,9 +831,9 @@ public:
     }
     
     ///returns the provided value
-    StringT getCsvIgnoreDoubleQuotes() const
+    StringT getCsvQuoteChars() const
     {
-        return m_vmap["csv-ignore-quotes"].as<StringT >();
+        return m_vmap["csv-quote-chars"].as<StringT >();
     }
     
     ///returns the provided value
@@ -999,10 +999,10 @@ public:
         return m_vmap.count( "add-include-directory") != 0;
     }
     
-    ///indicates that the option csv-delimiter has been provided
-    bool hasDelimiter() const
+    ///indicates that the option csv-delimiter-chars has been provided
+    bool hasCsvDelimiterChars() const
     {
-        return m_vmap.count( "csv-delimiter") != 0;
+        return m_vmap.count( "csv-delimiter-chars") != 0;
     }
     
     ///indicates that the option csv-comment-chars has been provided
@@ -1011,10 +1011,10 @@ public:
         return m_vmap.count( "csv-comment-chars") != 0;
     }
     
-    ///indicates that the option csv-ignore-quotes has been provided
-    bool hasCsvIgnoreDoubleQuotes() const
+    ///indicates that the option csv-quote-chars has been provided
+    bool hasCsvQuoteChars() const
     {
-        return m_vmap.count( "csv-ignore-quotes") != 0;
+        return m_vmap.count( "csv-quote-chars") != 0;
     }
     
     ///indicates that the option log-file has been provided

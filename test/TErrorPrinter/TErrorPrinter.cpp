@@ -43,10 +43,11 @@ BOOST_AUTO_TEST_CASE( TErrorPrinter)
     CErrorPrinter<StringT, CGenerator<StringT> > generator( generatorImpl);
 
     //bad comment chars
-    BOOST_CHECK_THROW( generator.setCsvCommentChars( "\"");, CErrorPrinted);
+    BOOST_CHECK_THROW( generator.setCsvCommentChars( "\""), CErrorPrinted);
     //bad delimiter
-    BOOST_CHECK_THROW( generator.setCsvDelimiter( '\"'), CErrorPrinted);
-    generator.setCsvDelimiter( ';');
+    BOOST_CHECK_THROW( generator.setCsvDelimiterChars( "\""), CErrorPrinted);
+    //bad quote
+    BOOST_CHECK_THROW(generator.setCsvQuoteChars(";"), CErrorPrinted);
     //require delimiting char
     BOOST_CHECK_THROW( generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "RequireDelimitingChar.csv", "LabelA", true, true, 1, 1, false), CErrorPrinted);
     //unexpected quote

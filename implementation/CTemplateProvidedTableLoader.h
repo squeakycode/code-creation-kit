@@ -125,6 +125,7 @@ namespace code_creation_kit
             const StringT& tableFileName,
             const StringT& label, //The label identifiying the table
             const StringT& csvDelimiter, //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
+            const StringT& csvQuoteChars, //Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
             const StringT& csvCommentChars, //Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.
             const StringT& properties //possible semicolon separated values: top-down;left-to-right;pad-rows;csv-ignore-quotes;permanent
         )
@@ -153,6 +154,7 @@ namespace code_creation_kit
                 file.get(),
                 label,
                 csvDelimiter,
+                csvQuoteChars,
                 csvCommentChars,
                 properties
             );
@@ -169,6 +171,7 @@ namespace code_creation_kit
             CsvInputStreamT& inputStream, //the data stream containing the csv table
             const StringT& label, //The label identifiying the table
             const StringT& csvDelimiter, //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
+            const StringT& csvQuoteChars, //Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
             const StringT& csvCommentChars, //Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.
             const StringT& properties //possible semicolon separated values: top-down;left-to-right;pad-rows;csv-ignore-quotes;permanent
         )
@@ -187,6 +190,7 @@ namespace code_creation_kit
                 inputStream,
                 label,
                 csvDelimiter,
+                csvQuoteChars,
                 csvCommentChars,
                 properties
             );
@@ -199,7 +203,8 @@ namespace code_creation_kit
         TableData loadTableImpl(
             CsvInputStreamT& inputStream, //the data stream containing the csv table
             const StringT& label, //The label identifiying the table
-            const StringT& csvDelimiter, //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
+            const StringT& csvDelimiterChars, //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
+            const StringT& csvQuoteChars, //Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
             const StringT& csvCommentChars, //Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.
             const StringT& properties //possible semicolon separated values: top-down;left-to-right;pad-rows;csv-ignore-quotes;permanent
         )
@@ -208,14 +213,13 @@ namespace code_creation_kit
             if (m_pLogOutputStream)
             {
                 *m_pLogOutputStream << "Label=" << label << "\n";
-                *m_pLogOutputStream << "Csv Delimiter (first char used)=" << csvDelimiter << "\n";
+                *m_pLogOutputStream << "Csv Delimiter (first char used)=" << csvDelimiterChars << "\n";
+                *m_pLogOutputStream << "Csv Quote Chars=" << csvQuoteChars << "\n";
                 *m_pLogOutputStream << "Csv Comment Chars=" << csvCommentChars << "\n";
                 *m_pLogOutputStream << "Properties=" << properties << "\n";
             }
 
             TableData tableData;
-            CharT csvDelimiterChar = csvDelimiter.empty() ? 0 : *csvDelimiter.begin();
-            bool csvIgnoreDoubleQuotes = false;
             bool padRows = false;
 
             std::vector<StringT> propertyVector;
@@ -233,10 +237,6 @@ namespace code_creation_kit
                 else if (property == STRING_LITERAL("pad-rows"))
                 {
                     padRows = true;
-                }
-                else if (property == STRING_LITERAL("csv-ignore-quotes"))
-                {
-                    csvIgnoreDoubleQuotes = true;
                 }
                 else if (property == STRING_LITERAL("permanent"))
                 {
@@ -256,8 +256,7 @@ namespace code_creation_kit
             }
 
             //check input data
-            CCsvParser::checkCharsUsedForCommenting(csvCommentChars, csvDelimiterChar, csvIgnoreDoubleQuotes, inputStream);
-            CCsvParser::checkDelimiter(csvDelimiterChar, csvIgnoreDoubleQuotes, inputStream);
+            CCsvParser::checkCharsUsedForCsvParsing<StringT>(CCsvParser::UsedCsvCharsCheck_All, csvDelimiterChars, csvQuoteChars, csvCommentChars);
 
             try
             {
@@ -269,7 +268,7 @@ namespace code_creation_kit
                 TableBuilderT tableBuidler(*tableData.ptrTable, padRows);
 
                 //parse the table file
-                CCsvParser::parse(inputStream, tableBuidler, csvDelimiterChar, csvCommentChars, csvIgnoreDoubleQuotes, m_positionTracker);
+                CCsvParser::parse(inputStream, tableBuidler, csvDelimiterChars, csvQuoteChars, csvCommentChars, m_positionTracker);
             }
             catch (...)
             {

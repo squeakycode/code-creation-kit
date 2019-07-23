@@ -78,7 +78,7 @@ namespace code_creation_kit
 
         ///parse parameter range, extract values
         template <typename IteratorT, typename ContainerT>
-        void getParametersCombi1Plain2CStyleOptional1PlainOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        void getParametersCombi1Plain2CStyleOptional1PlainOptional1CStyleOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
         {
             parameters.clear();
             parameters.resize(1);
@@ -138,6 +138,20 @@ namespace code_creation_kit
                 CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
+                //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
+                {
+                    IteratorT temp(start);
+                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    {
+                        break;
+                    }
+                    start = temp;
+                }
+                //parse parameter of type CStyle
+                parameterValue.clear();
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+                
                 break;
             }
 
@@ -148,7 +162,7 @@ namespace code_creation_kit
 
         ///parse parameter range, extract values
         template <typename IteratorT, typename ContainerT>
-        void getParametersCombi2Plain2CStyleOptional1PlainOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        void getParametersCombi2Plain2CStyleOptional1PlainOptional1CStyleOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
         {
             parameters.clear();
             parameters.resize(2);
@@ -211,6 +225,20 @@ namespace code_creation_kit
                 //parse parameter of type Plain
                 parameterValue.clear();
                 CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+                
+                //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
+                {
+                    IteratorT temp(start);
+                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    {
+                        break;
+                    }
+                    start = temp;
+                }
+                //parse parameter of type CStyle
+                parameterValue.clear();
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 break;

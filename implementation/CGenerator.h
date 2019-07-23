@@ -92,8 +92,9 @@ namespace code_creation_kit
         CGenerator()
             : m_lastRowNumberWithFailure(1)
             , m_indexOfLastProcessedParameter(0)
-            , m_csvDelimiter( STRING_LITERAL(';'))
-            , m_csvIgnoreDoubleQuotes(false)
+            , m_csvDelimiterChars(STRING_LITERAL(";"))
+            , m_csvCommentChars(STRING_LITERAL(""))
+            , m_csvQuoteChars(STRING_LITERAL("\""))
             , m_logOutputStream(0)
         {
         }
@@ -103,62 +104,68 @@ namespace code_creation_kit
         CGenerator& operator=(const CGenerator&) = delete;
 
         ///set delimiter for next csv table to load
-        void setCsvDelimiter( CharT delimiter)
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
         {
             //log
             if ( m_logOutputStream)
             {
                 *m_logOutputStream << "Setting CSV Delimiter:\n";
-                *m_logOutputStream << "CSV Delimiter=" << delimiter << "\n";
+                *m_logOutputStream << "CSV Delimiter=" << csvDelimiterChars << "\n";
             }
 
-            //get a stream object used to widen the used characters
-            CSourceFile<StringT, CsvFileT> file( "", true);
             //check the delimiter
-            CCsvParser::checkDelimiter( delimiter, m_csvIgnoreDoubleQuotes, file.get());
-            m_csvDelimiter = delimiter;
+            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars);
+            m_csvDelimiterChars = csvDelimiterChars;
         }
 
         ///get delimiter for next csv table to load
-        CharT getCsvDelimiter()
+        StringT getCsvDelimiterChars() const
         {
-            return m_csvDelimiter;
+            return m_csvDelimiterChars;
+        }
+
+        ///set list of characters as string used for quoting text item for next csv table to load
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
+        {
+            //log
+            if (m_logOutputStream)
+            {
+                *m_logOutputStream << "Setting CSV Quote Chars:\n";
+                *m_logOutputStream << "CSV Quote Chars=" << csvQuoteChars << "\n";
+            }
+
+            //check the characters
+            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, m_csvDelimiterChars, csvQuoteChars, m_csvQuoteChars);
+            //set the characters
+            m_csvQuoteChars = csvQuoteChars;
+        }
+
+        ///get list of characters as string used for quoting text item for next csv table to load
+        const StringT& getCsvQuoteChars() const
+        {
+            return m_csvQuoteChars;
         }
 
         ///set list of characters as string that mark commented lines for next csv table to load
-        void setCsvCommentChars( const StringT& commentChars)
+        void setCsvCommentChars( const StringT& csvCommentChars)
         {
             //log
             if ( m_logOutputStream)
             {
                 *m_logOutputStream << "Setting CSV Comment Chars:\n";
-                *m_logOutputStream << "CSV Comment Chars=" << commentChars << "\n";
+                *m_logOutputStream << "CSV Comment Chars=" << csvCommentChars << "\n";
             }
 
-            //get a stream object used to widen the used characters
-            CSourceFile<StringT, CsvFileT> file( "", true);
             //check the characters
-            CCsvParser::checkCharsUsedForCommenting( commentChars, m_csvDelimiter, m_csvIgnoreDoubleQuotes, file.get());
+            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, m_csvDelimiterChars, m_csvQuoteChars, csvCommentChars);
             //set the characters
-            m_csvCommentChars = commentChars;
+            m_csvCommentChars = csvCommentChars;
         }
 
         ///get list of characters as string that mark commented lines for next csv table to load
         const StringT& getCsvCommentChars() const
         {
             return m_csvCommentChars;
-        }
-
-        ///set csv parsing option
-        void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes)
-        {
-            //log
-            if ( m_logOutputStream)
-            {
-                *m_logOutputStream << "Setting CSV Ignore Double Quotes=:\n";
-                *m_logOutputStream << "CSV Ignore Double Quotes=" << ignoreDoubleQuotes << "\n";
-            }
-            m_csvIgnoreDoubleQuotes = ignoreDoubleQuotes;
         }
 
         ///load another table for generation, see also unloadTable
@@ -189,7 +196,7 @@ namespace code_creation_kit
                 //open table file
                 CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
                 //parse the table file
-                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
+                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
@@ -225,7 +232,7 @@ namespace code_creation_kit
             try
             {
                 //parse the table file
-                CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiter, getCsvCommentChars(), m_csvIgnoreDoubleQuotes, m_positionTracker);
+                CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
@@ -465,9 +472,9 @@ namespace code_creation_kit
             m_lastRowNumberWithFailure = 1;
             m_positionTracker.reset();
             m_indexOfLastProcessedParameter = 0;
-            setCsvDelimiter( STRING_LITERAL(';'));
-            setCsvCommentChars( STRING_LITERAL(""));
-            setCsvIgnoreDoubleQuotes( false);
+            m_csvDelimiterChars = STRING_LITERAL(";");
+            m_csvCommentChars = STRING_LITERAL("");
+            m_csvQuoteChars = STRING_LITERAL("\"");
         }
 
         ///unloads a table, see also loadTable
@@ -610,9 +617,9 @@ namespace code_creation_kit
         CPositionTracker m_positionTracker; ///<used by csv parser
         SizeT m_lastRowNumberWithFailure; ///<for error output
         SizeT m_indexOfLastProcessedParameter; ///<for error output
-        CharT m_csvDelimiter; ///<delimiter used by csv files to load
+        StringT m_csvDelimiterChars; ///<delimiter used by csv files to load
         StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
-        bool m_csvIgnoreDoubleQuotes; ///< Option for csv parser, double quotes are treated as normal character
+        StringT m_csvQuoteChars; ///< Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
         LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
     };
 }
