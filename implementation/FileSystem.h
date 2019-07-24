@@ -186,6 +186,16 @@ namespace code_creation_kit
             return getString<StringT>(path.filename());
         }
 
+        ///removes an extension if present
+        template <typename StringT>
+        inline StringT removeExtension(const StringT& location)
+        {
+            typedef boost::filesystem::path PathT;
+            PathT path(location);
+            path.replace_extension();
+            return getString<StringT>(path);
+        }
+
         ///returns the location (path+name) determined from a initial path and a location that may be relative to it
         template <typename StringT>
         inline StringT determineDependentLocation(const StringT& relativeLocation)

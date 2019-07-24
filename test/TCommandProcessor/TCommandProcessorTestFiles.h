@@ -42,5 +42,21 @@ R"(-l table.csv
         WriteTestInputFile(CCK_TEST_INPUT_FILE_PREFIX "CommandFile.tccmd", fileData);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    //TCommandProcessor/myfile.h.itpl
+    {
+        const char* fileData =
+            R"()";
 
+        WriteTestInputFile(CCK_TEST_INPUT_FILE_PREFIX "myfile.h.itpl", fileData);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //TCommandProcessor/myfile
+    {
+        const char* fileData =
+            R"()";
+
+        WriteTestInputFile(CCK_TEST_INPUT_FILE_PREFIX "myfile", fileData);
+    }
 }

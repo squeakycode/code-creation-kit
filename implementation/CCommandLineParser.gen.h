@@ -39,6 +39,7 @@ public:
         eExecuteCommand,
         eExecuteCommandFile,
         eCommandFileDependencies,
+        eProcessInstantTemplate,
         eNoOptionsGiven,
         eOptionsInvalid
     };
@@ -61,6 +62,7 @@ public:
         ;
         m_descriptionCommandFile.add_options() //("Command File")
             ("command-file,f", value<std::vector<StringT> >(), "Execute a command file. This option can be specified multiple times. The command files are executed in the order they are specified. Default when the option name is omitted.")
+            ("process-instant-template,t", value<std::vector<StringT> >(), "Process an instant template file (extension itpl). An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.")
             ("output-dependencies,d", value<StringT >(), "Output  command files dependencies instead of processing. Available styles are mpc (Meta Project Creator) or vs (Visual Studio).")
             ("prompt,p", value<bool >()->zero_tokens(), "Wait after processing or dependency output on a key press. Prompt for rerunning the command file(s).")
             ;
@@ -110,6 +112,7 @@ public:
         bool providedHelp = hasHelp();
         bool providedCommands = hasCommands();
         bool providedCommandFiles = hasCommandFiles();
+        bool providedInstantTemplateFiles = hasInstantTemplateFiles();
         bool providedOutputDependenciesStyle = hasOutputDependenciesStyle();
         bool providedPrompt = hasPrompt();
     
@@ -117,6 +120,7 @@ public:
                providedHelp == true
             && providedCommands == false
             && providedCommandFiles == false
+            && providedInstantTemplateFiles == false
             && providedOutputDependenciesStyle == false
             && providedPrompt == false
         )
@@ -128,6 +132,7 @@ public:
                providedHelp == false
             && providedCommands == true
             && providedCommandFiles == false
+            && providedInstantTemplateFiles == false
             && providedOutputDependenciesStyle == false
             && providedPrompt == false
         )
@@ -139,6 +144,7 @@ public:
                providedHelp == false
             && providedCommands == false
             && providedCommandFiles == true
+            && providedInstantTemplateFiles == false
             && providedOutputDependenciesStyle == false
         )
         {
@@ -149,10 +155,22 @@ public:
                providedHelp == false
             && providedCommands == false
             && providedCommandFiles == true
+            && providedInstantTemplateFiles == false
             && providedOutputDependenciesStyle == true
         )
         {
             return eCommandFileDependencies;
+        }
+        
+        if (
+               providedHelp == false
+            && providedCommands == false
+            && providedCommandFiles == false
+            && providedInstantTemplateFiles == true
+            && providedOutputDependenciesStyle == false
+        )
+        {
+            return eProcessInstantTemplate;
         }
         
         
@@ -160,6 +178,7 @@ public:
                !providedHelp
             && !providedCommands
             && !providedCommandFiles
+            && !providedInstantTemplateFiles
             && !providedOutputDependenciesStyle
             && !providedPrompt
         )
@@ -180,6 +199,12 @@ public:
     std::vector<StringT> getCommandFiles() const
     {
         return m_vmap["command-file"].as<std::vector<StringT> >();
+    }
+    
+    ///returns the provided value
+    std::vector<StringT> getInstantTemplateFiles() const
+    {
+        return m_vmap["process-instant-template"].as<std::vector<StringT> >();
     }
     
     ///returns the provided value
@@ -211,6 +236,12 @@ public:
     bool hasCommandFiles() const
     {
         return m_vmap.count( "command-file") != 0;
+    }
+    
+    ///indicates that the option process-instant-template has been provided
+    bool hasInstantTemplateFiles() const
+    {
+        return m_vmap.count( "process-instant-template") != 0;
     }
     
     ///indicates that the option output-dependencies has been provided

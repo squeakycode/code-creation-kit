@@ -604,6 +604,43 @@ void runTest()
     }
 
     {
+        //test instant template file
+        GeneratorT generator;
+        generator.m_reset = true;
+        generator.setTemplateFile(CCK_TEST_INPUT_FILE_PREFIX "myfile.h.itpl");
+        generator.setTargetFile(CCK_TEST_INPUT_FILE_PREFIX "myfile.h");
+        generator.setIntermediateFileName(CCK_TEST_INPUT_FILE_PREFIX "myfile.h.intermediate");
+        generator.m_useIntermediateFile = false;
+        generator.m_generate = true;
+        std::vector<std::string> args;
+        args += "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile.h.itpl";
+        process<StringT>(args, generator);
+    }
+    
+    {
+        //test instant template file no extension
+        GeneratorT generator;
+        generator.m_reset = true;
+        generator.setTemplateFile(CCK_TEST_INPUT_FILE_PREFIX "myfile");
+        generator.setTargetFile(CCK_TEST_INPUT_FILE_PREFIX "myfile.gen");
+        generator.setIntermediateFileName(CCK_TEST_INPUT_FILE_PREFIX "myfile.gen.intermediate");
+        generator.m_useIntermediateFile = false;
+        generator.m_generate = true;
+        std::vector<std::string> args;
+        args += "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile";
+        process<StringT>(args, generator);
+    }
+
+    {
+        //test file not found handling
+        GeneratorT generator;
+        std::vector<std::string> args;
+        generator.m_reset = true;
+        args += "NotThere.h.itpl";
+        BOOST_CHECK_THROW(process<StringT>(args, generator), CErrorPrinted);
+    }
+    
+    {
         //test file not found handling
         GeneratorT generator;
         std::vector<std::string> args;

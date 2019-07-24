@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added process-instant-template command line option for processing an instant template file (extension itpl). An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.;;
 Improvement;;Renamed command file parameter csv-delimiter to csv-delimiter-chars. Multiple delimiters can be supplied.;;
 Improvement;;Replaced  command file parameter csv-ignore-quotes with csv-quote-chars. You can pass an empty string to ignore quotes.;;
 New Feature;;Added CALC conversion tag for computing arithmetic expressions.;;

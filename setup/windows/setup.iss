@@ -97,6 +97,14 @@ Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\open\command;
 Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\edit\command; ValueType: string; ValueName: ; ValueData: """{win}\notepad.exe"" ""%1"""; Components: program
 Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\Dependencies\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ccktc.exe"" ""%1"" -p -d vs"; Components: program
 
+;add instant template file association
+Root: HKCR; Subkey: .itpl; ValueType: string; ValueName: ; ValueData: CodeCreationKit.TextCompiler.InstantTemplateFile; Flags: uninsdeletevalue; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile; ValueType: string; ValueName: ; ValueData: code-creation-kit Instant Template File; Flags: uninsdeletekey; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\tccmd.ico; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ccktc.exe"" -t ""%1"" -p"; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\shell\edit\command; ValueType: string; ValueName: ; ValueData: """{win}\notepad.exe"" ""%1"""; Components: program
+
+
 [Icons]
 Name: {group}\CCK Help; Filename: {app}\html\index.html; Components: help
 Name: {group}\CCK Examples; Filename: {app}\examples; Components: examples
