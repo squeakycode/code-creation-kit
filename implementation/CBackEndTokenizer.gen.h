@@ -184,6 +184,7 @@ namespace code_creation_kit
             expression += front + STRING_LITERAL("REPLACE") + back;
             expression += front + STRING_LITERAL("STARTS_WITH") + back;
             expression += front + STRING_LITERAL("TO_CSTRING") + back;
+            expression += front + STRING_LITERAL("TO_CSV") + back;
             expression += front + STRING_LITERAL("TO_LOWER") + back;
             expression += front + STRING_LITERAL("TO_UPPER") + back;
 
@@ -1514,6 +1515,37 @@ namespace code_creation_kit
                     else
                     {
                         *m_outputStream << TokenT( TokenT::eToCString);
+                    }
+                }
+                else if ( what[ (TokenT::eToCsv-1)*2 ].matched )
+                {
+                    if ( removeTick( what, (TokenT::eToCsv * 2) - 1))
+                    {
+                        continue;
+                    }
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        KeywordParameterParser::getParametersCombi1CStyle1CStyleOptional(start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::eToCsv, list, getSourceText( what, TokenT::eToCsv, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::eToCsv, list);
                     }
                 }
                 else if ( what[ (TokenT::eToLower-1)*2 ].matched )

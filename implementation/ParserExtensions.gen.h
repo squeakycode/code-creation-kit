@@ -53,11 +53,24 @@ namespace code_creation_kit
     }
 
     template <typename T, typename PosT>
-    std::shared_ptr<T> newItem2VariableArguments(PosT& pos)
+    std::shared_ptr<T> newItem2Combi1CStyle1UIntRepeatUIntOptional(PosT& pos)
     {
         return std::make_shared<T>(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
     }
 
+    template <typename T, typename PosT>
+    std::shared_ptr<T> newItem1Combi1CStyle1CStyleOptional(PosT& pos)
+    {
+        if (pos->getStringList()->size() > 1)
+        {
+            assert(pos->getStringList()->size() == 2);
+            return newItem2<T>(pos);
+        }
+        else
+        {
+            return newItem1<T>(pos);
+        }
+    }
 
 
     ///returns true if token at position is a directive for constraint
@@ -120,6 +133,7 @@ namespace code_creation_kit
             || *pos == PosT::value_type::eRegexReplace
             || *pos == PosT::value_type::eReplace
             || *pos == PosT::value_type::eToCString
+            || *pos == PosT::value_type::eToCsv
             || *pos == PosT::value_type::eToLower
             || *pos == PosT::value_type::eToUpper
         )
@@ -228,6 +242,7 @@ namespace code_creation_kit
                 case TokenT::eRegexReplace: return true;
                 case TokenT::eToLower: return true;
                 case TokenT::eToUpper: return true;
+                case TokenT::eToCsv: return true;
                 case TokenT::eToCString: return true;
                 default: return false;
                 }
@@ -602,7 +617,7 @@ namespace code_creation_kit
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
                     
-                    std::shared_ptr<CPadLeftConversion<StringT> > ptrConversion = newItem2VariableArguments<CPadLeftConversion<StringT> >( pos);
+                    std::shared_ptr<CPadLeftConversion<StringT> > ptrConversion = newItem2Combi1CStyle1UIntRepeatUIntOptional<CPadLeftConversion<StringT> >( pos);
                     item.attach( ptrConversion);
                     ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
@@ -615,7 +630,7 @@ namespace code_creation_kit
                 {
                     typedef typename TokenT::StringListT::value_type StringT;
                     
-                    std::shared_ptr<CPadRightConversion<StringT> > ptrConversion = newItem2VariableArguments<CPadRightConversion<StringT> >( pos);
+                    std::shared_ptr<CPadRightConversion<StringT> > ptrConversion = newItem2Combi1CStyle1UIntRepeatUIntOptional<CPadRightConversion<StringT> >( pos);
                     item.attach( ptrConversion);
                     ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;
@@ -655,6 +670,19 @@ namespace code_creation_kit
                     typedef typename TokenT::StringListT::value_type StringT;
                     
                     std::shared_ptr<CToCStringConversion<StringT> > ptrConversion = newItem0<CToCStringConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
+                    PosT newParentItem = pos;
+                    ++pos;
+                    parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+                }
+                break;
+
+            case TokenT::eToCsv:
+                {
+                    typedef typename TokenT::StringListT::value_type StringT;
+                    
+                    std::shared_ptr<CToCsvConversion<StringT> > ptrConversion = newItem1Combi1CStyle1CStyleOptional<CToCsvConversion<StringT> >( pos);
                     item.attach( ptrConversion);
                     ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;

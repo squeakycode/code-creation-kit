@@ -53,11 +53,24 @@ namespace code_creation_kit
     }
 
     template <typename T, typename PosT>
-    std::shared_ptr<T> newItem2VariableArguments(PosT& pos)
+    std::shared_ptr<T> newItem2Combi1CStyle1UIntRepeatUIntOptional(PosT& pos)
     {
         return std::make_shared<T>(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
     }
 
+    template <typename T, typename PosT>
+    std::shared_ptr<T> newItem1Combi1CStyle1CStyleOptional(PosT& pos)
+    {
+        if (pos->getStringList()->size() > 1)
+        {
+            assert(pos->getStringList()->size() == 2);
+            return newItem2<T>(pos);
+        }
+        else
+        {
+            return newItem1<T>(pos);
+        }
+    }
 
 
     [MACRO_BEGIN][TRIM]

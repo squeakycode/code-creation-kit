@@ -90,6 +90,7 @@ namespace code_creation_kit
             eReplace,
             eStartsWith,
             eToCString,
+            eToCsv,
             eToLower,
             eToUpper,
             eTextFragment,

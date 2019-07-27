@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+New Feature;;Added TO_CSV conversion tag. This can be used for putting text items in quotes correctly when creating CSV tables.;;
 Bugfix;;Fixed an issue that could cause to paths to not be determined correctly on Unix based operating systems. Furthermore absolute paths are now normalized instead of using the provided path directly.;;
 New Feature;;Added process-instant-template command line option for processing an instant template file (extension itpl). An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.;;
 Improvement;;Renamed command file parameter csv-delimiter to csv-delimiter-chars. Multiple delimiters can be supplied.;;

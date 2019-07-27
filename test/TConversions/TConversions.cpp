@@ -289,6 +289,60 @@ void testCalculation()
     testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(-(4 + 5) * +(-2 * -10)), STRING_LITERAL("-(4+5)*+(-2*-10)"));
 }
 
+
+template <typename StringT>
+void testToCsv(const StringT& in, const StringT& out, const StringT& csvDelimiterChars, const StringT& csvQuoteChars, bool single = false)
+{
+    std::vector<StringT> v;
+    v.push_back(in);
+
+    typedef typename StringT::value_type CharT;
+    {
+        if (single)
+        {
+            CToCsvConversion<StringT> toCsv(csvDelimiterChars);
+            toCsv.modify(v);
+        }
+        else
+        {
+            CToCsvConversion<StringT> toCsv(csvDelimiterChars, csvQuoteChars);
+            toCsv.modify(v);
+        }
+
+        bool result = v[0] == out;
+        if (!result)
+        {
+            toErrorStream(STRING_LITERAL("CsvDelimiterChars: "), csvDelimiterChars);
+            toErrorStream(STRING_LITERAL("csvQuoteChars: "), csvQuoteChars);
+            toErrorStream(STRING_LITERAL("Expected: "), out);
+            toErrorStream(STRING_LITERAL("Result: "), v[0]);
+        }
+        BOOST_CHECK(result);
+    }
+}
+
+
+template <typename StringT>
+void testToCsv()
+{
+    typedef typename StringT::value_type CharT;
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("\"a;b\""), STRING_LITERAL(";"), STRING_LITERAL(""), true);
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("\"a;b\""), STRING_LITERAL(";"), STRING_LITERAL(""), true);
+    testToCsv<StringT>(STRING_LITERAL("ab"), STRING_LITERAL("ab"), STRING_LITERAL(";"), STRING_LITERAL(""), true);
+
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("\"a;b\""), STRING_LITERAL(";"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("\"a;b\""), STRING_LITERAL(";"), STRING_LITERAL("\"ab"));
+    testToCsv<StringT>(STRING_LITERAL("a\nb"), STRING_LITERAL("\"a\nb\""), STRING_LITERAL(";"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;\nb"), STRING_LITERAL("\"a;\nb\""), STRING_LITERAL(";"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("a;b"), STRING_LITERAL("#"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("\"a;b\""), STRING_LITERAL("#b"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;\"b"), STRING_LITERAL("\"a;\"\"b\""), STRING_LITERAL("#b"), STRING_LITERAL("\""));
+    testToCsv<StringT>(STRING_LITERAL("a;b"), STRING_LITERAL("a;b"), STRING_LITERAL(";"), STRING_LITERAL("")); //no quote no action
+    testToCsv<StringT>(STRING_LITERAL("a\nb"), STRING_LITERAL("\"a\nb\""), STRING_LITERAL(""), STRING_LITERAL("\"")); //no delimiter but new line
+    testToCsv<StringT>(STRING_LITERAL("ab"), STRING_LITERAL("babbb"), STRING_LITERAL(""), STRING_LITERAL("b"));
+    testToCsv<StringT>(STRING_LITERAL("abc"), STRING_LITERAL("#abc#"), STRING_LITERAL(""), STRING_LITERAL("#c"));
+}
+
 BOOST_AUTO_TEST_CASE( TConversions)
 {
     testReplace<std::string, CReplaceConversion<std::string> >();
@@ -310,5 +364,8 @@ BOOST_AUTO_TEST_CASE( TConversions)
 
     testCalculation<std::string>();
     testCalculation<std::wstring>();
+
+    testToCsv<std::string>();
+    testToCsv<std::wstring>();
 }
 

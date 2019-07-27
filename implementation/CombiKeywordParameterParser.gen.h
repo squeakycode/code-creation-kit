@@ -303,5 +303,47 @@ namespace code_creation_kit
             //parse closing parentheses
             CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
+
+
+        ///parse parameter range, extract values
+        template <typename IteratorT, typename ContainerT>
+        void getParametersCombi1CStyle1CStyleOptional(IteratorT& start, const IteratorT& end, ContainerT& parameters)
+        {
+            parameters.clear();
+            parameters.resize(1);
+
+            //parse opening parentheses
+            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            {
+                typename ContainerT::iterator it = parameters.begin();
+                //parse parameter of type CStyle
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                ++it; //set to the next value to parse
+                assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
+            }
+            
+            for(;;)
+            {
+                typename ContainerT::value_type parameterValue;
+                //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
+                {
+                    IteratorT temp(start);
+                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    {
+                        break;
+                    }
+                    start = temp;
+                }
+                //parse parameter of type CStyle
+                parameterValue.clear();
+                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+                
+                break;
+            }
+
+            //parse closing parentheses
+            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+        }
     }
 }

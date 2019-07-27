@@ -1489,4 +1489,117 @@ namespace code_creation_kit
         SharedCalculationT m_parsedExpression;
         StringT m_expression;
     };
+
+    template <typename StringT>
+    class CToCsvConversion : public ConversionDirectives<StringT>
+    {
+        typedef typename StringT::value_type CharT;
+    public:
+        CToCsvConversion(
+            const StringT& csvDelimiterChars
+        )
+            : m_csvDelimiterChars(csvDelimiterChars)
+            , m_csvQuoteChars(STRING_LITERAL("\""))
+        {
+        }
+
+        CToCsvConversion(
+            const StringT& csvDelimiterChars,
+            const StringT& csvQuoteChars
+        )
+            : m_csvDelimiterChars(csvDelimiterChars)
+            , m_csvQuoteChars(csvQuoteChars)
+        {
+        }
+
+        typedef CToCsvConversion<StringT> ThisT;
+        typedef typename IConversion<StringT>::StringListT StringListT;
+
+        virtual bool operator==(const IConversion<StringT>& conversion) const
+        {
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
+            {
+                if (this->m_csvDelimiterChars != pConversionRhs->m_csvDelimiterChars
+                    || this->m_csvQuoteChars != pConversionRhs->m_csvQuoteChars
+                    )
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        void toCsv(StringT& text) const
+        {
+            const CharT new_line = STRING_LITERAL('\n');
+        
+            //check if the text contains a delimiter character
+            bool textNeedsToBePutInQuotes = false;
+            for (CharT c : text)
+            {
+                if (c == new_line)
+                {
+                    textNeedsToBePutInQuotes = true;
+                    break;
+                }
+                for (CharT d : m_csvDelimiterChars)
+                {
+                    if (c == d)
+                    {
+                        textNeedsToBePutInQuotes = true;
+                        break;
+                    }
+                }
+                for (CharT q : m_csvQuoteChars)
+                {
+                    if (c == q)
+                    {
+                        textNeedsToBePutInQuotes = true;
+                        break;
+                    }
+                }
+                if (textNeedsToBePutInQuotes)
+                {
+                    break;
+                }
+            }
+
+            //if the text needs to be put in quotes
+            if (textNeedsToBePutInQuotes)
+            {
+                StringT result;
+                CharT quote = *m_csvQuoteChars.begin();
+                result.reserve(text.size() + 2); //+2 -> left and right quote char
+                result += quote;
+                for (CharT c : text)
+                {
+                    if (c == quote)
+                    {
+                        //quotes need to be doubled in this case
+                        result += c;
+                    }
+                    result += c;
+                }
+                result += quote;
+                text.swap(result);
+            }
+        }
+
+        virtual void modify(StringListT& textList) const
+        {
+            if (!m_csvQuoteChars.empty())
+            {
+                for (StringT& text : textList)
+                {
+                    toCsv(text);
+                }
+            }
+        }
+
+    private:
+        const StringT m_csvDelimiterChars; //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
+        const StringT m_csvQuoteChars; //Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
+    };
 }

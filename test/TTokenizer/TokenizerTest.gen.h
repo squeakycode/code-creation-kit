@@ -451,6 +451,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//TO_CSV
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TO_CSV%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eToCsv, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//TO_LOWER
         result.clear();
         tokenizer << STRING_LITERAL("start%TO_LOWER%end");
@@ -881,6 +889,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%TO_CSTRING.%end") : STRING_LITERAL("start%TO_CSTRING..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_CSTRING"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TO_CSV
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TO_CSV.%end") : STRING_LITERAL("start%TO_CSV..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_CSV"));
         BOOST_CHECK( expected == result);
     }
 

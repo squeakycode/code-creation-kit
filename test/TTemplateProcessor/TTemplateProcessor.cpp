@@ -176,31 +176,31 @@ void testMacroProcessing()
     ProcessorT processor;
 
     //check too large macro check is working
-    if ( processor.getMaxMacroTextSizeBytes() < 20 * 1024 * 1024)
+    if (processor.getMaxMacroTextSizeBytes() < 20 * 1024 * 1024)
     {
-        StringT largeString( processor.getMaxMacroTextSizeBytes() + 1, 'a');
-        BOOST_CHECK_THROW( test( processor, largeString, ""), CParserExceptions::ExMacroTooLarge);
+        StringT largeString(processor.getMaxMacroTextSizeBytes() + 1, 'a');
+        BOOST_CHECK_THROW(test(processor, largeString, ""), CParserExceptions::ExMacroTooLarge);
     }
 
-    processor.connectTable( ptrTable, "label A", true, true, 1, 1, false);
+    processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
 
     //error handling
-    BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
-    BOOST_CHECK_THROW( test( processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
-    BOOST_CHECK_THROW( test( processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
-    BOOST_CHECK_THROW( test( processor, "a[BEGIN][MACRO_END]", ""), CParserExceptions::ExMissingBlockEnd);
-    BOOST_CHECK_THROW( test( processor, "a[BEGIN]b[END]c[END]d", ""), CParserExceptions::ExMissingBlockBegin);
-    BOOST_CHECK_THROW( test( processor, "a[BEGIN]b[END]c[MACRO_END]d", ""), CParserExceptions::ExMissingMacroBegin);
-    BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][NOT]", ""), CParserExceptions::ExConstraintExpectedAfterNot);
+    BOOST_CHECK_THROW(test(processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
+    BOOST_CHECK_THROW(test(processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
+    BOOST_CHECK_THROW(test(processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
+    BOOST_CHECK_THROW(test(processor, "a[BEGIN][MACRO_END]", ""), CParserExceptions::ExMissingBlockEnd);
+    BOOST_CHECK_THROW(test(processor, "a[BEGIN]b[END]c[END]d", ""), CParserExceptions::ExMissingBlockBegin);
+    BOOST_CHECK_THROW(test(processor, "a[BEGIN]b[END]c[MACRO_END]d", ""), CParserExceptions::ExMissingMacroBegin);
+    BOOST_CHECK_THROW(test(processor, "a[ENTRY][\"Type\"][NOT]", ""), CParserExceptions::ExConstraintExpectedAfterNot);
 
-    BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][ANY][READ_TOP_DOWN]", ""), CParserExceptions::ExSubstitutionParsingBadOrder);
-    BOOST_CHECK_THROW( test( processor, "a[INDEX][READ_TOP_DOWN]", ""), CParserExceptions::ExCannotApplyDirectiveToSubstitution);
-    BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][ANY][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConstraint);
-    BOOST_CHECK_THROW( test( processor, "a[IF][ENTRY][\"Type\"][TO_UPPER][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConversion);
-    BOOST_CHECK_THROW( test( processor, "a[IF][INDEX][ANY]", ""), CParserExceptions::ExCannotApplyConstraintToSubstitution);
-    BOOST_CHECK_THROW( test( processor, "a[INDEX][TO_UPPER]", ""), CParserExceptions::ExCannotApplyConversionToSubstitution);
-    BOOST_CHECK_THROW( test( processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
-    BOOST_CHECK_THROW( test( processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
+    BOOST_CHECK_THROW(test(processor, "a[ENTRY][\"Type\"][ANY][READ_TOP_DOWN]", ""), CParserExceptions::ExSubstitutionParsingBadOrder);
+    BOOST_CHECK_THROW(test(processor, "a[INDEX][READ_TOP_DOWN]", ""), CParserExceptions::ExCannotApplyDirectiveToSubstitution);
+    BOOST_CHECK_THROW(test(processor, "a[ENTRY][\"Type\"][ANY][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConstraint);
+    BOOST_CHECK_THROW(test(processor, "a[IF][ENTRY][\"Type\"][TO_UPPER][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConversion);
+    BOOST_CHECK_THROW(test(processor, "a[IF][INDEX][ANY]", ""), CParserExceptions::ExCannotApplyConstraintToSubstitution);
+    BOOST_CHECK_THROW(test(processor, "a[INDEX][TO_UPPER]", ""), CParserExceptions::ExCannotApplyConversionToSubstitution);
+    BOOST_CHECK_THROW(test(processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
+    BOOST_CHECK_THROW(test(processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
 
     //parts
     BOOST_CHECK_THROW(test(processor, R"(a[PART_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingPartEnd);
@@ -253,167 +253,169 @@ row3;3,1;3,2;3,3
     BOOST_CHECK_THROW(test(processor, "a[INDEX][CALC][\"a/0\"]", ""), CCalcConversionExceptions::ExDivisionByZero);
 
     //something still in parser
-    BOOST_CHECK_THROW( test( processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    BOOST_CHECK_THROW(test(processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in line collector
-    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    BOOST_CHECK_THROW(test(processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in next level
-    BOOST_CHECK_THROW( test( processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    BOOST_CHECK_THROW(test(processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
 
 
-    class ExCannotApplyConversionToSubstitution : public std::runtime_error 
-    { public: ExCannotApplyConversionToSubstitution() : std::runtime_error( "Conversion cannot be applied to this substitution.") {}};
+    class ExCannotApplyConversionToSubstitution : public std::runtime_error
+    {
+    public: ExCannotApplyConversionToSubstitution() : std::runtime_error("Conversion cannot be applied to this substitution.") {}
+    };
 
     processor.reset();
-    processor.connectTable( ptrTable, "label A", true, true, 1, 1, false);
+    processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
 
     //no keyword
-    BOOST_CHECK( test( processor, "a", "a"));
+    BOOST_CHECK(test(processor, "a", "a"));
     //simple block parsing
-    BOOST_CHECK( test( processor, "a[BEGIN]b[END]c", "abc"));
+    BOOST_CHECK(test(processor, "a[BEGIN]b[END]c", "abc"));
     //empty pipeline on close
-    BOOST_CHECK( test( processor, "a[BEGIN][BEGIN.][BEGIN..][BEGIN...]b[END...][END..][END.][END]c", "abc"));
+    BOOST_CHECK(test(processor, "a[BEGIN][BEGIN.][BEGIN..][BEGIN...]b[END...][END..][END.][END]c", "abc"));
     //advanced block parsing
-    BOOST_CHECK( test( processor, "a[MACRO_BEGIN]b[BEGIN]c[BEGIN]d[OR]e[END]f[OR]g[END]h[OR]i[MACRO_END]j", "abcdfhj"));
+    BOOST_CHECK(test(processor, "a[MACRO_BEGIN]b[BEGIN]c[BEGIN]d[OR]e[END]f[OR]g[END]h[OR]i[MACRO_END]j", "abcdfhj"));
 
     //no keyword with no lookup substitute
-    BOOST_CHECK( test( processor, "a[IF][FIRST_TIME]", "a"));
+    BOOST_CHECK(test(processor, "a[IF][FIRST_TIME]", "a"));
     //entry
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
     //any
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][ANY]>", "<><description&more><><>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][ANY]>", "<><description&more><><>"));
     //last time
-    BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"a\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int,><valueCount,><0>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"a\"][BEGIN][IF][NOT][LAST_TIME][OR],[END]>", "<int><valueCount><0,>"));
     //last time empty
-    BOOST_CHECK( test( processor, "[BEGIN][IF][LAST_TIME][OR]<[ENTRY][\"Type\"]>[END]", "<int><double><bool>"));
+    BOOST_CHECK(test(processor, "[BEGIN][IF][LAST_TIME][OR]<[ENTRY][\"Type\"]>[END]", "<int><double><bool>"));
     //count
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][COUNT][BEGIN][IF][LAST_TIME][OR],[END]>", "<int1,><double2,><bool3,><bool4>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][COUNT][BEGIN][IF][LAST_TIME][OR],[END]>", "<int1,><double2,><bool3,><bool4>"));
     //two entries top down        
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<double,30>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<double,30>"));
     //entry left to right
-    BOOST_CHECK( test( processor, "<[ENTRY][\"a\"]>", "<int><valueCount><0>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"a\"]>", "<int><valueCount><0>"));
     //entry list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"]>", "<description&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"]>", "<description&more>"));
     //entry list with separator
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\";\"]>", "<description;&more>"));
     //if entry
-    BOOST_CHECK( test( processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<,30>"));
+    BOOST_CHECK(test(processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"]>", "<,30>"));
     //if not entry
-    BOOST_CHECK( test( processor, "<[IF][NOT][ENTRY][\"Array Maximum\"][ENTRY][\"Type\"]>", "<int><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[IF][NOT][ENTRY][\"Array Maximum\"][ENTRY][\"Type\"]>", "<int><bool><bool>"));
     //first time
-    BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
-    BOOST_CHECK( test( processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
+    BOOST_CHECK(test(processor, "<[BEGIN]+[IF][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<++int><valueCount><0>"));
+    BOOST_CHECK(test(processor, "<[BEGIN]+[IF][NOT][FIRST_TIME]+[OR][END][ENTRY][\"a\"]>", "<int><++valueCount><++0>"));
     //text correctly sorted
-    BOOST_CHECK( test( processor, "�[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]�[BEGIN][END]", "�<++int>��<valueCount$>��[30]��<0$>��[description]��[&more]�"));
-    BOOST_CHECK( test( processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
-    BOOST_CHECK( test( processor, "[BEGIN]    [IF][ENTRY][\"Item\"][READ_TOP_DOWN][EQUALS][\"a\"][ENTRY][\"Name\"][END]\n", "    valueCount\n"));
+    BOOST_CHECK(test(processor, "�[BEGIN]<+[IF][FIRST_TIME]+[ENTRY][\"a\"]>[OR]<[ENTRY][\"a\"][BEGIN][IF][ENTRY][\"a\"]$[IF][ENTRY][\"a\"][OR][END]>[OR][[ENTRY][\"b\"]][END]�[BEGIN][END]", "�<++int>��<valueCount$>��[30]��<0$>��[description]��[&more]�"));
+    BOOST_CHECK(test(processor, "<[BEGIN]+[IF][FIRST_TIME]+[END]-[ENTRY][\"a\"]>", "<++-int>"));
+    BOOST_CHECK(test(processor, "[BEGIN]    [IF][ENTRY][\"Item\"][READ_TOP_DOWN][EQUALS][\"a\"][ENTRY][\"Name\"][END]\n", "    valueCount\n"));
     //matches
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][EQUALS][\"bool\"]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][EQUALS][\"bool\"]>", "<bool><bool>"));
     //not matches
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"bool\"]>", "<int><double>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"bool\"]>", "<int><double>"));
     //matches ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][EQUALS][\"Bool\"][IGNORE_CASE]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][EQUALS][\"Bool\"][IGNORE_CASE]>", "<bool><bool>"));
     //not matches ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"Bool\"][IGNORE_CASE]>", "<int><double>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][NOT][EQUALS][\"Bool\"][IGNORE_CASE]>", "<int><double>"));
     //matches list
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"]>", "<&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"]>", "<&more>"));
     //matches list + flush 
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH]>", "<description&more>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH][MERGE][\";\"]>", "<description;&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH]>", "<description&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FLUSH][MERGE][\";\"]>", "<description;&more>"));
     //matches list + forall
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL][FLUSH]>", ""));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<description&more>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL]>", ""));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][EQUALS][\"&more\"][FOR_ALL][FLUSH]>", ""));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][NOT][EQUALS][\"\"][FOR_ALL]>", "<description&more>"));
     //check left to right
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Item\"][READ_LEFT_TO_RIGHT]>", "<Type><Name><Array Maximum><Default><Description><Description>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Item\"][READ_LEFT_TO_RIGHT]>", "<Type><Name><Array Maximum><Default><Description><Description>"));
     //top down
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Item\"][READ_TOP_DOWN]>", "<a><b><c><d>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Item\"][READ_TOP_DOWN]>", "<a><b><c><d>"));
     //no modifier in contrast to direction defined
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Item\"]>", "<a><b><c><d><Type><Name><Array Maximum><Default><Description><Description>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Item\"]>", "<a><b><c><d><Type><Name><Array Maximum><Default><Description><Description>"));
     //count
-    BOOST_CHECK( test( processor, "<[COUNT][ENTRY][\"Item\"]>", "<1a><2b><3c><4d><5Type><6Name><7Array Maximum><8Default><9Description><10Description>"));
+    BOOST_CHECK(test(processor, "<[COUNT][ENTRY][\"Item\"]>", "<1a><2b><3c><4d><5Type><6Name><7Array Maximum><8Default><9Description><10Description>"));
 
     //last time not expanded because a expands and has higher priority
-    BOOST_CHECK( test( processor, "<[BEGIN][ENTRY][\"a\"][OR][IF][LAST_TIME]default[END]>", "<int><valueCount><0>"));
+    BOOST_CHECK(test(processor, "<[BEGIN][ENTRY][\"a\"][OR][IF][LAST_TIME]default[END]>", "<int><valueCount><0>"));
     //index
-    BOOST_CHECK( test( processor, "<[IF][ENTRY][\"a\"][INDEX]>", "<2><3><5>"));
+    BOOST_CHECK(test(processor, "<[IF][ENTRY][\"a\"][INDEX]>", "<2><3><5>"));
     //regex matches
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][MATCHES_REGEX]['val.*']>", "<valueCount><values><valid>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][MATCHES_REGEX]['val.*']>", "<valueCount><values><valid>"));
     //regex matches ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][MATCHES_REGEX]['vAl.*'][IGNORE_CASE]>", "<valueCount><values><valid>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][MATCHES_REGEX]['vAl.*'][IGNORE_CASE]>", "<valueCount><values><valid>"));
     //not matches regex
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][NOT][MATCHES_REGEX]['val.*']>", "<test>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][NOT][MATCHES_REGEX]['val.*']>", "<test>"));
     //not matches regex ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][NOT][MATCHES_REGEX]['vAl.*'][IGNORE_CASE]>", "<test>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][NOT][MATCHES_REGEX]['vAl.*'][IGNORE_CASE]>", "<test>"));
     //replace
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][REPLACE][\"oo\",\"aaa\"]>", "<int><double><baaal><baaal>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][REPLACE][\"oo\",\"aaa\"]>", "<int><double><baaal><baaal>"));
     //replace ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][REPLACE][\"Oo\",\"aaa\"][IGNORE_CASE]>", "<int><double><baaal><baaal>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][REPLACE][\"Oo\",\"aaa\"][IGNORE_CASE]>", "<int><double><baaal><baaal>"));
     //volatile
-    BOOST_CHECK( test( processor, "<[BEGIN][ENTRY][\"not existent\"][OR][END][ENTRY][\"Type\"]>", ""));
-    BOOST_CHECK( test( processor, "<[BEGIN][ENTRY][\"not existent\"][AS_VOLATILE][OR][END][ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[BEGIN][ENTRY][\"not existent\"][OR][END][ENTRY][\"Type\"]>", ""));
+    BOOST_CHECK(test(processor, "<[BEGIN][ENTRY][\"not existent\"][AS_VOLATILE][OR][END][ENTRY][\"Type\"]>", "<int><double><bool><bool>"));
     //regex replace
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['[aeiou]','_']>", "<_nt><d__bl_><b__l><b__l>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['(b|d)','/$1']>", "<int></dou/ble></bool></bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['[aeiou]','_']>", "<_nt><d__bl_><b__l><b__l>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['(b|d)','/$1']>", "<int></dou/ble></bool></bool>"));
     //regex replace ignore case
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['[AEIOU]','_'][IGNORE_CASE]>", "<_nt><d__bl_><b__l><b__l>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][REGEX_REPLACE]['[AEIOU]','_'][IGNORE_CASE]>", "<_nt><d__bl_><b__l><b__l>"));
     //to upper
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][TO_UPPER]>", "<INT><DOUBLE><BOOL><BOOL>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_UPPER]>", "<INT><DOUBLE><BOOL><BOOL>"));
     //to lower
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][TO_LOWER]>", "<valuecount><values><valid><test>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Name\"][TO_UPPER][TO_LOWER]>", "<valuecount><values><valid><test>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][TO_LOWER]>", "<valuecount><values><valid><test>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Name\"][TO_UPPER][TO_LOWER]>", "<valuecount><values><valid><test>"));
     //starts with
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][STARTS_WITH][\"bo\"]>", "<bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][STARTS_WITH][\"BO\"][IGNORE_CASE]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][STARTS_WITH][\"bo\"]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][STARTS_WITH][\"BO\"][IGNORE_CASE]>", "<bool><bool>"));
     //ends with
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"ol\"]>", "<bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"OL\"][IGNORE_CASE]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"ol\"]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][ENDS_WITH][\"OL\"][IGNORE_CASE]>", "<bool><bool>"));
     //contains
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"oo\"]>", "<bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][CONTAINS][\"OO\"][IGNORE_CASE]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][CONTAINS][\"oo\"]>", "<bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][CONTAINS][\"OO\"][IGNORE_CASE]>", "<bool><bool>"));
     //not contains x 2
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][NOT][CONTAINS][\"o\"][NOT][CONTAINS][\"u\"]>", "<int><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][NOT][CONTAINS][\"o\"][NOT][CONTAINS][\"u\"]>", "<int><bool><bool>"));
     //to cstring
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][TO_UPPER][REPLACE][\"I\",\"\\n\"][TO_CSTRING]>", "<\\nNT><DOUBLE><BOOL><BOOL>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_UPPER][REPLACE][\"I\",\"\\n\"][TO_CSTRING]>", "<\\nNT><DOUBLE><BOOL><BOOL>"));
     //if count and constraints
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int><double2+><bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool+><bool+>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][IF][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int><double2+><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][COUNT][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool+><bool+>"));
     //if index and constraints
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int2+><double><bool><bool>"));
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool+><bool+>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][IF][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int+><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int2+><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool+><bool+>"));
     //error tag
-    BOOST_CHECK( test( processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
-    BOOST_CHECK_THROW( test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
+    BOOST_CHECK_THROW(test(processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
     //html escape
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][HTML_ESCAPE]>", "<description&amp;more>"));
     try
     {
-        test( processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
+        test(processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
     }
-    catch( CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
+    catch (CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
     {
-        BOOST_CHECK_EQUAL( e.getMessage(), "Error Message 1234.");
+        BOOST_CHECK_EQUAL(e.getMessage(), "Error Message 1234.");
     }
     //trim
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM] \n", "<int><double><bool><bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM.] \n", "<int><double><bool><bool>"));
     //trim left
     BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] ", "<int> <double> <bool> <bool> "));
     BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT]\n", "<int>\n<double>\n<bool>\n<bool>\n"));
     BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
     BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_LEFT.] \n", "<int> \n<double> \n<bool> \n<bool> \n"));
     //trim right
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT] \n", "  <int>  <double>  <bool>  <bool>"));
-    BOOST_CHECK( test( processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT.] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT] \n", "  <int>  <double>  <bool>  <bool>"));
+    BOOST_CHECK(test(processor, "  <[ENTRY][\"Type\"]>[TRIM_RIGHT.] \n", "  <int>  <double>  <bool>  <bool>"));
     //comment
-    BOOST_CHECK( test( processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
-    BOOST_CHECK( test( processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
+    BOOST_CHECK(test(processor, "  [COMMENT]<[ENTRY][\"Type\"]>[TRIM] \n", ""));
+    BOOST_CHECK(test(processor, "[COMMENT.]<[ENTRY][\"Type\"]>[TRIM.] \n", ""));
     //set recursion level limit
-    BOOST_CHECK( test( processor, "[SET_RECURSION_LEVEL_LIMIT][MACRO_BEGIN]<[ENTRY][\"Type\"]>[MACRO_END]<[ENTRY.][\"Type\"]>", "<int><double><bool><bool><[ENTRY][\"Type\"]>"));
+    BOOST_CHECK(test(processor, "[SET_RECURSION_LEVEL_LIMIT][MACRO_BEGIN]<[ENTRY][\"Type\"]>[MACRO_END]<[ENTRY.][\"Type\"]>", "<int><double><bool><bool><[ENTRY][\"Type\"]>"));
     //check limit is reseted properly
-    BOOST_CHECK( test( processor, "<[ENTRY.][\"Type\"]>", "<int><double><bool><bool>")); 
+    BOOST_CHECK(test(processor, "<[ENTRY.][\"Type\"]>", "<int><double><bool><bool>"));
     //pad left
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][PAD_LEFT][\" \",15]>", "<    description          &more>"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Description\"][MERGE][\"\n\"][PAD_LEFT][\" \",5,7]>", "<description\n  &more>"));
@@ -445,7 +447,7 @@ row3;3,1;3,2;3,3
     BOOST_CHECK(test(processor, R"(#[PART_BEGIN]["labelxyz"]a[MACRO_BEGIN]<[ENTRY]["Type"]>[MACRO_END]b[MACRO_BEGIN]{[ENTRY]["Type"]}[PART_END]-[PART]["labelxyz"][MACRO_END]c[PART_REMOVE]["labelxyz"][PART_REMOVE]["labelxyz"]d)", "#-a<int><double><bool><bool>b{int}{double}{bool}{bool}cd"));
     //part with padding left
     { const char* input =
-R"(#[PART_BEGIN]["labelxyz"]
+        R"(#[PART_BEGIN]["labelxyz"]
 <a><[ENTRY]["Type"]>
 <b>
 <c>[PART_END][TRIM]
@@ -453,7 +455,7 @@ R"(#[PART_BEGIN]["labelxyz"]
 #
 )";
     const char* result =
-R"(#
+        R"(#
 abc<a><int>
 abc<a><double>
 abc<a><bool>
@@ -466,7 +468,7 @@ abc<c>
     }
     //part with padding left and padding width, bonus: ignore trimmed lines
     { const char* input =
-R"(#[PART_BEGIN]["labelxyz"][TRIM]
+        R"(#[PART_BEGIN]["labelxyz"][TRIM]
 
 <a><[ENTRY]["Type"]>
     [TRIM]
@@ -476,7 +478,7 @@ R"(#[PART_BEGIN]["labelxyz"][TRIM]
 #
 )";
     const char* result =
-R"(#
+        R"(#
 abccc<a><int>
 abccc<a><double>
 abccc<a><bool>
@@ -489,7 +491,7 @@ abccc<c>
     }
     //part with padding left and padding width, padding width very small, leaving only fixed part
     { const char* input =
-R"(#[PART_BEGIN]["labelxyz"]
+        R"(#[PART_BEGIN]["labelxyz"]
 <a><[ENTRY]["Type"]>
 <b>
 <c>[PART_END][TRIM]
@@ -497,7 +499,7 @@ R"(#[PART_BEGIN]["labelxyz"]
 #
 )";
     const char* result =
-R"(#
+        R"(#
 ab<a><int>
 ab<a><double>
 ab<a><bool>
@@ -664,6 +666,11 @@ row3;3,1;3,2;3,3
     BOOST_CHECK(test(processor, "<[IF][ENTRY][\"Type\"],[ENTRY][\"Array Maximum\"][CALC][\"5+a*2\"]>", "<,65>"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][COUNT][CALC][\"5+a*2\"][CALC][\"a-5\"][BEGIN][IF][LAST_TIME][OR],[END]>", "<int2,><double4,><bool6,><bool8>"));
     BOOST_CHECK(test(processor, "<[IF][ENTRY][\"a\"][INDEX][CALC][\"5+a*-3\"][CALC][\"a-5\"]>", "<-6><-9><-15>"));
+
+    //to csv
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_CSV][\"o\"]>", "<int><\"double\"><\"bool\"><\"bool\">"));
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_CSV][\"b\",\"i\"]>", "<iiinti><idoublei><ibooli><ibooli>"));
+
 
     //connect more tables for testing unloading
     SharedTableT ptrAnotherTableA = std::make_shared<TableT>();
