@@ -27,16 +27,18 @@ add_executable(TSourceFile
     TSourceFile.cpp
     TSourceFileTestFiles.h
 )
+
 add_dependencies(TSourceFile cck_implementation)
+
 target_link_libraries(TSourceFile
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TSourceFile
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TSourceFile PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TSourceFile)
+
 #run the test
 add_custom_command(TARGET TSourceFile
                    POST_BUILD

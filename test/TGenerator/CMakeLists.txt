@@ -27,20 +27,17 @@ add_executable(TGenerator
     TGenerator.cpp
     TGeneratorTestFiles.h
 )
-add_dependencies(TGenerator cck_implementation)
+
 target_link_libraries(TGenerator
-    #unit test runners need to link the cck_implementation static library only in a few cases
+    PRIVATE
     cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
     Boost::regex
 )
-target_include_directories(TGenerator
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TGenerator)
+
 #run the test
 add_custom_command(TARGET TGenerator
                    POST_BUILD

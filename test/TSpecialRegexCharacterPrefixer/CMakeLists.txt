@@ -24,16 +24,18 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(TSpecialRegexCharacterPrefixer TSpecialRegexCharacterPrefixer.cpp)
+
 add_dependencies(TSpecialRegexCharacterPrefixer cck_implementation)
+
 target_link_libraries(TSpecialRegexCharacterPrefixer
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TSpecialRegexCharacterPrefixer
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TSpecialRegexCharacterPrefixer PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TSpecialRegexCharacterPrefixer)
+
 #run the test
 add_custom_command(TARGET TSpecialRegexCharacterPrefixer
                    POST_BUILD

@@ -27,16 +27,18 @@ add_executable(TCsvParser
     TCsvParser.cpp
     TCsvParserTestFiles.h
 )
+
 add_dependencies(TCsvParser cck_implementation)
+
 target_link_libraries(TCsvParser
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TCsvParser
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TCsvParser PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TCsvParser)
+
 #run the test
 add_custom_command(TARGET TCsvParser
                    POST_BUILD

@@ -27,19 +27,18 @@ add_executable(TCommandProcessor
     TCommandProcessor.cpp
     TCommandProcessorTestFiles.h
     )
-add_dependencies(TCommandProcessor cck_implementation)
+
 target_link_libraries(TCommandProcessor
+    PRIVATE
+    cck_implementation
     Boost::unit_test_framework
     Boost::program_options
     Boost::filesystem
     Boost::regex
 )
-target_include_directories(TCommandProcessor
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TCommandProcessor)
+
 #run the test
 add_custom_command(TARGET TCommandProcessor
                    POST_BUILD

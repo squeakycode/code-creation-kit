@@ -27,17 +27,16 @@ add_executable(TTemplateLoader
     TTemplateLoader.cpp
     TTemplateLoaderTestFiles.h    
 )
-add_dependencies(TTemplateLoader cck_implementation)
+
 target_link_libraries(TTemplateLoader
+    PRIVATE
+    cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
 )
-target_include_directories(TTemplateLoader
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TTemplateLoader)
+
 #run the test
 add_custom_command(TARGET TTemplateLoader
                    POST_BUILD

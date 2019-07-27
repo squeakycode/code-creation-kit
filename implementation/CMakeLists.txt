@@ -102,6 +102,8 @@ add_library(cck_implementation STATIC
 )
 
 target_include_directories(cck_implementation
+INTERFACE
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 PRIVATE
 ${Boost_INCLUDE_DIR}
 )

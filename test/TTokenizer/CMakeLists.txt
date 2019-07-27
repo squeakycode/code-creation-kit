@@ -28,16 +28,17 @@ add_executable(TTokenizer
     TokenizerTest.tpl.h
     TokenizerTest.gen.h
 )
+
 add_dependencies(TTokenizer cck_implementation)
+
 target_link_libraries(TTokenizer
+    PRIVATE
     Boost::unit_test_framework
     Boost::regex
 )
-target_include_directories(TTokenizer
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TTokenizer PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TTokenizer)
 #run the test
 add_custom_command(TARGET TTokenizer

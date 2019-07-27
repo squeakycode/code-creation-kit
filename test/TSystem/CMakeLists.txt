@@ -24,17 +24,19 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(TSystem TSystem.cpp)
+
 add_dependencies(TSystem cck_implementation)
+
 target_link_libraries(TSystem
+    PRIVATE
     Boost::unit_test_framework
     Boost::regex
 )
-target_include_directories(TSystem
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TSystem PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TSystem)
+
 #run the test
 add_custom_command(TARGET TSystem
                    POST_BUILD

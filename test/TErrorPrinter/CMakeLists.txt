@@ -27,19 +27,19 @@ add_executable(TErrorPrinter
     TErrorPrinter.cpp
     TErrorPrinterTestFiles.h
 )
+
 add_dependencies(TErrorPrinter cck_implementation)
+
 target_link_libraries(TErrorPrinter
+    PRIVATE
     cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
     Boost::regex
 )
-target_include_directories(TErrorPrinter
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TErrorPrinter)
+
 #run the test
 add_custom_command(TARGET TErrorPrinter
                    POST_BUILD

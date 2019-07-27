@@ -27,19 +27,17 @@ add_executable(TGeneratorStatistic
     TGeneratorStatistic.cpp
     TGeneratorStatisticTestFiles.h
 )
-add_dependencies(TGeneratorStatistic cck_implementation)
+
 target_link_libraries(TGeneratorStatistic
+    PRIVATE
     cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
     Boost::regex
 )
-target_include_directories(TGeneratorStatistic
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TGeneratorStatistic)
+
 #run the test
 add_custom_command(TARGET TGeneratorStatistic
                    POST_BUILD

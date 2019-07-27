@@ -24,16 +24,18 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(TParameterParser TParameterParser.cpp)
+
 add_dependencies(TParameterParser cck_implementation)
+
 target_link_libraries(TParameterParser
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TParameterParser
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TParameterParser PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TParameterParser)
+
 #run the test
 add_custom_command(TARGET TParameterParser
                    POST_BUILD

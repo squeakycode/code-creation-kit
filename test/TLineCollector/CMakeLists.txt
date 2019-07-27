@@ -24,16 +24,18 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(TLineCollector TLineCollector.cpp)
+
 add_dependencies(TLineCollector cck_implementation)
+
 target_link_libraries(TLineCollector
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TLineCollector
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TLineCollector PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TLineCollector)
+
 #run the test
 add_custom_command(TARGET TLineCollector
                    POST_BUILD

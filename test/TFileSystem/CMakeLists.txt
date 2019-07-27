@@ -24,17 +24,16 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 add_executable(TFileSystem TFileSystem.cpp)
-add_dependencies(TFileSystem cck_implementation)
+
 target_link_libraries(TFileSystem
+    PRIVATE
+    cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
 )
-target_include_directories(TFileSystem
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
 custom_target_use_highest_warning_level(TFileSystem)
+
 #run the test
 add_custom_command(TARGET TFileSystem
                    POST_BUILD

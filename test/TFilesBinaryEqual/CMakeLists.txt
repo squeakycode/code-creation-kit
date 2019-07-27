@@ -27,16 +27,18 @@ add_executable(TFilesBinaryEqual
     TFilesBinaryEqual.cpp
     TFilesBinaryEqualTestFiles.h
 )
+
 add_dependencies(TFilesBinaryEqual cck_implementation)
+
 target_link_libraries(TFilesBinaryEqual
+    PRIVATE
     Boost::unit_test_framework
 )
-target_include_directories(TFilesBinaryEqual
-    PRIVATE
-    ${Boost_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../implementation
-)
+
+target_include_directories(TFilesBinaryEqual PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)
+
 custom_target_use_highest_warning_level(TFilesBinaryEqual)
+
 #run the test
 add_custom_command(TARGET TFilesBinaryEqual
                    POST_BUILD
