@@ -163,8 +163,10 @@ namespace code_creation_kit
             PathT relative( relativeLocation);
 
             //if is absolute path return it
-            if ( relative.has_root_name())
+            if (relative.is_absolute())
             {
+                //normalize it removing superfluous '..' and so on
+                relative.normalize();
                 return getString<StringT>( relative);
             }
             else
