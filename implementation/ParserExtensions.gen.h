@@ -135,6 +135,7 @@ namespace code_creation_kit
             || *pos == PosT::value_type::eToCString
             || *pos == PosT::value_type::eToCsv
             || *pos == PosT::value_type::eToLower
+            || *pos == PosT::value_type::eToSize
             || *pos == PosT::value_type::eToUpper
         )
         {
@@ -244,6 +245,7 @@ namespace code_creation_kit
                 case TokenT::eToUpper: return true;
                 case TokenT::eToCsv: return true;
                 case TokenT::eToCString: return true;
+                case TokenT::eToSize: return true;
                 default: return false;
                 }
             }
@@ -696,6 +698,19 @@ namespace code_creation_kit
                     typedef typename TokenT::StringListT::value_type StringT;
                     
                     std::shared_ptr<CToLowerConversion<StringT> > ptrConversion = newItem0<CToLowerConversion<StringT> >( pos);
+                    item.attach( ptrConversion);
+                    ConversionDirectives<StringT>& newItem = *ptrConversion;
+                    PosT newParentItem = pos;
+                    ++pos;
+                    parseDirectiveForConversion( pos, end, newItem, newParentItem->getToken());
+                }
+                break;
+
+            case TokenT::eToSize:
+                {
+                    typedef typename TokenT::StringListT::value_type StringT;
+                    
+                    std::shared_ptr<CToSizeConversion<StringT> > ptrConversion = newItem1<CToSizeConversion<StringT> >( pos);
                     item.attach( ptrConversion);
                     ConversionDirectives<StringT>& newItem = *ptrConversion;
                     PosT newParentItem = pos;

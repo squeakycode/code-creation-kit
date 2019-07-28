@@ -250,6 +250,7 @@ namespace code_creation_kit
             expression += front + STRING_LITERAL("TO_CSTRING") + back;
             expression += front + STRING_LITERAL("TO_CSV") + back;
             expression += front + STRING_LITERAL("TO_LOWER") + back;
+            expression += front + STRING_LITERAL("TO_SIZE") + back;
             expression += front + STRING_LITERAL("TO_UPPER") + back;
 
             m_searchExpression = RegexT( expression);
@@ -1385,6 +1386,34 @@ namespace code_creation_kit
                     else
                     {
                         *m_outputStream << TokenT( TokenT::eToLower);
+                    }
+                }
+                else if ( what[ (TokenT::eToSize) ].matched )
+                {
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    try
+                    {
+                        list->resize(1);
+                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                    }
+                    catch(...)
+                    {
+                        //log
+                        if ( isLoggingEnabled())
+                        {
+                            *m_logOutputStream << "Error parsing parameters in line:\n";
+                            *m_logOutputStream << line;
+                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                        }
+                        throw;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( TokenT::eToSize, list, getSourceText( what, TokenT::eToSize, start));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( TokenT::eToSize, list);
                     }
                 }
                 else if ( what[ (TokenT::eToUpper) ].matched )

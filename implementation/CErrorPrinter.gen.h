@@ -536,6 +536,14 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
+            catch( CToSizeConversionExceptions::ExUnexpectedToSizeProperty& e)
+            {
+                (void) e; //unused
+                FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1880: Unexpected property found for to size conversion.\n"));
+                formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
+                toErrorStream( formatter.str());
+                throw CErrorPrinted();
+            }
             catch( CCsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused

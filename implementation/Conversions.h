@@ -1490,6 +1490,7 @@ namespace code_creation_kit
         StringT m_expression;
     };
 
+
     template <typename StringT>
     class CToCsvConversion : public ConversionDirectives<StringT>
     {
@@ -1601,5 +1602,76 @@ namespace code_creation_kit
     private:
         const StringT m_csvDelimiterChars; //The first character specifies the delimiter for the next CSV-files to load. Cannot use 'tab' for tab separated items. Use an empty string for no delimiter.
         const StringT m_csvQuoteChars; //Specifies a list of characters as string that are used for quoting text items in CSV-files. The default is the double quote character.
+    };
+
+
+    ///defines exceptions thrown by CToSizeConversion for template argument independent access
+    class CToSizeConversionExceptions
+    {
+    public:
+        class ExUnexpectedToSizeProperty : public std::runtime_error
+        {
+        public: ExUnexpectedToSizeProperty() : std::runtime_error("Unexpected property found for to size conversion.") {}
+        };
+    };
+
+
+    template <typename StringT>
+    class CToSizeConversion : public ConversionDirectives<StringT>, public CToSizeConversionExceptions
+    {
+        typedef typename StringT::value_type CharT;
+
+        enum ERequestedSizeType
+        {
+            RequestedSizeType_ArrayElements //depends on encoding and string type
+            //RequestedSizeType_Chars //depends on encoding
+        };
+
+    public:
+        CToSizeConversion(
+            const StringT& properties
+        )
+            : m_requestedSizeType(RequestedSizeType_ArrayElements)
+        {
+            if (properties != STRING_LITERAL("array-elements"))
+            {
+                throw ExUnexpectedToSizeProperty();
+            }
+        }
+
+        typedef CToSizeConversion<StringT> ThisT;
+        typedef typename IConversion<StringT>::StringListT StringListT;
+
+        virtual bool operator==(const IConversion<StringT>& conversion) const
+        {
+            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            if (pConversionRhs)
+            {
+                if (this->m_requestedSizeType != pConversionRhs->m_requestedSizeType
+                    )
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        StringT toSize(StringT& text) const
+        {
+            StringT result = boost::lexical_cast<StringT>(text.size());
+            return result;
+        }
+
+        virtual void modify(StringListT& textList) const
+        {
+            for (StringT& text : textList)
+            {
+                text = toSize(text);
+            }
+        }
+
+    private:
+        const ERequestedSizeType m_requestedSizeType;
     };
 }

@@ -467,6 +467,14 @@ void testSingleTokens()
         BOOST_CHECK( expected == result);
     }
 
+    {//TO_SIZE
+        result.clear();
+        tokenizer << STRING_LITERAL("start%TO_SIZE%[\"parameter1\"]end");
+        expected[1] = TokenT( TokenT::eToSize, STRING_LITERAL("parameter1"));
+        BOOST_CHECK( result.size() == 3);
+        BOOST_CHECK( expected == result);
+    }
+
     {//TO_UPPER
         result.clear();
         tokenizer << STRING_LITERAL("start%TO_UPPER%end");
@@ -905,6 +913,14 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%TO_LOWER.%end") : STRING_LITERAL("start%TO_LOWER..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_LOWER"));
+        BOOST_CHECK( expected == result);
+    }
+
+    {//TO_SIZE
+
+        result.clear();
+        tokenizer << (bypassMode ? STRING_LITERAL("start%TO_SIZE.%end") : STRING_LITERAL("start%TO_SIZE..%end"));
+        expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%TO_SIZE"));
         BOOST_CHECK( expected == result);
     }
 

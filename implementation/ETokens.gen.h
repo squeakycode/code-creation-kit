@@ -92,6 +92,7 @@ namespace code_creation_kit
             eToCString,
             eToCsv,
             eToLower,
+            eToSize,
             eToUpper,
             eTextFragment,
             eFullLineWithoutTags

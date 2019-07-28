@@ -259,11 +259,8 @@ row3;3,1;3,2;3,3
     //something still in next level
     BOOST_CHECK_THROW(test(processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
 
-
-    class ExCannotApplyConversionToSubstitution : public std::runtime_error
-    {
-    public: ExCannotApplyConversionToSubstitution() : std::runtime_error("Conversion cannot be applied to this substitution.") {}
-    };
+    //to size
+    BOOST_CHECK_THROW(test(processor, "<[ENTRY][\"Type\"][TO_SIZE][\"willi\"]>", ""), CToSizeConversionExceptions::ExUnexpectedToSizeProperty);
 
     processor.reset();
     processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
@@ -670,6 +667,10 @@ row3;3,1;3,2;3,3
     //to csv
     BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_CSV][\"o\"]>", "<int><\"double\"><\"bool\"><\"bool\">"));
     BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_CSV][\"b\",\"i\"]>", "<iiinti><idoublei><ibooli><ibooli>"));
+
+    //to size
+    BOOST_CHECK(test(processor, "<[ENTRY][\"Type\"][TO_SIZE][\"array-elements\"]>", "<3><6><4><4>"));
+
 
 
     //connect more tables for testing unloading
