@@ -381,9 +381,9 @@ namespace code_creation_kit
             static const SCharTable table[] =
                 {
                     {'&' , STRING_LITERAL("&amp;")},
-                    {'<' , STRING_LITERAL("&lt")  },
-                    {'>' , STRING_LITERAL("&gt")  },
-                    {'"' , STRING_LITERAL("&quot")},
+                    {'<' , STRING_LITERAL("&lt;")  },
+                    {'>' , STRING_LITERAL("&gt;")  },
+                    {'"' , STRING_LITERAL("&quot;")},
                     {'\'', NULL   },
                     {'`' , NULL   },
                     {'(' , NULL   },

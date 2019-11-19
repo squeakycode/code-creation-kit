@@ -127,7 +127,7 @@ void testHtmlEscape()
     v.push_back(STRING_LITERAL("&, <, >, \", ', `, (, ), {, }, [, ], !, @, $, %, =, +,"));
 
     htmlEscape.modify(v);
-    BOOST_CHECK(v[0] == STRING_LITERAL("&amp;, &lt, &gt, &quot, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
+    BOOST_CHECK(v[0] == STRING_LITERAL("&amp;, &lt;, &gt;, &quot;, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
 }
 
 template <typename StringT, typename ConversionT>
