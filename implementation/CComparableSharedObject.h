@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace code_creation_kit
 {
@@ -43,7 +43,7 @@ namespace code_creation_kit
         {
         }
 
-        CComparableSharedObject( boost::shared_ptr<T> ptr)
+        CComparableSharedObject( std::shared_ptr<T> ptr)
             : m_ptr( ptr)
         {
         }
@@ -77,22 +77,22 @@ namespace code_creation_kit
             return &(*m_ptr);
         }
 
-        boost::shared_ptr<T> get()
+        std::shared_ptr<T> get()
         {
             return m_ptr;
         }
 
-        boost::shared_ptr<const T> get() const
+        std::shared_ptr<const T> get() const
         {
             return m_ptr;
         }
 
-        operator boost::shared_ptr<T>()
+        operator std::shared_ptr<T>()
         {
             return m_ptr;
         }
 
-        operator boost::shared_ptr<const T>() const
+        operator std::shared_ptr<const T>() const
         {
             return m_ptr;
         }
@@ -107,6 +107,6 @@ namespace code_creation_kit
             return *m_ptr;
         }
     private:
-        boost::shared_ptr<T> m_ptr;
+        std::shared_ptr<T> m_ptr;
     };
 }

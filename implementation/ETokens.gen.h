@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -44,12 +44,23 @@ namespace code_creation_kit
             eTrim,
             eTrimLeft,
             eTrimRight,
+            ePart,
+            ePartBegin,
+            ePartEnd,
+            ePartLazy,
+            ePartPadding,
+            ePartRemove,
             eSetRecursionLevelLimit,
             eSetRecursionLevelLimitOff,
+            eTableBegin,
+            eTableEnd,
+            eTableLoad,
+            eTableRemove,
             eAny,
             eVolatil,
             eBegin,
             eBlockFormat,
+            eCalc,
             eContains,
             eCount,
             eEnd,
@@ -79,7 +90,9 @@ namespace code_creation_kit
             eReplace,
             eStartsWith,
             eToCString,
+            eToCsv,
             eToLower,
+            eToSize,
             eToUpper,
             eTextFragment,
             eFullLineWithoutTags

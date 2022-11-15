@@ -1,5 +1,5 @@
 @echo off
-rem  Copyright (c) 2011-2015 Andreas Gau
+rem  Copyright (c) 2011-2019 Andreas Gau
 rem  All rights reserved.
 rem
 rem  Redistribution and use in source and binary forms, with or without
@@ -61,13 +61,13 @@ xcopy /s /e /q ..\output\examples ..\output\examples_build_test\
 
 echo Creating workspace vc8
 pushd ..\output\examples\mpc_integration
-call create_workspace.cmd vc8 nowait
+call create_workspace.cmd vc10 nowait
 popd
 if %errorlevel% neq 0 goto :exit_failure
 
 echo Creating workspace for test build
 pushd ..\output\examples_build_test\mpc_integration
-call create_workspace.cmd vc14 nowait
+call create_workspace.cmd vs2019 nowait
 popd
 if %errorlevel% neq 0 goto :exit_failure
 

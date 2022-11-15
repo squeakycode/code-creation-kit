@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ namespace code_creation_kit
     {
     public:
         typedef const std::vector<StringT> ConstStringListT;
-        typedef boost::shared_ptr<ConstStringListT> ConstSharedStringListT;
+        typedef std::shared_ptr<ConstStringListT> ConstSharedStringListT;
 
         typedef std::list<CComparableSharedObject<IConversion<StringT> > > ConversionListT;
         typedef std::list<CComparableSharedObject<IConstraint<StringT> > > ConstraintListT;
@@ -149,14 +149,12 @@ namespace code_creation_kit
             return m_conversionList;
         }
 
-        ///attaches pointer to conversion, takes ownership
-        void attach( IConversion<StringT>* conversion)
+        void attach( std::shared_ptr<IConversion<StringT> > conversion)
         {
             m_conversionList.push_back( conversion);
         }
 
-        ///attaches pointer to constrain, takes ownership
-        void attach( IConstraint<StringT>* constraint)
+        void attach(std::shared_ptr <IConstraint<StringT> > constraint)
         {
             m_constraintList.push_back( constraint);
         }
@@ -196,7 +194,7 @@ namespace code_creation_kit
             m_separator = true; 
         }
         const StringT& separatorText() const { return m_separatorText; }
-        const bool separator() const { return m_separator; }
+        bool separator() const { return m_separator; }
 
         ///volatil
         void volatil( bool volatil) 

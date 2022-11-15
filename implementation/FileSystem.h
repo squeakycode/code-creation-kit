@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -163,8 +163,10 @@ namespace code_creation_kit
             PathT relative( relativeLocation);
 
             //if is absolute path return it
-            if ( relative.has_root_name())
+            if (relative.is_absolute())
             {
+                //normalize it removing superfluous '..' and so on
+                relative.normalize();
                 return getString<StringT>( relative);
             }
             else
@@ -184,6 +186,16 @@ namespace code_creation_kit
             typedef boost::filesystem::path PathT;
             PathT path( location);
             return getString<StringT>(path.filename());
+        }
+
+        ///removes an extension if present
+        template <typename StringT>
+        inline StringT removeExtension(const StringT& location)
+        {
+            typedef boost::filesystem::path PathT;
+            PathT path(location);
+            path.replace_extension();
+            return getString<StringT>(path);
         }
 
         ///returns the location (path+name) determined from a initial path and a location that may be relative to it

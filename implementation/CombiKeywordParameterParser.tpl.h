@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <cassert>
 #include "KeywordParameterParser.h"
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -49,14 +50,51 @@ namespace code_creation_kit
             [BEGIN][TRIM]
             {
                 typename ContainerT::iterator it = parameters.begin();
-                C[ENTRY]["Fixed Part"][REPLACE][";", "ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end); ++it;\n            C"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it); ++it;
-                assert(it == parameters.end());
+                [TABLE_BEGIN.]["Fixed Part Table"]Fixed Part Row;[ENTRY]["Fixed Part"][TABLE_END.][TRIM.]
+                [MACRO_BEGIN.][TRIM.]
+                //parse parameter of type [ENTRY.]["Fixed Part Row"]
+                C[ENTRY.]["Fixed Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                ++it; //set to the next value to parse
+                [BEGIN.][IF.][NOT.][LAST_TIME.][TRIM.]
+                //parse the seperator, e.g. the comma and surrounding space
+                CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
+                [OR.][END.][TRIM.]
+                [MACRO_END.][TRIM.]
+                [TABLE_REMOVE.]["Fixed Part Table"][TRIM.]
+                assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
+            
             [OR][END][TRIM]
-
             [BEGIN][TRIM]
-            for (size_t i = 1; i < [ENTRY]["Variable Part Maximum Count"]; ++i)
+            for(;;)
             {
+                typename ContainerT::value_type parameterValue;
+                [TABLE_BEGIN.]["Optional Part Table"]Optional Part Row;[ENTRY]["Optional Part"][TABLE_END.][TRIM.]
+                [MACRO_BEGIN.][TRIM.]
+                //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
+                {
+                    IteratorT temp(start);
+                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    {
+                        break;
+                    }
+                    start = temp;
+                }
+                //parse parameter of type [ENTRY.]["Optional Part Row"]
+                parameterValue.clear();
+                C[ENTRY.]["Optional Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                parameters.push_back(parameterValue);
+                
+                [MACRO_END.][TRIM.]
+                [TABLE_REMOVE.]["Optional Part Table"][TRIM.]
+                break;
+            }
+
+            [OR][END][TRIM]            
+            [BEGIN][TRIM]
+            for (size_t i = 0; i < [ENTRY]["Repeat Part Maximum Count"]; ++i)
+            {
+                //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 IteratorT temp(start);
                 if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                 {
@@ -64,7 +102,7 @@ namespace code_creation_kit
                 }
                 start = temp;
                 typename ContainerT::value_type parameterValue;
-                C[ENTRY]["Variable Part"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                C[ENTRY]["Repeat Part"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
             }
 
@@ -72,8 +110,10 @@ namespace code_creation_kit
             //parse closing parentheses
             CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
+        [BEGIN][IF][NOT][LAST_TIME][TRIM]
 
 
+        [OR][END][TRIM]
         [MACRO_END][TRIM]
     }
 }

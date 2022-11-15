@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ namespace code_creation_kit
         while ( a == b && fileA && fileB);
 
         //check that the streams have not failed reading
-        if ( !fileA && !fileA.eof() || !fileB && !fileB.eof())
+        if ( (!fileA && !fileA.eof()) || (!fileB && !fileB.eof()))
         {
             throw FilesBinaryEqualExceptions::ExStreamBad();
         }

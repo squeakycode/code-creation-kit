@@ -1,3 +1,0 @@
-project(*) : test_base, boost_program_options {
-    after += implementation
-}

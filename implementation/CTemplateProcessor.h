@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,8 @@
 #include "CBackEndTokenizer.gen.h"
 #include "CProcessingLevelControl.h"
 #include "CInlineTemplateParameters.h"
+#include "CTemplateProvidedTableLoader.h"
+#include "StringLiteral.h"
 
 namespace code_creation_kit
 {
@@ -46,6 +48,12 @@ namespace code_creation_kit
         template <typename StringT>
         void loadTemplateFile( const StringT&)
         {
+        }
+
+        template <typename StringT>
+        StringT resolveFileNameForTableToLoad(const StringT& filename)
+        {
+            return filename;
         }
     };
 
@@ -61,13 +69,15 @@ namespace code_creation_kit
         typedef CLineCollector< StringT, BackEndTokenizer> LineCollectorT;
         typedef CMacroProcessor<TableT, ProcessingLevelControl, LogOutputStreamT> ProcessorT;
         typedef CToken<Tokens, StringT> TokenT;
-        typedef CParser<ProcessorT, TokenT, StringT, LogOutputStreamT> ParserT;
-        typedef CProcessingLevelControl<ParserT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT, LogOutputStreamT> ProcessingLevelControlT;
+        typedef CTemplateProvidedTableLoader<StringT, LogOutputStreamT> TemplateProvidedTableLoaderT;
+        typedef CParser<ProcessorT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ParserT;
+        typedef CProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT, LogOutputStreamT> ProcessingLevelControlT;
         typedef CTemplatePreprocessor<ProcessingLevelControl, ThisT, TemplateLoaderT, TokenT, StringT> PreprocessorT;
         typedef CTokenizer<TokenT, StringT, PreprocessorT, OutputStreamT, LogOutputStreamT> TokenizerT;
         typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT, LogOutputStreamT> BackEndTokenizerT;
         class BackEndTokenizer : public BackEndTokenizerT {};
         class ProcessingLevelControl : public ProcessingLevelControlT {};
+        typedef std::shared_ptr<const TableT> SharedConstTableT;
 
     public:
 
@@ -94,18 +104,21 @@ namespace code_creation_kit
 
             //setup tick remover
             m_backEndTokenizer.connectOutputStream( &m_preprocessor);
+
+            //setup table loading
+            m_processingLevelControl.connectTemplateProvidedTableLoader(&m_templateProvidedTableLoader);
         }
 
         ///attaches a table with the given properties, does not take ownership of the table
-        void connectTable( const TableT* table, StringT label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex)
+        void connectTable( const SharedConstTableT ptrTable, StringT label, bool topDown, bool leftRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool isTemporary)
         {
-            m_processor.connectTable( table, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex);
+            m_processor.connectTable(ptrTable, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, isTemporary);
         }
 
         ///detaches a table with the given properties
-        bool disconnectTable( const StringT& label, const TableT*& disconnectedTable /*out*/)
+        bool disconnectTable( const StringT& label, bool throwIfNotFound, SharedConstTableT& ptrDisconnectedTable /*out*/)
         {
-            return m_processor.disconnectTable( label, disconnectedTable);
+            return m_processor.disconnectTable( label, throwIfNotFound, ptrDisconnectedTable);
         }
 
         ///attaches output stream as sink for generated output
@@ -128,6 +141,7 @@ namespace code_creation_kit
             m_backEndTokenizer.connectLogOutputStream( stream);
             m_processingLevelControl.connectLogOutputStream( stream);
             m_processor.connectLogOutputStream( stream);
+            m_templateProvidedTableLoader.connectLogOutputStream( stream);
         }
 
         ///resets the processor for next input stream, added for symmetry to close
@@ -143,12 +157,6 @@ namespace code_creation_kit
         {
             m_tokenizer << line;
             return *this;
-        }
-
-        ///sets new keyword markup, may be called during processing
-        void setMarkup( const char* prefix, const char* postfix)
-        {
-            setMarkup( boost::lexical_cast<StringT>(prefix), boost::lexical_cast<StringT>(postfix));
         }
 
         ///sets new keyword markup, may be called during processing
@@ -180,6 +188,7 @@ namespace code_creation_kit
         {
             m_backEndTokenizer.close();
             m_processingLevelControl.close();
+            m_processor.removeTemporaryTables();
         }
 
         ///resets all buidling blocks
@@ -188,7 +197,14 @@ namespace code_creation_kit
             m_tokenizer.reset();
             m_processingLevelControl.reset();
             m_processor.reset();
+            m_templateProvidedTableLoader.reset();
             setDefaultMarkup();
+        }
+
+        ///this allows controlling the changes made by a template
+        void setCanChangeNonTemporaryTableList(bool canChangeNonTemporaryTableList)
+        {
+            m_processor.setCanChangeNonTemporaryTableList(canChangeNonTemporaryTableList);
         }
 
         ///return maximum number of recursion levels
@@ -203,11 +219,31 @@ namespace code_creation_kit
             return ParserT::getMaxMacroTextSizeBytes();
         }
 
+
+        ///is empty when currently not loading, this is used to report error information
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return m_templateProvidedTableLoader.getTableLoadFileNameWithFailure();
+        }
+
+
+        size_t getLastCsvRowNumberWithFailure()
+        {
+            return m_templateProvidedTableLoader.getLastCsvRowNumberWithFailure();
+        }
+
+
+        CPositionTracker getCsvPositionWithFailure()
+        {
+            return m_templateProvidedTableLoader.getCsvPositionWithFailure();
+        }
+
     private:
         ///set default markup
         void setDefaultMarkup()
         {
-            setMarkup( boost::lexical_cast<StringT>("["), boost::lexical_cast<StringT>("]"));
+            typedef typename StringT::value_type CharT;
+            setMarkup( STRING_LITERAL("["), STRING_LITERAL("]"));
         }
 
         TokenizerT m_tokenizer; ///<splits input lines into tokens
@@ -215,5 +251,6 @@ namespace code_creation_kit
         ProcessingLevelControl m_processingLevelControl; ///<controls the level used for processing in spiral recursion
         ProcessorT m_processor; ///<processes macro expressions
         PreprocessorT m_preprocessor; ///<preprocesses the input
+        TemplateProvidedTableLoaderT m_templateProvidedTableLoader; ///<loader for tables provided by template keywords TABLE_BEGIN and TABLE_END
     };
 }

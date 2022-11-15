@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,13 @@
 #include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
 
-#include <boost/regex.hpp> 
-#include <boost/foreach.hpp>
+#if defined(CCK_USE_STD_REGEX)
+#   include <regex>
+    namespace regex_namespace = std;
+#else
+#   include <boost/regex.hpp>
+    namespace regex_namespace = boost;
+#endif
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -85,7 +90,7 @@ namespace code_creation_kit
     public:
         typedef [ENTRY]["Tokenizer"]<TokenT, StringT, OutputStreamT[MACRO_BEGIN], FinalOutputStreamT[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][MACRO_END], LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
-        typedef boost::basic_regex<typename StringT::value_type, boost::regex_traits<typename StringT::value_type> > RegexT;
+        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
         typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
 
@@ -273,14 +278,14 @@ namespace code_creation_kit
             pos = pos * 2 - 1;
             if ( (what[ pos ].second - what[ pos ].first) > 0 )
             {
-                typename TokenT::SharedStringListT list( new typename TokenT::StringListT(2));
+                typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(2);
                 list->front().assign( what[ pos - 1 ].first, what[ pos ].first);
                 list->back().assign( what[ pos ].first + 1, endPos);
                 return list;
             }
             --pos;
             [MACRO_END][TRIM]
-            typename TokenT::SharedStringListT list( new typename TokenT::StringListT(1));
+            typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(1);
             list->front().assign( what[ pos ].first, endPos);
             return list;
         }
@@ -290,7 +295,7 @@ namespace code_creation_kit
         {
             bool trimmedRight = false;
             CAutoLineClear autoClear;[IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"]
-            boost::match_results<typename StringT::const_iterator> what; 
+            regex_namespace::match_results<typename StringT::const_iterator> what;
             typename StringT::const_iterator start = line.begin();
             typename StringT::const_iterator fullLineStart = line.begin();
             typename StringT::const_iterator end = line.end(); 
@@ -412,7 +417,7 @@ namespace code_creation_kit
                         continue;
                     }
                     [MACRO_END.][TRIM]
-                    typename TokenT::SharedStringListT list( new typename TokenT::StringListT);
+                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
                     [BEGIN][TRIM]

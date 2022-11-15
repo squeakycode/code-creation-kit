@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,8 @@
 #pragma once
 
 #include "CComparableSharedObject.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
-#include <boost/foreach.hpp>
 
 namespace code_creation_kit
 {
@@ -38,8 +37,8 @@ namespace code_creation_kit
     public:
         typedef typename ETokenHolderT::token_type ETokenT;
         typedef std::vector<StringT> StringListT;
-        typedef boost::shared_ptr<StringListT> SharedStringListT;
-        typedef boost::shared_ptr<const StringListT> ConstSharedStringListT;
+        typedef std::shared_ptr<StringListT> SharedStringListT;
+        typedef std::shared_ptr<const StringListT> ConstSharedStringListT;
 
         CToken()
             : m_token((ETokenT)0)
@@ -66,21 +65,21 @@ namespace code_creation_kit
 
         CToken( ETokenT token, const StringT& textA)
             : m_token( token)
-            , m_stringList( new StringListT(1))
+            , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->front() = textA;
         }
 
         CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
             : m_token( token)
-            , m_stringList( new StringListT(1))
+            , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->back().assign( start, end);
         }
 
         CToken( ETokenT token, const StringT& textA, const StringT& textB)
             : m_token( token)
-            , m_stringList( new StringListT(2))
+            , m_stringList(std::make_shared<StringListT>(2))
         {
             m_stringList->front() = textA;
             m_stringList->back() = textB;
@@ -99,6 +98,23 @@ namespace code_creation_kit
             m_stringList = rhs.m_stringList;
             m_sourceText = rhs.m_sourceText;
             return *this;
+        }
+
+        CToken<ETokenHolderT, StringT> cloneChangingParameter(StringT parameter0) const
+        {
+            CToken<ETokenHolderT, StringT> clone;
+            clone.m_token = m_token;
+            clone.m_stringList = std::make_shared<StringListT>(*m_stringList);
+            clone.m_sourceText = m_sourceText;
+            if (!clone.m_stringList->empty())
+            {
+                clone.m_stringList->front() = parameter0;
+            }
+            else
+            {
+                clone.m_stringList->push_back(parameter0);
+            }
+            return clone;
         }
 
         bool operator == ( ETokenT token) const
@@ -133,13 +149,20 @@ namespace code_creation_kit
             return m_stringList;
         }
 
+        ConstSharedStringListT getSourceTextList() const
+        {
+            return m_sourceText;
+        }
+
+
+
         size_t getTextSize() const
         {
             if ( m_stringList)
             {
                 size_t result = 0;
                 const StringListT& textList = *m_stringList;
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     result += text.size();
                 }
@@ -154,7 +177,7 @@ namespace code_creation_kit
             if ( m_stringList)
             {
                 const StringListT& textList = *m_stringList;
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     stream << text;
                 }
@@ -167,14 +190,14 @@ namespace code_creation_kit
             if ( m_sourceText || m_stringList)
             {
                 const StringListT& textList = *(m_sourceText ? m_sourceText : m_stringList);
-                BOOST_FOREACH( const StringT& text, textList)
+                for (const StringT& text : textList)
                 {
                     stream << text;
                 }
             }
         }
 
-    public:
+    private:
         ETokenT m_token;
         CComparableSharedObject<StringListT> m_stringList;
         CComparableSharedObject<StringListT> m_sourceText;

@@ -1,4 +1,4 @@
-#  Copyright (c) 2011-2015 Andreas Gau
+#  Copyright (c) 2011-2019 Andreas Gau
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -28,4 +28,4 @@
 -s ETokens.tpl.h -o ETokens.gen.h
 -s CTokenizer.tpl.h -o CTokenizer.gen.h -p Tokenizer=CTokenizer
 -s CTokenizer.tpl.h -o CBackEndTokenizer.gen.h -p Tokenizer=CBackEndTokenizer
--s test/TTokenizer/TokenizerTest.tpl.h -o test/TTokenizer/TokenizerTest.gen.h
+-s ../test/TTokenizer/TokenizerTest.tpl.h -o ../test/TTokenizer/TokenizerTest.gen.h

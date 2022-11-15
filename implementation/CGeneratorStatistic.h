@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 
 #include <set>
 #include "CTemplateLoader.h"
-#include <boost/noncopyable.hpp>
 #include "ETokens.gen.h"
 #include "CToken.h"
 #include "CTokenizer.gen.h"
@@ -45,7 +44,7 @@ namespace code_creation_kit
 
     ///serves generator stub and creating a statistic of the used files
     template <typename StringT>
-    class CGeneratorStatistic : public boost::noncopyable, public CGeneratorStatisticExceptions
+    class CGeneratorStatistic : public CGeneratorStatisticExceptions
     {
         typedef CGeneratorStatistic<StringT> ThisT;
         typedef CToken<Tokens, StringT> TokenT;
@@ -56,10 +55,14 @@ namespace code_creation_kit
     public:
         typedef typename StringT::value_type CharT;
         typedef typename TemplateLoaderT::FileDataListT FileDataListT;
+        typedef typename TemplateLoaderT::FileData FileDataT;
         typedef std::set<StringT> FileSetT;
 
         CGeneratorStatistic()
-            : m_csvDelimiter( STRING_LITERAL(';'))
+            : m_csvDelimiterChars(STRING_LITERAL(";"))
+            , m_csvCommentChars(STRING_LITERAL(""))
+            , m_csvQuoteChars(STRING_LITERAL("\""))
+
         {
             //set default markup
             setDefaultMarkup();
@@ -74,32 +77,44 @@ namespace code_creation_kit
             m_templateLoader.connectOutputStream( &m_tokenizer);
         }
 
+        //noncopyable
+        CGeneratorStatistic(const CGeneratorStatistic&) = delete;
+        CGeneratorStatistic& operator=(const CGeneratorStatistic&) = delete;
+
         ///set delimiter for next csv table to load
-        void setCsvDelimiter( CharT delimiter)
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
         {
-            m_csvDelimiter = delimiter;
+            m_csvDelimiterChars = csvDelimiterChars;
         }
 
         ///get delimiter for next csv table to load
-        CharT getCsvDelimiter()
+        StringT getCsvDelimiterChars() const
         {
-            return m_csvDelimiter;
+            return m_csvDelimiterChars;
+        }
+
+        ///set list of characters as string used for quoting text item for next csv table to load
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
+        {
+            m_csvQuoteChars = csvQuoteChars;
+        }
+
+        ///get list of characters as string used for quoting text item for next csv table to load
+        const StringT& getCsvQuoteChars() const
+        {
+            return m_csvQuoteChars;
         }
 
         ///set list of characters as string that mark commented lines for next csv table to load
-        void setCsvCommentChars( const StringT& commentChars)
+        void setCsvCommentChars(const StringT& csvCommentChars)
         {
-            m_csvCommentChars = commentChars;
+            m_csvCommentChars = csvCommentChars;
         }
 
         ///get list of characters as string that mark commented lines for next csv table to load
         const StringT& getCsvCommentChars() const
         {
             return m_csvCommentChars;
-        }
-
-        void setCsvIgnoreDoubleQuotes( bool /*ignoreDoubleQuotes*/)
-        {
         }
 
         ///load another table for generation, see also unloadTable
@@ -118,6 +133,14 @@ namespace code_creation_kit
             m_templateLoader.loadTemplateFile( filename, useCinInstead);
         }
 
+        ///used when a CSV table is loaded using TABLE_LOAD
+        StringT resolveFileNameForTableToLoad(const StringT& filename)
+        {
+            StringT resolvedFileName = m_templateLoader.resolveFileName(filename);
+            m_tables.insert(resolvedFileName);
+            return resolvedFileName;
+        }
+
         ///generates output by processing a template file
         template <typename ParameterListT>
         void generate( 
@@ -128,6 +151,7 @@ namespace code_creation_kit
             const StringT& , 
             bool , 
             const ParameterListT& ,
+            bool ,
             const CInlineTemplateParameters<StringT>& p
             )
         {
@@ -188,6 +212,12 @@ namespace code_creation_kit
             return m_templateLoader.getInclusionHierarchy();
         }
 
+        ///can be used for error reporting
+        const FileDataT& getLastTemplateFileProcessed() const
+        {
+            return m_templateLoader.getLastFileProcessed();
+        }
+
         ///get list of loaded tables
         const FileSetT& getTableFiles() const
         {
@@ -204,6 +234,11 @@ namespace code_creation_kit
         const FileSetT& getTemplateFiles() const
         {
             return m_templateFiles;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return StringT();
         }
 
         ///dummy only:
@@ -232,6 +267,8 @@ namespace code_creation_kit
         FileSetT m_tables; ///<list of tables loaded
         FileSetT m_generatedFiles; ///<list of files generated
         FileSetT m_templateFiles; ///<list of template files loaded
+        StringT m_csvDelimiterChars; ///<delimiter used by csv files to load
         StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
+        StringT m_csvQuoteChars; ///< Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.
     };
 }

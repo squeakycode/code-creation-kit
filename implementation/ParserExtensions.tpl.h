@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -35,29 +35,42 @@
 namespace code_creation_kit
 {
     template <typename T, typename PosT>
-    T* newItem0( PosT&)
+    std::shared_ptr<T> newItem0(PosT&)
     {
-        return new T();
+        return std::make_shared<T>();
     }
 
     template <typename T, typename PosT>
-    T* newItem1( PosT& pos)
+    std::shared_ptr<T> newItem1(PosT& pos)
     {
-        return new T( pos->getStringList()->front());
+        return std::make_shared<T>(pos->getStringList()->front());
     }
 
     template <typename T, typename PosT>
-    T* newItem2( PosT& pos)
+    std::shared_ptr<T> newItem2(PosT& pos)
     {
-        return new T( pos->getStringList()->front(), pos->getStringList()->back());
+        return std::make_shared<T>(pos->getStringList()->front(), pos->getStringList()->back());
     }
 
     template <typename T, typename PosT>
-    T* newItem2VariableArguments(PosT& pos)
+    std::shared_ptr<T> newItem2Combi1CStyle1UIntRepeatUIntOptional(PosT& pos)
     {
-        return new T(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
+        return std::make_shared<T>(pos->getStringList()->at(0), pos->getStringList()->at(1), pos->getStringList()->begin() + 2, pos->getStringList()->end());
     }
 
+    template <typename T, typename PosT>
+    std::shared_ptr<T> newItem1Combi1CStyle1CStyleOptional(PosT& pos)
+    {
+        if (pos->getStringList()->size() > 1)
+        {
+            assert(pos->getStringList()->size() == 2);
+            return newItem2<T>(pos);
+        }
+        else
+        {
+            return newItem1<T>(pos);
+        }
+    }
 
 
     [MACRO_BEGIN][TRIM]
@@ -87,9 +100,13 @@ namespace code_creation_kit
                 switch( appliedItem)
                 {
                 case TokenT::e[ENTRY..]["Tag Name Capital"][IF..][ENTRY..]["Tag Name"][EQUALS..]["[ENTRY.]["[ENTRY]["Tag Name"]"]"][IF.][ENTRY.]["Tag Name"][EQUALS.]["Applyable"]: return true;
+                default: return false;
                 }
             }
             [MACRO_END][TRIM]
+        default:
+            //results in return false
+            break;
         }
         return false;
     }
@@ -100,7 +117,6 @@ namespace code_creation_kit
     bool parse[ENTRY]["Name for Subtype"]( PosT& pos, PosT& end, ItemT& item[BEGIN][IF][ENTRY]["Validation Error"], ETokenT parentItem[OR][END])
     {
         typedef typename PosT::value_type TokenT;
-        typedef typename TokenT::StringListT::value_type StringT;
 
         [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["substitution"][TRIM]
         bool if_ = false;
@@ -143,8 +159,8 @@ namespace code_creation_kit
             [MACRO_BEGIN.][TRIM.]
             case TokenT::e[ENTRY.]["Tag Name Capital"][IF.][ENTRY.]["Subtype"][EQUALS.]["[ENTRY]["Subtype"]"]:
                 {
-                    [ENTRY]["Action"][REGEX_REPLACE]['\n', '\n                ']
-                    PosT newParentItem = pos;
+                    [ENTRY]["Action"][REGEX_REPLACE]['\n', '\n                    ']
+                    PosT newParentItem = pos;[IF..][FIRST_TIME..][IF..][ENTRY..]["[ENTRY]["Subtype"]"][IF..][ENTRY..]["Subtype"][EQUALS..]["Parse"]
                     ++pos;
                     parse[ENTRY..]["[ENTRY]["Subtype"]"][IF..][ENTRY..]["Subtype"][EQUALS..]["Parse"]( pos, end, newItem, newParentItem->getToken());
                 }

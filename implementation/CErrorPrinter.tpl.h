@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,34 @@
 #include <set>
 #include "StringLiteral.h"
 
+#if defined BOOST_TEST_MAIN
+//prevent test output to be listed as error
+#   define CODE_CREATION_KIT_ERROR_TAG1 "just_testing"
+#   define CODE_CREATION_KIT_ERROR_TAG2 "Just_Testing"
+#else
+#   define CODE_CREATION_KIT_ERROR_TAG1 "error"
+#   define CODE_CREATION_KIT_ERROR_TAG2 "Error"
+#endif
+[PART_BEGIN]["print error message"][TRIM]
+FormatT formatter(STRING_LITERAL("[BEGIN][ENTRY]["Prefix"] : " CODE_CREATION_KIT_ERROR_TAG1 " [OR] " CODE_CREATION_KIT_ERROR_TAG2 " [END]TC[ENTRY]["Error Number"]: [ENTRY]["Description"]\n"));
+formatter % [ENTRY]["Source"][MERGE][" % "];
+toErrorStream( formatter.str());[PART_END][TRIM]
+[PART_BEGIN]["error handler catch"][TRIM]
+catch( [ENTRY]["Scope"]::[ENTRY]["Exception Name"]& e)
+{
+    (void) e; //unused
+[BEGIN][IF][ENTRY]["Condition"][TRIM]
+    [MACRO_BEGIN.][IF.][ENTRY.]["Scope"][EQUALS.]["[ENTRY]["Scope"]"][IF.][ENTRY.]["Exception Name"][EQUALS.]["[ENTRY]["Exception Name"]"][IF.][ENTRY.]["Condition Group"][EQUALS.]["[ENTRY]["Condition Group"]"][TRIM.]
+    [BEGIN.]if ([ENTRY.]["Condition"])[OR.]else[END.]
+    {
+        [PART.]["print error message", "[PART_PADDING]        "]
+    }
+    [MACRO_END.][TRIM.]
+[OR][TRIM]
+    [PART]["print error message", " ", 4]
+[END][TRIM]
+    throw CErrorPrinted();
+}[PART_END]
 namespace code_creation_kit
 {
     class CErrorPrinted{};
@@ -62,6 +90,7 @@ namespace code_creation_kit
             const StringT& intermediateFileName,
             bool append,
             const ParameterListT& parameters,
+            bool canChangeTableList = false,
             const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
         )
         {
@@ -75,10 +104,11 @@ namespace code_creation_kit
                     intermediateFileName,
                     append,
                     parameters,
+                    canChangeTableList,
                     inlineTemplateParameters);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["generate"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -88,32 +118,38 @@ namespace code_creation_kit
         }
 
         ///set delimiter for next csv table to load
-        void setCsvDelimiter( CharT delimiter)
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
         {
             try
             {
-                m_generator.setCsvDelimiter( delimiter);
+                m_generator.setCsvDelimiterChars(csvDelimiterChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvDelimiter"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
         ///set list of characters as string that mark commented lines for next csv table to load
-        void setCsvCommentChars( const StringT& commentChars)
+        void setCsvCommentChars( const StringT& csvCommentChars)
         {
             try
             {
-                m_generator.setCsvCommentChars( commentChars);
+                m_generator.setCsvCommentChars( csvCommentChars);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["setCsvCommentChars"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
-        void setCsvIgnoreDoubleQuotes( bool ignoreDoubleQuotes) 
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
         {
-            m_generator.setCsvIgnoreDoubleQuotes( ignoreDoubleQuotes);
+            try
+            {
+                m_generator.setCsvQuoteChars(csvQuoteChars);
+            }
+            [MACRO_BEGIN] [IF][ENTRY]["Operation"][EQUALS]["setCsvQuoteChars"][TRIM]
+                [PART]["error handler catch", " ", 12]
+                [MACRO_END][TRIM]
         }
 
         void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
@@ -123,7 +159,7 @@ namespace code_creation_kit
                 m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["loadTable"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -134,7 +170,7 @@ namespace code_creation_kit
                 m_generator.unloadTable( label);
             }
             [MACRO_BEGIN][IF][ENTRY]["Operation"][EQUALS]["unloadTable"][TRIM]
-            [INCLUDE]["ErrorPrinterCatch.tpl.h"][TRIM]
+            [PART]["error handler catch"," ",12]
             [MACRO_END][TRIM]
         }
 
@@ -189,23 +225,28 @@ namespace code_creation_kit
 
         unsigned int getCurrentLineNumber()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if (fileData.line == 0) //uninitialized?
             {
                 return 1;
             }
-            return list.back().line;
+            return fileData.line;
         }
 
         StringT getCurrentFileName()
         {
-            const typename GeneratorT::FileDataListT& list = m_generator.getInclusionHierarchy();
-            if ( list.empty())
+            const typename GeneratorT::FileDataT& fileData = m_generator.getLastTemplateFileProcessed();
+            if ( fileData.name.empty()) //uninitialized?
             {
                 return STRING_LITERAL("???");
             }
 
-            return list.back().name;
+            return fileData.name;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return m_generator.getTableLoadFileNameWithFailure();
         }
 
         StringT addPath( const StringT& location)
@@ -219,4 +260,7 @@ namespace code_creation_kit
 #ifdef _MSC_VER
 #pragma warning( pop ) 
 #endif
+
+#undef CODE_CREATION_KIT_ERROR_TAG1
+#undef CODE_CREATION_KIT_ERROR_TAG2
 }

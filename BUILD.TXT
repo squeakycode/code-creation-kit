@@ -7,14 +7,16 @@ Required Tools and Libraries
 
 Tool                    Used Version     Where to get                Needed for
 ----------------------  ------------ ------------------------------- ------------
-Microsoft Visual Studio         14.0 www.microsoft.com               build
+Microsoft Visual Studio         14.2 www.microsoft.com               build
 
-boost C++ library               1.58 www.boost.org                   build
+CMake                            3.8 cmake.org                       build
 
-Makefile, Project and          4.1.0 www.ociweb.com/products/mpc     build
-Workspace Creator - MPC
+boost C++ library               1.70 www.boost.org                   build
 
-Perl, e.g. ActivePerl                www.activestate.com/activeperl  MPC, build
+Makefile, Project and          1907  www.ociweb.com/products/mpc     examples
+Workspace Creator - MPC              github.com/DOCGroup/MPC
+
+Perl, e.g. ActivePerl                www.activestate.com/activeperl  examples
 
 highlight                       3.23 www.andre-simon.de              documentation
 
@@ -23,20 +25,17 @@ Inno Setup Compiler     5      5.5.6 www.jrsoftware.org              windows set
 Inno Setup Preprocessor              ispp.sourceforge.net            windows setup
 
 
-
 The boost C++ library needs to be build. Consult the boost documentation on how
 to do it.
 
-The environment variable BOOST_ROOT needs to be set, e.g. BOOST_ROOT=C:\libs\boost_1_43_0
+The environment variable BOOST_ROOT needs to be set, e.g. BOOST_ROOT=C:\libs\boost_1_70_0
 
 The environment variable MPC_ROOT needs to be set, e.g. MPC_ROOT=C:\MPC
 
 Creating the Projects and Solution:
 
 The create_workspace.cmd batch in the tools folder can be used to create
-the project and solution files for building. The used Visual Studio type can be
-passed as first paramter (vc8,vc9,vc10,vc11,vc12,vc14). Some Visual Studio versions are
-detected automatically, see the batch file for details.
+the project and solution files for building using cmake.
 
 There are two ways the solution can be created. If a text compiler is already
 available (CCK_ROOT is set) then the projects use the text compiler to
@@ -71,13 +70,10 @@ Tool                    Used Version     Where to get                Needed for
 ----------------------  ------------ ------------------------------- ------------
 boost C++ library               1.58 official package repository     build
 
-Makefile, Project and          4.1.0 www.ociweb.com/products/mpc     make file update
-Workspace Creator - MPC
+CMake                            3.8 official package repository     build
 
-Perl                                                                 make file update
-
-Get the boost development package. Run make. The result of build can be found in
-the output/bin folder.
+Get the boost development package. Run cmake. Run make. The result of build can be
+found in the output/bin folder.
 
 
 

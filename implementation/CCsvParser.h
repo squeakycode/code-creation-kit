@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 #pragma once
 
 #include <stdexcept>
+#include "StringLiteral.h"
 
 namespace code_creation_kit
 {
@@ -34,73 +35,111 @@ namespace code_creation_kit
     {
     public:
         class ExBadDelimiter : public std::invalid_argument
-        { public: ExBadDelimiter( const std::string& name) : std::invalid_argument( name + " cannot be used as delimiting character.") {}};
+        {
+        public: ExBadDelimiter(const std::string& name) : std::invalid_argument(name + " cannot be used as delimiting character.") {}
+        };
 
         class ExBadCommentChars : public std::invalid_argument
-        { public: ExBadCommentChars() : std::invalid_argument( "Quote, new line, carriage return, and the delimiter cannot be used for commenting lines.") {}};
-
-        class ExRequireDelimitingChar : public std::runtime_error 
-        { public: ExRequireDelimitingChar() : std::runtime_error( "Expecting new line or delimiter at the end of item in quotes. Check quotes.") {}};
-
-        class ExUnexpectedQuote : public std::runtime_error 
-        { public: ExUnexpectedQuote() : std::runtime_error( "Unexpected quote. Check quotes.") {}};
-
-        class ExStreamNotReady : public std::runtime_error 
-        { public: ExStreamNotReady() : std::runtime_error( "Parser input stream not ready.") {}};
-
-        class ExStreamBad : public std::runtime_error 
-        { public: ExStreamBad() : std::runtime_error( "Failed to read from parser input stream.") {}};
-
-        ///check chars used for commenting, throws ExBadCommentChars when bad
-        template <typename StringT, typename CharT, typename StreamT>
-        static void checkCharsUsedForCommenting( const StringT& commentChars, const CharT delimiter, bool ignoreDoubleQuotes, const StreamT& stream)
         {
-            const CharT quote = stream.widen('"');
-            const CharT new_line = stream.widen('\n');
-            const CharT carriage_return = stream.widen('\r');
+        public: ExBadCommentChars(const std::string& name) : std::invalid_argument(name + " cannot be used for commenting lines.") {}
+        };
 
-            //check characters for commenting a line
-            for ( typename StringT::const_iterator it = commentChars.begin(); it != commentChars.end(); ++it)
+        class ExBadQuoteChars : public std::invalid_argument
+        {
+        public: ExBadQuoteChars(const std::string& name) : std::invalid_argument(name + " cannot be used for text item quote.") {}
+        };
+
+        class ExRequireDelimitingChar : public std::runtime_error
+        {
+        public: ExRequireDelimitingChar() : std::runtime_error("Expecting new line or delimiter at the end of item in quotes. Check quotes.") {}
+        };
+
+        class ExUnexpectedQuote : public std::runtime_error
+        {
+        public: ExUnexpectedQuote() : std::runtime_error("Unexpected quote. Check quotes.") {}
+        };
+
+        class ExStreamNotReady : public std::runtime_error
+        {
+        public: ExStreamNotReady() : std::runtime_error("Parser input stream not ready.") {}
+        };
+
+        class ExStreamBad : public std::runtime_error
+        {
+        public: ExStreamBad() : std::runtime_error("Failed to read from parser input stream.") {}
+        };
+
+    protected:
+         ///check chars used for throw exception when bad
+        template <typename StringT, typename ExceptionT>
+        static void checkChars(const StringT& chars, const StringT& forbiddenChars, const char* forbiddenCharsName)
+        {
+            typedef typename StringT::value_type CharT;
+            const CharT new_line = STRING_LITERAL('\n');
+            const CharT carriage_return = STRING_LITERAL('\r');
+
+            for (auto c : chars)
             {
-                if (    *it == delimiter
-                    ||  (*it == quote && !ignoreDoubleQuotes)
-                    ||  *it == new_line
-                    ||  *it == carriage_return)
+                for (auto f : forbiddenChars)
                 {
-                    throw ExBadCommentChars();
+                    if (f == c)
+                    {
+                        throw ExceptionT(std::string(forbiddenCharsName) + static_cast<char>(c)); //TODO
+                    }
+                }
+                if (c == new_line)
+                {
+                    throw ExceptionT("New line");
+                }
+                if (c == carriage_return)
+                {
+                    throw ExceptionT("Carriage return");
                 }
             }
         }
-
-        ///check chars used for commenting, throws ExBadCommentChars when bad
-        template <typename CharT, typename StreamT>
-        static void checkDelimiter( const CharT delimiter, bool ignoreDoubleQuotes, const StreamT& stream)
+    public:
+        enum EUsedCsvCharsCheck
         {
-            const CharT quote = stream.widen('"');
-            const CharT new_line = stream.widen('\n');
-            const CharT carriage_return = stream.widen('\r');
+            UsedCsvCharsCheck_Delimiter,
+            UsedCsvCharsCheck_Quote,
+            UsedCsvCharsCheck_Commenting,
+            UsedCsvCharsCheck_All
+        };
 
-            if ( delimiter == quote && !ignoreDoubleQuotes)
+        ///check chars used, throws when bad
+        template <typename StringT>
+        static void checkCharsUsedForCsvParsing(EUsedCsvCharsCheck check, const StringT& delimiterChars, const StringT& quoteChars, const StringT& commentChars)
+        {
+            if (check == UsedCsvCharsCheck_Delimiter || check == UsedCsvCharsCheck_All)
             {
-                throw ExBadDelimiter( "Quote");
+                checkChars<StringT, ExBadDelimiter>(delimiterChars, quoteChars, "Quote character ");
+                checkChars<StringT, ExBadDelimiter>(delimiterChars, commentChars, "Commenting character ");
             }
-            if ( delimiter == new_line )
+            if (check == UsedCsvCharsCheck_Quote || check == UsedCsvCharsCheck_All)
             {
-                throw ExBadDelimiter( "New line");
+                checkChars<StringT, ExBadQuoteChars>(quoteChars, delimiterChars, "Delimiter ");
+                checkChars<StringT, ExBadQuoteChars>(quoteChars, commentChars, "Commenting character ");
             }
-            if ( delimiter == carriage_return)
+            if (check == UsedCsvCharsCheck_Commenting || check == UsedCsvCharsCheck_All)
             {
-                throw ExBadDelimiter( "Carriage return");
+                checkChars<StringT, ExBadCommentChars>(commentChars, quoteChars, "Quote character ");
+                checkChars<StringT, ExBadCommentChars>(commentChars, delimiterChars, "Delimiter ");
             }
         }
 
         ///parses a csv file with the delimiter given, csv data is fed into table builder, postion is fed into postion tracker
         template <typename StreamT, typename TableBuilderT, typename PositionTrackerT>
-        static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars, bool ignoreDoubleQuotes,PositionTrackerT& positionTracker)
+        static void parse(
+            StreamT& stream,
+            TableBuilderT& tableBuilder,
+            const typename TableBuilderT::StringT& delimiterChars,
+            const typename TableBuilderT::StringT& quoteChars,
+            const typename TableBuilderT::StringT& commentChars,
+            PositionTrackerT& positionTracker)
         {
             positionTracker.reset();
 
-            if ( !stream )
+            if (!stream)
             {
                 throw ExStreamNotReady();
             }
@@ -108,32 +147,54 @@ namespace code_creation_kit
             typedef typename TableBuilderT::StringT::value_type CharT;
             typedef typename TableBuilderT::StringT StringT;
 
-            const CharT quote = stream.widen('"');
+            auto isDelimiter = [&delimiterChars](CharT c) -> bool
+            {
+                for (auto x : delimiterChars)
+                {
+                    if (x == c)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            auto isQuote = [&quoteChars](CharT c) -> bool
+            {
+                for (auto x : quoteChars)
+                {
+                    if (x == c)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             const CharT new_line = stream.widen('\n');
             const CharT carriage_return = stream.widen('\r');
 
-            checkDelimiter( delimiter, ignoreDoubleQuotes, stream); 
-            checkCharsUsedForCommenting( commentChars, delimiter, ignoreDoubleQuotes, stream);
+            checkCharsUsedForCsvParsing(UsedCsvCharsCheck_All, delimiterChars, quoteChars, commentChars);
 
             CharT c;
             StringT item;
             bool newLine = true;
 
-            while( stream.get(c))
+            while (stream.get(c))
             {
-                if ( c == carriage_return ) continue; //ignore carriage return
+                if (c == carriage_return) continue; //ignore carriage return
 
                 //check for comment if needed
-                if ( newLine && !commentChars.empty())
+                if (newLine && !commentChars.empty())
                 {
                     bool isComment = false;
-                    for ( typename StringT::const_iterator it = commentChars.begin(); it != commentChars.end(); ++it)
+                    for (typename StringT::const_iterator it = commentChars.begin(); it != commentChars.end(); ++it)
                     {
-                        if ( *it == c) //is comment
+                        if (*it == c) //is comment
                         {
-                            while( stream.get(c)) //consume one line
+                            while (stream.get(c)) //consume one line
                             {
-                                if ( c == new_line)
+                                if (c == new_line)
                                 {
                                     positionTracker.nextLine();
                                     isComment = true;
@@ -143,38 +204,40 @@ namespace code_creation_kit
                             break;
                         }
                     }
-                    if ( isComment) //back to start?
+                    if (isComment) //back to start?
                     {
                         continue;
                     }
                 }
 
                 item.clear();
-                if ( c == quote && !ignoreDoubleQuotes) //item in quotes
+                if (isQuote(c)) //item in quotes
                 {
+                    CharT quote = c; //quoted item must use quote character consistently
+
                     positionTracker.nextColumn();
-                    while( stream.get( c))
+                    while (stream.get(c))
                     {
-                        if ( c == carriage_return ) continue; //ignore carriage return
-                        if ( c == quote ) //quote in item in quotes
+                        if (c == carriage_return) continue; //ignore carriage return
+                        if (c == quote) //quote in item in quotes
                         {
                             positionTracker.nextColumn();
-                            if ( stream.get( c)) //read next character to find out what to do
+                            if (stream.get(c)) //read next character to find out what to do
                             {
-                                if ( c == carriage_return ) //ignore carriage return
+                                if (c == carriage_return) //ignore carriage return
                                 {
-                                    if ( !stream.get( c))
+                                    if (!stream.get(c))
                                     {
                                         c = new_line; //end of file will be treated as new line
                                         break;
                                     }
                                 }
 
-                                if ( c == quote ) //double quote results in single quote
+                                if (c == quote) //double quote results in single quote
                                 {
                                     //no action, added below
                                 }
-                                else if ( c == delimiter || c == new_line ) //delimiter or end of line marking end of item
+                                else if (isDelimiter(c) || c == new_line) //delimiter or end of line marking end of item
                                 {
                                     break;
                                 }
@@ -191,7 +254,7 @@ namespace code_creation_kit
                         }
 
                         item += c; //add character to item
-                        if ( c == new_line ) //update position tracking
+                        if (c == new_line) //update position tracking
                         {
                             positionTracker.nextLine();
                         }
@@ -205,33 +268,32 @@ namespace code_creation_kit
                 {
                     do
                     {
-                        if ( c == carriage_return ) continue; //ignore carriage return
-                        if ( c == delimiter || c == new_line ) break; //end of item
-                        if ( c == quote && !ignoreDoubleQuotes) //error condition
+                        if (c == carriage_return) continue; //ignore carriage return
+                        if (isDelimiter(c) || c == new_line) break; //end of item
+                        if (isQuote(c)) //error condition
                         {
                             throw ExUnexpectedQuote();
                         }
                         item += c; //add character to item
                         positionTracker.nextColumn();
-                    }
-                    while( stream.get( c));
+                    } while (stream.get(c));
                 }
 
-                tableBuilder.addItem( item);
-                if ( c == new_line ) //begin new row
+                tableBuilder.addItem(item);
+                if (c == new_line) //begin new row
                 {
                     tableBuilder.addRow();
                     positionTracker.nextLine();
                     newLine = true;
                 }
-                else if ( c == delimiter ) //the delimiter is not added to item and that's why the position is not updated yet
+                else if (isDelimiter(c)) //the delimiter is not added to item and that's why the position is not updated yet
                 {
                     positionTracker.nextColumn();
                     newLine = false;
                 }
             }
 
-            if ( stream.bad() || (stream.fail() && !stream.eof()))
+            if (stream.bad() || (stream.fail() && !stream.eof()))
             {
                 throw ExStreamBad();
             }
@@ -241,14 +303,20 @@ namespace code_creation_kit
 
         ///parse with no position tracker required
         template <typename StreamT, typename TableBuilderT>
-        static void parse( StreamT& stream, TableBuilderT& tableBuilder, typename TableBuilderT::StringT::value_type delimiter, const typename TableBuilderT::StringT& commentChars, bool ignoreDoubleQuotes)
+        static void parse(
+            StreamT& stream,
+            TableBuilderT& tableBuilder,
+            const typename TableBuilderT::StringT& delimiterChars,
+            const typename TableBuilderT::StringT& commentChars,
+            const typename TableBuilderT::StringT& quoteChars
+            )
         {
             CNoTracker noTracker;
-            parse( stream, tableBuilder, delimiter, commentChars, ignoreDoubleQuotes, noTracker);
+            parse(stream, tableBuilder, delimiterChars, commentChars, quoteChars, noTracker);
         }
 
     private:
         ///dummy position tracker used when prosition tracking is not required
-        struct CNoTracker{void reset(){}void nextLine(){}void nextColumn(){}};
+        struct CNoTracker { void reset() {}void nextLine() {}void nextColumn() {} };
     };
 }

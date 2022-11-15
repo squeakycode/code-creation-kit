@@ -1,4 +1,4 @@
-;  Copyright (c) 2011-2015 Andreas Gau
+;  Copyright (c) 2011-2019 Andreas Gau
 ;  All rights reserved.
 ;
 ;  Redistribution and use in source and binary forms, with or without
@@ -96,6 +96,14 @@ Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\DefaultIcon; ValueT
 Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ccktc.exe"" ""%1"" -p"; Components: program
 Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\edit\command; ValueType: string; ValueName: ; ValueData: """{win}\notepad.exe"" ""%1"""; Components: program
 Root: HKCR; Subkey: CodeCreationKit.TextCompiler.CommandFile\shell\Dependencies\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ccktc.exe"" ""%1"" -p -d vs"; Components: program
+
+;add instant template file association
+Root: HKCR; Subkey: .itpl; ValueType: string; ValueName: ; ValueData: CodeCreationKit.TextCompiler.InstantTemplateFile; Flags: uninsdeletevalue; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile; ValueType: string; ValueName: ; ValueData: code-creation-kit Instant Template File; Flags: uninsdeletekey; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\tccmd.ico; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ccktc.exe"" -t ""%1"" -p"; Components: program
+Root: HKCR; Subkey: CodeCreationKit.TextCompiler.InstantTemplateFile\shell\edit\command; ValueType: string; ValueName: ; ValueData: """{win}\notepad.exe"" ""%1"""; Components: program
+
 
 [Icons]
 Name: {group}\CCK Help; Filename: {app}\html\index.html; Components: help

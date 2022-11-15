@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include <stdexcept>
 
 namespace code_creation_kit
@@ -42,13 +41,14 @@ namespace code_creation_kit
     };
 
 
-    template <typename ParserT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
+    template <typename ParserT, typename TemplateProvidedTableLoaderT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
     class CProcessingLevelControl : public CProcessingLevelControlExceptions
     {
         ///represents a processing stage in the processing spiral
         ///holds the processing blocks having a state
-        struct ProcessingLevelBlocks
+        class ProcessingLevelBlocks
         {
+        public:
             ProcessingLevelBlocks()
                 : nextLevelIsProcessing(false)
             {
@@ -68,7 +68,7 @@ namespace code_creation_kit
         };
 
     public:
-        typedef CProcessingLevelControl<ParserT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
+        typedef CProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
         typedef typename ParserT::ParserTokenT TokenT;
         typedef typename ParserT::ParserStringT StringT;
         typedef typename StringT::value_type CharT;
@@ -81,7 +81,10 @@ namespace code_creation_kit
             , m_inlineTemplateMode(false)
             , m_numInlinePad(0)
         {
-
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
+            {
+                levelBlock.parser.connectPartMap(&m_partMap);
+            }
         }
 
         ///attaches stream for the final output
@@ -94,7 +97,7 @@ namespace code_creation_kit
         void connectOutputStream( OutputStreamT* stream)
         {
             m_outputStream = stream;
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.lineCollector.connectOutputStream( stream);
             }
@@ -103,16 +106,25 @@ namespace code_creation_kit
         ///attaches the macro processor for the next level
         void connectMacroProcessor( MacroProcessorT* processor)
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.parser.connectOutputStream( processor);
+            }
+        }
+
+        ///attaches the template processor for the next level
+        void connectTemplateProvidedTableLoader(TemplateProvidedTableLoaderT* pTemplateProvidedTableLoader)
+        {
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
+            {
+                levelBlock.parser.connectTemplateProvidedTableLoader(pTemplateProvidedTableLoader);
             }
         }
 
         ///connect log output stream
         void connectLogOutputStream( LogOutputStreamT* stream)
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.parser.connectLogOutputStream( stream, &levelBlock - m_levelBlocks);
             }
@@ -162,7 +174,7 @@ namespace code_creation_kit
                     if ( stringList)
                     {
                         const typename TokenT::StringListT& strings = *stringList;
-                        BOOST_FOREACH( const StringT& text, strings)
+                        for (const StringT& text : strings)
                         {
                             if ( !text.empty())
                             {
@@ -248,8 +260,9 @@ namespace code_creation_kit
         {
             m_level = m_levelBlocks;
             m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+            m_partMap.clear();
 
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 levelBlock.lineCollector.reset();
                 levelBlock.parser.reset();
@@ -266,7 +279,7 @@ namespace code_creation_kit
         ///close all blocks flushing the content
         void close()
         {
-            BOOST_FOREACH( ProcessingLevelBlocks& levelBlock, m_levelBlocks)
+            for (ProcessingLevelBlocks& levelBlock : m_levelBlocks)
             {
                 if ( &levelBlock >= &m_levelBlocks[ m_cMaxNumLevel ])
                 {
@@ -302,6 +315,7 @@ namespace code_creation_kit
             m_outputStream->setBypassMode( false);
             m_level = m_levelBlocks;
             m_levelLimit = m_levelBlocks + m_cMaxNumLevel;
+            m_partMap.clear();
         }
 
         ///return maximum number of recursion levels
@@ -330,6 +344,7 @@ namespace code_creation_kit
         StringT m_inlineGeneratedPostfixAndNewLine; ///< marks a generated line
         StringT m_inlineGeneratedPostfixAndCarriageReturnNewLine; ///< marks a generated line
         size_t m_numInlinePad; ///< if a line has less chars than this value then pad with spaces
+        typename ParserT::PartMapT m_partMap;
 
         ProcessingLevelBlocks m_levelBlocks[ m_cMaxNumLevel ];
     };

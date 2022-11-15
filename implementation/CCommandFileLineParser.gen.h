@@ -42,9 +42,9 @@ public:
         eUnloadTable,
         eLoadTable,
         eAddIncludeDirectory,
-        eCsvDelimiter,
+        eCsvDelimiterChars,
         eCsvCommentChars,
-        eCsvIgnoreDoubleQuotes,
+        eCsvQuoteChars,
         eSetLogFile,
         eNoOptionsGiven,
         eOptionsInvalid
@@ -81,17 +81,18 @@ public:
             ("output-file,o", value<StringT >(), "Specifies the file to output to.")
             ("parameter,p", value<std::vector<StringT> >()->multitoken(), "Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.")
             ("use-intermediate-output-file,u", value<bool >()->zero_tokens(), "Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.")
-            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to '.intermediate' when omitted.")
+            ("intermediate-file-extension,e", value<StringT >(), "The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to \'.intermediate\' when omitted.")
             ("markup-prefix", value<StringT >(), "Sets the initial tag markup prefix.")
             ("markup-postfix", value<StringT >(), "Sets the initial tag markup postfix.")
             ("markup,m", value<StringT >(), "Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.")
             ("append-to-file", value<bool >()->zero_tokens(), "The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.")
-            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. WARNING: Use this option carefully to prevent data loss. Consider using the recycle option.")
+            ("inlined", value<bool >()->zero_tokens(), "Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. Use this option carefully to prevent data loss. Consider using the recycle option.")
             ("inline-prefix,b", value<StringT >(), "A prefix that marks a line of an inline template file as template content. This string must not be empty.")
             ("inline-postfix,c", value<StringT >(), "A postfix that marks a line of an inline template file as template content. This string can be empty.")
             ("inline-generated-postfix,d", value<StringT >(), "A postfix that marks a line of an inline template file as generated content. This string must not be empty.")
             ("inline-pad", value<unsigned int >(), "The number of characters a generated line is padded up to with spaces before the generated postfix is appended.")
             ("recycle,y", value<bool >()->zero_tokens(), "Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ")
+            ("can-change-table-list", value<bool >()->zero_tokens(), "Allows a template to change the table list provided to the generator, e.g. by adding or removing tables. The default setting is off. A template can always use temporary tables during processing.")
         ;
         m_descriptionResetGenerator.add_options() //("Reset Generator")
             ("reset,r", value<bool >()->zero_tokens(), "Reset the generator to defaults.")
@@ -100,12 +101,12 @@ public:
             ("add-include-directory,i", value<std::vector<StringT> >()->multitoken(), "Adds an include directory. This option accepts multiple parameters.")
         ;
         m_descriptionCsvTableProperties.add_options() //("CSV Table Properties")
-            ("csv-delimiter", value<StringT >(), "Specifies the delimiter for the next CSV-files to load. Use 'tab' for tab separated items. Use an empty string for no delimiter.")
-            ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line.")
-            ("csv-ignore-quotes", value<StringT >(), "Double quotes in table entries are treated as normal character when on. Valid values are 'on' and 'off'. The default setting is 'off'. ")
+            ("csv-delimiter-chars", value<StringT >(), "Specifies a list of delimiter characters for the next CSV-files to load. Use \"\\t\" for tab separated items. Use an empty string for no delimiter.")
+            ("csv-comment-chars", value<StringT >(), "Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line. The default is no commenting characters used.")
+            ("csv-quote-chars", value<StringT >(), "Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.")
         ;
         m_descriptionLogging.add_options() //("Logging")
-            ("log-file", value<StringT >(), "Sets up logging as follows: 'none' is off, '-' is log to stdout, and any other parameter value is the name of a log file.")
+            ("log-file", value<StringT >(), "Sets up logging as follows: \'none\' is off, \'-\' is log to stdout, and any other parameter value is the name of a log file.")
             ;
         // Add the positional descriptions
         m_positionalDescription.add( "load-table", 1);
@@ -177,11 +178,12 @@ public:
         bool providedInlineGeneratedPostfix = hasInlineGeneratedPostfix();
         bool providedInlinePad = hasInlinePad();
         bool providedRecycle = hasRecycle();
+        bool providedCanChangeTableList = hasCanChangeTableList();
         bool providedReset = hasReset();
         bool providedIncludeDirectories = hasIncludeDirectories();
-        bool providedDelimiter = hasDelimiter();
+        bool providedCsvDelimiterChars = hasCsvDelimiterChars();
         bool providedCsvCommentChars = hasCsvCommentChars();
-        bool providedCsvIgnoreDoubleQuotes = hasCsvIgnoreDoubleQuotes();
+        bool providedCsvQuoteChars = hasCsvQuoteChars();
         bool providedLogFile = hasLogFile();
     
         if (
@@ -205,9 +207,9 @@ public:
             && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -235,9 +237,9 @@ public:
             && providedRecycle == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -257,9 +259,9 @@ public:
             && providedInline == true
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -290,11 +292,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == true
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -325,11 +328,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -354,11 +358,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -389,11 +394,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == true
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -424,15 +430,16 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == true
+            && providedCsvDelimiterChars == true
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
-            return eCsvDelimiter;
+            return eCsvDelimiterChars;
         }
         
         if (
@@ -459,11 +466,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == true
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == false
         )
         {
@@ -494,15 +502,16 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == true
+            && providedCsvQuoteChars == true
             && providedLogFile == false
         )
         {
-            return eCsvIgnoreDoubleQuotes;
+            return eCsvQuoteChars;
         }
         
         if (
@@ -529,11 +538,12 @@ public:
             && providedInlineGeneratedPostfix == false
             && providedInlinePad == false
             && providedRecycle == false
+            && providedCanChangeTableList == false
             && providedReset == false
             && providedIncludeDirectories == false
-            && providedDelimiter == false
+            && providedCsvDelimiterChars == false
             && providedCsvCommentChars == false
-            && providedCsvIgnoreDoubleQuotes == false
+            && providedCsvQuoteChars == false
             && providedLogFile == true
         )
         {
@@ -565,11 +575,12 @@ public:
             && !providedInlineGeneratedPostfix
             && !providedInlinePad
             && !providedRecycle
+            && !providedCanChangeTableList
             && !providedReset
             && !providedIncludeDirectories
-            && !providedDelimiter
+            && !providedCsvDelimiterChars
             && !providedCsvCommentChars
-            && !providedCsvIgnoreDoubleQuotes
+            && !providedCsvQuoteChars
             && !providedLogFile
         )
         {
@@ -653,14 +664,14 @@ public:
         return m_vmap["template-source-file"].as<StringT >();
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("") as default
+    ///returns the provided value or STRING_LITERAL("") as default
     StringT getOutputFile() const
     {
         if ( hasOutputFile())
         {
             return m_vmap["output-file"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("");
+        return STRING_LITERAL("");
     }
     
     ///returns the provided value or std::vector<StringT>() as default
@@ -683,34 +694,34 @@ public:
         return false;
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>(".intermediate") as default
+    ///returns the provided value or STRING_LITERAL(".intermediate") as default
     StringT getIntermediateOutputFileExtension() const
     {
         if ( hasIntermediateOutputFileExtension())
         {
             return m_vmap["intermediate-file-extension"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>(".intermediate");
+        return STRING_LITERAL(".intermediate");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("[") as default
+    ///returns the provided value or STRING_LITERAL("[") as default
     StringT getMarkupPrefix() const
     {
         if ( hasMarkupPrefix())
         {
             return m_vmap["markup-prefix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("[");
+        return STRING_LITERAL("[");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("]") as default
+    ///returns the provided value or STRING_LITERAL("]") as default
     StringT getMarkupPostfix() const
     {
         if ( hasMarkupPostfix())
         {
             return m_vmap["markup-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("]");
+        return STRING_LITERAL("]");
     }
     
     ///returns the provided value
@@ -735,34 +746,34 @@ public:
         return m_vmap["inlined"].as<bool >();
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("//<>") as default
+    ///returns the provided value or STRING_LITERAL("//<>") as default
     StringT getInlinePrefix() const
     {
         if ( hasInlinePrefix())
         {
             return m_vmap["inline-prefix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("//<>");
+        return STRING_LITERAL("//<>");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("") as default
+    ///returns the provided value or STRING_LITERAL("") as default
     StringT getInlinePostfix() const
     {
         if ( hasInlinePostfix())
         {
             return m_vmap["inline-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("");
+        return STRING_LITERAL("");
     }
     
-    ///returns the provided value or boost::lexical_cast<StringT>("//$") as default
+    ///returns the provided value or STRING_LITERAL("//$") as default
     StringT getInlineGeneratedPostfix() const
     {
         if ( hasInlineGeneratedPostfix())
         {
             return m_vmap["inline-generated-postfix"].as<StringT >();
         }
-        return boost::lexical_cast<StringT>("//$");
+        return STRING_LITERAL("//$");
     }
     
     ///returns the provided value or 0 as default
@@ -785,6 +796,16 @@ public:
         return false;
     }
     
+    ///returns the provided value or false as default
+    bool getCanChangeTableList() const
+    {
+        if ( hasCanChangeTableList())
+        {
+            return m_vmap["can-change-table-list"].as<bool >();
+        }
+        return false;
+    }
+    
     ///returns the provided value
     bool getReset() const
     {
@@ -798,9 +819,9 @@ public:
     }
     
     ///returns the provided value
-    StringT getDelimiter() const
+    StringT getCsvDelimiterChars() const
     {
-        return m_vmap["csv-delimiter"].as<StringT >();
+        return m_vmap["csv-delimiter-chars"].as<StringT >();
     }
     
     ///returns the provided value
@@ -810,9 +831,9 @@ public:
     }
     
     ///returns the provided value
-    StringT getCsvIgnoreDoubleQuotes() const
+    StringT getCsvQuoteChars() const
     {
-        return m_vmap["csv-ignore-quotes"].as<StringT >();
+        return m_vmap["csv-quote-chars"].as<StringT >();
     }
     
     ///returns the provided value
@@ -960,6 +981,12 @@ public:
         return m_vmap.count( "recycle") != 0;
     }
     
+    ///indicates that the option can-change-table-list has been provided
+    bool hasCanChangeTableList() const
+    {
+        return m_vmap.count( "can-change-table-list") != 0;
+    }
+    
     ///indicates that the option reset has been provided
     bool hasReset() const
     {
@@ -972,10 +999,10 @@ public:
         return m_vmap.count( "add-include-directory") != 0;
     }
     
-    ///indicates that the option csv-delimiter has been provided
-    bool hasDelimiter() const
+    ///indicates that the option csv-delimiter-chars has been provided
+    bool hasCsvDelimiterChars() const
     {
-        return m_vmap.count( "csv-delimiter") != 0;
+        return m_vmap.count( "csv-delimiter-chars") != 0;
     }
     
     ///indicates that the option csv-comment-chars has been provided
@@ -984,10 +1011,10 @@ public:
         return m_vmap.count( "csv-comment-chars") != 0;
     }
     
-    ///indicates that the option csv-ignore-quotes has been provided
-    bool hasCsvIgnoreDoubleQuotes() const
+    ///indicates that the option csv-quote-chars has been provided
+    bool hasCsvQuoteChars() const
     {
-        return m_vmap.count( "csv-ignore-quotes") != 0;
+        return m_vmap.count( "csv-quote-chars") != 0;
     }
     
     ///indicates that the option log-file has been provided

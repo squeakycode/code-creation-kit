@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,20 @@
 #include "ConstraintDirectives.gen.h"
 
 #include <stdexcept>
-#include <boost/regex.hpp>
+
+#if defined(CCK_USE_STD_REGEX)
+#   include <regex>
+    namespace regex_namespace = std;
+#else
+#   include <boost/regex.hpp>
+    namespace regex_namespace = boost;
+#endif
+
 
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4702 ) //warning C4702: unreachable code
+#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
 #endif
 #include <boost/algorithm/string.hpp>
 #ifdef _MSC_VER
@@ -329,7 +338,7 @@ namespace code_creation_kit
     class CRegexMatchesConstraint : public CConstraintBase<StringT>, public CRegexMatchesConstraintExceptions
     {
     public:
-        typedef boost::basic_regex<typename StringT::value_type, boost::regex_traits<typename StringT::value_type> > RegexT;
+        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
         typedef CRegexMatchesConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
@@ -340,7 +349,7 @@ namespace code_creation_kit
             try
             {
                 m_regexMatches = RegexT( m_matches);
-                m_regexMatchesIgnoreCase = RegexT( m_matches, boost::regex::icase);
+                m_regexMatchesIgnoreCase = RegexT( m_matches, regex_namespace::regex::icase);
             }
             catch(...)
             {

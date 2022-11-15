@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,11 @@ namespace code_creation_kit
     public:
         class ExFileInclusionNotSupported : public std::runtime_error 
         { public: ExFileInclusionNotSupported() : std::runtime_error( "The inclusion of template files is not supported.") {}};
+
+        class ExTableLoadingNotSupported : public std::runtime_error
+        {
+            public: ExTableLoadingNotSupported() : std::runtime_error("The loading of table files is not supported.") {}
+        };
 
         class ExBadlyPlacedTrim : public std::runtime_error
         { public: ExBadlyPlacedTrim() : std::runtime_error( "Trim directives are expected at the end of a line. Trailing whitespace is allowed.") {}};
@@ -116,6 +121,22 @@ namespace code_creation_kit
                 else
                 {
                     throw ExFileInclusionNotSupported();
+                }
+            }
+            else if (token == TokenT::eTableLoad)
+            {
+                if (m_templateLoader)
+                {
+                    //resolve the location of the file
+                    StringT filename = token.getStringList()->front();
+                    StringT resolvedFileName = m_templateLoader->resolveFileNameForTableToLoad(filename);
+                    //forward a modified token with the resolved filename, this is not optimal but the best compromise
+                    TokenT modifiedToken(token.cloneChangingParameter(resolvedFileName));
+                    *m_preprocessedStream << modifiedToken;
+                }
+                else
+                {
+                    throw ExTableLoadingNotSupported();
                 }
             }
             else if ( token == TokenT::eTrim || token == TokenT::eTrimLeft || token == TokenT::eTrimRight)

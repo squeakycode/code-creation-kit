@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2015 Andreas Gau
+//  Copyright (c) 2011-2019 Andreas Gau
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,12 @@
 #pragma once
 
 #include "CCommandFileLineParser.gen.h"
-#include <boost/foreach.hpp>
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
 #include "System.h"
 #include "CInlineTemplateParameters.h"
+#include "KeywordParameterParser.h"
 
 namespace code_creation_kit
 {
@@ -49,9 +49,6 @@ namespace code_creation_kit
     public:
         class ExInvalidCommandOptions : public std::runtime_error 
         { public: ExInvalidCommandOptions() : std::runtime_error( "Invalid command options. Please use --help to get the option description.") {}};
-
-        class ExInvalidOptionValueCsvIgnoreDoubleQuotes : public std::runtime_error 
-        { public: ExInvalidOptionValueCsvIgnoreDoubleQuotes() : std::runtime_error( "Invalid option value for CSV ignore quotes.") {}};
 
         ///process a stream of commands
         template <typename InputStreamT, typename GeneratorT, typename LogFileT>
@@ -106,7 +103,7 @@ namespace code_creation_kit
                     inlineTemplateParameters.inlineGeneratedPostfix = m_parser.getInlineGeneratedPostfix();
                     inlineTemplateParameters.inlinePad = m_parser.getInlinePad();
 
-                    //if no output file name has been passed source is also target
+                    //if no output filename has been passed source is also target
                     if ( outputFileName.empty())
                     {
                         outputFileName = m_parser.getTemplateFile();
@@ -122,14 +119,15 @@ namespace code_creation_kit
                 {
                     generator.setMarkup( m_parser.getMarkupPrefix(), m_parser.getMarkupPostfix());
                 }
-                generator.generate( 
-                    prepareFileName( m_parser.getTemplateFile(), commandFileName),
-                    prepareFileName( outputFileName, commandFileName), 
+                generator.generate(
+                    prepareFileName(m_parser.getTemplateFile(), commandFileName),
+                    prepareFileName(outputFileName, commandFileName),
                     useIntermediateFile,
                     m_parser.getRecycle(),
-                    prepareFileName( outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
+                    prepareFileName(outputFileName + m_parser.getIntermediateOutputFileExtension(), commandFileName),
                     m_parser.getAppendToFile(),
                     m_parser.getParameters(),
+                    m_parser.getCanChangeTableList(),
                     inlineTemplateParameters);
             }
             else if ( command == ParserT::eLoadTable )
@@ -149,7 +147,7 @@ namespace code_creation_kit
             else if ( command == ParserT::eUnloadTable)
             {
                 std::vector<StringT> labels = m_parser.getLabelsOfTableFilesToUnload();
-                BOOST_FOREACH( const StringT& label, labels)
+                for (const StringT& label : labels)
                 {
                     generator.unloadTable( label);
                 }
@@ -165,64 +163,33 @@ namespace code_creation_kit
             {
                 //add include directories relative to command file
                 std::vector<StringT> includeDirectories = m_parser.getIncludeDirectories();
-                BOOST_FOREACH( const StringT& directory, includeDirectories)
+                for (const StringT& directory : includeDirectories)
                 {
                     generator.addIncludeDirectory( prepareFileName( directory, commandFileName));
                 }
             }
-            else if ( command == ParserT::eCsvDelimiter )
+            else if ( command == ParserT::eCsvDelimiterChars )
             {
-                CharT delimiterChar = STRING_LITERAL(';');
-
-                if ( m_parser.hasDelimiter())
+                StringT delimiterChars(m_parser.getCsvDelimiterChars());
+                if(delimiterChars.size() > 1) //something escaped?
                 {
-                    StringT delimiter = m_parser.getDelimiter();
-                    if ( delimiter == STRING_LITERAL("tab"))
+                    StringT delimiterCharsQuoted = STRING_LITERAL("\"") + delimiterChars + STRING_LITERAL("\"");
+                    StringT result;
+                    auto itBegin = delimiterCharsQuoted.cbegin();
+                    if (CCStyleParameterPolicy::parseParameterValue<ExInvalidCommandOptions, typename StringT::const_iterator, StringT>(itBegin, delimiterCharsQuoted.cend(), result, true))
                     {
-                        delimiterChar = STRING_LITERAL('\t');
-                    }
-                    else if ( delimiter.size())
-                    {
-                        delimiterChar = delimiter[0];
-                    }
-                    else
-                    {
-                        delimiterChar = 0;
+                        delimiterChars = result;
                     }
                 }
-                else
-                {
-                    throw ExInvalidCommandOptions();
-                }
-
-                generator.setCsvDelimiter( delimiterChar);
+                generator.setCsvDelimiterChars( delimiterChars);
             }
             else if ( command == ParserT::eCsvCommentChars )
             {
                 generator.setCsvCommentChars( m_parser.getCsvCommentChars());
             }
-            else if ( command == ParserT::eCsvIgnoreDoubleQuotes )
+            else if (command == ParserT::eCsvQuoteChars)
             {
-                if ( m_parser.hasCsvIgnoreDoubleQuotes())
-                {
-                    StringT val = m_parser.getCsvIgnoreDoubleQuotes();
-                    if ( val == STRING_LITERAL("on"))
-                    {
-                        generator.setCsvIgnoreDoubleQuotes( true);
-                    }
-                    else if ( val == STRING_LITERAL("off"))
-                    {
-                        generator.setCsvIgnoreDoubleQuotes( false);
-                    }
-                    else
-                    {
-                        throw ExInvalidOptionValueCsvIgnoreDoubleQuotes();
-                    }
-                }
-                else
-                {
-                    throw ExInvalidCommandOptions();
-                }
+                generator.setCsvQuoteChars(m_parser.getCsvQuoteChars());
             }
             else if ( command == ParserT::eSetLogFile )
             {
