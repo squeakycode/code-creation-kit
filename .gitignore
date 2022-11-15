@@ -33,6 +33,8 @@ ipch/
 [Bb]in
 [Dd]ebug*/
 [Rr]elease*/
+#CLion files
+.idea
 #Temp files
 /output
 /docsource/temp
@@ -45,6 +47,8 @@ cmake_install.cmake
 generate.stamp
 generate.stamp.depend
 CMakeCache.txt
+cmake-build-release
+cmake-build-debug
 #gcc files
 *.o
 *.a

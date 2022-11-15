@@ -161,11 +161,11 @@ public:
         [BEGIN][TRIM]
         if ( has[ENTRY]["C++ Name"]())
         {
-            return m_vmap["[ENTRY]["Name"]"].as<[ENTRY]["C++ Type"] >();
+            return m_vmap["[ENTRY]["Name"]"].template as<[ENTRY]["C++ Type"] >();
         }
         return [ENTRY]["Default"];
         [OR][TRIM]
-        return m_vmap["[ENTRY]["Name"]"].as<[ENTRY]["C++ Type"] >();
+        return m_vmap["[ENTRY]["Name"]"].template as<[ENTRY]["C++ Type"] >();
         [END][TRIM]
     }
     

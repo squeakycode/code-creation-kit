@@ -83,7 +83,7 @@ namespace code_creation_kit
 
         ///read file line by line
         template <typename SinkT>
-        void feedLineSink( SinkT& sink, bool includeNewLine)
+        void feedLineSink( SinkT& sink, bool /* includeNewLine */)
         {
             int dummyCounter = 0;
             feedLineSink( sink, dummyCounter);

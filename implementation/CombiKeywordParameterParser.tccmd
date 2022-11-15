@@ -23,6 +23,6 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"..\requirements\Tag Specification.CombiParsers.csv"
+"../requirements/Tag Specification.CombiParsers.csv"
 
 -s CombiKeywordParameterParser.tpl.h -o CombiKeywordParameterParser.gen.h

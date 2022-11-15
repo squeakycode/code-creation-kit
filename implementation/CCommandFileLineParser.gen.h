@@ -593,13 +593,13 @@ public:
     ///returns the provided value
     StringT getTableFile() const
     {
-        return m_vmap["load-table"].as<StringT >();
+        return m_vmap["load-table"].template as<StringT >();
     }
     
     ///returns the provided value
     StringT getLabel() const
     {
-        return m_vmap["label"].as<StringT >();
+        return m_vmap["label"].template as<StringT >();
     }
     
     ///returns the provided value or false as default
@@ -607,7 +607,7 @@ public:
     {
         if ( hasTopDown())
         {
-            return m_vmap["top-down"].as<bool >();
+            return m_vmap["top-down"].template as<bool >();
         }
         return false;
     }
@@ -617,7 +617,7 @@ public:
     {
         if ( hasLeftToRight())
         {
-            return m_vmap["left-to-right"].as<bool >();
+            return m_vmap["left-to-right"].template as<bool >();
         }
         return false;
     }
@@ -627,7 +627,7 @@ public:
     {
         if ( hasRowHeaderIndex())
         {
-            return m_vmap["row-header-index"].as<unsigned int >();
+            return m_vmap["row-header-index"].template as<unsigned int >();
         }
         return 1;
     }
@@ -637,7 +637,7 @@ public:
     {
         if ( hasColumnHeaderIndex())
         {
-            return m_vmap["column-header-index"].as<unsigned int >();
+            return m_vmap["column-header-index"].template as<unsigned int >();
         }
         return 1;
     }
@@ -647,7 +647,7 @@ public:
     {
         if ( hasPadRows())
         {
-            return m_vmap["pad-rows"].as<bool >();
+            return m_vmap["pad-rows"].template as<bool >();
         }
         return false;
     }
@@ -655,13 +655,13 @@ public:
     ///returns the provided value
     std::vector<StringT> getLabelsOfTableFilesToUnload() const
     {
-        return m_vmap["unload-table"].as<std::vector<StringT> >();
+        return m_vmap["unload-table"].template as<std::vector<StringT> >();
     }
     
     ///returns the provided value
     StringT getTemplateFile() const
     {
-        return m_vmap["template-source-file"].as<StringT >();
+        return m_vmap["template-source-file"].template as<StringT >();
     }
     
     ///returns the provided value or STRING_LITERAL("") as default
@@ -669,7 +669,7 @@ public:
     {
         if ( hasOutputFile())
         {
-            return m_vmap["output-file"].as<StringT >();
+            return m_vmap["output-file"].template as<StringT >();
         }
         return STRING_LITERAL("");
     }
@@ -679,7 +679,7 @@ public:
     {
         if ( hasParameters())
         {
-            return m_vmap["parameter"].as<std::vector<StringT> >();
+            return m_vmap["parameter"].template as<std::vector<StringT> >();
         }
         return std::vector<StringT>();
     }
@@ -689,7 +689,7 @@ public:
     {
         if ( hasUseIntermediateOutputFile())
         {
-            return m_vmap["use-intermediate-output-file"].as<bool >();
+            return m_vmap["use-intermediate-output-file"].template as<bool >();
         }
         return false;
     }
@@ -699,7 +699,7 @@ public:
     {
         if ( hasIntermediateOutputFileExtension())
         {
-            return m_vmap["intermediate-file-extension"].as<StringT >();
+            return m_vmap["intermediate-file-extension"].template as<StringT >();
         }
         return STRING_LITERAL(".intermediate");
     }
@@ -709,7 +709,7 @@ public:
     {
         if ( hasMarkupPrefix())
         {
-            return m_vmap["markup-prefix"].as<StringT >();
+            return m_vmap["markup-prefix"].template as<StringT >();
         }
         return STRING_LITERAL("[");
     }
@@ -719,7 +719,7 @@ public:
     {
         if ( hasMarkupPostfix())
         {
-            return m_vmap["markup-postfix"].as<StringT >();
+            return m_vmap["markup-postfix"].template as<StringT >();
         }
         return STRING_LITERAL("]");
     }
@@ -727,7 +727,7 @@ public:
     ///returns the provided value
     StringT getMarkup() const
     {
-        return m_vmap["markup"].as<StringT >();
+        return m_vmap["markup"].template as<StringT >();
     }
     
     ///returns the provided value or false as default
@@ -735,7 +735,7 @@ public:
     {
         if ( hasAppendToFile())
         {
-            return m_vmap["append-to-file"].as<bool >();
+            return m_vmap["append-to-file"].template as<bool >();
         }
         return false;
     }
@@ -743,7 +743,7 @@ public:
     ///returns the provided value
     bool getInline() const
     {
-        return m_vmap["inlined"].as<bool >();
+        return m_vmap["inlined"].template as<bool >();
     }
     
     ///returns the provided value or STRING_LITERAL("//<>") as default
@@ -751,7 +751,7 @@ public:
     {
         if ( hasInlinePrefix())
         {
-            return m_vmap["inline-prefix"].as<StringT >();
+            return m_vmap["inline-prefix"].template as<StringT >();
         }
         return STRING_LITERAL("//<>");
     }
@@ -761,7 +761,7 @@ public:
     {
         if ( hasInlinePostfix())
         {
-            return m_vmap["inline-postfix"].as<StringT >();
+            return m_vmap["inline-postfix"].template as<StringT >();
         }
         return STRING_LITERAL("");
     }
@@ -771,7 +771,7 @@ public:
     {
         if ( hasInlineGeneratedPostfix())
         {
-            return m_vmap["inline-generated-postfix"].as<StringT >();
+            return m_vmap["inline-generated-postfix"].template as<StringT >();
         }
         return STRING_LITERAL("//$");
     }
@@ -781,7 +781,7 @@ public:
     {
         if ( hasInlinePad())
         {
-            return m_vmap["inline-pad"].as<unsigned int >();
+            return m_vmap["inline-pad"].template as<unsigned int >();
         }
         return 0;
     }
@@ -791,7 +791,7 @@ public:
     {
         if ( hasRecycle())
         {
-            return m_vmap["recycle"].as<bool >();
+            return m_vmap["recycle"].template as<bool >();
         }
         return false;
     }
@@ -801,7 +801,7 @@ public:
     {
         if ( hasCanChangeTableList())
         {
-            return m_vmap["can-change-table-list"].as<bool >();
+            return m_vmap["can-change-table-list"].template as<bool >();
         }
         return false;
     }
@@ -809,37 +809,37 @@ public:
     ///returns the provided value
     bool getReset() const
     {
-        return m_vmap["reset"].as<bool >();
+        return m_vmap["reset"].template as<bool >();
     }
     
     ///returns the provided value
     std::vector<StringT> getIncludeDirectories() const
     {
-        return m_vmap["add-include-directory"].as<std::vector<StringT> >();
+        return m_vmap["add-include-directory"].template as<std::vector<StringT> >();
     }
     
     ///returns the provided value
     StringT getCsvDelimiterChars() const
     {
-        return m_vmap["csv-delimiter-chars"].as<StringT >();
+        return m_vmap["csv-delimiter-chars"].template as<StringT >();
     }
     
     ///returns the provided value
     StringT getCsvCommentChars() const
     {
-        return m_vmap["csv-comment-chars"].as<StringT >();
+        return m_vmap["csv-comment-chars"].template as<StringT >();
     }
     
     ///returns the provided value
     StringT getCsvQuoteChars() const
     {
-        return m_vmap["csv-quote-chars"].as<StringT >();
+        return m_vmap["csv-quote-chars"].template as<StringT >();
     }
     
     ///returns the provided value
     StringT getLogFile() const
     {
-        return m_vmap["log-file"].as<StringT >();
+        return m_vmap["log-file"].template as<StringT >();
     }
     
 

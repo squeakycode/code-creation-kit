@@ -192,31 +192,31 @@ public:
     ///returns the provided value
     std::vector<StringT> getCommands() const
     {
-        return m_vmap["command"].as<std::vector<StringT> >();
+        return m_vmap["command"].template as<std::vector<StringT> >();
     }
     
     ///returns the provided value
     std::vector<StringT> getCommandFiles() const
     {
-        return m_vmap["command-file"].as<std::vector<StringT> >();
+        return m_vmap["command-file"].template as<std::vector<StringT> >();
     }
     
     ///returns the provided value
     std::vector<StringT> getInstantTemplateFiles() const
     {
-        return m_vmap["process-instant-template"].as<std::vector<StringT> >();
+        return m_vmap["process-instant-template"].template as<std::vector<StringT> >();
     }
     
     ///returns the provided value
     StringT getOutputDependenciesStyle() const
     {
-        return m_vmap["output-dependencies"].as<StringT >();
+        return m_vmap["output-dependencies"].template as<StringT >();
     }
     
     ///returns the provided value
     bool getPrompt() const
     {
-        return m_vmap["prompt"].as<bool >();
+        return m_vmap["prompt"].template as<bool >();
     }
     
 

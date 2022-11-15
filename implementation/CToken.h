@@ -35,6 +35,7 @@ namespace code_creation_kit
     class CToken : public ETokenHolderT
     {
     public:
+        typedef typename StringT::value_type CharT;
         typedef typename ETokenHolderT::token_type ETokenT;
         typedef std::vector<StringT> StringListT;
         typedef std::shared_ptr<StringListT> SharedStringListT;
@@ -80,6 +81,14 @@ namespace code_creation_kit
         CToken( ETokenT token, const StringT& textA, const StringT& textB)
             : m_token( token)
             , m_stringList(std::make_shared<StringListT>(2))
+        {
+            m_stringList->front() = textA;
+            m_stringList->back() = textB;
+        }
+
+        CToken( ETokenT token, const CharT* textA, const CharT* textB)
+                : m_token( token)
+                , m_stringList(std::make_shared<StringListT>(2))
         {
             m_stringList->front() = textA;
             m_stringList->back() = textB;
