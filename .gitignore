@@ -53,6 +53,8 @@ cmake-build-debug
 *.o
 *.a
 test_exe
+out
+CMakeSettings.json
 #output files
 /.cproject
 /.project

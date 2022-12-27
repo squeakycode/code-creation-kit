@@ -30,7 +30,6 @@ add_dependencies(TConversions cck_implementation)
 target_link_libraries(TConversions
     PRIVATE
     Boost::unit_test_framework
-    Boost::regex
 )
 
 target_include_directories(TConversions PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)

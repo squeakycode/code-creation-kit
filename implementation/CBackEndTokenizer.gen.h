@@ -34,14 +34,8 @@
 #include "CombiKeywordParameterParser.gen.h"
 #include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
+#include "cpptokenfinder.hpp"
 
-#if defined(CCK_USE_STD_REGEX)
-#   include <regex>
-    namespace regex_namespace = std;
-#else
-#   include <boost/regex.hpp>
-    namespace regex_namespace = boost;
-#endif
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -57,6 +51,7 @@
 #include "StringLiteral.h"
 #include "CNul.h"
 
+
 namespace code_creation_kit
 {
 
@@ -71,9 +66,31 @@ namespace code_creation_kit
     public:
         typedef CBackEndTokenizer<TokenT, StringT, OutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
-        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
         typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
+    private:
+        typedef typename StringT::const_iterator IteratorT;
+        typedef typename TokenT::SharedStringListT SharedStringListT;
+        typedef typename TokenT::StringListT StringListT;
+        typedef void (*ParseParameters)(IteratorT& start, const IteratorT& end, StringListT& parameters);
+        typedef void (*CheckParameters)(const StringListT& container);
+        class TokenData
+        {
+        public:
+            TokenData(typename TokenT::ETokenT tokenId = TokenT::eInvalid, size_t parameterCount = 0, ParseParameters parseFunction = 0, CheckParameters checkParameters = 0)
+                : TokenId(tokenId)
+                , ParameterCount(parameterCount)
+                , ParseFunction(parseFunction)
+                , CheckFunction(checkParameters)
+            {
+            }
+            
+            typename TokenT::ETokenT TokenId;
+            size_t ParameterCount;
+            ParseParameters ParseFunction;
+            CheckParameters CheckFunction;
+        };
+    public:
 
         CBackEndTokenizer()
             : m_outputStream(0)
@@ -112,6 +129,10 @@ namespace code_creation_kit
         ///sets up regex search expression; 
         void setMarkup( const StringT& prefix, const StringT& postfix)
         {
+            m_tokenFinder.clear();
+            m_tokenData.clear();
+            m_markupPostfix = postfix;
+            
             m_commentKeyword = prefix + STRING_LITERAL("COMMENT") + postfix;
             m_commentDotKeyword = prefix + STRING_LITERAL("COMMENT.") + postfix;
             m_trimKeyword = prefix + STRING_LITERAL("TRIM") + postfix;
@@ -121,75 +142,121 @@ namespace code_creation_kit
             m_trimRightKeyword = prefix + STRING_LITERAL("TRIM_RIGHT") + postfix;
             m_trimRightDotKeyword = prefix + STRING_LITERAL("TRIM_RIGHT.") + postfix;
 
-            StringT regexPrefix = prefix;
-            StringT regexPostfix = postfix;
-            CSpecialRegexCharacterPrefixer::prefixSpecialCharacters( regexPrefix);
-            CSpecialRegexCharacterPrefixer::prefixSpecialCharacters( regexPostfix);
-
-            StringT expression;
-            StringT front = StringT() + STRING_LITERAL("|") + STRING_LITERAL("(") + regexPrefix;
-            StringT back = regexPostfix + STRING_LITERAL(")");
-            back = StringT() + STRING_LITERAL("(\\.*)") + back;
-
-            expression += STRING_LITERAL("(\r\n|\n)");
-            expression += front + STRING_LITERAL("COMMENT") + back;
-            expression += front + STRING_LITERAL("INCLUDE") + back;
-            expression += front + STRING_LITERAL("SET_MARKUP") + back;
-            expression += front + STRING_LITERAL("TRIM") + back;
-            expression += front + STRING_LITERAL("TRIM_LEFT") + back;
-            expression += front + STRING_LITERAL("TRIM_RIGHT") + back;
-            expression += front + STRING_LITERAL("PART") + back;
-            expression += front + STRING_LITERAL("PART_BEGIN") + back;
-            expression += front + STRING_LITERAL("PART_END") + back;
-            expression += front + STRING_LITERAL("PART_LAZY") + back;
-            expression += front + STRING_LITERAL("PART_PADDING") + back;
-            expression += front + STRING_LITERAL("PART_REMOVE") + back;
-            expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + back;
-            expression += front + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + back;
-            expression += front + STRING_LITERAL("TABLE_BEGIN") + back;
-            expression += front + STRING_LITERAL("TABLE_END") + back;
-            expression += front + STRING_LITERAL("TABLE_LOAD") + back;
-            expression += front + STRING_LITERAL("TABLE_REMOVE") + back;
-            expression += front + STRING_LITERAL("ANY") + back;
-            expression += front + STRING_LITERAL("AS_VOLATILE") + back;
-            expression += front + STRING_LITERAL("BEGIN") + back;
-            expression += front + STRING_LITERAL("BLOCK_FORMAT") + back;
-            expression += front + STRING_LITERAL("CALC") + back;
-            expression += front + STRING_LITERAL("CONTAINS") + back;
-            expression += front + STRING_LITERAL("COUNT") + back;
-            expression += front + STRING_LITERAL("END") + back;
-            expression += front + STRING_LITERAL("ENDS_WITH") + back;
-            expression += front + STRING_LITERAL("ENTRY") + back;
-            expression += front + STRING_LITERAL("EQUALS") + back;
-            expression += front + STRING_LITERAL("ERROR") + back;
-            expression += front + STRING_LITERAL("FIRST_TIME") + back;
-            expression += front + STRING_LITERAL("FLUSH") + back;
-            expression += front + STRING_LITERAL("FOR_ALL") + back;
-            expression += front + STRING_LITERAL("HTML_ESCAPE") + back;
-            expression += front + STRING_LITERAL("IF") + back;
-            expression += front + STRING_LITERAL("IGNORE_CASE") + back;
-            expression += front + STRING_LITERAL("INDEX") + back;
-            expression += front + STRING_LITERAL("LAST_TIME") + back;
-            expression += front + STRING_LITERAL("MACRO_BEGIN") + back;
-            expression += front + STRING_LITERAL("MACRO_END") + back;
-            expression += front + STRING_LITERAL("MATCHES_REGEX") + back;
-            expression += front + STRING_LITERAL("MERGE") + back;
-            expression += front + STRING_LITERAL("NOT") + back;
-            expression += front + STRING_LITERAL("OR") + back;
-            expression += front + STRING_LITERAL("PAD_LEFT") + back;
-            expression += front + STRING_LITERAL("PAD_RIGHT") + back;
-            expression += front + STRING_LITERAL("READ_LEFT_TO_RIGHT") + back;
-            expression += front + STRING_LITERAL("READ_TOP_DOWN") + back;
-            expression += front + STRING_LITERAL("REGEX_REPLACE") + back;
-            expression += front + STRING_LITERAL("REPLACE") + back;
-            expression += front + STRING_LITERAL("STARTS_WITH") + back;
-            expression += front + STRING_LITERAL("TO_CSTRING") + back;
-            expression += front + STRING_LITERAL("TO_CSV") + back;
-            expression += front + STRING_LITERAL("TO_LOWER") + back;
-            expression += front + STRING_LITERAL("TO_SIZE") + back;
-            expression += front + STRING_LITERAL("TO_UPPER") + back;
-
-            m_searchExpression = RegexT( expression);
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("COMMENT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eComment));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("INCLUDE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eInclude, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_MARKUP"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eMarkup, 2, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TRIM"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTrim));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TRIM_LEFT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTrimLeft));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TRIM_RIGHT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTrimRight));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePart, 0, KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional<IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_BEGIN"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePartBegin, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_END"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePartEnd));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_LAZY"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePartLazy, 0, KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional<IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_PADDING"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePartPadding));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_REMOVE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePartRemove, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eSetRecursionLevelLimit));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eSetRecursionLevelLimitOff));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_BEGIN"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTableBegin, 0, KeywordParameterParser::getParametersCombi1Plain2CStyleOptional1PlainOptional1CStyleOptional<IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_END"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTableEnd));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_LOAD"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTableLoad, 0, KeywordParameterParser::getParametersCombi2Plain2CStyleOptional1PlainOptional1CStyleOptional<IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_REMOVE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTableRemove, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("ANY"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eAny));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("AS_VOLATILE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eVolatil));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("BEGIN"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eBegin));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("BLOCK_FORMAT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eBlockFormat, 1, KeywordParameterParser::getParameters<CUIntParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("CALC"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eCalc, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("CONTAINS"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eContains, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("COUNT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eCount));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("END"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eEnd));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("ENDS_WITH"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eEndsWith, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("ENTRY"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eEntry, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("EQUALS"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eMatches, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("ERROR"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eError_, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("FIRST_TIME"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eFirstTime));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("FLUSH"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eFlush));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("FOR_ALL"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eForAll));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("HTML_ESCAPE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eHtmlEscape));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("IF"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eIf_));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("IGNORE_CASE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eIgnoreCase));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("INDEX"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eIndex));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("LAST_TIME"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eLastTime));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("MACRO_BEGIN"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eMacroBegin));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("MACRO_END"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eMacroEnd));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("MATCHES_REGEX"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eRegexMatches, 1, KeywordParameterParser::getParameters<CRegexParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("MERGE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eMerge, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("NOT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eNot_));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("OR"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eOr_));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PAD_LEFT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePadLeft, 0, KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional<IteratorT, StringListT>, checkPadParameters));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("PAD_RIGHT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::ePadRight, 0, KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional<IteratorT, StringListT>, checkPadParameters));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("READ_LEFT_TO_RIGHT"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eLeftToRight));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("READ_TOP_DOWN"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eTopDown));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("REGEX_REPLACE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eRegexReplace, 2, KeywordParameterParser::getParameters<CRegexParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("REPLACE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eReplace, 2, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("STARTS_WITH"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eStartsWith, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_CSTRING"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eToCString));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_CSV"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eToCsv, 0, KeywordParameterParser::getParametersCombi1CStyle1CStyleOptional<IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_LOWER"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eToLower));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_SIZE"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eToSize, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_UPPER"), m_tokenData.size());
+            m_tokenData.push_back(TokenData(TokenT::eToUpper));
+            m_tokenFinder.add_token(STRING_LITERAL("\r\n"), m_tokenData.size());
+            m_tokenFinder.add_token(STRING_LITERAL("\n"), m_tokenData.size());
+            m_tokenData.emplace_back(TokenT::eNewLine);
         }
 
         ///connect receiver of processed stream
@@ -202,8 +269,8 @@ namespace code_creation_kit
         template <typename PredicateT>
         RangeT trimRange( const StringT& line, PredicateT isSpace)
         {
-            typename StringT::const_iterator start = line.begin();
-            typename StringT::const_iterator end = line.end();
+            IteratorT start = line.begin();
+            IteratorT end = line.end();
             while( start != end && isSpace( *start)) { ++start; }
             while( start != end && isSpace( *--end));
             if ( end != line.end()) ++end;
@@ -211,41 +278,42 @@ namespace code_creation_kit
         }
 
         ///removes a delay mark if needed
-        template <typename WhatT>
-        bool removeTick( WhatT& what, int pos)
+        bool removeTick( IteratorT tokenBegin, IteratorT dotsBegin, IteratorT dotsEnd, IteratorT tokenEnd)
         {
             // if there is more than one delay mark, remove delay mark and output as text
             // one delay mark triggers processing
             // remove delay mark and output in bypass mode in any case
-            if ( (what[ pos ].second - what[ pos ].first) > (m_bypassMode ? 0 : 1) )
+            if ( (dotsEnd - dotsBegin) > (m_bypassMode ? 0 : 1) )
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos - 1 ].first, what[ pos ].first);
-                *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos ].first + 1, what[ pos - 1 ].second);
+                *m_outputStream << TokenT( TokenT::eTextFragment, tokenBegin, dotsBegin);
+                *m_outputStream << TokenT( TokenT::eTextFragment, dotsBegin + 1, tokenEnd);
                 return true;
             }
-            else if ( m_bypassMode) // remove delay mark and output in bypass mode in any case
+            else if ( m_bypassMode) // output in bypass mode
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, what[ pos - 1 ].first, what[ pos - 1 ].second);
+                *m_outputStream << TokenT( TokenT::eTextFragment, tokenBegin, tokenEnd);
                 return true;
             }
 
             return false;
         }
 
-        template <typename WhatT>
-        typename TokenT::SharedStringListT getSourceText( WhatT& what, int pos, typename StringT::const_iterator& endPos)
+        SharedStringListT getSourceText(
+            IteratorT tokenBegin,
+            IteratorT dotsBegin,
+            IteratorT dotsEnd,
+            IteratorT& endPos
+            )
         {
-            pos = pos * 2 - 1;
-            if ( (what[ pos ].second - what[ pos ].first) > 0 )
+            if ( (dotsEnd - dotsBegin) > 0 )
             {
-                typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(2);
-                list->front().assign( what[ pos - 1 ].first, what[ pos ].first);
-                list->back().assign( what[ pos ].first + 1, endPos);
+                SharedStringListT list = std::make_shared<typename TokenT::StringListT>(2);
+                list->front().assign( tokenBegin, dotsBegin);
+                list->back().assign( dotsBegin + 1, endPos);
                 return list;
             }
-            --pos;
-            typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>(1);
-            list->front().assign( what[ pos ].first, endPos);
+            SharedStringListT list = std::make_shared<typename TokenT::StringListT>(1);
+            list->front().assign( tokenBegin, endPos);
             return list;
         }
 
@@ -253,12 +321,11 @@ namespace code_creation_kit
         ThisT& operator <<( const StringT& line)
         {
             bool trimmedRight = false;
-            regex_namespace::match_results<typename StringT::const_iterator> what;
-            typename StringT::const_iterator start = line.begin();
-            typename StringT::const_iterator fullLineStart = line.begin();
-            typename StringT::const_iterator end = line.end(); 
-            typename StringT::const_iterator trimLeftTokenTrailingTextBegin = end;
-            typename StringT::const_iterator trimLeftTokenTrailingTextEnd = end;
+            IteratorT textBegin = line.begin();
+            IteratorT fullLineBegin = line.begin();
+            IteratorT textEnd = line.end(); 
+            IteratorT trimLeftTokenTrailingTextBegin = textEnd;
+            IteratorT trimLeftTokenTrailingTextEnd = textEnd;
 
             //check if the line needs to be trimmed or is comment
             for (;!m_bypassMode;)
@@ -275,60 +342,66 @@ namespace code_creation_kit
                 if ( boost::ends_with( range, m_trimKeyword))
                 {
                     size_t keywordSize = m_trimKeyword.size();
-                    start = range.begin();
-                end = range.end() - keywordSize;
-                trimmedRight = true;
-                break;
+                    textBegin = range.begin();
+                    textEnd = range.end() - keywordSize;
+                    trimmedRight = true;
+                    break;
                 }
                 if ( boost::ends_with( range, m_trimDotKeyword))
                 {
                     size_t keywordSize = m_trimDotKeyword.size();
-                    start = range.begin();
-                end = range.end() - keywordSize;
-                trimmedRight = true;
-                break;
+                    textBegin = range.begin();
+                    textEnd = range.end() - keywordSize;
+                    trimmedRight = true;
+                    break;
                 }
                 if ( boost::ends_with( range, m_trimLeftKeyword))
                 {
                     size_t keywordSize = m_trimLeftKeyword.size();
-                    start = range.begin();
-                end = range.end() - keywordSize;
-                trimLeftTokenTrailingTextBegin = range.end();
-                break;
+                    textBegin = range.begin();
+                    textEnd = range.end() - keywordSize;
+                    trimLeftTokenTrailingTextBegin = range.end();
+                    break;
                 }
                 if ( boost::ends_with( range, m_trimLeftDotKeyword))
                 {
                     size_t keywordSize = m_trimLeftDotKeyword.size();
-                    start = range.begin();
-                end = range.end() - keywordSize;
-                trimLeftTokenTrailingTextBegin = range.end();
-                break;
+                    textBegin = range.begin();
+                    textEnd = range.end() - keywordSize;
+                    trimLeftTokenTrailingTextBegin = range.end();
+                    break;
                 }
                 if ( boost::ends_with( range, m_trimRightKeyword))
                 {
                     size_t keywordSize = m_trimRightKeyword.size();
-                    end = range.end() - keywordSize;
-                trimmedRight = true;
-                break;
+                    textEnd = range.end() - keywordSize;
+                    trimmedRight = true;
+                    break;
                 }
                 if ( boost::ends_with( range, m_trimRightDotKeyword))
                 {
                     size_t keywordSize = m_trimRightDotKeyword.size();
-                    end = range.end() - keywordSize;
-                trimmedRight = true;
-                break;
+                    textEnd = range.end() - keywordSize;
+                    trimmedRight = true;
+                    break;
                 }
                 break;
             }
 
-            while( regex_search(start, end, what, m_searchExpression)) 
+            IteratorT tokenBegin;
+            IteratorT tokenEnd;
+            size_t index = 0;
+
+            while(m_tokenFinder.find_token(textBegin, textEnd, tokenBegin, tokenEnd, index)) 
             {
+                const TokenData& tokenData = m_tokenData[index];
+                
                 //if full line without tags, output as special token
-                if ( what[ TokenT::eNewLine ].matched && start == fullLineStart )
+                if ( TokenT::eNewLine == tokenData.TokenId && textBegin == fullLineBegin )
                 {
-                    *m_outputStream << TokenT( TokenT::eFullLineWithoutTags, start, what[ TokenT::eNewLine ].second);
-                    start = what[ 0 ].second;
-                    if ( what[ TokenT::eNewLine ].second == end)
+                    *m_outputStream << TokenT( TokenT::eFullLineWithoutTags, textBegin, tokenEnd);
+                    textBegin = tokenEnd;
+                    if ( tokenEnd == textEnd)
                     {
                         break;
                     }
@@ -337,47 +410,65 @@ namespace code_creation_kit
                         continue;
                     }
                 }
-
-                //forward preceding text as token, if not empty
-                if ( start != what[ 0 ].first )
+                // In back end we only found the first part of the tag, now we look for tick mark dots
+                IteratorT dotsBegin = tokenEnd;
+                IteratorT dotsEnd = tokenEnd;
+                if (TokenT::eNewLine != tokenData.TokenId) //but not when new line
                 {
-                    *m_outputStream << TokenT( TokenT::eTextFragment, start, what[ 0 ].first);
+                    for (;dotsBegin != textEnd;++dotsEnd)
+                    {
+                        if (*dotsEnd != STRING_LITERAL('.'))
+                        {
+                            break;
+                        }
+                    }
+                    
+                    // Check if the markup postfix is present
+                    if (boost::starts_with(RangeT(dotsEnd, textEnd), m_markupPostfix))
+                    {
+                        // Advance token end
+                        tokenEnd = dotsEnd + m_markupPostfix.size();
+                    }
+                    else
+                    {
+                        // Token not complete, continue search with the next character
+                        ++textBegin;
+                        continue;
+                    }
+                }
+                
+                //forward preceding text as token, if not empty
+                if ( textBegin != tokenBegin )
+                {
+                    *m_outputStream << TokenT( TokenT::eTextFragment, textBegin, tokenBegin);
                 }
 
-                //set start position for next loop iteration
-                start = what[ 0 ].second;
+                //set textBegin position for next loop iteration
+                textBegin = tokenEnd;
 
                 //process tokens
-                if ( what[ TokenT::eNewLine ].matched )
+                if ( TokenT::eNewLine == tokenData.TokenId )
                 {
-                    *m_outputStream << TokenT( TokenT::eNewLine, what[ TokenT::eNewLine ].first, what[ TokenT::eNewLine ].second);
+                    *m_outputStream << TokenT( TokenT::eNewLine, tokenBegin, tokenEnd);
                 }
-                else if ( what[ (TokenT::eComment-1)*2 ].matched )
+                else if ( tokenData.ParseFunction )
                 {
-                    if ( removeTick( what, (TokenT::eComment * 2) - 1))
+                    if ( removeTick( tokenBegin, dotsBegin, dotsEnd, tokenEnd))
                     {
                         continue;
                     }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eComment, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eComment, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eComment);
-                    }
-                }
-                else if ( what[ (TokenT::eInclude-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eInclude * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
+                    SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
                     try
                     {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
+                        if (tokenData.ParameterCount)
+                        {
+                            list->resize(tokenData.ParameterCount);
+                        }
+                        tokenData.ParseFunction(textBegin, textEnd, *list);
+                        if (tokenData.CheckFunction)
+                        {
+                            tokenData.CheckFunction(*list);
+                        }
                     }
                     catch(...)
                     {
@@ -386,1241 +477,49 @@ namespace code_creation_kit
                         {
                             *m_logOutputStream << "Error parsing parameters in line:\n";
                             *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
+                            *m_logOutputStream << StringT(fullLineBegin,textBegin) << "\n";
                         }
                         throw;
                     }
                     if ( isLoggingEnabled())
                     {
-                        *m_outputStream << TokenT( TokenT::eInclude, list, getSourceText( what, TokenT::eInclude, start));
+                        *m_outputStream << TokenT( tokenData.TokenId, list, getSourceText( tokenBegin, dotsBegin, dotsEnd, textBegin /*has been updated*/));
                     }
                     else
                     {
-                        *m_outputStream << TokenT( TokenT::eInclude, list);
-                    }
-                }
-                else if ( what[ (TokenT::eMarkup-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eMarkup * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(2);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eMarkup, list, getSourceText( what, TokenT::eMarkup, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eMarkup, list);
-                    }
-                }
-                else if ( what[ (TokenT::eTrim-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTrim * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrim, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTrim, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrim);
-                    }
-                }
-                else if ( what[ (TokenT::eTrimLeft-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTrimLeft * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrimLeft, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTrimLeft, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrimLeft);
-                    }
-                }
-                else if ( what[ (TokenT::eTrimRight-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTrimRight * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrimRight, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTrimRight, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTrimRight);
-                    }
-                }
-                else if ( what[ (TokenT::ePart-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePart * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional(start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePart, list, getSourceText( what, TokenT::ePart, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePart, list);
-                    }
-                }
-                else if ( what[ (TokenT::ePartBegin-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePartBegin * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartBegin, list, getSourceText( what, TokenT::ePartBegin, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartBegin, list);
-                    }
-                }
-                else if ( what[ (TokenT::ePartEnd-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePartEnd * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartEnd, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::ePartEnd, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartEnd);
-                    }
-                }
-                else if ( what[ (TokenT::ePartLazy-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePartLazy * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional(start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartLazy, list, getSourceText( what, TokenT::ePartLazy, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartLazy, list);
-                    }
-                }
-                else if ( what[ (TokenT::ePartPadding-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePartPadding * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartPadding, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::ePartPadding, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartPadding);
-                    }
-                }
-                else if ( what[ (TokenT::ePartRemove-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePartRemove * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartRemove, list, getSourceText( what, TokenT::ePartRemove, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePartRemove, list);
-                    }
-                }
-                else if ( what[ (TokenT::eSetRecursionLevelLimit-1)*2 ].matched )
-                {
-                    //turn limit off to make sure that the new limit gets processed
-                    *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
-
-                    if ( removeTick( what, (TokenT::eSetRecursionLevelLimit * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eSetRecursionLevelLimit, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimit);
-                    }
-                }
-                else if ( what[ (TokenT::eSetRecursionLevelLimitOff-1)*2 ].matched )
-                {
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eSetRecursionLevelLimitOff, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
-                    }
-                }
-                else if ( what[ (TokenT::eTableBegin-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTableBegin * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1Plain2CStyleOptional1PlainOptional1CStyleOptional(start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableBegin, list, getSourceText( what, TokenT::eTableBegin, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableBegin, list);
-                    }
-                }
-                else if ( what[ (TokenT::eTableEnd-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTableEnd * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableEnd, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTableEnd, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableEnd);
-                    }
-                }
-                else if ( what[ (TokenT::eTableLoad-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTableLoad * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi2Plain2CStyleOptional1PlainOptional1CStyleOptional(start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableLoad, list, getSourceText( what, TokenT::eTableLoad, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableLoad, list);
-                    }
-                }
-                else if ( what[ (TokenT::eTableRemove-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTableRemove * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableRemove, list, getSourceText( what, TokenT::eTableRemove, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTableRemove, list);
-                    }
-                }
-                else if ( what[ (TokenT::eAny-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eAny * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eAny, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eAny, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eAny);
-                    }
-                }
-                else if ( what[ (TokenT::eVolatil-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eVolatil * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eVolatil, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eVolatil, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eVolatil);
-                    }
-                }
-                else if ( what[ (TokenT::eBegin-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eBegin * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eBegin, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eBegin, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eBegin);
-                    }
-                }
-                else if ( what[ (TokenT::eBlockFormat-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eBlockFormat * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CUIntParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eBlockFormat, list, getSourceText( what, TokenT::eBlockFormat, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eBlockFormat, list);
-                    }
-                }
-                else if ( what[ (TokenT::eCalc-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eCalc * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eCalc, list, getSourceText( what, TokenT::eCalc, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eCalc, list);
-                    }
-                }
-                else if ( what[ (TokenT::eContains-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eContains * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eContains, list, getSourceText( what, TokenT::eContains, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eContains, list);
-                    }
-                }
-                else if ( what[ (TokenT::eCount-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eCount * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eCount, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eCount, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eCount);
-                    }
-                }
-                else if ( what[ (TokenT::eEnd-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eEnd * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eEnd, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eEnd, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eEnd);
-                    }
-                }
-                else if ( what[ (TokenT::eEndsWith-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eEndsWith * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eEndsWith, list, getSourceText( what, TokenT::eEndsWith, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eEndsWith, list);
-                    }
-                }
-                else if ( what[ (TokenT::eEntry-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eEntry * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eEntry, list, getSourceText( what, TokenT::eEntry, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eEntry, list);
-                    }
-                }
-                else if ( what[ (TokenT::eMatches-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eMatches * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eMatches, list, getSourceText( what, TokenT::eMatches, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eMatches, list);
-                    }
-                }
-                else if ( what[ (TokenT::eError_-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eError_ * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eError_, list, getSourceText( what, TokenT::eError_, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eError_, list);
-                    }
-                }
-                else if ( what[ (TokenT::eFirstTime-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eFirstTime * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eFirstTime, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eFirstTime, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eFirstTime);
-                    }
-                }
-                else if ( what[ (TokenT::eFlush-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eFlush * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eFlush, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eFlush, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eFlush);
-                    }
-                }
-                else if ( what[ (TokenT::eForAll-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eForAll * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eForAll, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eForAll, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eForAll);
-                    }
-                }
-                else if ( what[ (TokenT::eHtmlEscape-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eHtmlEscape * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eHtmlEscape, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eHtmlEscape, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eHtmlEscape);
-                    }
-                }
-                else if ( what[ (TokenT::eIf_-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eIf_ * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eIf_, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eIf_, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eIf_);
-                    }
-                }
-                else if ( what[ (TokenT::eIgnoreCase-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eIgnoreCase * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eIgnoreCase, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eIgnoreCase, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eIgnoreCase);
-                    }
-                }
-                else if ( what[ (TokenT::eIndex-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eIndex * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eIndex, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eIndex, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eIndex);
-                    }
-                }
-                else if ( what[ (TokenT::eLastTime-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eLastTime * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eLastTime, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eLastTime, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eLastTime);
-                    }
-                }
-                else if ( what[ (TokenT::eMacroBegin-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eMacroBegin * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eMacroBegin, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eMacroBegin, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eMacroBegin);
-                    }
-                }
-                else if ( what[ (TokenT::eMacroEnd-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eMacroEnd * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eMacroEnd, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eMacroEnd, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eMacroEnd);
-                    }
-                }
-                else if ( what[ (TokenT::eRegexMatches-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eRegexMatches * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CRegexParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eRegexMatches, list, getSourceText( what, TokenT::eRegexMatches, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eRegexMatches, list);
-                    }
-                }
-                else if ( what[ (TokenT::eMerge-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eMerge * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eMerge, list, getSourceText( what, TokenT::eMerge, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eMerge, list);
-                    }
-                }
-                else if ( what[ (TokenT::eNot_-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eNot_ * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eNot_, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eNot_, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eNot_);
-                    }
-                }
-                else if ( what[ (TokenT::eOr_-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eOr_ * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eOr_, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eOr_, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eOr_);
-                    }
-                }
-                else if ( what[ (TokenT::ePadLeft-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePadLeft * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(start, end, *list);
-                        checkPadParameters(*list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePadLeft, list, getSourceText( what, TokenT::ePadLeft, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePadLeft, list);
-                    }
-                }
-                else if ( what[ (TokenT::ePadRight-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::ePadRight * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(start, end, *list);
-                        checkPadParameters(*list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::ePadRight, list, getSourceText( what, TokenT::ePadRight, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::ePadRight, list);
-                    }
-                }
-                else if ( what[ (TokenT::eLeftToRight-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eLeftToRight * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eLeftToRight, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eLeftToRight, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eLeftToRight);
-                    }
-                }
-                else if ( what[ (TokenT::eTopDown-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eTopDown * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eTopDown, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eTopDown, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eTopDown);
-                    }
-                }
-                else if ( what[ (TokenT::eRegexReplace-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eRegexReplace * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(2);
-                        KeywordParameterParser::getParameters<CRegexParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eRegexReplace, list, getSourceText( what, TokenT::eRegexReplace, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eRegexReplace, list);
-                    }
-                }
-                else if ( what[ (TokenT::eReplace-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eReplace * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(2);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eReplace, list, getSourceText( what, TokenT::eReplace, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eReplace, list);
-                    }
-                }
-                else if ( what[ (TokenT::eStartsWith-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eStartsWith * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CCStyleParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eStartsWith, list, getSourceText( what, TokenT::eStartsWith, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eStartsWith, list);
-                    }
-                }
-                else if ( what[ (TokenT::eToCString-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eToCString * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eToCString, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eToCString, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eToCString);
-                    }
-                }
-                else if ( what[ (TokenT::eToCsv-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eToCsv * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        KeywordParameterParser::getParametersCombi1CStyle1CStyleOptional(start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eToCsv, list, getSourceText( what, TokenT::eToCsv, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eToCsv, list);
-                    }
-                }
-                else if ( what[ (TokenT::eToLower-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eToLower * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eToLower, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eToLower, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eToLower);
-                    }
-                }
-                else if ( what[ (TokenT::eToSize-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eToSize * 2) - 1))
-                    {
-                        continue;
-                    }
-                    typename TokenT::SharedStringListT list = std::make_shared<typename TokenT::StringListT>();
-                    try
-                    {
-                        list->resize(1);
-                        KeywordParameterParser::getParameters<CPlainParameterPolicy>( start, end, *list);
-                    }
-                    catch(...)
-                    {
-                        //log
-                        if ( isLoggingEnabled())
-                        {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineStart,start) << "\n";
-                        }
-                        throw;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eToSize, list, getSourceText( what, TokenT::eToSize, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eToSize, list);
-                    }
-                }
-                else if ( what[ (TokenT::eToUpper-1)*2 ].matched )
-                {
-                    if ( removeTick( what, (TokenT::eToUpper * 2) - 1))
-                    {
-                        continue;
-                    }
-                    if ( isLoggingEnabled())
-                    {
-                        *m_outputStream << TokenT( TokenT::eToUpper, typename TokenT::SharedStringListT(), getSourceText( what, TokenT::eToUpper, start));
-                    }
-                    else
-                    {
-                        *m_outputStream << TokenT( TokenT::eToUpper);
+                        *m_outputStream << TokenT( tokenData.TokenId, list);
                     }
                 }
                 else
                 {
-                    throw std::runtime_error( "Unexpected match found in tokenizer.");
+                    if (tokenData.TokenId == TokenT::eSetRecursionLevelLimit)
+                    {
+                        // Turn limit off to make sure that the new limit gets processed
+                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+                    }
+                    if (tokenData.TokenId == TokenT::eSetRecursionLevelLimitOff)
+                    {
+                        // This tag is always processed. Delay dots have no effect.
+                    }
+                    else if ( removeTick( tokenBegin, dotsBegin, dotsEnd, tokenEnd))
+                    {
+                        continue;
+                    }
+                    if ( isLoggingEnabled())
+                    {
+                        *m_outputStream << TokenT( tokenData.TokenId, SharedStringListT(), getSourceText( tokenBegin, dotsBegin, dotsEnd, tokenEnd));
+                    }
+                    else
+                    {
+                        *m_outputStream << TokenT( tokenData.TokenId);
+                    }
                 }
             }
 
-            if ( start != end)
+            if ( textBegin != textEnd)
             {
-                //if full line without tags, output as special token used for optimizations, otherwise ouput text fragment
-                *m_outputStream << TokenT( (start == fullLineStart && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, start, end);
+                //if full line without tags, output as special token used for optimizations, otherwise output text fragment
+                *m_outputStream << TokenT( (textBegin == fullLineBegin && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, textBegin, textEnd);
             }
             if ( trimmedRight)
             {
@@ -1629,7 +528,7 @@ namespace code_creation_kit
             }
             else if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextEnd)
             {
-                typename StringT::const_iterator trimLeftTokenTrailingTextNewLine = trimLeftTokenTrailingTextEnd - 1;
+                IteratorT trimLeftTokenTrailingTextNewLine = trimLeftTokenTrailingTextEnd - 1;
                 //trailing text ends with new line?
                 if (*trimLeftTokenTrailingTextNewLine == STRING_LITERAL('\n'))
                 {
@@ -1653,10 +552,12 @@ namespace code_creation_kit
             return m_logOutputStream != NULL;
         }
     private:
-        RegexT m_searchExpression; ///<used for finding keywords and new line
+        std::vector<TokenData> m_tokenData;
+        cpptokenfinder::token_finder<CharT, size_t, size_t, size_t(-1)> m_tokenFinder;
         OutputStreamT* m_outputStream; ///<sink for tokens
         bool m_closing;///<output line fragments as full line if closing to force flush
         bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal
+        StringT m_markupPostfix;///<used when processing tick marks in back textEnd
         StringT m_commentKeyword; ///<used for special preprocessing action
         StringT m_commentDotKeyword; ///<used for special preprocessing action
         StringT m_trimKeyword; ///<used for special preprocessing action

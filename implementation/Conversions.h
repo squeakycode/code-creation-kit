@@ -31,15 +31,7 @@
 #include <cassert>
 #include <memory>
 #include <map>
-
-#if defined(CCK_USE_STD_REGEX)
-#   include <regex>
-    namespace regex_namespace = std;
-#else
-#   include <boost/regex.hpp>
-    namespace regex_namespace = boost;
-#endif
-
+#include <regex>
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -128,7 +120,7 @@ namespace code_creation_kit
     class CRegexReplaceConversion : public ConversionDirectives<StringT>, public CRegexReplaceConversionExceptions
     {
     public:
-        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
+        typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;
         typedef CRegexReplaceConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
@@ -140,7 +132,7 @@ namespace code_creation_kit
             try
             {
                 m_regexReplace = RegexT( m_replace);
-                m_regexReplaceIgnoreCase = RegexT( m_replace, regex_namespace::regex::icase);
+                m_regexReplaceIgnoreCase = RegexT( m_replace, std::regex::icase);
             }
             catch(...)
             {
@@ -182,11 +174,11 @@ namespace code_creation_kit
             {
                 if ( m_ignoreCase)
                 {
-                    text = regex_namespace::regex_replace( text, m_regexReplaceIgnoreCase, m_with);
+                    text = std::regex_replace( text, m_regexReplaceIgnoreCase, m_with);
                 }
                 else
                 {
-                    text = regex_namespace::regex_replace( text, m_regexReplace, m_with);
+                    text = std::regex_replace( text, m_regexReplace, m_with);
                 }
             }
         }

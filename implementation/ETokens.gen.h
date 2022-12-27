@@ -37,6 +37,7 @@ namespace code_creation_kit
         ///the tokens
         enum ETokens
         {
+            eInvalid = 0,
             eNewLine = 1,
             eComment,
             eInclude,

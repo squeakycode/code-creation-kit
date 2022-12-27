@@ -30,7 +30,6 @@ add_dependencies(TSystem cck_implementation)
 target_link_libraries(TSystem
     PRIVATE
     Boost::unit_test_framework
-    Boost::regex
 )
 
 target_include_directories(TSystem PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)

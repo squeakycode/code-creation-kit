@@ -31,7 +31,6 @@ target_link_libraries(ccktc
     cck_implementation 
     Boost::program_options
     Boost::filesystem
-    Boost::regex
 )
 
 custom_target_use_highest_warning_level(ccktc)

@@ -25,13 +25,7 @@
 
 #pragma once
 
-#if defined(CCK_USE_STD_REGEX)
-#   include <regex>
-    namespace regex_namespace = std;
-#else
-#   include <boost/regex.hpp>
-    namespace regex_namespace = boost;
-#endif
+#include <regex>
 
 #include "StringLiteral.h"
 #include <stdlib.h>
@@ -76,10 +70,10 @@
         StringT expandEnvironmentVariables( const StringT& text)
         {
             typedef typename StringT::value_type CharT;
-            typedef regex_namespace::basic_regex<CharT, regex_namespace::regex_traits<CharT> > RegexT;
+            typedef std::basic_regex<CharT, std::regex_traits<CharT> > RegexT;
 
             RegexT searchExpression( STRING_LITERAL( "\\$\\(([_a-zA-Z]+[_a-zA-Z0-9]*)\\)"));
-            regex_namespace::match_results<typename StringT::const_iterator> what;
+            std::match_results<typename StringT::const_iterator> what;
             typename StringT::const_iterator start = text.begin();
             typename StringT::const_iterator end = text.end(); 
             StringT result;

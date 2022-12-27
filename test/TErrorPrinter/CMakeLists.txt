@@ -35,7 +35,6 @@ target_link_libraries(TErrorPrinter
     cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
-    Boost::regex
 )
 
 custom_target_use_highest_warning_level(TErrorPrinter)

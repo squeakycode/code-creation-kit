@@ -34,7 +34,6 @@ target_link_libraries(TCommandProcessor
     Boost::unit_test_framework
     Boost::program_options
     Boost::filesystem
-    Boost::regex
 )
 
 custom_target_use_highest_warning_level(TCommandProcessor)

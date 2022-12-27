@@ -28,15 +28,7 @@
 #include "ConstraintDirectives.gen.h"
 
 #include <stdexcept>
-
-#if defined(CCK_USE_STD_REGEX)
-#   include <regex>
-    namespace regex_namespace = std;
-#else
-#   include <boost/regex.hpp>
-    namespace regex_namespace = boost;
-#endif
-
+#include <regex>
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -338,7 +330,7 @@ namespace code_creation_kit
     class CRegexMatchesConstraint : public CConstraintBase<StringT>, public CRegexMatchesConstraintExceptions
     {
     public:
-        typedef regex_namespace::basic_regex<typename StringT::value_type, regex_namespace::regex_traits<typename StringT::value_type> > RegexT;
+        typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;
         typedef CRegexMatchesConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
@@ -349,7 +341,7 @@ namespace code_creation_kit
             try
             {
                 m_regexMatches = RegexT( m_matches);
-                m_regexMatchesIgnoreCase = RegexT( m_matches, regex_namespace::regex::icase);
+                m_regexMatchesIgnoreCase = RegexT( m_matches, std::regex::icase);
             }
             catch(...)
             {
