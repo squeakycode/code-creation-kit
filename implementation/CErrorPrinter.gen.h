@@ -29,10 +29,9 @@
 
 #pragma once
 
-#include <boost/format.hpp>
-
-#include "FileSystem.h"
 #include <set>
+#include "CSimpleFormat.h"
+#include "FileSystem.h"
 #include "StringLiteral.h"
 
 #if defined BOOST_TEST_MAIN
@@ -57,7 +56,7 @@ namespace code_creation_kit
     class CErrorPrinter
     {
     public:
-        typedef boost::basic_format< typename StringT::value_type> FormatT;
+        typedef CSimpleFormat<StringT> FormatT;
         typedef typename StringT::value_type CharT; 
 
         CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}

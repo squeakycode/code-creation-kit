@@ -62,7 +62,10 @@ add_library(cck_implementation STATIC
     Conversions.h
     CParser.h
     CPositionTracker.h
+    cppstringx.hpp
+    cpptokenfinder.hpp
     CProcessingLevelControl.h
+    CSimpleFormat.h
     CSourceFile.h
     CSpecialRegexCharacterPrefixer.h
     CSubstitution.h
@@ -95,6 +98,7 @@ add_library(cck_implementation STATIC
     ParserExtensions.gen.h
     ParserExtensions.tpl.h
     ParserExtensions.xls
+    StringConvert.h
     StringLiteral.h
     Substitutions.tccmd
     System.h
