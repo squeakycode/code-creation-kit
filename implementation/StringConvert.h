@@ -23,48 +23,65 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
-
+#pragma once
+#include "cppstringx.hpp"
 #include <string>
-#include <vector>
-#include "ParameterParser.h"
 
-using namespace code_creation_kit;
-
-BOOST_AUTO_TEST_CASE( TParameterParser)
+namespace code_creation_kit
 {
-    //expected output data
-    const unsigned int rows = 4;
-    const unsigned int columns = 3;
-
-    const char* itemTable[rows][columns] =
+    //use only for ASCII character strings
+    template <typename StringOutT, typename StringInT>
+    inline StringOutT StringConvert(const StringInT& string)
     {
-        {"a","b","c"},
-        {"x","1","y"},
-        {"","2","z"},
-        {"","3",""},
-    };
+        StringOutT result = cppstringx::copy<StringOutT>(string);
+        return result;
+    }
 
-    //types used in test
-    typedef std::vector<std::vector<std::string> >  TableT;
-
-    //create table and parameter list
-    TableT table;
-    std::vector<std::string> parameterList = { "c=y", "b=1", "c=z", "a=x", "b=2", "b=3" };
-
-    //parse the list
-    size_t lastProcessed = 0;
-    ParameterParser::parse( parameterList, table, lastProcessed,'=');
-
-    //check if the data in the table and the array is the same
-    BOOST_REQUIRE( table.size() == columns );
-    for ( unsigned int row = 0; row < rows; ++row)
+    template <typename StringOutT, typename IntT>
+    inline StringOutT ToString(IntT number)
     {
-        for ( unsigned int col = 0; col < columns; ++col)
-        {
-            BOOST_REQUIRE( table[col].size() == rows );
-            BOOST_CHECK( table[col][row] == itemTable[row][col] );
-        }
+        //extend the ToString variants below if you get compile errors here
+    }
+
+    template <>
+    inline std::string ToString<std::string, int>(int number)
+    {
+        std::string result = std::to_string(number);
+        return result;
+    }
+
+    template <>
+    inline std::wstring ToString<std::wstring, int>(int number)
+    {
+        std::wstring result = std::to_wstring(number);
+        return result;
+    }
+
+    template <>
+    inline std::string ToString<std::string, size_t>(size_t number)
+    {
+        std::string result = std::to_string(number);
+        return result;
+    }
+
+    template <>
+    inline std::wstring ToString<std::wstring, size_t>(size_t number)
+    {
+        std::wstring result = std::to_wstring(number);
+        return result;
+    }
+
+    template <>
+    inline std::string ToString<std::string, int64_t>(int64_t number)
+    {
+        std::string result = std::to_string(number);
+        return result;
+    }
+
+    template <>
+    inline std::wstring ToString<std::wstring, int64_t>(int64_t number)
+    {
+        std::wstring result = std::to_wstring(number);
+        return result;
     }
 }

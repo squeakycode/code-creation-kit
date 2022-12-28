@@ -226,22 +226,22 @@ void toErrorStream(std::wstring text1, std::wstring text2)
 }
 
 template <typename StringT>
-void testCalculation(const StringT& in, const StringT& out, const StringT& expression)
+void testCalculation(const std::string& in, const std::string& out, const std::string& expression)
 {
     typedef typename StringT::value_type CharT;
     {
-        CCalcConversion<StringT> calc(expression);
+        CCalcConversion<StringT> calc(StringConvert<StringT>(expression));
 
         std::vector<StringT> v;
-        v.push_back(in);
+        v.push_back(StringConvert<StringT>(in));
 
         calc.modify(v);
 
-        bool result = v[0] == out;
+        bool result = v[0] == StringConvert<StringT>(out);
         if (!result)
         {
-            toErrorStream(STRING_LITERAL("Expression: "), expression);
-            toErrorStream(STRING_LITERAL("Expected: "), out);
+            toErrorStream(STRING_LITERAL("Expression: "), StringConvert<StringT>(expression));
+            toErrorStream(STRING_LITERAL("Expected: "), StringConvert<StringT>(out));
             toErrorStream(STRING_LITERAL("Result: "), v[0]);
         }
         BOOST_CHECK(result);
@@ -253,40 +253,40 @@ template <typename StringT>
 void testCalculation()
 {
     typedef typename StringT::value_type CharT;
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a/0")), CCalcConversionExceptions::ExDivisionByZero);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a%0")), CCalcConversionExceptions::ExDivisionByZero);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a+02")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("#a+2")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("#a+2")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a#+2")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a+2#")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("b+2#")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("a1"), STRING_LITERAL("3"), STRING_LITERAL("a+1")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("b*")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("b**")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("*b")), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a#+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("a1", "3", "a+1"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b*"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b**"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "*b"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
 
-    testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("3"), STRING_LITERAL("a+2"));
-    testCalculation<StringT>(STRING_LITERAL("1"), STRING_LITERAL("304"), STRING_LITERAL("a+2+300+1"));
-    testCalculation<StringT>(STRING_LITERAL("10"), STRING_LITERAL("-25"), STRING_LITERAL("a-35"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("71"), STRING_LITERAL("a/2"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("284"), STRING_LITERAL("a*2"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("2"), STRING_LITERAL("a%10"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("-142"), STRING_LITERAL("-a"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("-420"), STRING_LITERAL("(-a+2)*3"));
-    testCalculation<StringT>(STRING_LITERAL("142"), STRING_LITERAL("-420"), STRING_LITERAL("(((-a+2))*3)"));
-    testCalculation<StringT>(STRING_LITERAL("2"), STRING_LITERAL("22"), STRING_LITERAL("a+2*10"));
-    testCalculation<StringT>(STRING_LITERAL("2"), STRING_LITERAL("22"), STRING_LITERAL("2*10+a"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), STRING_LITERAL("20"), STRING_LITERAL("2*10"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), STRING_LITERAL("20"), STRING_LITERAL("-2*-10"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(312 % 100 / 2 * 5 - 4 + 1), STRING_LITERAL("312%100/2*5-4+1"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(1 + 2 - 5 * 100 / 52 % 10), STRING_LITERAL("1+2-5*100/52%10"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(1 + 2 - 5 * 100 / 52 % 10), STRING_LITERAL(" 1 + 2 - 5 * 100 / 52 % 10 "));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(+ 1 + + 2 - + 5 * + 100 / + 52 % + 10), STRING_LITERAL(" + 1 + + 2 - + 5 * + 100 / + 52 % + 10 "));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>( - 1 + - 2 - - 5 * - 100 / - 52 % - 10 ), STRING_LITERAL(" - 1 + - 2 - - 5 * - 100 / - 52 % - 10 "));
-    testCalculation<StringT>(STRING_LITERAL("4"), boost::lexical_cast<StringT>(4 + 10 / 5 * 3- -6 % 2 + 1), STRING_LITERAL("a+10/5*3--6%2+1"));
-    testCalculation<StringT>(STRING_LITERAL("1+2-5*100/52%10"), boost::lexical_cast<StringT>((1 + 2 - 5 * 100 / 52 % 10) + 10 / 5 * 3 - -6 % 2 + 1), STRING_LITERAL("a+10/5*3--6%2+1"));
-    testCalculation<StringT>(STRING_LITERAL("xyz"), boost::lexical_cast<StringT>(-(4 + 5) * +(-2 * -10)), STRING_LITERAL("-(4+5)*+(-2*-10)"));
+    testCalculation<StringT>("1", "3", "a+2");
+    testCalculation<StringT>("1", "304", "a+2+300+1");
+    testCalculation<StringT>("10", "-25", "a-35");
+    testCalculation<StringT>("142", "71", "a/2");
+    testCalculation<StringT>("142", "284", "a*2");
+    testCalculation<StringT>("142", "2", "a%10");
+    testCalculation<StringT>("142", "-142", "-a");
+    testCalculation<StringT>("142", "-420", "(-a+2)*3");
+    testCalculation<StringT>("142", "-420", "(((-a+2))*3)");
+    testCalculation<StringT>("2", "22", "a+2*10");
+    testCalculation<StringT>("2", "22", "2*10+a");
+    testCalculation<StringT>("xyz", "20", "2*10");
+    testCalculation<StringT>("xyz", "20", "-2*-10");
+    testCalculation<StringT>("xyz", std::to_string(312 % 100 / 2 * 5 - 4 + 1), "312%100/2*5-4+1");
+    testCalculation<StringT>("xyz", std::to_string(1 + 2 - 5 * 100 / 52 % 10), "1+2-5*100/52%10");
+    testCalculation<StringT>("xyz", std::to_string(1 + 2 - 5 * 100 / 52 % 10), " 1 + 2 - 5 * 100 / 52 % 10 ");
+    testCalculation<StringT>("xyz", std::to_string(+ 1 + + 2 - + 5 * + 100 / + 52 % + 10), " + 1 + + 2 - + 5 * + 100 / + 52 % + 10 ");
+    testCalculation<StringT>("xyz", std::to_string( - 1 + - 2 - - 5 * - 100 / - 52 % - 10 ), " - 1 + - 2 - - 5 * - 100 / - 52 % - 10 ");
+    testCalculation<StringT>("4", std::to_string(4 + 10 / 5 * 3- -6 % 2 + 1), "a+10/5*3--6%2+1");
+    testCalculation<StringT>("1+2-5*100/52%10", std::to_string((1 + 2 - 5 * 100 / 52 % 10) + 10 / 5 * 3 - -6 % 2 + 1), "a+10/5*3--6%2+1");
+    testCalculation<StringT>("xyz", std::to_string(-(4 + 5) * +(-2 * -10)), "-(4+5)*+(-2*-10)");
 }
 
 

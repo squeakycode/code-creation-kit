@@ -32,17 +32,8 @@
 #include <memory>
 #include <map>
 #include <regex>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "cppstringx.hpp"
+#include "StringConvert.h"
 
 namespace code_creation_kit
 {
@@ -94,11 +85,11 @@ namespace code_creation_kit
             {
                 if ( m_ignoreCase)
                 {
-                    boost::ireplace_all( text, m_replace, m_with);
+                    cppstringx::ireplace_all_in_place( text, m_replace, m_with);
                 }
                 else
                 {
-                    boost::replace_all( text, m_replace, m_with);
+                    cppstringx::replace_all_in_place( text, m_replace, m_with);
                 }
             }
         }
@@ -263,7 +254,7 @@ namespace code_creation_kit
         {
             for (StringT& text : textList)
             {
-                boost::to_lower( text);
+                cppstringx::to_lower_in_place( text);
             }
         }
     };
@@ -289,7 +280,7 @@ namespace code_creation_kit
         {
             for (StringT& text : textList)
             {
-                boost::to_upper( text);
+                cppstringx::to_upper_in_place( text);
             }
         }
     };
@@ -411,7 +402,7 @@ namespace code_creation_kit
                         else
                         {
                             result += STRING_LITERAL("&#");
-                            result += boost::lexical_cast<StringT>((int)c);
+                            result += ToString<StringT>(static_cast<int>(c));
                             result += STRING_LITERAL(";");
                         }
                         break;
@@ -642,7 +633,7 @@ namespace code_creation_kit
             }
 
             SPadWidthInfo(const StringT& padWidth)
-                : padWidth(boost::lexical_cast<size_t>(padWidth))
+                : padWidth(static_cast<size_t>(std::stoul(padWidth)))
                 , extend(!padWidth.empty() && padWidth[0] == STRING_LITERAL('+'))
             {
             }
@@ -783,7 +774,7 @@ namespace code_creation_kit
     public:
         CBlockFormatConversion(const StringT& blockWidth)
         {
-            m_blockWidth = boost::lexical_cast<size_t>(blockWidth);
+            m_blockWidth = static_cast<size_t>(std::stoul(blockWidth));
         }
 
         typedef CBlockFormatConversion<StringT> ThisT;
@@ -995,7 +986,7 @@ namespace code_creation_kit
 
                     //calculate
                     Value v = m_parsedExpression->calculate();
-                    text = boost::lexical_cast<StringT>(v.data.intValue);
+                    text = ToString<StringT>(v.data.intValue);
 
                     //detach expression from text as variable
                     if (!m_variablesMap.empty())
@@ -1651,7 +1642,7 @@ namespace code_creation_kit
 
         StringT toSize(StringT& text) const
         {
-            StringT result = boost::lexical_cast<StringT>(text.size());
+            StringT result = ToString<StringT>(text.size());
             return result;
         }
 

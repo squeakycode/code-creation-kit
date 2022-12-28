@@ -37,20 +37,10 @@ class CErrorPrinted{};
 
 #include "CommandProcessor.h"
 #include "CTargetFile.h"
+#include "StringConvert.h"
 using namespace code_creation_kit;
 
 class LogFileT;
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4512 )
-#pragma warning( disable : 4702 )
-#endif
-#include <boost/assign.hpp>
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
 
 ///stub for the generator
 template <typename StringT>
@@ -201,67 +191,67 @@ public:
 
     void setTemplateFile( const char* text)
     {
-        m_templateFile = boost::lexical_cast<StringT>(text);
+        m_templateFile = StringConvert<StringT>(text);
         m_templateFile = FileSystem::determineDependentLocation( m_templateFile);
     }
 
     void setTargetFile( const char* text)
     {
-        m_targetFile = boost::lexical_cast<StringT>(text);
+        m_targetFile = StringConvert<StringT>(text);
         m_targetFile = FileSystem::determineDependentLocation( m_targetFile);
     }
 
     void setTableFileName( const char* text)
     {
-        m_tableFileName = boost::lexical_cast<StringT>(text);
+        m_tableFileName = StringConvert<StringT>(text);
         m_tableFileName = FileSystem::determineDependentLocation( m_tableFileName);
     }
 
     void setIntermediateFileName( const char* text)
     {
-        m_intermediateFileName = boost::lexical_cast<StringT>(text);
+        m_intermediateFileName = StringConvert<StringT>(text);
         m_intermediateFileName = FileSystem::determineDependentLocation( m_intermediateFileName);
     }
 
     void setParameter( const char* text)
     {
-        m_parameters.push_back( boost::lexical_cast<StringT>(text));
+        m_parameters.push_back( StringConvert<StringT>(text));
     }
 
     void setMarkupPrefix( const char* text)
     {
-        m_markupPrefix = boost::lexical_cast<StringT>(text);
+        m_markupPrefix = StringConvert<StringT>(text);
     }
 
     void setMarkupPostfix( const char* text)
     {
-        m_markupPostfix = boost::lexical_cast<StringT>(text);
+        m_markupPostfix = StringConvert<StringT>(text);
     }
 
     void setCsvCommentCharsExpected( const char* text)
     {
-        m_csvCommentChars = boost::lexical_cast<StringT>(text);
+        m_csvCommentChars = StringConvert<StringT>(text);
     }
 
     void setLabel( const char* text)
     {
-        m_label = boost::lexical_cast<StringT>(text);
+        m_label = StringConvert<StringT>(text);
     }
 
     void setIncludeDirectory( const char* text)
     {
-        m_includeDirectory = boost::lexical_cast<StringT>(text);
+        m_includeDirectory = StringConvert<StringT>(text);
         m_includeDirectory = FileSystem::determineDependentLocation( m_includeDirectory);
     }
 
     void setSetCsvDelimiterCharsExpected(const char* text)
     {
-        m_csvDelimiterChars = boost::lexical_cast<StringT>(text);
+        m_csvDelimiterChars = StringConvert<StringT>(text);
     }
 
     void setCsvQuoteCharsExpected(const char* text)
     {
-        m_csvQuoteChars = boost::lexical_cast<StringT>(text);
+        m_csvQuoteChars = StringConvert<StringT>(text);
     }
 
     const FileSetT& getTableFiles() const
@@ -304,12 +294,12 @@ void process( ContainerT& container, GeneratorT& generator)
     std::list<StringT> argsString;
     std::vector<typename StringT::value_type*> args;
 
-    argsString.push_back( boost::lexical_cast<StringT>( "exename"));
+    argsString.push_back( StringConvert<StringT>( "exename"));
     args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
 
     for( const typename ContainerT::value_type& arg : container)
     {
-        argsString.push_back( boost::lexical_cast<StringT>( arg.c_str()));
+        argsString.push_back( StringConvert<StringT>( arg.c_str()));
         args.push_back( const_cast<typename StringT::value_type*> (argsString.back().c_str()));
     }
 
@@ -320,15 +310,13 @@ void process( ContainerT& container, GeneratorT& generator)
 template <typename StringT>
 void runTest()
 {
-    using namespace boost::assign;
     typedef TTestGenerator<StringT> GeneratorT;
     typedef typename StringT::value_type CharT;
 
     {
         //test help
         GeneratorT generator;
-        std::vector<std::string> args;
-        args += "-h";
+        std::vector<std::string> args = { "-h" };
         process<StringT>( args, generator);
     }
 
@@ -336,8 +324,7 @@ void runTest()
         //test reset
         GeneratorT generator;
         generator.m_reset = true;
-        std::vector<std::string> args;
-        args += "-c", "-r";
+        std::vector<std::string> args = { "-c", "-r" };
         process<StringT>( args, generator);
     }
 
@@ -345,8 +332,7 @@ void runTest()
         //test empty line
         GeneratorT generator;
         generator.m_reset = true;
-        std::vector<std::string> args;
-        args += "-c", "";
+        std::vector<std::string> args = { "-c", "" };
         process<StringT>( args, generator);
     }
 
@@ -355,8 +341,7 @@ void runTest()
         GeneratorT generator;
         generator.m_setLogStream = true;
         generator.m_logStream = true;
-        std::vector<std::string> args;
-        args += "-c", "--log-file none";
+        std::vector<std::string> args = { "-c", "--log-file none" };
         process<StringT>( args, generator);
         BOOST_CHECK( !generator.m_logStream);
     }
@@ -366,8 +351,7 @@ void runTest()
         GeneratorT generator;
         generator.m_setLogStream = true;
         generator.m_logStream = false;
-        std::vector<std::string> args;
-        args += "-c", "--log-file -";
+        std::vector<std::string> args = { "-c", "--log-file -" };
         process<StringT>( args, generator);
         BOOST_CHECK( generator.m_logStream);
     }
@@ -377,8 +361,7 @@ void runTest()
         GeneratorT generator;
         generator.m_setLogStream = true;
         generator.m_logStream = false;
-        std::vector<std::string> args;
-        args += "-c", "--log-file testlogfile.log";
+        std::vector<std::string> args = { "-c", "--log-file testlogfile.log" };
         process<StringT>( args, generator);
         BOOST_CHECK( generator.m_logStream);
     }
@@ -393,8 +376,7 @@ void runTest()
         generator.m_columnHeaderIndex = 1;
         generator.m_rowHeaderIndex = 1;
         generator.m_loadTable = true;
-        std::vector<std::string> args;
-        args += "-c", "table.csv";
+        std::vector<std::string> args = { "-c", "table.csv" };
         process<StringT>( args, generator);
     }
 
@@ -408,8 +390,7 @@ void runTest()
         generator.m_padRows = true;
         generator.m_columnHeaderIndex = 6;
         generator.m_rowHeaderIndex = 1;
-        std::vector<std::string> args;
-        args += "-c", "-n 6 -t \"tab le.csv\" --pad-rows";
+        std::vector<std::string> args = { "-c", "-n 6 -t \"tab le.csv\" --pad-rows" };
         process<StringT>( args, generator);
     }
     {
@@ -421,8 +402,7 @@ void runTest()
         generator.m_loadTable = true;
         generator.m_columnHeaderIndex = 1;
         generator.m_rowHeaderIndex = 0;
-        std::vector<std::string> args;
-        args += "-c", "-w 0 -l -a LabelA table.csv";
+        std::vector<std::string> args = { "-c", "-w 0 -l -a LabelA table.csv" };
         process<StringT>( args, generator);
     }
 
@@ -431,11 +411,11 @@ void runTest()
         GeneratorT generator;
         generator.m_setCsvDelimiterChars = true;
         generator.setSetCsvDelimiterCharsExpected( "\t");
-        std::vector<std::string> args;
+        std::vector<std::string> args = 
 #ifdef _MSC_VER
-        args += "-c", "--csv-delimiter \\t";
+        { "-c", "--csv-delimiter \\t" };
 #else
-        args += "-c", "--csv-delimiter \"\t\"";
+        { "-c", "--csv-delimiter \"\t\"" };
 #endif
         process<StringT>( args, generator);
     }
@@ -445,8 +425,7 @@ void runTest()
         GeneratorT generator;
         generator.m_setCsvCommentChars = true;
         generator.setCsvCommentCharsExpected( "#+");
-        std::vector<std::string> args;
-        args += "-c", "--csv-comment-chars #+";
+        std::vector<std::string> args = { "-c", "--csv-comment-chars #+" };
         process<StringT>( args, generator);
     }
 
@@ -455,8 +434,7 @@ void runTest()
         GeneratorT generator;
         generator.m_setCsvQuoteChars = true;
         generator.setCsvQuoteCharsExpected( "#-");
-        std::vector<std::string> args;
-        args += "-c", "--csv-quote-chars #-";
+        std::vector<std::string> args = { "-c", "--csv-quote-chars #-" };
         process<StringT>( args, generator);
     }
 
@@ -465,8 +443,7 @@ void runTest()
         GeneratorT generator;
         generator.setLabel( "LabelA");
         generator.m_unloadTable = true;
-        std::vector<std::string> args;
-        args += "-c", "-x LabelA LabelA";
+        std::vector<std::string> args = { "-c", "-x LabelA LabelA" };
         process<StringT>( args, generator);
     }
 
@@ -478,8 +455,7 @@ void runTest()
         generator.m_useIntermediateFile = false;
         generator.setIntermediateFileName( "b.txt.intermediate");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt" };
         process<StringT>( args, generator);
     }
 
@@ -492,8 +468,7 @@ void runTest()
         generator.m_append = true;
         generator.setIntermediateFileName( "b.txt.intermediate");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt --append-to-file";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt --append-to-file" };
         process<StringT>( args, generator);
     }
 
@@ -506,8 +481,7 @@ void runTest()
         generator.m_canChangeTableList = true;
         generator.setIntermediateFileName("b.txt.intermediate");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt --can-change-table-list";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt --can-change-table-list" };
         process<StringT>(args, generator);
     }
     
@@ -522,8 +496,7 @@ void runTest()
         generator.m_generate = true;
         generator.m_recycle = true;
         generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y";
+        std::vector<std::string> args = { "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y" };
         process<StringT>( args, generator);
     }
 
@@ -537,8 +510,7 @@ void runTest()
         generator.setParameter( "a=b");
         generator.setParameter( "name=d");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt -p a=b name=d";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt -p a=b name=d" };
         process<StringT>( args, generator);
     }
 
@@ -552,8 +524,7 @@ void runTest()
         generator.m_useIntermediateFile = false;
         generator.setIntermediateFileName( "b.txt.intermediate");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt --markup-prefix \"<<\" --markup-postfix \">>\"";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt --markup-prefix \"<<\" --markup-postfix \">>\"" };
         process<StringT>( args, generator);
     }
 
@@ -567,8 +538,7 @@ void runTest()
         generator.m_useIntermediateFile = false;
         generator.setIntermediateFileName( "b.txt.intermediate");
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-c", "-s a.txt -o b.txt -m $";
+        std::vector<std::string> args = { "-c", "-s a.txt -o b.txt -m $" };
         process<StringT>( args, generator);
     }
 
@@ -576,9 +546,8 @@ void runTest()
         //test add include directory
         GeneratorT generator;
         generator.setIncludeDirectory( "my/templates");
-        std::vector<std::string> args;
+        std::vector<std::string> args = { "-c", "-i my/templates" };
         generator.m_addIncludeDirectory = true;
-        args += "-c", "-i my/templates";
         process<StringT>( args, generator);
     }
 
@@ -598,8 +567,7 @@ void runTest()
         generator.m_leftToRight = true;
         generator.m_loadTable = true;
         generator.setParameter( "a=\"b\"");
-        std::vector<std::string> args;
-        args += "-f", CCK_TEST_INPUT_FILE_PREFIX "CommandFile.tccmd";
+        std::vector<std::string> args = { "-f", CCK_TEST_INPUT_FILE_PREFIX "CommandFile.tccmd" };
         process<StringT>( args, generator);
     }
 
@@ -612,8 +580,7 @@ void runTest()
         generator.setIntermediateFileName(CCK_TEST_INPUT_FILE_PREFIX "myfile.h.intermediate");
         generator.m_useIntermediateFile = false;
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile.h.itpl";
+        std::vector<std::string> args = { "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile.h.itpl" };
         process<StringT>(args, generator);
     }
     
@@ -626,26 +593,23 @@ void runTest()
         generator.setIntermediateFileName(CCK_TEST_INPUT_FILE_PREFIX "myfile.gen.intermediate");
         generator.m_useIntermediateFile = false;
         generator.m_generate = true;
-        std::vector<std::string> args;
-        args += "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile";
+        std::vector<std::string> args = { "-t", CCK_TEST_INPUT_FILE_PREFIX "myfile" };
         process<StringT>(args, generator);
     }
 
     {
         //test file not found handling
         GeneratorT generator;
-        std::vector<std::string> args;
+        std::vector<std::string> args = { "NotThere.h.itpl" };
         generator.m_reset = true;
-        args += "NotThere.h.itpl";
         BOOST_CHECK_THROW(process<StringT>(args, generator), CErrorPrinted);
     }
     
     {
         //test file not found handling
         GeneratorT generator;
-        std::vector<std::string> args;
+        std::vector<std::string> args = { "NotThere.tccmd" };
         generator.m_reset = true;
-        args += "NotThere.tccmd";
         BOOST_CHECK_THROW( process<StringT>( args, generator), CErrorPrinted);
     }
 }

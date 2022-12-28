@@ -39,7 +39,7 @@ public:
     template <typename InputT>
     TStreamHelper<StringT>& operator <<(const InputT& text)
     {
-        result.push_back( boost::lexical_cast<StringT>(text));
+        result.push_back(StringConvert<StringT>(text));
         return *this;
     }
     std::vector<StringT> result; 
@@ -58,7 +58,7 @@ public:
     template <typename InputT>
     TStreamConversionWrapper<StringT, WrappedT>& operator <<(const InputT& text)
     {
-        m_wrapped << boost::lexical_cast<StringT>(text);
+        m_wrapped << StringConvert<StringT>(text);
         return *this;
     }
     WrappedT& m_wrapped; 
@@ -116,16 +116,12 @@ bool test( ProcessorT& processor, const std::string& in, const std::string& out,
     processor.open();
     if (newLineSplit)
     {
-        for (boost::algorithm::split_iterator<std::string::const_iterator> it
-            = make_split_iterator(in, token_finder(
-                boost::algorithm::is_any_of("\n"),
-                boost::algorithm::token_compress_off));
-            ;
-            )
+        
+        for (auto it = cppstringx::make_split_chars_iterator(in, "\n");;)
         {
             std::string txt(it->begin(), it->end());
             ++it;
-            if (it != boost::algorithm::split_iterator<std::string::const_iterator>())
+            if (!it.is_end_position())
             {
                 processor << (txt + "\n");
             }
@@ -169,7 +165,7 @@ void testMacroProcessing()
         (*ptrTable)[col].resize(rows);
         for (unsigned int row = 0; row < rows; ++row)
         {
-            (*ptrTable)[col][row] = boost::lexical_cast<StringT>(cItemTable[row][col]);
+            (*ptrTable)[col][row] = StringConvert<StringT>(cItemTable[row][col]);
         }
     }
 
@@ -720,7 +716,7 @@ void testTemplateProcessor()
         (*ptrTable)[col].resize( rows);
         for ( unsigned int row = 0; row < rows; ++row)
         {
-            (*ptrTable)[col][row] = boost::lexical_cast<StringT>(cItemTable[row][col]);
+            (*ptrTable)[col][row] = StringConvert<StringT>(cItemTable[row][col]);
         }
     }
 
@@ -732,7 +728,7 @@ void testTemplateProcessor()
     TStreamConversionWrapper<StringT, ProcessorT> wrappedProcessor( processor);
 
     processor.connectTemplateLoader( &loader);
-    processor.connectTable( ptrTable, boost::lexical_cast<StringT>("label"), true, true, 1, 1, false);
+    processor.connectTable( ptrTable, StringConvert<StringT>("label"), true, true, 1, 1, false);
     processor.connectOutputStream( &output);
 
     processor.open();
@@ -766,7 +762,7 @@ void testTemplateProcessor()
 
     BOOST_CHECK( output.result == expectedOutput.result);
     BOOST_CHECK( loader.m_count == 1);
-    BOOST_CHECK( loader.m_filename == boost::lexical_cast<StringT>("templatefile.name ") );
+    BOOST_CHECK( loader.m_filename == StringConvert<StringT>("templatefile.name ") );
 }
 
 BOOST_AUTO_TEST_CASE( TTemplateProcessor)

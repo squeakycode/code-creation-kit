@@ -35,19 +35,7 @@
 #include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
 #include "cpptokenfinder.hpp"
-
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 )
-#endif
-#include <boost/algorithm/string.hpp>
-#include <boost/range.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
+#include "cppstringx.hpp"
 #include "StringLiteral.h"
 #include "CNul.h"
 
@@ -83,7 +71,7 @@ namespace code_creation_kit
     public:
         typedef CTokenizer<TokenT, StringT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
-        typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
+        typedef cppstringx::range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
     private:
         typedef typename StringT::const_iterator IteratorT;
@@ -151,9 +139,9 @@ namespace code_creation_kit
         ///set inline markup
         void setInlineTemplateMarkup( const StringT& prefix, const StringT& postfix,  const StringT& generatedPostfix)
         {
-            if (   prefix != boost::trim_copy( prefix)
-                || postfix != boost::trim_copy( postfix)
-                || generatedPostfix != boost::trim_copy( generatedPostfix)
+            if (   prefix != cppstringx::trim_copy( prefix)
+                || postfix != cppstringx::trim_copy( postfix)
+                || generatedPostfix != cppstringx::trim_copy( generatedPostfix)
             )
             {
                 throw CTokenizerExceptions::ExInlineMarkupWhiteSpace();
@@ -166,7 +154,7 @@ namespace code_creation_kit
             {
                 throw CTokenizerExceptions::ExInlineGeneratedPostfixEmpty();
             }
-            if ( boost::ends_with( prefix+postfix, generatedPostfix))
+            if (cppstringx::ends_with( prefix+postfix, generatedPostfix))
             {
                 throw CTokenizerExceptions::ExBadInlineGeneratedPostfix();
             }
@@ -365,12 +353,12 @@ namespace code_creation_kit
             //check if the line needs to be trimmed or is comment
             for (;;)
             {
-                RangeT range = trimRange( line, boost::is_any_of(" \t\n\r"));
+                RangeT range = trimRange( line, cppstringx::utility::is_any_of<const char*>(" \t\n\r"));
                 //if in inline processing Mode
                 if ( m_inlineTemplateMode && m_temporaryInlineTemplateLine.empty())
                 {
                     //check whether the line contains generated content
-                    if ( boost::ends_with( range, m_inlineGeneratedPostfix))
+                    if ( cppstringx::ends_with( range, m_inlineGeneratedPostfix))
                     {
                         //generated content is ignored/removed
                         return *this;
@@ -380,12 +368,12 @@ namespace code_creation_kit
                     *m_finalOutputStream << line;
 
                     //check whether the line contains template content
-                    if (    boost::starts_with( range, m_inlinePrefix) // must start with inline prefix
+                    if (    cppstringx::starts_with( range, m_inlinePrefix) // must start with inline prefix
                         &&  (m_inlinePostfix.empty() // either no postfix
                             || 
-                            (boost::ends_with( range, m_inlinePostfix) // or ends with inline postfix
+                            (cppstringx::ends_with( range, m_inlinePostfix) // or ends with inline postfix
                             &&
-                            static_cast<size_t>(range.size()) >= ( m_inlinePostfix.size() + m_inlinePrefix.size())) //and no overlap
+                            static_cast<size_t>(range.end() - range.begin()) >= ( m_inlinePostfix.size() + m_inlinePrefix.size())) //and no overlap
                             )
                     )
                     {
@@ -396,7 +384,7 @@ namespace code_creation_kit
                         m_temporaryInlineTemplateLine.append( range.end(), textEnd);
                         
                         //switch to processing of this line
-                        range = trimRange( m_temporaryInlineTemplateLine, boost::is_any_of(" \t\n\r"));
+                        range = trimRange( m_temporaryInlineTemplateLine, cppstringx::utility::is_any_of<const char*>(" \t\n\r"));
                         textBegin = m_temporaryInlineTemplateLine.begin();
                         fullLineBegin = m_temporaryInlineTemplateLine.begin();
                         textEnd = m_temporaryInlineTemplateLine.end(); 
@@ -412,11 +400,11 @@ namespace code_creation_kit
                     }
                 }
 
-                if ( boost::starts_with( range, m_commentKeyword))
+                if ( cppstringx::starts_with( range, m_commentKeyword))
                 {
                     return *this;
                 }
-                if ( boost::ends_with( range, m_trimKeyword))
+                if ( cppstringx::ends_with( range, m_trimKeyword))
                 {
                     size_t keywordSize = m_trimKeyword.size();
                     textBegin = range.begin();
@@ -424,7 +412,7 @@ namespace code_creation_kit
                     trimmedRight = true;
                     break;
                 }
-                if ( boost::ends_with( range, m_trimLeftKeyword))
+                if ( cppstringx::ends_with( range, m_trimLeftKeyword))
                 {
                     size_t keywordSize = m_trimLeftKeyword.size();
                     textBegin = range.begin();
@@ -432,7 +420,7 @@ namespace code_creation_kit
                     trimLeftTokenTrailingTextBegin = range.end();
                     break;
                 }
-                if ( boost::ends_with( range, m_trimRightKeyword))
+                if ( cppstringx::ends_with( range, m_trimRightKeyword))
                 {
                     size_t keywordSize = m_trimRightKeyword.size();
                     textEnd = range.end() - keywordSize;

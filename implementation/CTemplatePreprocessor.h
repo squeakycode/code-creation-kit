@@ -26,16 +26,7 @@
 #pragma once
 
 #include <stdexcept>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4996 )
-#pragma warning( disable : 4702 )
-#endif
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "cppstringx.hpp"
 
 namespace code_creation_kit
 {
@@ -85,12 +76,12 @@ namespace code_creation_kit
                 StringT prefix = token.getStringList()->front();
                 StringT postfix = token.getStringList()->back();
 
-                if ( prefix != boost::trim_left_copy( prefix) )
+                if ( prefix != cppstringx::trim_start_copy( prefix) )
                 {
                     throw ExPrefixLeadingWhiteSpace();  //collides with TRIM
                 }
 
-                if ( postfix != boost::trim_right_copy( postfix) )
+                if ( postfix != cppstringx::trim_end_copy( postfix) )
                 {
                     throw ExPostfixTrailingWhiteSpace();  //collides with TRIM
                 }

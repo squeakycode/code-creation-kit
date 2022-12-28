@@ -27,15 +27,7 @@
 #include <boost/test/unit_test.hpp>
 #include "CSourceFile.h"
 #include "TSourceFileTestFiles.h"
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "StringConvert.h"
 
 using namespace code_creation_kit;
 
@@ -47,7 +39,7 @@ public:
     template <typename InputT>
     TStreamHelper<StringT>& operator <<(const InputT& text)
     {
-        result.push_back( boost::lexical_cast<StringT>(text));
+        result.push_back( StringConvert<StringT>(text));
         return *this;
     }
     std::vector<StringT> result; 
@@ -67,7 +59,7 @@ void run_test()
         SinkT result;
         SinkT expected;
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "a.txt")).feedLineSink( result, true, counter);
+        FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "a.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 0);
         BOOST_CHECK( result.result == expected.result);
     }
@@ -76,7 +68,7 @@ void run_test()
         SinkT expected;
         expected << "a";
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "b.txt")).feedLineSink( result, true, counter);
+        FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "b.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 1);
         BOOST_CHECK( result.result == expected.result);
     }
@@ -85,7 +77,7 @@ void run_test()
         SinkT expected;
         expected << "a\n";
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "c.txt")).feedLineSink( result, true, counter);
+        FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "c.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 1);
         BOOST_CHECK( result.result == expected.result);
     }
@@ -95,7 +87,7 @@ void run_test()
         expected << "a\n" << "b";
 
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, true, counter);
+        FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, true, counter);
         BOOST_CHECK( counter == 2);
         BOOST_CHECK( result.result == expected.result);
     }
@@ -104,7 +96,7 @@ void run_test()
         SinkT expected;
         expected << "a" << "b";
         int counter = 0;
-        FileT( boost::lexical_cast<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, false, counter);
+        FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, false, counter);
         BOOST_CHECK( counter == 2);
         BOOST_CHECK( result.result == expected.result);
     }

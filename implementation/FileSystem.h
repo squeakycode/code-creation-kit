@@ -28,15 +28,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include "StringLiteral.h"
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "cppstringx.hpp"
 
 #include <iostream>
 
@@ -54,25 +46,25 @@ namespace code_creation_kit
         inline std::string getString(const boost::filesystem::path& p)
         {
             std::string s = p.string();
-            boost::replace_all(s, "\\", "/");
-            return s;
+            std::string result = cppstringx::replace_all_copy(s, "\\", "/");
+            return result;
         }
 
         template <>
         inline std::wstring getString(const boost::filesystem::path& p)
         {
             std::wstring s = p.wstring();
-            boost::replace_all(s, "\\", "/");
-            return s;
+            std::wstring result = cppstringx::replace_all_copy(s, "\\", "/");
+            return result;
         }
 
         template <typename StringT>
         bool equals( const StringT& a, const StringT& b)
         {
 #if defined WIN32
-            return boost::iequals( a, b);
+            return cppstringx::iequals( a, b);
 #else
-            return boost::equals( a, b);
+            return cppstringx::equals( a, b);
 #endif
         }
 

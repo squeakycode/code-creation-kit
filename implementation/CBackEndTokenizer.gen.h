@@ -35,19 +35,7 @@
 #include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
 #include "cpptokenfinder.hpp"
-
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 )
-#endif
-#include <boost/algorithm/string.hpp>
-#include <boost/range.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
+#include "cppstringx.hpp"
 #include "StringLiteral.h"
 #include "CNul.h"
 
@@ -66,7 +54,7 @@ namespace code_creation_kit
     public:
         typedef CBackEndTokenizer<TokenT, StringT, OutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
-        typedef boost::iterator_range<typename StringT::const_iterator> RangeT;
+        typedef cppstringx::range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
     private:
         typedef typename StringT::const_iterator IteratorT;
@@ -330,16 +318,16 @@ namespace code_creation_kit
             //check if the line needs to be trimmed or is comment
             for (;!m_bypassMode;)
             {
-                RangeT range = trimRange( line, boost::is_any_of(" \t\n\r"));
-                if ( boost::starts_with( range, m_commentKeyword))
+                RangeT range = trimRange( line, cppstringx::utility::is_any_of<const char*>(" \t\n\r"));
+                if ( cppstringx::starts_with( range, m_commentKeyword))
                 {
                     return *this;
                 }
-                if ( boost::starts_with( range, m_commentDotKeyword))
+                if ( cppstringx::starts_with( range, m_commentDotKeyword))
                 {
                     return *this;
                 }
-                if ( boost::ends_with( range, m_trimKeyword))
+                if ( cppstringx::ends_with( range, m_trimKeyword))
                 {
                     size_t keywordSize = m_trimKeyword.size();
                     textBegin = range.begin();
@@ -347,7 +335,7 @@ namespace code_creation_kit
                     trimmedRight = true;
                     break;
                 }
-                if ( boost::ends_with( range, m_trimDotKeyword))
+                if ( cppstringx::ends_with( range, m_trimDotKeyword))
                 {
                     size_t keywordSize = m_trimDotKeyword.size();
                     textBegin = range.begin();
@@ -355,7 +343,7 @@ namespace code_creation_kit
                     trimmedRight = true;
                     break;
                 }
-                if ( boost::ends_with( range, m_trimLeftKeyword))
+                if ( cppstringx::ends_with( range, m_trimLeftKeyword))
                 {
                     size_t keywordSize = m_trimLeftKeyword.size();
                     textBegin = range.begin();
@@ -363,7 +351,7 @@ namespace code_creation_kit
                     trimLeftTokenTrailingTextBegin = range.end();
                     break;
                 }
-                if ( boost::ends_with( range, m_trimLeftDotKeyword))
+                if ( cppstringx::ends_with( range, m_trimLeftDotKeyword))
                 {
                     size_t keywordSize = m_trimLeftDotKeyword.size();
                     textBegin = range.begin();
@@ -371,14 +359,14 @@ namespace code_creation_kit
                     trimLeftTokenTrailingTextBegin = range.end();
                     break;
                 }
-                if ( boost::ends_with( range, m_trimRightKeyword))
+                if ( cppstringx::ends_with( range, m_trimRightKeyword))
                 {
                     size_t keywordSize = m_trimRightKeyword.size();
                     textEnd = range.end() - keywordSize;
                     trimmedRight = true;
                     break;
                 }
-                if ( boost::ends_with( range, m_trimRightDotKeyword))
+                if ( cppstringx::ends_with( range, m_trimRightDotKeyword))
                 {
                     size_t keywordSize = m_trimRightDotKeyword.size();
                     textEnd = range.end() - keywordSize;
@@ -424,7 +412,7 @@ namespace code_creation_kit
                     }
                     
                     // Check if the markup postfix is present
-                    if (boost::starts_with(RangeT(dotsEnd, textEnd), m_markupPostfix))
+                    if (cppstringx::starts_with(RangeT(dotsEnd, textEnd), m_markupPostfix))
                     {
                         // Advance token end
                         tokenEnd = dotsEnd + m_markupPostfix.size();

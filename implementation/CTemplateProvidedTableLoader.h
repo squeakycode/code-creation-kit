@@ -35,16 +35,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "CSourceFile.h"
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "cppstringx.hpp"
 
 namespace code_creation_kit
 {
@@ -223,7 +214,7 @@ namespace code_creation_kit
             bool padRows = false;
 
             std::vector<StringT> propertyVector;
-            boost::split(propertyVector, properties, boost::is_any_of(";"));
+            cppstringx::split_chars(propertyVector, properties, ";");
             for (const StringT& property : propertyVector)
             {
                 if (property == STRING_LITERAL("top-down"))

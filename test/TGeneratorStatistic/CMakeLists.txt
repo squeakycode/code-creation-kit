@@ -33,7 +33,6 @@ target_link_libraries(TGeneratorStatistic
     cck_implementation
     Boost::unit_test_framework
     Boost::filesystem
-    Boost::regex
 )
 
 custom_target_use_highest_warning_level(TGeneratorStatistic)

@@ -29,15 +29,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include "StringConvert.h"
 
 using namespace code_creation_kit;
 
@@ -46,7 +38,7 @@ template <typename StringT, typename PolicyT>
 void test( const char* testText, std::vector<std::string> expectedParameters, unsigned int count)
 {
     //prepare
-    StringT text = boost::lexical_cast<StringT>( testText);
+    StringT text = StringConvert<StringT>( testText);
     typename StringT::const_iterator start = text.begin();
     typename StringT::const_iterator end = text.end();
     //perform parsing
@@ -54,11 +46,11 @@ void test( const char* testText, std::vector<std::string> expectedParameters, un
     parameters.resize(count);
     KeywordParameterParser::getParameters<PolicyT>( start, end, parameters);
     //check
-    BOOST_CHECK( *start == boost::lexical_cast<typename StringT::value_type>('-'));
+    BOOST_CHECK( *start == static_cast<typename StringT::value_type>('-'));
     BOOST_REQUIRE( expectedParameters.size() == parameters.size());
     for( unsigned int i = 0; i < expectedParameters.size(); ++i)
     {
-        bool ok = parameters[i] == boost::lexical_cast<StringT>( expectedParameters[i].c_str());
+        bool ok = parameters[i] == StringConvert<StringT>( expectedParameters[i].c_str());
         if ( !ok )
         {
             BOOST_CHECK( ok );

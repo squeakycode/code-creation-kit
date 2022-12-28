@@ -25,17 +25,9 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#endif
-#include <boost/lexical_cast.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
 #include <vector>
 #include <map>
+#include "StringConvert.h"
 
 namespace code_creation_kit
 {
@@ -93,7 +85,7 @@ namespace code_creation_kit
             {
                 for( IndexT i = 0; i < (*m_table).size(); ++i)
                 {
-                    m_itemToIndexMap[ boost::lexical_cast<StringT>( i + 1 ) ].push_back( i );
+                    m_itemToIndexMap[ ToString<StringT>( i + 1 ) ].push_back( i );
                 }
             }
         }

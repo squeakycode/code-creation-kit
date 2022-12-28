@@ -60,7 +60,7 @@ namespace code_creation_kit
 
     ///processes macro expression text and ouputs expansion result
     template <typename TableT, typename OutputStreamT, typename LogOutputStreamT = CNul >
-    class CMacroProcessor : public CMacroProcessorExceptions, public boost::noncopyable
+    class CMacroProcessor : public CMacroProcessorExceptions
     {
         //types used:
         typedef typename TableT::value_type::value_type StringT;
@@ -153,6 +153,9 @@ namespace code_creation_kit
             , m_canChangeNonTemporaryTableList(true)
         {
         }
+
+        CMacroProcessor(CMacroProcessor& rhs) = delete;
+        CMacroProcessor& operator=(CMacroProcessor& rhs) = delete;
 
         ///this allows controlling the changes made by a template
         void setCanChangeNonTemporaryTableList(bool canChangeNonTemporaryTableList)

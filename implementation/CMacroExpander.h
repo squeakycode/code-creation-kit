@@ -25,18 +25,9 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
 #include <vector>
+#include <string>
+#include "StringConvert.h"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -220,7 +211,7 @@ namespace code_creation_kit
             }
             else if (  substitutionData == MacroT::SubstitutionT::eCount)
             {
-                StringT result = boost::lexical_cast<StringT>( count + 1);
+                StringT result = ToString<StringT>(count + 1);
                 success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
                 if ( !substitutionData.if_())
                 {
@@ -229,7 +220,7 @@ namespace code_creation_kit
             }
             else if ( substitutionData == MacroT::SubstitutionT::eIndex)
             {
-                StringT result = boost::lexical_cast<StringT>( row + 1);
+                StringT result = ToString<StringT>(row + 1);
                 success = checkConstraints( substitutionData.getConstraints(), result) != substitutionData.not_();
                 if ( !substitutionData.if_())
                 {

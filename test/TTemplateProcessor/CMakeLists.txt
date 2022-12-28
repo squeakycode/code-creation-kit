@@ -30,7 +30,6 @@ add_dependencies(TTemplateProcessor cck_implementation)
 target_link_libraries(TTemplateProcessor
     PRIVATE
     Boost::unit_test_framework
-    Boost::regex
 )
 
 target_include_directories(TTemplateProcessor PRIVATE $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>)

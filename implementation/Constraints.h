@@ -29,16 +29,7 @@
 
 #include <stdexcept>
 #include <regex>
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4702 ) //warning C4702: unreachable code
-#pragma warning( disable : 4996 ) // 'std::copy': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.
-#endif
-#include <boost/algorithm/string.hpp>
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+#include <cppstringx.hpp>
 
 namespace code_creation_kit
 {
@@ -138,7 +129,7 @@ namespace code_creation_kit
         {
             if ( m_ignoreCase)
             {
-                return boost::iequals( m_matches, text) != m_not_;
+                return cppstringx::iequals( m_matches, text) != m_not_;
             }
             else
             {
@@ -194,11 +185,11 @@ namespace code_creation_kit
         {
             if ( m_ignoreCase)
             {
-                return boost::istarts_with( text, m_testText) != m_not_;
+                return cppstringx::istarts_with( text, m_testText) != m_not_;
             }
             else
             {
-                return boost::starts_with( text, m_testText) != m_not_;
+                return cppstringx::starts_with( text, m_testText) != m_not_;
             }
         }
     private:
@@ -250,11 +241,11 @@ namespace code_creation_kit
         {
             if ( m_ignoreCase)
             {
-                return boost::iends_with( text, m_testText) != m_not_;
+                return cppstringx::iends_with( text, m_testText) != m_not_;
             }
             else
             {
-                return boost::ends_with( text, m_testText) != m_not_;
+                return cppstringx::ends_with( text, m_testText) != m_not_;
             }
         }
     private:
@@ -306,11 +297,11 @@ namespace code_creation_kit
         {
             if ( m_ignoreCase)
             {
-                return boost::icontains( text, m_testText) != m_not_;
+                return cppstringx::icontains( text, m_testText) != m_not_;
             }
             else
             {
-                return boost::contains( text, m_testText) != m_not_;
+                return cppstringx::contains( text, m_testText) != m_not_;
             }
         }
     private:
