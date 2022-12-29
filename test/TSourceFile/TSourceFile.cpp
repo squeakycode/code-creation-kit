@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include "CSourceFile.h"
 #include "TSourceFileTestFiles.h"
 #include "StringConvert.h"
@@ -50,7 +50,7 @@ class TestFile;
 template <typename StringT>
 void run_test()
 {
-    BOOST_CHECK_NO_THROW(CreateTSourceFileFiles());
+    CHECK_NOTHROW(CreateTSourceFileFiles());
 
     typedef TStreamHelper<StringT> SinkT;
     typedef CSourceFile<StringT,TestFile> FileT;
@@ -60,8 +60,8 @@ void run_test()
         SinkT expected;
         int counter = 0;
         FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "a.txt")).feedLineSink( result, true, counter);
-        BOOST_CHECK( counter == 0);
-        BOOST_CHECK( result.result == expected.result);
+        CHECK( counter == 0);
+        CHECK( result.result == expected.result);
     }
     {
         SinkT result;
@@ -69,8 +69,8 @@ void run_test()
         expected << "a";
         int counter = 0;
         FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "b.txt")).feedLineSink( result, true, counter);
-        BOOST_CHECK( counter == 1);
-        BOOST_CHECK( result.result == expected.result);
+        CHECK( counter == 1);
+        CHECK( result.result == expected.result);
     }
     {
         SinkT result;
@@ -78,8 +78,8 @@ void run_test()
         expected << "a\n";
         int counter = 0;
         FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX  "c.txt")).feedLineSink( result, true, counter);
-        BOOST_CHECK( counter == 1);
-        BOOST_CHECK( result.result == expected.result);
+        CHECK( counter == 1);
+        CHECK( result.result == expected.result);
     }
     {
         SinkT result;
@@ -88,8 +88,8 @@ void run_test()
 
         int counter = 0;
         FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, true, counter);
-        BOOST_CHECK( counter == 2);
-        BOOST_CHECK( result.result == expected.result);
+        CHECK( counter == 2);
+        CHECK( result.result == expected.result);
     }
     {
         SinkT result;
@@ -97,15 +97,15 @@ void run_test()
         expected << "a" << "b";
         int counter = 0;
         FileT( StringConvert<StringT>(CCK_TEST_INPUT_FILE_PREFIX "d.txt")).feedLineSink( result, false, counter);
-        BOOST_CHECK( counter == 2);
-        BOOST_CHECK( result.result == expected.result);
+        CHECK( counter == 2);
+        CHECK( result.result == expected.result);
     }
 }
 
-BOOST_AUTO_TEST_CASE( TSourceFile)
+TEST_CASE( "TSourceFile", "[TSourceFile]")
 {
     run_test<std::string>();
-#ifdef _MSC_VER //TODO
+#ifdef _MSC_VER
     run_test<std::wstring>();
 #endif
 }

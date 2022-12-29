@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include "Constraints.h"
 
@@ -36,16 +36,16 @@ void testMatches()
     { //matches no ignore case
         MatchesConstraintT matches( "b");
 
-        BOOST_CHECK( !matches.matchesConstraint( "a"));
-        BOOST_CHECK( matches.matchesConstraint( "b"));
+        CHECK( !matches.matchesConstraint( "a"));
+        CHECK( matches.matchesConstraint( "b"));
     }
 
     { //matches ignore case
         MatchesConstraintT matches( "b");
         matches.ignoreCase(true);
 
-        BOOST_CHECK( !matches.matchesConstraint( "a"));
-        BOOST_CHECK( matches.matchesConstraint( "B"));
+        CHECK( !matches.matchesConstraint( "a"));
+        CHECK( matches.matchesConstraint( "B"));
     }
 
     { //test compare
@@ -57,18 +57,18 @@ void testMatches()
         IConstraint<StringT>* cB = &matchesB;
         IConstraint<StringT>* cC = &matchesC;
 
-        BOOST_CHECK( !(*cA == *cB));
-        BOOST_CHECK( *cA == *cA);
-        BOOST_CHECK( *cA == *cC);
+        CHECK( !(*cA == *cB));
+        CHECK( *cA == *cA);
+        CHECK( *cA == *cC);
     }
 
 }
 
-BOOST_AUTO_TEST_CASE( TConstraints)
+TEST_CASE( "TConstraints", "[TConstraints]")
 {
     testMatches<std::string, CMatchesConstraint<std::string> >();
     testMatches<std::string, CRegexMatchesConstraint<std::string> >();
 
     CAnyConstraint<std::string> any;
-    BOOST_CHECK( any.matchesConstraint( "text"));
+    CHECK( any.matchesConstraint( "text"));
 }

@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <sstream>
@@ -35,9 +35,9 @@ using namespace code_creation_kit;
 
 class LogFileT;
 
-BOOST_AUTO_TEST_CASE( TGenerator)
+TEST_CASE( "TGenerator", "[TGenerator]")
 {
-    BOOST_CHECK_NO_THROW(CreateTGeneratorFiles());
+    CHECK_NOTHROW(CreateTGeneratorFiles());
 
     {
         CGenerator<std::string> generator;
@@ -60,13 +60,13 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", false, parameterList);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOut.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
 
         //generate the output using intermediate file
         generator.generate(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplate.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", true, false, CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt.intermediate", false, parameterList, false);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutIntermediateUsed.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutExpected.txt"));
     }
 
     //data flow test
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt");
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
     }
 
     //test append
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", true);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppendExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TAppend.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TAppendExpected.txt"));
     }
 
     //test streams
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
 
         generator.generate( in, out);
 
-        BOOST_CHECK_EQUAL( out.str(), "start\n11\n33\n07\nend");
+        CHECK( out.str() == "start\n11\n33\n07\nend");
     }
 
     //test inline
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             itp);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected.txt"));
 
         parameterList.push_back("a=4");
         parameterList.push_back("b=5");
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
             itp);
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected2.txt"));
+        CHECK( FilesBinaryEqual<std::string>( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TGeneratorTemplateInline.txt", CCK_TEST_INPUT_FILE_PREFIX "TGeneratorOutInlineExpected2.txt"));
     }
 
     //table with padding test
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "NeedsPaddingDuplicate.tpl", CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.gen.csv");
 
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.csv", CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.gen.csv"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.csv", CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.gen.csv"));
     }
 
     //log test
@@ -207,12 +207,12 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         generator.reset();
 
         //csv options
-        BOOST_CHECK_NO_THROW(generator.setCsvDelimiterChars( ":"));
-        BOOST_CHECK_NO_THROW(generator.setCsvDelimiterChars( ";"));
-        BOOST_CHECK_NO_THROW(generator.setCsvCommentChars( "#*"));
-        BOOST_CHECK_NO_THROW(generator.setCsvCommentChars( ""));
-        BOOST_CHECK_NO_THROW(generator.setCsvQuoteChars("\'l"));
-        BOOST_CHECK_NO_THROW(generator.setCsvQuoteChars( "\""));
+        CHECK_NOTHROW(generator.setCsvDelimiterChars( ":"));
+        CHECK_NOTHROW(generator.setCsvDelimiterChars( ";"));
+        CHECK_NOTHROW(generator.setCsvCommentChars( "#*"));
+        CHECK_NOTHROW(generator.setCsvCommentChars( ""));
+        CHECK_NOTHROW(generator.setCsvQuoteChars("\'l"));
+        CHECK_NOTHROW(generator.setCsvQuoteChars( "\""));
 
         //include
         generator.addIncludeDirectory("IncludeDirectoryThatDoesNotExist");
@@ -229,16 +229,16 @@ BOOST_AUTO_TEST_CASE( TGenerator)
         //generate the output
         generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "TDataflow.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt");
         //check output is as expected
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.gen.txt", CCK_TEST_INPUT_FILE_PREFIX "TDataflowExpected.txt"));
 
         //check extended error output
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.gen.txt"), std::exception);
+        CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.gen.txt"), std::exception);
         CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), false, itp), std::exception);
-        BOOST_CHECK_THROW( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest3.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest1.gen.txt"), std::exception);
+        CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), false, itp), std::exception);
+        CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest3.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest1.gen.txt"), std::exception);
 
         generator.connectLogOutputStream( NULL);
         logFile.close();
-        BOOST_CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", CCK_TEST_INPUT_FILE_PREFIX "LogOutputExpected.txt"));
+        CHECK( FilesBinaryEqual<std::string>(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", CCK_TEST_INPUT_FILE_PREFIX "LogOutputExpected.txt"));
     }
 }

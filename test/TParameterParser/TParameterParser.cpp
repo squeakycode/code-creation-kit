@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <vector>
@@ -32,7 +32,7 @@
 
 using namespace code_creation_kit;
 
-BOOST_AUTO_TEST_CASE( TParameterParser)
+TEST_CASE( "TParameterParser", "[TParameterParser]")
 {
     //expected output data
     const unsigned int rows = 4;
@@ -58,13 +58,13 @@ BOOST_AUTO_TEST_CASE( TParameterParser)
     ParameterParser::parse( parameterList, table, lastProcessed,'=');
 
     //check if the data in the table and the array is the same
-    BOOST_REQUIRE( table.size() == columns );
+    REQUIRE( table.size() == columns );
     for ( unsigned int row = 0; row < rows; ++row)
     {
         for ( unsigned int col = 0; col < columns; ++col)
         {
-            BOOST_REQUIRE( table[col].size() == rows );
-            BOOST_CHECK( table[col][row] == itemTable[row][col] );
+            REQUIRE( table[col].size() == rows );
+            CHECK( table[col][row] == itemTable[row][col] );
         }
     }
 }

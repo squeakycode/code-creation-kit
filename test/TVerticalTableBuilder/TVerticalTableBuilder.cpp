@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include "CVerticalTableBuilder.h"
 #include <string>
 #include <vector>
@@ -58,18 +58,18 @@ void testBuilder( T& itemTable, const unsigned int rows, const unsigned int colu
     tableBuilder.finished();
 
     //check if the data in the table and the array is the same
-    BOOST_REQUIRE( table.size() == columns );
+    REQUIRE( table.size() == columns );
     for ( unsigned int row = 0; row < rows; ++row)
     {
         for ( unsigned int col = 0; col < columns; ++col)
         {
-            BOOST_REQUIRE( table[col].size() == rows );
-            BOOST_CHECK( table[col][row] == (itemTable[row][col] ? itemTable[row][col] : ""));
+            REQUIRE( table[col].size() == rows );
+            CHECK( table[col][row] == (itemTable[row][col] ? itemTable[row][col] : ""));
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
+TEST_CASE("TVerticalTableBuilder", "[TVerticalTableBuilder]")
 {
     {
         //test data array
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
             {"a5","b5"}
         };
         testBuilder( itemTable, rows, columns, true);
-        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
     }
 
     {
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
             {"a5","b5",NULL}
         };
         testBuilder( itemTable, rows, columns, true);
-        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExOverflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExOverflow);
     }
 
     {
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( TVerticalTableBuilder)
             {"c",NULL},
         };
         testBuilder( itemTable, rows, columns, true);
-        BOOST_CHECK_THROW( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
     }
 
 }

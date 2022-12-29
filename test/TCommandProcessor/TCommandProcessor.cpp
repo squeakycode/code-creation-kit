@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <vector>
@@ -92,75 +92,75 @@ public:
         const CInlineTemplateParameters<StringT>& inlineTemplateParameters
         )
     {
-        BOOST_CHECK( m_generate);
-        BOOST_CHECK( m_templateFile == templateFile);
-        BOOST_CHECK( m_targetFile == targetFile);
-        BOOST_CHECK( m_useIntermediateFile == useIntermediateFile);
-        BOOST_CHECK( m_recycle == recycle);
-        BOOST_CHECK( m_intermediateFileName == intermediateFile);
-        BOOST_CHECK( m_parameters == parameters);
-        BOOST_CHECK( m_append == append);
-        BOOST_CHECK( m_inlineTemplateParameters == inlineTemplateParameters);
-        BOOST_CHECK(m_canChangeTableList == canChangeTableList);
+        CHECK( m_generate);
+        CHECK( m_templateFile == templateFile);
+        CHECK( m_targetFile == targetFile);
+        CHECK( m_useIntermediateFile == useIntermediateFile);
+        CHECK( m_recycle == recycle);
+        CHECK( m_intermediateFileName == intermediateFile);
+        CHECK( m_parameters == parameters);
+        CHECK( m_append == append);
+        CHECK( (m_inlineTemplateParameters == inlineTemplateParameters));
+        CHECK(m_canChangeTableList == canChangeTableList);
     }
 
     void reset()
     {
-        BOOST_CHECK( m_reset);
+        CHECK( m_reset);
     }
 
     void loadTable( const StringT& tableFileName, const StringT& label, bool topDown, bool leftToRight, unsigned int rowHeaderIndex, unsigned int columnHeaderIndex, bool padRows)
     {
-        BOOST_CHECK( m_loadTable);
-        BOOST_CHECK( m_tableFileName == tableFileName);
-        BOOST_CHECK( m_label == label);
-        BOOST_CHECK( m_topDown == topDown);
-        BOOST_CHECK( m_leftToRight == leftToRight);
-        BOOST_CHECK( m_rowHeaderIndex == rowHeaderIndex);
-        BOOST_CHECK( m_columnHeaderIndex == columnHeaderIndex);
-        BOOST_CHECK( m_padRows == padRows);
+        CHECK( m_loadTable);
+        CHECK( m_tableFileName == tableFileName);
+        CHECK( m_label == label);
+        CHECK( m_topDown == topDown);
+        CHECK( m_leftToRight == leftToRight);
+        CHECK( m_rowHeaderIndex == rowHeaderIndex);
+        CHECK( m_columnHeaderIndex == columnHeaderIndex);
+        CHECK( m_padRows == padRows);
     }
 
     void unloadTable( const StringT& label)
     {
-        BOOST_CHECK( m_unloadTable);
-        BOOST_CHECK( m_label == label);
+        CHECK( m_unloadTable);
+        CHECK( m_label == label);
     }
 
     void setMarkup( const StringT& prefix, const StringT& postfix)
     {
-        BOOST_CHECK( m_generate);
-        BOOST_CHECK( m_markupPrefix == prefix);
-        BOOST_CHECK( m_markupPostfix == postfix);
+        CHECK( m_generate);
+        CHECK( m_markupPrefix == prefix);
+        CHECK( m_markupPostfix == postfix);
     }
 
     void addIncludeDirectory( const StringT& directory)
     {
-        BOOST_CHECK( m_addIncludeDirectory);
-        BOOST_CHECK( m_includeDirectory == directory);
+        CHECK( m_addIncludeDirectory);
+        CHECK( m_includeDirectory == directory);
     }
 
     void setCsvDelimiterChars( StringT delimiter)
     {
-        BOOST_CHECK( m_setCsvDelimiterChars);
-        BOOST_CHECK( m_csvDelimiterChars == delimiter);
+        CHECK( m_setCsvDelimiterChars);
+        CHECK( m_csvDelimiterChars == delimiter);
     }
 
     void setCsvCommentChars( const StringT& commentChars)
     {
-        BOOST_CHECK( m_setCsvCommentChars);
-        BOOST_CHECK( m_csvCommentChars == commentChars);
+        CHECK( m_setCsvCommentChars);
+        CHECK( m_csvCommentChars == commentChars);
     }
 
     void setCsvQuoteChars( StringT quoteChars) 
     {
-        BOOST_CHECK( m_setCsvQuoteChars);
-        BOOST_CHECK( m_csvQuoteChars == quoteChars);
+        CHECK( m_setCsvQuoteChars);
+        CHECK( m_csvQuoteChars == quoteChars);
     }
 
     void connectLogOutputStream( const void* stream)
     {
-        BOOST_CHECK( m_setLogStream);
+        CHECK( m_setLogStream);
         m_logStream = (stream != NULL);
     }
 
@@ -343,7 +343,7 @@ void runTest()
         generator.m_logStream = true;
         std::vector<std::string> args = { "-c", "--log-file none" };
         process<StringT>( args, generator);
-        BOOST_CHECK( !generator.m_logStream);
+        CHECK( !generator.m_logStream);
     }
 
     {
@@ -353,7 +353,7 @@ void runTest()
         generator.m_logStream = false;
         std::vector<std::string> args = { "-c", "--log-file -" };
         process<StringT>( args, generator);
-        BOOST_CHECK( generator.m_logStream);
+        CHECK( generator.m_logStream);
     }
 
     {
@@ -363,7 +363,7 @@ void runTest()
         generator.m_logStream = false;
         std::vector<std::string> args = { "-c", "--log-file testlogfile.log" };
         process<StringT>( args, generator);
-        BOOST_CHECK( generator.m_logStream);
+        CHECK( generator.m_logStream);
     }
 
     {
@@ -602,7 +602,7 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.h.itpl" };
         generator.m_reset = true;
-        BOOST_CHECK_THROW(process<StringT>(args, generator), CErrorPrinted);
+        CHECK_THROWS_AS(process<StringT>(args, generator), CErrorPrinted);
     }
     
     {
@@ -610,13 +610,13 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.tccmd" };
         generator.m_reset = true;
-        BOOST_CHECK_THROW( process<StringT>( args, generator), CErrorPrinted);
+        CHECK_THROWS_AS( process<StringT>( args, generator), CErrorPrinted);
     }
 }
 
-BOOST_AUTO_TEST_CASE( TCommandProcessor)
+TEST_CASE( "TCommandProcessor", "[TCommandProcessor]")
 {
-    BOOST_CHECK_NO_THROW(CreateTCommandProcessorFiles());
+    CHECK_NOTHROW(CreateTCommandProcessorFiles());
 
     runTest<std::string>();
 #ifdef _MSC_VER

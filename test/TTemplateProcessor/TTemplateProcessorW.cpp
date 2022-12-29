@@ -23,33 +23,13 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "CSpecialRegexCharacterPrefixer.h"
-#include <string>
-#include <vector>
+#include "TTemplateProcessor.h"
 
-using namespace code_creation_kit;
-
-TEST_CASE( "TSpecialRegexCharacterPrefixer", "[TSpecialRegexCharacterPrefixer]")
+//this is separated to avoid fatal error C1128: number of sections exceeded object file format limit: compile with /bigobj
+TEST_CASE("TTemplateProcessorW", "[TTemplateProcessor]")
 {
-    {
-        std::string s( "start.[{()\\*+?|^$end");
-        CSpecialRegexCharacterPrefixer::prefixSpecialCharacters( s);
-        CHECK( s == "start\\.\\[\\{\\(\\)\\\\\\*\\+\\?\\|\\^\\$end");
-    }
-    {
-        std::wstring s( L"start.[{()\\*+?|^$end");
-        CSpecialRegexCharacterPrefixer::prefixSpecialCharacters( s);
-        CHECK( s == L"start\\.\\[\\{\\(\\)\\\\\\*\\+\\?\\|\\^\\$end");
-    }
-    {
-        std::vector<std::string > list;
-        list.push_back( std::string( "0start.[{()\\*+?|^$end"));
-        list.push_back( std::string( "1start.[{()\\*+?|^$end"));
-        CSpecialRegexCharacterPrefixer::prefixSpecialCharacters( list);
-        REQUIRE( list.size() == 2);
-        CHECK( list[0] == "0start\\.\\[\\{\\(\\)\\\\\\*\\+\\?\\|\\^\\$end");
-        CHECK( list[1] == "1start\\.\\[\\{\\(\\)\\\\\\*\\+\\?\\|\\^\\$end");
-    }
+#ifdef _MSC_VER
+    testTemplateProcessor<std::wstring>();
+#endif 
 }

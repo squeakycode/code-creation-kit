@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <fstream>
@@ -82,12 +82,12 @@ struct TCsvParserTableBuilder
     ///checks data and positions
     void addItem( const std::string& item)
     {
-        BOOST_REQUIRE( row < test_data::rows );
-        BOOST_REQUIRE( col < test_data::columns );
+        REQUIRE( row < test_data::rows );
+        REQUIRE( col < test_data::columns );
 
-        BOOST_CHECK( item == test_data::itemTable[row][col]);
-        BOOST_CHECK( positionTracker.getLine() == test_data::lineTable[row][col]);
-        BOOST_CHECK( positionTracker.getColumn() == test_data::columnTable[row][col]);
+        CHECK( item == test_data::itemTable[row][col]);
+        CHECK( positionTracker.getLine() == test_data::lineTable[row][col]);
+        CHECK( positionTracker.getColumn() == test_data::columnTable[row][col]);
 
         col++;
         items++;
@@ -96,7 +96,7 @@ struct TCsvParserTableBuilder
     ///checks row handling
     void addRow()
     {
-        BOOST_CHECK( col == 5);
+        CHECK( col == 5);
         row++;
         col = 0;
     }
@@ -124,10 +124,10 @@ struct TCsvParserTableBuilderDoubleQuote
     ///checks data and positions
     void addItem( const std::string& item)
     {
-        BOOST_REQUIRE( row < 2 );
-        BOOST_REQUIRE( col < 3 );
+        REQUIRE( row < 2 );
+        REQUIRE( col < 3 );
 
-        BOOST_CHECK( item == test_data::itemTableDoubleQuote[row][col]);
+        CHECK( item == test_data::itemTableDoubleQuote[row][col]);
 
         col++;
         items++;
@@ -136,7 +136,7 @@ struct TCsvParserTableBuilderDoubleQuote
     ///checks row handling
     void addRow()
     {
-        BOOST_CHECK( col == 3);
+        CHECK( col == 3);
         row++;
         col = 0;
     }
@@ -155,13 +155,13 @@ struct TCsvParserTableBuilderDoubleQuote
     typedef std::string StringT;
 };
 
-BOOST_AUTO_TEST_CASE( TCsvParser)
+TEST_CASE( "TCsvParser", "[TCsvParser]")
 {
-    BOOST_CHECK_NO_THROW(CreateTCsvParserFiles());
+    CHECK_NOTHROW(CreateTCsvParserFiles());
 
     //open test file
     std::ifstream file( CCK_TEST_INPUT_FILE_PREFIX "TCsvParser.csv");
-    BOOST_CHECK( file.good() );
+    CHECK( file.good() );
 
     //create parser
     CCsvParser parser;
@@ -172,36 +172,36 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
     parser.parse( file, helper, ";", "\"", "#'", helper.positionTracker);
 
     //check parsing ok
-    BOOST_CHECK( helper.row == test_data::rows );
-    BOOST_CHECK( helper.items == test_data::columns * test_data::rows );
-    BOOST_CHECK( helper.finishedCount == 1);
+    CHECK( helper.row == test_data::rows );
+    CHECK( helper.items == test_data::columns * test_data::rows );
+    CHECK( helper.finishedCount == 1);
 
     //check file format error handling
     {
         std::stringstream s;
         s << "a\"a"; //a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExUnexpectedQuote);
+        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExUnexpectedQuote);
     }
     {
         std::stringstream s;
         s << "\"a\"a"; //"a"a
-        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExRequireDelimitingChar);
+        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExRequireDelimitingChar);
     }
     {
         std::stringstream s;
-        BOOST_CHECK_THROW( parser.parse( s, helper, ";", "\"", "\n"), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW( parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CCsvParser::ExBadCommentChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CCsvParser::ExBadDelimiter);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CCsvParser::ExBadDelimiter);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CCsvParser::ExBadDelimiter);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CCsvParser::ExBadDelimiter);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CCsvParser::ExBadQuoteChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CCsvParser::ExBadQuoteChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CCsvParser::ExBadQuoteChars);
-        BOOST_CHECK_THROW(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", "\n"), CCsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS( parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CCsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CCsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CCsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CCsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CCsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CCsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CCsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CCsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CCsvParser::ExBadQuoteChars);
     }
 
     //check ignore double quotes
@@ -212,8 +212,8 @@ BOOST_AUTO_TEST_CASE( TCsvParser)
         parser.parse( s, helperDoubleQuote, ";", "", "");
 
         //check parsing ok
-        BOOST_CHECK( helperDoubleQuote.row == 1 );
-        BOOST_CHECK( helperDoubleQuote.items == 6 );
-        BOOST_CHECK( helperDoubleQuote.finishedCount == 1);
+        CHECK( helperDoubleQuote.row == 1 );
+        CHECK( helperDoubleQuote.items == 6 );
+        CHECK( helperDoubleQuote.finishedCount == 1);
     }
 }

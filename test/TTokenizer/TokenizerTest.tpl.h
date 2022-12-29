@@ -76,8 +76,8 @@ void testSingleTokens()
         tokenizer << STRING_LITERAL("start%[ENTRY]["Tag Name"]%end");
         expected[1] = TokenT( TokenT::e[ENTRY]["Tag Name Capital"]);
         [END][TRIM]
-        BOOST_CHECK( result.size() == 3);
-        BOOST_CHECK( expected == result);
+        CHECK( result.size() == 3);
+        CHECK( expected == result);
     }
 
     [MACRO_END][TRIM]
@@ -104,7 +104,7 @@ void testRemoveDelayMarks( TokenizerT& tokenizer, bool bypassMode)
         result.clear();
         tokenizer << (bypassMode ? STRING_LITERAL("start%[ENTRY]["Tag Name"].%end") : STRING_LITERAL("start%[ENTRY]["Tag Name"]..%end"));
         expected[1] = TokenT( TokenT::eTextFragment, STRING_LITERAL("%[ENTRY]["Tag Name"]"));
-        BOOST_CHECK( expected == result);
+        CHECK( expected == result);
     }
 
     [MACRO_END][TRIM]

@@ -23,15 +23,15 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include "CTableIndex.h"
 #include <string>
 #include <vector>
 
 using namespace code_creation_kit;
 
-BOOST_AUTO_TEST_CASE( TTableIndex)
+TEST_CASE( "TTableIndex", "[TTableIndex]")
 {
     //test data array
     const unsigned int rows = 1;
@@ -62,18 +62,18 @@ BOOST_AUTO_TEST_CASE( TTableIndex)
     tableIndex.connectTable( &table);
     tableIndex.readTable(1);
 
-    BOOST_CHECK( tableIndex.getHeaderIndex() == 1);
-    BOOST_REQUIRE( tableIndex.lookUp( "a1").size() == 2);
-    BOOST_CHECK( tableIndex.lookUp( "a1").at(0) == 0);
-    BOOST_CHECK( tableIndex.lookUp( "a1").at(1) == 2);
-    BOOST_REQUIRE( tableIndex.lookUp( "d1").size() == 1);
-    BOOST_CHECK( tableIndex.lookUp( "d1").at(0) == 3);
+    CHECK( tableIndex.getHeaderIndex() == 1);
+    REQUIRE( tableIndex.lookUp( "a1").size() == 2);
+    CHECK( tableIndex.lookUp( "a1").at(0) == 0);
+    CHECK( tableIndex.lookUp( "a1").at(1) == 2);
+    REQUIRE( tableIndex.lookUp( "d1").size() == 1);
+    CHECK( tableIndex.lookUp( "d1").at(0) == 3);
 
     tableIndex.readTable(0);
 
-    BOOST_CHECK( tableIndex.getHeaderIndex() == 0);
-    BOOST_REQUIRE( tableIndex.lookUp( "1").size() == 1);
-    BOOST_CHECK( tableIndex.lookUp( "1").at(0) == 0);
-    BOOST_REQUIRE( tableIndex.lookUp( "3").size() == 1);
-    BOOST_CHECK( tableIndex.lookUp( "3").at(0) == 2);
+    CHECK( tableIndex.getHeaderIndex() == 0);
+    REQUIRE( tableIndex.lookUp( "1").size() == 1);
+    CHECK( tableIndex.lookUp( "1").at(0) == 0);
+    REQUIRE( tableIndex.lookUp( "3").size() == 1);
+    CHECK( tableIndex.lookUp( "3").at(0) == 2);
 }

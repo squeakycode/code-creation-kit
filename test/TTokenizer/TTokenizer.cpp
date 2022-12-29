@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include "CTokenizer.gen.h"
 #include "CBackEndTokenizer.gen.h"
 #include "ETokens.gen.h"
@@ -70,33 +70,33 @@ void test()
     {//plain text
         result.clear();
         tokenizer << STRING_LITERAL( "text");
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")) //when frontend
+        REQUIRE( result.size() == 1);
+        CHECK((  result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")) //when frontend
             || result[0] == TokenT( TokenT::eFullLineWithoutTags, STRING_LITERAL("text")) //when backend
-            );
+            ));
     }
 
     {//comment
         result.clear();
         tokenizer << STRING_LITERAL( " %COMMENT%a comment  \n");
-        BOOST_CHECK( result.size() == 0);
+        CHECK( result.size() == 0);
     }
 
     {//trim
         result.clear();
         tokenizer << STRING_LITERAL( " text%TRIM% \n");
-        BOOST_REQUIRE( result.size() == 2);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")));
-        BOOST_CHECK( result[1] == TokenT( TokenT::eNewLine));
+        REQUIRE( result.size() == 2);
+        CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text")));
+        CHECK( result[1] == TokenT( TokenT::eNewLine));
     }
 
     {//new line
         result.clear();
         tokenizer << STRING_LITERAL( "\n");
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK(   result[0] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")) //when frontend
+        REQUIRE( result.size() == 1);
+        CHECK((  result[0] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")) //when frontend
             || result[0] == TokenT( TokenT::eFullLineWithoutTags, STRING_LITERAL("\n")) //when backend
-            );
+            ));
     }
 
     //generated tests
@@ -124,27 +124,27 @@ void testBackEndFeatures()
         result.clear();
         tokenizer << STRING_LITERAL("start%BEGIN.%end");
         expected[1] = TokenT( TokenT::eBegin);
-        BOOST_REQUIRE( result.size() == 3);
-        BOOST_CHECK( expected == result);
+        REQUIRE( result.size() == 3);
+        CHECK( expected == result);
     }
 
     {//comment and bypass mode
         tokenizer.setBypassMode( true);
         result.clear();
         tokenizer << STRING_LITERAL( " %COMMENT%text \n");
-        BOOST_REQUIRE( result.size() == 4);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
-        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT%")));
-        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
-        BOOST_CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result.size() == 4);
+        CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT%")));
+        CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
+        CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
         result.clear();
         tokenizer << STRING_LITERAL( " %COMMENT.%text \n");
-        BOOST_REQUIRE( result.size() == 5);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
-        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT")));
-        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
-        BOOST_CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
-        BOOST_CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result.size() == 5);
+        CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%COMMENT")));
+        CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
+        CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL("text ")));
+        CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
         tokenizer.setBypassMode( false);
     }
 
@@ -152,19 +152,19 @@ void testBackEndFeatures()
         tokenizer.setBypassMode( true);
         result.clear();
         tokenizer << STRING_LITERAL( " text%TRIM% \n");
-        BOOST_REQUIRE( result.size() == 4);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
-        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM%")));
-        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
-        BOOST_CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result.size() == 4);
+        CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
+        CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM%")));
+        CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        CHECK( result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
         result.clear();
         tokenizer << STRING_LITERAL( " text%TRIM.% \n");
-        BOOST_REQUIRE( result.size() == 5);
-        BOOST_CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
-        BOOST_CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM")));
-        BOOST_CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
-        BOOST_CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
-        BOOST_CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result.size() == 5);
+        CHECK( result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" text")));
+        CHECK( result[1] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%TRIM")));
+        CHECK( result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL("%")));
+        CHECK( result[3] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" ")));
+        CHECK( result[4] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
         tokenizer.setBypassMode( false);
     }
 
@@ -178,8 +178,8 @@ void testBackEndFeatures()
         tokenizer.close();
         tokenizer << STRING_LITERAL("start");
         tokenizer.open();
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK( expected == result);
+        REQUIRE( result.size() == 1);
+        CHECK( expected == result);
     }
 
     //full line without tags, no new line when end of file stream
@@ -190,8 +190,8 @@ void testBackEndFeatures()
 
         result.clear();
         tokenizer << STRING_LITERAL("start");
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK( expected == result);
+        REQUIRE( result.size() == 1);
+        CHECK( expected == result);
     }
 
     //full line without tags
@@ -202,8 +202,8 @@ void testBackEndFeatures()
 
         result.clear();
         tokenizer << STRING_LITERAL("start\n");
-        BOOST_REQUIRE( result.size() == 1);
-        BOOST_CHECK( expected == result);
+        REQUIRE( result.size() == 1);
+        CHECK( expected == result);
     }
 
     //generated tests
@@ -225,14 +225,14 @@ void testInlineTemplateProcessing()
     TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
 
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ * "), STRING_LITERAL("* /"), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* / "), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* /"), STRING_LITERAL("// $ ")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL(""), STRING_LITERAL("*/"), STRING_LITERAL("//$")), CTokenizerExceptions::ExInlinePrefixEmpty);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("")), CTokenizerExceptions::ExInlineGeneratedPostfixEmpty);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("**/"), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("**/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
-    BOOST_CHECK_THROW( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*/"), STRING_LITERAL(""), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ * "), STRING_LITERAL("* /"), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* / "), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* /"), STRING_LITERAL("// $ ")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL(""), STRING_LITERAL("*/"), STRING_LITERAL("//$")), CTokenizerExceptions::ExInlinePrefixEmpty);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("")), CTokenizerExceptions::ExInlineGeneratedPostfixEmpty);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("**/"), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("**/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*/"), STRING_LITERAL(""), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
 
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -252,13 +252,13 @@ void testInlineTemplateProcessing()
         tokenizer << STRING_LITERAL( "generated //$");
         tokenizer << STRING_LITERAL( " /*/ \n");
 
-        BOOST_REQUIRE( result.size() == 2);
-        BOOST_CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro  ")));
-        BOOST_CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
-        BOOST_REQUIRE( result2.size() == 3);
-        BOOST_CHECK(   result2[0] == STRING_LITERAL("text\n"));
-        BOOST_CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
-        BOOST_CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
+        REQUIRE( result.size() == 2);
+        CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro  ")));
+        CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result2.size() == 3);
+        CHECK(   result2[0] == STRING_LITERAL("text\n"));
+        CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
+        CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
     }
 
     {//test no postfix
@@ -272,22 +272,21 @@ void testInlineTemplateProcessing()
         tokenizer << STRING_LITERAL( "generated //$");
         tokenizer << STRING_LITERAL( " /*/ \n");
 
-        BOOST_REQUIRE( result.size() == 4);
-        BOOST_CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro */ ")));
-        BOOST_CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
-        BOOST_CHECK(   result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" / ")));
-        BOOST_CHECK(   result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
-        BOOST_REQUIRE( result2.size() == 3);
-        BOOST_CHECK(   result2[0] == STRING_LITERAL("text\n"));
-        BOOST_CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
-        BOOST_CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
+        REQUIRE( result.size() == 4);
+        CHECK(   result[0] == TokenT( TokenT::eTextFragment, STRING_LITERAL("  macro */ ")));
+        CHECK(   result[1] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        CHECK(   result[2] == TokenT( TokenT::eTextFragment, STRING_LITERAL(" / ")));
+        CHECK(   result[3] == TokenT( TokenT::eNewLine, STRING_LITERAL("\n")));
+        REQUIRE( result2.size() == 3);
+        CHECK(   result2[0] == STRING_LITERAL("text\n"));
+        CHECK(   result2[1] == STRING_LITERAL(" /* macro */ \n"));
+        CHECK(   result2[2] == STRING_LITERAL(" /*/ \n"));
     }
 
 
 }
 
-
-BOOST_AUTO_TEST_CASE( TTokenizer)
+TEST_CASE("TTokenizer", "[TTokenizer]")
 {
     {
         typedef std::string StringT;

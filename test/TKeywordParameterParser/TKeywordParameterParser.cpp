@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include "CombiKeywordParameterParser.gen.h"
 #include <string>
 #include <sstream>
@@ -46,14 +46,14 @@ void test( const char* testText, std::vector<std::string> expectedParameters, un
     parameters.resize(count);
     KeywordParameterParser::getParameters<PolicyT>( start, end, parameters);
     //check
-    BOOST_CHECK( *start == static_cast<typename StringT::value_type>('-'));
-    BOOST_REQUIRE( expectedParameters.size() == parameters.size());
+    CHECK( *start == static_cast<typename StringT::value_type>('-'));
+    REQUIRE( expectedParameters.size() == parameters.size());
     for( unsigned int i = 0; i < expectedParameters.size(); ++i)
     {
         bool ok = parameters[i] == StringConvert<StringT>( expectedParameters[i].c_str());
         if ( !ok )
         {
-            BOOST_CHECK( ok );
+            CHECK( ok );
         }
     }
 }
@@ -66,7 +66,7 @@ void test( const char* testText, std::vector<std::string> expectedParameters, un
     test<std::wstring, PolicyT>( testText, expectedParameters, count);
 }
 
-BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
+TEST_CASE( "TKeywordParameterParser", "[TKeywordParameterParser]")
 {
     { // one
         std::vector<std::string> expectedParameters;
@@ -83,10 +83,10 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        BOOST_CHECK_THROW( test<CPlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
-        BOOST_CHECK_THROW( test<CPlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
-        BOOST_CHECK_THROW( test<CPlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
-        BOOST_CHECK_THROW( test<CPlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
+        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
+        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
+        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
     }
 
     { // one + special chars
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        BOOST_CHECK_THROW( test<CCStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<CCStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
     }
 
     { // one + special chars
@@ -116,24 +116,24 @@ BOOST_AUTO_TEST_CASE( TKeywordParameterParser)
             std::string text("[\" \" , 99]");
             std::string::iterator it = text.begin();
             KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
-            BOOST_CHECK(it == text.end());
-            BOOST_CHECK(expectedParameters == parsedParameters);
+            CHECK(it == text.end());
+            CHECK(expectedParameters == parsedParameters);
         }
         expectedParameters.push_back("22");
         {
             std::string text("[ \" \" , 99, 22 ]");
             std::string::iterator it = text.begin();
             KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
-            BOOST_CHECK(it == text.end());
-            BOOST_CHECK(expectedParameters == parsedParameters);
+            CHECK(it == text.end());
+            CHECK(expectedParameters == parsedParameters);
         }
         expectedParameters.push_back("+42");
         {
             std::string text("[\" \",99,22,+42]");
             std::string::iterator it = text.begin();
             KeywordParameterParser::getParametersCombi1CStyle1UIntRepeatUIntOptional(it, text.end(), parsedParameters);
-            BOOST_CHECK(it == text.end());
-            BOOST_CHECK(expectedParameters == parsedParameters);
+            CHECK(it == text.end());
+            CHECK(expectedParameters == parsedParameters);
         }
     }
 

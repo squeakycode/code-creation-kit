@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <set>
@@ -59,7 +59,7 @@ void run_test()
         DependencyPrinter::printMpc( tables, generatedFiles, templateFiles, StringT(STRING_LITERAL("c:/a/b/a.agen")), stream);
         StringT result = stream.str();
 
-        BOOST_CHECK( result == STRING_LITERAL("a.agen >> ../../x/y/z/b.txt \"d:/a/b/c/a; .txt\" << a.csv c/b.csv ../../b.tpl ../a.tpl"));
+        CHECK( result == STRING_LITERAL("a.agen >> ../../x/y/z/b.txt \"d:/a/b/c/a; .txt\" << a.csv c/b.csv ../../b.tpl ../a.tpl"));
     }
 
 
@@ -68,12 +68,12 @@ void run_test()
         DependencyPrinter::printVs( tables, generatedFiles, templateFiles, StringT(STRING_LITERAL("c:/a/b/a.agen")), stream);
         StringT result = stream.str();
 
-        BOOST_CHECK( result == STRING_LITERAL("Parameters for creating a custom build step for file:\na.agen\n\nCommand Line:\n$(CCK_ROOT)\\bin\\ccktc.exe \"$(InputPath)\"\n\nDescription:\nInvoking code-creation-kit text compiler on a.agen\n\nOutputs:\n../../x/y/z/b.txt;\"d:/a/b/c/a; .txt\"\n\nAdditional Dependencies:\na.csv;c/b.csv;../../b.tpl;../a.tpl\n\n"));
+        CHECK( result == STRING_LITERAL("Parameters for creating a custom build step for file:\na.agen\n\nCommand Line:\n$(CCK_ROOT)\\bin\\ccktc.exe \"$(InputPath)\"\n\nDescription:\nInvoking code-creation-kit text compiler on a.agen\n\nOutputs:\n../../x/y/z/b.txt;\"d:/a/b/c/a; .txt\"\n\nAdditional Dependencies:\na.csv;c/b.csv;../../b.tpl;../a.tpl\n\n"));
     }
 }
 
 
-BOOST_AUTO_TEST_CASE( TDependencyPrinter)
+TEST_CASE( "TDependencyPrinter", "[TDependencyPrinter]")
 {
 #ifdef _MSC_VER //TODO
     run_test<std::string>();

@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include "CLineCollector.h"
 
@@ -43,7 +43,7 @@ public:
     std::vector<StringT> result; 
 };
 
-BOOST_AUTO_TEST_CASE( TLineCollector)
+TEST_CASE( "TLineCollector", "[TLineCollector]")
 {
     //types in test
     typedef std::string StringT;
@@ -77,5 +77,5 @@ BOOST_AUTO_TEST_CASE( TLineCollector)
         ;
 
     //compare equal
-    BOOST_CHECK( expectedLines.result == lines.result);
+    CHECK( expectedLines.result == lines.result);
 }

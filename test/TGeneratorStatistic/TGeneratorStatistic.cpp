@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include <string>
 #include <vector>
@@ -33,10 +33,10 @@
 
 using namespace code_creation_kit;
 
-BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
+TEST_CASE( "TGeneratorStatistic", "[TGeneratorStatistic]")
 {
-    BOOST_REQUIRE(CreateDirForTesting("IncludeDirectory"));
-    BOOST_CHECK_NO_THROW(CreateTGeneratorStatisticFiles());
+    REQUIRE(CreateDirForTesting("IncludeDirectory"));
+    CHECK_NOTHROW(CreateTGeneratorStatisticFiles());
 
     // standard
     {
@@ -49,14 +49,14 @@ BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
         generator.addIncludeDirectory("IncludeDirectory");
         generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>());
 
-        BOOST_REQUIRE( generator.getTableFiles().size() == 1);
-        BOOST_REQUIRE( generator.getGeneratedFiles().size() == 1);
-        BOOST_REQUIRE( generator.getTemplateFiles().size() == 2);
+        REQUIRE( generator.getTableFiles().size() == 1);
+        REQUIRE( generator.getGeneratedFiles().size() == 1);
+        REQUIRE( generator.getTemplateFiles().size() == 2);
 
-        BOOST_CHECK( *generator.getTableFiles().begin() == "a");
-        BOOST_CHECK( *generator.getGeneratedFiles().begin() == CCK_TEST_INPUT_FILE_PREFIX "out.txt");
-        BOOST_CHECK( *generator.getTemplateFiles().begin() == "IncludeDirectory/" CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt");
-        BOOST_CHECK( *(++generator.getTemplateFiles().begin()) == CCK_TEST_INPUT_FILE_PREFIX "test2.tpl.txt");
+        CHECK( *generator.getTableFiles().begin() == "a");
+        CHECK( *generator.getGeneratedFiles().begin() == CCK_TEST_INPUT_FILE_PREFIX "out.txt");
+        CHECK( *generator.getTemplateFiles().begin() == "IncludeDirectory/" CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt");
+        CHECK( *(++generator.getTemplateFiles().begin()) == CCK_TEST_INPUT_FILE_PREFIX "test2.tpl.txt");
     }
     // inline
     {
@@ -69,13 +69,13 @@ BOOST_AUTO_TEST_CASE( TGeneratorStatistic)
         generator.addIncludeDirectory("IncludeDirectory");
         generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>( true, "$$$", "", "&&&&", 0));
 
-        BOOST_REQUIRE( generator.getTableFiles().size() == 1);
-        BOOST_REQUIRE( generator.getGeneratedFiles().size() == 1);
-        BOOST_REQUIRE( generator.getTemplateFiles().size() == 2);
+        REQUIRE( generator.getTableFiles().size() == 1);
+        REQUIRE( generator.getGeneratedFiles().size() == 1);
+        REQUIRE( generator.getTemplateFiles().size() == 2);
 
-        BOOST_CHECK( *generator.getTableFiles().begin() == "a");
-        BOOST_CHECK( *generator.getGeneratedFiles().begin() == CCK_TEST_INPUT_FILE_PREFIX "out.txt");
-        BOOST_CHECK( *generator.getTemplateFiles().begin() == "IncludeDirectory/" CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt");
-        BOOST_CHECK( *(++generator.getTemplateFiles().begin()) == CCK_TEST_INPUT_FILE_PREFIX "test2.tpl.txt");
+        CHECK( *generator.getTableFiles().begin() == "a");
+        CHECK( *generator.getGeneratedFiles().begin() == CCK_TEST_INPUT_FILE_PREFIX "out.txt");
+        CHECK( *generator.getTemplateFiles().begin() == "IncludeDirectory/" CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt");
+        CHECK( *(++generator.getTemplateFiles().begin()) == CCK_TEST_INPUT_FILE_PREFIX "test2.tpl.txt");
     }
 }

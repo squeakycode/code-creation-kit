@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 #include <string>
 #include "Conversions.h"
 #include <iostream>
@@ -42,8 +42,8 @@ void testReplace()
         ReplaceConversionT replace( "b", "BB");
 
         replace.modify( v);
-        BOOST_CHECK( v[0] == "aBBc");
-        BOOST_CHECK( v[1] == "aBc");
+        CHECK( v[0] == "aBBc");
+        CHECK( v[1] == "aBc");
     }
 
     { //replace ignore case
@@ -54,8 +54,8 @@ void testReplace()
         ReplaceConversionT replace( "b", "BB");
         replace.ignoreCase(true);
         replace.modify( v);
-        BOOST_CHECK( v[0] == "aBBc");
-        BOOST_CHECK( v[1] == "aBBc");
+        CHECK( v[0] == "aBBc");
+        CHECK( v[1] == "aBBc");
     }
 
     { //test compare
@@ -67,9 +67,9 @@ void testReplace()
         IConversion<StringT>* modB = &replaceB;
         IConversion<StringT>* modC = &replaceC;
 
-        BOOST_CHECK( !(*modA == *modB));
-        BOOST_CHECK( *modA == *modA);
-        BOOST_CHECK( *modA == *modC);
+        CHECK( !(*modA == *modB));
+        CHECK( *modA == *modA);
+        CHECK( *modA == *modC);
     }
 
 }
@@ -85,7 +85,7 @@ void testMerge()
         MergeConversionT replace( ";");
 
         replace.modify( v);
-        BOOST_CHECK( v[0] == "abc;aBc;1");
+        CHECK( v[0] == "abc;aBc;1");
     }
 
     { //test compare
@@ -97,9 +97,9 @@ void testMerge()
         IConversion<StringT>* modB = &mergeB;
         IConversion<StringT>* modC = &mergeC;
 
-        BOOST_CHECK( !(*modA == *modB));
-        BOOST_CHECK( *modA == *modA);
-        BOOST_CHECK( *modA == *modC);
+        CHECK( !(*modA == *modB));
+        CHECK( *modA == *modA);
+        CHECK( *modA == *modC);
     }
 
 }
@@ -114,7 +114,7 @@ void testToCString()
     v.push_back( STRING_LITERAL("abc\'\"\?\\\a\b\f\n\r\t\v123"));
 
     toCString.modify( v);
-    BOOST_CHECK( v[0] == STRING_LITERAL("abc\\'\\\"\\?\\\\\\a\\b\\f\\n\\r\\t\\v123"));
+    CHECK( v[0] == STRING_LITERAL("abc\\'\\\"\\?\\\\\\a\\b\\f\\n\\r\\t\\v123"));
 }
 
 template <typename StringT, typename ConversionT>
@@ -127,7 +127,7 @@ void testHtmlEscape()
     v.push_back(STRING_LITERAL("&, <, >, \", ', `, (, ), {, }, [, ], !, @, $, %, =, +,"));
 
     htmlEscape.modify(v);
-    BOOST_CHECK(v[0] == STRING_LITERAL("&amp;, &lt;, &gt;, &quot;, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
+    CHECK(v[0] == STRING_LITERAL("&amp;, &lt;, &gt;, &quot;, &#39;, &#96;, &#40;, &#41;, &#123;, &#125;, &#91;, &#93;, &#33;, &#64;, &#36;, &#37;, &#61;, &#43;,"));
 }
 
 template <typename StringT, typename ConversionT>
@@ -147,7 +147,7 @@ void testPad(const StringT& in, const StringT& out, const StringT& padText, cons
         pad.modify(v);
         if (v[0] != out)
         {
-            BOOST_CHECK(v[0] == out);
+            CHECK(v[0] == out);
         }
     }
 }
@@ -194,7 +194,7 @@ void testBlockFormat(const StringT& in, const StringT& out, const StringT& block
         bf.modify(v);
         if (v[0] != out)
         {
-            BOOST_CHECK(v[0] == out);
+            CHECK(v[0] == out);
         }
     }
 }
@@ -244,7 +244,7 @@ void testCalculation(const std::string& in, const std::string& out, const std::s
             toErrorStream(STRING_LITERAL("Expected: "), StringConvert<StringT>(out));
             toErrorStream(STRING_LITERAL("Result: "), v[0]);
         }
-        BOOST_CHECK(result);
+        CHECK(result);
     }
 }
 
@@ -253,18 +253,18 @@ template <typename StringT>
 void testCalculation()
 {
     typedef typename StringT::value_type CharT;
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a#+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "a+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("a1", "3", "a+1"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b*"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "b**"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    BOOST_CHECK_THROW(testCalculation<StringT>("1", "3", "*b"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a#+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("a1", "3", "a+1"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b*"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b**"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "*b"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
 
     testCalculation<StringT>("1", "3", "a+2");
     testCalculation<StringT>("1", "304", "a+2+300+1");
@@ -317,7 +317,7 @@ void testToCsv(const StringT& in, const StringT& out, const StringT& csvDelimite
             toErrorStream(STRING_LITERAL("Expected: "), out);
             toErrorStream(STRING_LITERAL("Result: "), v[0]);
         }
-        BOOST_CHECK(result);
+        CHECK(result);
     }
 }
 
@@ -343,7 +343,7 @@ void testToCsv()
     testToCsv<StringT>(STRING_LITERAL("abc"), STRING_LITERAL("#abc#"), STRING_LITERAL(""), STRING_LITERAL("#c"));
 }
 
-BOOST_AUTO_TEST_CASE( TConversions)
+TEST_CASE( "TConversions", "[TConversions]")
 {
     testReplace<std::string, CReplaceConversion<std::string> >();
     testReplace<std::string, CRegexReplaceConversion<std::string> >();

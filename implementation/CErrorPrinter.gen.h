@@ -34,7 +34,7 @@
 #include "FileSystem.h"
 #include "StringLiteral.h"
 
-#if defined BOOST_TEST_MAIN
+#if defined CODE_CREATION_KIT_JUST_TESTING
 //prevent test output to be listed as error
 #   define CODE_CREATION_KIT_ERROR_TAG1 "just_testing"
 #   define CODE_CREATION_KIT_ERROR_TAG2 "Just_Testing"

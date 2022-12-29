@@ -23,8 +23,8 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
 
 #include "CFilesBinaryEqual.h"
 #include <string>
@@ -32,15 +32,14 @@
 
 using namespace code_creation_kit;
 
-BOOST_AUTO_TEST_CASE( TFilesBinaryEqual)
+TEST_CASE( "TFilesBinaryEqual", "[TFilesBinaryEqual]")
 {
-    BOOST_CHECK_NO_THROW(CreateTFilesBinaryEqualFiles());
+    CHECK_NOTHROW(CreateTFilesBinaryEqualFiles());
 
-    BOOST_CHECK( FilesBinaryEqual<std::string>( CCK_TEST_INPUT_FILE_PREFIX "a.txt", CCK_TEST_INPUT_FILE_PREFIX "a_.txt"));
-    BOOST_CHECK( !FilesBinaryEqual<std::string>( CCK_TEST_INPUT_FILE_PREFIX "a.txt", CCK_TEST_INPUT_FILE_PREFIX "b.txt"));
-    //TODO: make compile under linux
+    CHECK( FilesBinaryEqual<std::string>( CCK_TEST_INPUT_FILE_PREFIX "a.txt", CCK_TEST_INPUT_FILE_PREFIX "a_.txt"));
+    CHECK( !FilesBinaryEqual<std::string>( CCK_TEST_INPUT_FILE_PREFIX "a.txt", CCK_TEST_INPUT_FILE_PREFIX "b.txt"));
 #ifdef WIN32
-    BOOST_CHECK( FilesBinaryEqual<std::wstring>( CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a.txt", CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a_.txt"));
-    BOOST_CHECK( !FilesBinaryEqual<std::wstring>( CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a.txt", CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"b.txt"));
+    CHECK( FilesBinaryEqual<std::wstring>( CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a.txt", CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a_.txt"));
+    CHECK( !FilesBinaryEqual<std::wstring>( CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"a.txt", CCK_TEST_INPUT_FILE_PREFIX_WCHAR L"b.txt"));
 #endif
 }
