@@ -176,7 +176,7 @@ namespace code_creation_kit
 
             checkCharsUsedForCsvParsing(UsedCsvCharsCheck_All, delimiterChars, quoteChars, commentChars);
 
-            CharT c;
+            CharT c = 0;
             StringT item;
             bool newLine = true;
 
@@ -296,6 +296,16 @@ namespace code_creation_kit
             if (stream.bad() || (stream.fail() && !stream.eof()))
             {
                 throw ExStreamBad();
+            }
+            else if (
+                !newLine //last character of file is not new line
+                && isDelimiter(c) //the previous character was a delimiter
+                )
+            {
+                //last item is empty followed by end of file
+                //add this empty item
+                item.clear();
+                tableBuilder.addItem(item);
             }
 
             tableBuilder.finished();

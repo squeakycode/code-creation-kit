@@ -72,6 +72,13 @@ namespace test_data
         {"\"a1","b\"1","c1\""},
         {"\"x","y\"","z"},
     };
+
+    const char* itemTableEmptyLastItemOnEof[2][2] =
+    {
+        {"a1","b1"},
+        {"x" ,""}
+    };
+
 }
 
 ///table builder test stub 
@@ -155,6 +162,45 @@ struct TCsvParserTableBuilderDoubleQuote
     typedef std::string StringT;
 };
 
+///table builder test stub 
+struct TCsvParserTableBuilderEmptyLastItemOnEof
+{
+    TCsvParserTableBuilderEmptyLastItemOnEof() : row(0), col(0), items(0), finishedCount(0) {}
+
+    ///checks data and positions
+    void addItem(const std::string& item)
+    {
+        REQUIRE(row < 2);
+        REQUIRE(col < 2);
+
+        CHECK(item == test_data::itemTableEmptyLastItemOnEof[row][col]);
+
+        col++;
+        items++;
+    }
+
+    ///checks row handling
+    void addRow()
+    {
+        CHECK(col == 2);
+        row++;
+        col = 0;
+    }
+
+    ///checks finished handling
+    void finished()
+    {
+        finishedCount++;
+    }
+
+    unsigned int row;
+    unsigned int col;
+    unsigned int items;
+    int finishedCount;
+
+    typedef std::string StringT;
+};
+
 TEST_CASE( "TCsvParser", "[TCsvParser]")
 {
     CHECK_NOTHROW(CreateTCsvParserFiles());
@@ -215,5 +261,18 @@ TEST_CASE( "TCsvParser", "[TCsvParser]")
         CHECK( helperDoubleQuote.row == 1 );
         CHECK( helperDoubleQuote.items == 6 );
         CHECK( helperDoubleQuote.finishedCount == 1);
+    }
+
+    //check empty last item when eof
+    {
+        TCsvParserTableBuilderEmptyLastItemOnEof helperEmptyLastItemOnEof;
+        std::stringstream s;
+        s << "a1;b1\nx;";
+        parser.parse(s, helperEmptyLastItemOnEof, ";", "", "");
+
+        //check parsing ok
+        CHECK(helperEmptyLastItemOnEof.row == 1);
+        CHECK(helperEmptyLastItemOnEof.items == 4);
+        CHECK(helperEmptyLastItemOnEof.finishedCount == 1);
     }
 }
