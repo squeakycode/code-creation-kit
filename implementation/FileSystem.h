@@ -25,12 +25,21 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#endif
+#include "3rdparty/ghc/filesystem.hpp"
+#ifdef _MSC_VER
+#pragma warning( pop ) 
+#endif
+
 #include "StringLiteral.h"
 #include "cppstringx.hpp"
 
 #include <iostream>
+
+namespace filesystem_namespace = ghc;
 
 namespace code_creation_kit
 {
@@ -38,12 +47,12 @@ namespace code_creation_kit
     {
 
         template <typename StringT>
-        inline StringT getString(const boost::filesystem::path&)
+        inline StringT getString(const filesystem_namespace::filesystem::path&)
         {
         }
 
         template <>
-        inline std::string getString(const boost::filesystem::path& p)
+        inline std::string getString(const filesystem_namespace::filesystem::path& p)
         {
             std::string s = p.string();
             std::string result = cppstringx::replace_all_copy(s, "\\", "/");
@@ -51,7 +60,7 @@ namespace code_creation_kit
         }
 
         template <>
-        inline std::wstring getString(const boost::filesystem::path& p)
+        inline std::wstring getString(const filesystem_namespace::filesystem::path& p)
         {
             std::wstring s = p.wstring();
             std::wstring result = cppstringx::replace_all_copy(s, "\\", "/");
@@ -68,19 +77,49 @@ namespace code_creation_kit
 #endif
         }
 
+        //restores deprecated boost behavior without treating symlinks correctly, TODO
+        inline void unsafe_normalize(filesystem_namespace::filesystem::path& p)
+        {
+            filesystem_namespace::filesystem::path result;
+            for (filesystem_namespace::filesystem::path::iterator it = p.begin(); it != p.end();
+                ++it)
+            {
+                if (*it == "..")
+                {
+                    if (result.filename() == ".." || result.empty())
+                    {
+                        result /= *it;
+                    }
+                    else
+                    {
+                        result = result.parent_path();
+                    }
+                }
+                else if (*it == ".")
+                {
+                    // ignore
+                }
+                else
+                {
+                    result /= *it;
+                }
+            }
+            p = result;
+        }
+
         ///returns the location (path+name) determined from a fixed location and a location that may be relative to the fixed location
         template <typename StringT>
         inline StringT determineRelativeLocation( const StringT& location, const StringT& dependentLocation, bool locationIsFile = true)
         {
             typedef typename StringT::value_type CharT;
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
 
             //create path objects
             PathT base( location);
             PathT dependent( dependentLocation);
 
-            base.normalize();
-            dependent.normalize();
+            unsafe_normalize(base);
+            unsafe_normalize(dependent);
 
             //remove filename if file
             if ( locationIsFile )
@@ -150,7 +189,7 @@ namespace code_creation_kit
         template <typename StringT>
         inline StringT determineDependentLocation( const StringT& location, const StringT& relativeLocation, bool locationIsFile = true)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT base( location);
             PathT relative( relativeLocation);
 
@@ -158,7 +197,7 @@ namespace code_creation_kit
             if (relative.is_absolute())
             {
                 //normalize it removing superfluous '..' and so on
-                relative.normalize();
+                unsafe_normalize(relative);
                 return getString<StringT>( relative);
             }
             else
@@ -166,7 +205,7 @@ namespace code_creation_kit
                 //create new location relative to base
                 PathT  dependentLocation( (locationIsFile ? base.parent_path() : base) / relativeLocation);
                 //normalize it removing superfluous '..' and so on
-                dependentLocation.normalize();
+                unsafe_normalize(dependentLocation);
                 return getString<StringT>( dependentLocation);
             }
         }
@@ -175,7 +214,7 @@ namespace code_creation_kit
         template <typename StringT>
         inline StringT determineFilename( const StringT& location)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT path( location);
             return getString<StringT>(path.filename());
         }
@@ -184,7 +223,7 @@ namespace code_creation_kit
         template <typename StringT>
         inline StringT removeExtension(const StringT& location)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT path(location);
             path.replace_extension();
             return getString<StringT>(path);
@@ -194,8 +233,8 @@ namespace code_creation_kit
         template <typename StringT>
         inline StringT determineDependentLocation(const StringT& relativeLocation)
         {
-            typedef boost::filesystem::path PathT;
-            PathT initialPath( boost::filesystem::initial_path<PathT>());
+            typedef filesystem_namespace::filesystem::path PathT;
+            PathT initialPath;
             return determineDependentLocation(getString<StringT>(initialPath), relativeLocation, false);
         }
 
@@ -203,28 +242,28 @@ namespace code_creation_kit
         template <typename StringT>
         inline bool isRegularFile( const StringT& location)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT path( location);
-            return boost::filesystem::is_regular_file( path);
+            return filesystem_namespace::filesystem::is_regular_file( path);
         }
 
         /// removes a file
         template <typename StringT>
         inline bool removeFile( const StringT& location)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT path( location);
-            return boost::filesystem::remove( path);
+            return filesystem_namespace::filesystem::remove( path);
         }
 
         /// moves a file
         template <typename StringT>
         inline void moveFile( const StringT& from, const StringT& to)
         {
-            typedef boost::filesystem::path PathT;
+            typedef filesystem_namespace::filesystem::path PathT;
             PathT pathFrom( from);
             PathT pathTo( to);
-            boost::filesystem::rename( from, to);
+            filesystem_namespace::filesystem::rename( from, to);
         }
 
         /// recycle a file

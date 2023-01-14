@@ -36,6 +36,7 @@ bool run_test( const StringT& base, const StringT& relative, const StringT& expe
 {
     StringT result = FileSystem::determineDependentLocation<StringT>( base, relative);
 
+    CHECK(result == expected);
     if ( result != expected)
     {
         return false;
@@ -48,6 +49,7 @@ bool run_test_relative( const StringT& base, const StringT& relative, const Stri
 {
     StringT result = FileSystem::determineRelativeLocation<StringT>( base, relative);
 
+    CHECK(result == expected);
     if ( result != expected)
     {
         return false;
