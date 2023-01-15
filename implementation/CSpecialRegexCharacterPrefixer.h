@@ -37,7 +37,6 @@ namespace code_creation_kit
         template <typename StringT>
         static void prefixSpecialCharacters( StringT& text)
         {
-            typedef typename StringT::value_type CharT;
             StringT result;
             for (typename StringT::value_type c : text)
             {

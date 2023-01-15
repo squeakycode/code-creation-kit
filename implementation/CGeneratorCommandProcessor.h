@@ -219,7 +219,7 @@ namespace code_creation_kit
         //prints parser help
         void printDescription()
         {
-            m_parser.printDescription();
+            m_parser.printDescription(std::cout);
         }
 
     private:

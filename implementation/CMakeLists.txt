@@ -109,7 +109,6 @@ target_include_directories(cck_implementation
 INTERFACE
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 PRIVATE
-${Boost_INCLUDE_DIR}
 )
 
 custom_target_use_highest_warning_level(cck_implementation)

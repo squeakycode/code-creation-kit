@@ -7,29 +7,21 @@
 
 #pragma once
 
-#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <cstring>
+#include <cwchar>
+#include <climits>
+#include "StringLiteral.h"
+#include "3rdparty/boost/split_winmain.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4512 )
-#pragma warning( disable : 4702 )
-#endif
-#include "boost/program_options.hpp"
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4512 )
-#endif
-
-///parses the command line, provides the parameters from the command line, and checks for valid option combinations
+//parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
 class CCommandLineParser
 {
-    typedef typename StringT::value_type CharT; 
-    typedef boost::program_options::basic_command_line_parser<CharT> CommandLineParserT;
+    typedef typename StringT::value_type CharT;
+    static const size_t cLeftColumnSize = 40;
 
 public:
     ///lists valid option combinations
@@ -43,131 +35,210 @@ public:
         eNoOptionsGiven,
         eOptionsInvalid
     };
-    
-    ///sets up the option description used by boost program options library
-    CCommandLineParser()
-      : m_description("Command Line Options")
-      , m_descriptionhelp("Help")
-      , m_descriptionCommand("Command")
-      , m_descriptionCommandFile("Command File")
-    {
-        // Declare the supported options.
-        
-        ;
-        m_descriptionhelp.add_options() //("Help")
-            ("help,h", "Print help message")
-        ;
-        m_descriptionCommand.add_options() //("Command")
-            ("command,c", value<std::vector<StringT> >(), "Execute a command. This option can be specified multiple times. The commands are executed in the order they are specified.")
-        ;
-        m_descriptionCommandFile.add_options() //("Command File")
-            ("command-file,f", value<std::vector<StringT> >(), "Execute a command file. This option can be specified multiple times. The command files are executed in the order they are specified. Default when the option name is omitted.")
-            ("process-instant-template,t", value<std::vector<StringT> >(), "Process an instant template file (extension itpl). An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.")
-            ("output-dependencies,d", value<StringT >(), "Output  command files dependencies instead of processing. Available styles are mpc (Meta Project Creator) or vs (Visual Studio).")
-            ("prompt,p", value<bool >()->zero_tokens(), "Wait after processing or dependency output on a key press. Prompt for rerunning the command file(s).")
-            ;
-        // Add the positional descriptions
-        m_positionalDescription.add( "command-file", -1);
 
-        // Connect descriptions
-        m_description.add( m_descriptionhelp);
-        m_description.add( m_descriptionCommand);
-        m_description.add( m_descriptionCommandFile);
+    CCommandLineParser()
+    {
+        reset();
+    }
+
+    ///reset the parsed data
+    void reset()
+    {
+        m_HelpPassed = false;
+        m_CommandsPassed = false;
+        m_CommandFilesPassed = false;
+        m_InstantTemplateFilesPassed = false;
+        m_OutputDependenciesStylePassed = false;
+        m_PromptPassed = false;
+
+        m_CommandsValue.clear();
+        m_CommandFilesValue.clear();
+        m_InstantTemplateFilesValue.clear();
+        m_OutputDependenciesStyleValue.clear();
+    }
+
+    void printDescription(std::ostream& stream)
+    {
+        stream << "Command Line Options" << std::endl;
+        stream << "Help" << ":" << std::endl;
+        printHelpCommandText("  -h [ --help ]", stream);
+        stream << "Print help message" << std::endl;
+        stream << "Command" << ":" << std::endl;
+        printHelpCommandText("  -c [ --command ] arg", stream);
+        stream << "Execute a command. This option can be" << std::endl;
+        stream << "                                        specified multiple times. The commands" << std::endl;
+        stream << "                                        are executed in the order they are" << std::endl;
+        stream << "                                        specified." << std::endl;
+        stream << "Command File" << ":" << std::endl;
+        printHelpCommandText("  -f [ --command-file ] arg", stream);
+        stream << "Execute a command file. This option can" << std::endl;
+        stream << "                                        be specified multiple times. The" << std::endl;
+        stream << "                                        command files are executed in the order" << std::endl;
+        stream << "                                        they are specified. Default when the" << std::endl;
+        stream << "                                        option name is omitted." << std::endl;
+        printHelpCommandText("  -t [ --process-instant-template ] arg", stream);
+        stream << "Process an instant template file" << std::endl;
+        stream << "                                        (extension itpl). An instant template" << std::endl;
+        stream << "                                        file contains or loads all needed" << std::endl;
+        stream << "                                        tables. The name of the output file is" << std::endl;
+        stream << "                                        build by removing the extension. This" << std::endl;
+        stream << "                                        option can be specified multiple times." << std::endl;
+        stream << "                                        The commands are executed in the order" << std::endl;
+        stream << "                                        they are specified." << std::endl;
+        printHelpCommandText("  -d [ --output-dependencies ] arg", stream);
+        stream << "Output  command files dependencies" << std::endl;
+        stream << "                                        instead of processing. Available styles" << std::endl;
+        stream << "                                        are mpc (Meta Project Creator) or vs" << std::endl;
+        stream << "                                        (Visual Studio)." << std::endl;
+        printHelpCommandText("  -p [ --prompt ]", stream);
+        stream << "Wait after processing or dependency" << std::endl;
+        stream << "                                        output on a key press. Prompt for" << std::endl;
+        stream << "                                        rerunning the command file(s)." << std::endl;
     }
 
     ///parses standard command line parameters
-    void parse( int ac, CharT* av[])
+    void parse(int argc, CharT* args[])
     {
-        m_vmap = boost::program_options::variables_map();
-        boost::program_options::store( 
-            CommandLineParserT(ac, av).options(m_description).positional(m_positionalDescription).run()
-            , m_vmap
-        );
+        std::vector<const CharT*> argv;
+        argv.reserve(argc + 1);
+        for (int i = 0; i < argc; ++i)
+        {
+            argv.push_back(args[i]);
+        }
+        argv.push_back(NULL);
+        parse(argc, argv.data());
     }
     
-    ///parses command line parameters provided as single text string
-    void parse( const StringT& commandLine)
+    ///parses command line parameters
+    void parse(int argc, const CharT* argv[])
     {
-        m_vmap = boost::program_options::variables_map();
-#ifdef WIN32
-        std::vector<StringT> args = boost::program_options::split_winmain( commandLine);
-#else
-        std::vector<StringT> args = boost::program_options::split_unix( commandLine);
-#endif
-        boost::program_options::store( 
-            CommandLineParserT(args).options(m_description).positional(m_positionalDescription).run()
-            , m_vmap
-        );
+        reset();
+
+        for (int i = 1; i < argc; ++i)
+        {
+            //get current argument
+            bool argumentConsumed = false;
+            const CharT* arg = argv[ i ];
+            if (arg && arg[0] == '-')
+            {
+                if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("help"))) || isEqual(arg + 1, STRING_LITERAL("h")))
+                {
+                    argumentConsumed = true;
+                    m_HelpPassed = true;
+                }
+                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("command"))) || isEqual(arg + 1, STRING_LITERAL("c")))
+                {
+                    argumentConsumed = true;
+                    m_CommandsPassed = true;
+                    parseArgs(arg, argc, argv, ++i, m_CommandsValue, 1, SIZE_MAX);
+                }
+                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("command-file"))) || isEqual(arg + 1, STRING_LITERAL("f")))
+                {
+                    argumentConsumed = true;
+                    m_CommandFilesPassed = true;
+                    parseArgs(arg, argc, argv, ++i, m_CommandFilesValue, 1, SIZE_MAX);
+                }
+                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("process-instant-template"))) || isEqual(arg + 1, STRING_LITERAL("t")))
+                {
+                    argumentConsumed = true;
+                    m_InstantTemplateFilesPassed = true;
+                    parseArgs(arg, argc, argv, ++i, m_InstantTemplateFilesValue, 1, SIZE_MAX);
+                }
+                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("output-dependencies"))) || isEqual(arg + 1, STRING_LITERAL("d")))
+                {
+                    argumentConsumed = true;
+                    m_OutputDependenciesStylePassed = true;
+                    parseArg(arg, argc, argv, ++i, m_OutputDependenciesStyleValue, false);
+                }
+                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("prompt"))) || isEqual(arg + 1, STRING_LITERAL("p")))
+                {
+                    argumentConsumed = true;
+                    m_PromptPassed = true;
+                }
+            }
+            
+            if (!argumentConsumed && !m_CommandFilesPassed)
+            {
+                argumentConsumed = true;
+                m_CommandFilesPassed = true;
+                parseArgs("--command-file", argc, argv, i, m_CommandFilesValue, 1, static_cast<size_t>(-1));
+            }
+            if (!argumentConsumed)
+            {
+                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
+            }
+        }
     }
-    
-    ///prints the option description to cout
-    void printDescription() const
+
+    void parse(const StringT& commandLine)
     {
-        std::cout << m_description << std::endl;
+        std::vector<StringT> args = boost::program_options::split_winmain(commandLine);
+        std::vector<const CharT*> argv;
+        argv.reserve(args.size() + 2);
+        argv.push_back("");
+        for (const StringT& arg : args)
+        {
+            argv.push_back(arg.c_str());
+        }
+        argv.push_back(NULL);
+        parse(static_cast<int>(args.size() + 1), argv.data());
     }
-    
+
     ///determines the command by checking the combination of parameters provided
     ECommand getCommand() const
     {
-        bool providedHelp = hasHelp();
-        bool providedCommands = hasCommands();
-        bool providedCommandFiles = hasCommandFiles();
-        bool providedInstantTemplateFiles = hasInstantTemplateFiles();
-        bool providedOutputDependenciesStyle = hasOutputDependenciesStyle();
-        bool providedPrompt = hasPrompt();
-    
         if (
-               providedHelp == true
-            && providedCommands == false
-            && providedCommandFiles == false
-            && providedInstantTemplateFiles == false
-            && providedOutputDependenciesStyle == false
-            && providedPrompt == false
+               m_HelpPassed == true
+            && m_CommandsPassed == false
+            && m_CommandFilesPassed == false
+            && m_InstantTemplateFilesPassed == false
+            && m_OutputDependenciesStylePassed == false
+            && m_PromptPassed == false
         )
         {
             return eHelp;
         }
         
         if (
-               providedHelp == false
-            && providedCommands == true
-            && providedCommandFiles == false
-            && providedInstantTemplateFiles == false
-            && providedOutputDependenciesStyle == false
-            && providedPrompt == false
+               m_HelpPassed == false
+            && m_CommandsPassed == true
+            && m_CommandFilesPassed == false
+            && m_InstantTemplateFilesPassed == false
+            && m_OutputDependenciesStylePassed == false
+            && m_PromptPassed == false
         )
         {
             return eExecuteCommand;
         }
         
         if (
-               providedHelp == false
-            && providedCommands == false
-            && providedCommandFiles == true
-            && providedInstantTemplateFiles == false
-            && providedOutputDependenciesStyle == false
+               m_HelpPassed == false
+            && m_CommandsPassed == false
+            && m_CommandFilesPassed == true
+            && m_InstantTemplateFilesPassed == false
+            && m_OutputDependenciesStylePassed == false
         )
         {
             return eExecuteCommandFile;
         }
         
         if (
-               providedHelp == false
-            && providedCommands == false
-            && providedCommandFiles == true
-            && providedInstantTemplateFiles == false
-            && providedOutputDependenciesStyle == true
+               m_HelpPassed == false
+            && m_CommandsPassed == false
+            && m_CommandFilesPassed == true
+            && m_InstantTemplateFilesPassed == false
+            && m_OutputDependenciesStylePassed == true
         )
         {
             return eCommandFileDependencies;
         }
         
         if (
-               providedHelp == false
-            && providedCommands == false
-            && providedCommandFiles == false
-            && providedInstantTemplateFiles == true
-            && providedOutputDependenciesStyle == false
+               m_HelpPassed == false
+            && m_CommandsPassed == false
+            && m_CommandFilesPassed == false
+            && m_InstantTemplateFilesPassed == true
+            && m_OutputDependenciesStylePassed == false
         )
         {
             return eProcessInstantTemplate;
@@ -175,12 +246,12 @@ public:
         
         
         if (
-               !providedHelp
-            && !providedCommands
-            && !providedCommandFiles
-            && !providedInstantTemplateFiles
-            && !providedOutputDependenciesStyle
-            && !providedPrompt
+               !m_HelpPassed
+            && !m_CommandsPassed
+            && !m_CommandFilesPassed
+            && !m_InstantTemplateFilesPassed
+            && !m_OutputDependenciesStylePassed
+            && !m_PromptPassed
         )
         {
             return eNoOptionsGiven;
@@ -188,97 +259,207 @@ public:
         
         return eOptionsInvalid;
     }
-
-    ///returns the provided value
+    
+    bool getHelp() const
+    {
+        return m_HelpPassed;
+    }
+    
     std::vector<StringT> getCommands() const
     {
-        return m_vmap["command"].template as<std::vector<StringT> >();
+        return m_CommandsValue;
     }
-    
-    ///returns the provided value
+
     std::vector<StringT> getCommandFiles() const
     {
-        return m_vmap["command-file"].template as<std::vector<StringT> >();
+        return m_CommandFilesValue;
     }
-    
-    ///returns the provided value
+
     std::vector<StringT> getInstantTemplateFiles() const
     {
-        return m_vmap["process-instant-template"].template as<std::vector<StringT> >();
+        return m_InstantTemplateFilesValue;
     }
-    
-    ///returns the provided value
+
     StringT getOutputDependenciesStyle() const
     {
-        return m_vmap["output-dependencies"].template as<StringT >();
+        return m_OutputDependenciesStyleValue;
     }
-    
-    ///returns the provided value
+
     bool getPrompt() const
     {
-        return m_vmap["prompt"].template as<bool >();
+        return m_PromptPassed;
     }
     
-
-    ///indicates that the option help has been provided
+    
     bool hasHelp() const
     {
-        return m_vmap.count( "help") != 0;
+        return m_HelpPassed;
     }
     
-    ///indicates that the option command has been provided
     bool hasCommands() const
     {
-        return m_vmap.count( "command") != 0;
+        return m_CommandsPassed;
     }
     
-    ///indicates that the option command-file has been provided
     bool hasCommandFiles() const
     {
-        return m_vmap.count( "command-file") != 0;
+        return m_CommandFilesPassed;
     }
     
-    ///indicates that the option process-instant-template has been provided
     bool hasInstantTemplateFiles() const
     {
-        return m_vmap.count( "process-instant-template") != 0;
+        return m_InstantTemplateFilesPassed;
     }
     
-    ///indicates that the option output-dependencies has been provided
     bool hasOutputDependenciesStyle() const
     {
-        return m_vmap.count( "output-dependencies") != 0;
+        return m_OutputDependenciesStylePassed;
     }
     
-    ///indicates that the option prompt has been provided
     bool hasPrompt() const
     {
-        return m_vmap.count( "prompt") != 0;
+        return m_PromptPassed;
     }
     
+
     
-private:
-    ///assignment not supported
-    void operator=( const CCommandLineParser<StringT>&);
-    
-    ///creates the right value object depending on the character type
-    template<class T>
-    boost::program_options::typed_value<T, CharT>*
-    value()
+private:    
+    bool isOption(const CharT* arg)
     {
-        boost::program_options::typed_value<T, CharT>* r = new boost::program_options::typed_value<T, CharT>(0);
-        return r;        
+        bool result = false;
+        if (arg && arg[0] == '-')
+        {
+            if (arg[1] == '-')
+            {
+                if(
+                       isEqual(arg + 2, STRING_LITERAL("help"))
+                    || isEqual(arg + 2, STRING_LITERAL("command"))
+                    || isEqual(arg + 2, STRING_LITERAL("command-file"))
+                    || isEqual(arg + 2, STRING_LITERAL("process-instant-template"))
+                    || isEqual(arg + 2, STRING_LITERAL("output-dependencies"))
+                    || isEqual(arg + 2, STRING_LITERAL("prompt"))
+                )
+                {
+                    result = true;
+                }
+                
+            }
+            else if(
+                   isEqual(arg + 1, STRING_LITERAL("h"))
+                || isEqual(arg + 1, STRING_LITERAL("c"))
+                || isEqual(arg + 1, STRING_LITERAL("f"))
+                || isEqual(arg + 1, STRING_LITERAL("t"))
+                || isEqual(arg + 1, STRING_LITERAL("d"))
+                || isEqual(arg + 1, STRING_LITERAL("p"))
+            )
+            {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
+    bool isEqual(const char* a, const char* b)
+    {
+        bool result = (strcmp(a,b) == 0);
+        return result;
     }
 
-    boost::program_options::variables_map m_vmap; ///<map of the provided values
-    boost::program_options::options_description m_description; ///<the option description
-    boost::program_options::options_description m_descriptionhelp; ///<the option description of group: Help
-    boost::program_options::options_description m_descriptionCommand; ///<the option description of group: Command
-    boost::program_options::options_description m_descriptionCommandFile; ///<the option description of group: Command File
-    boost::program_options::positional_options_description m_positionalDescription; ///<description of positional options 
+    bool isEqual(const wchar_t* a, const wchar_t* b)
+    {
+        bool result = (wcscmp(a,b) == 0);
+        return result;
+    }
+
+    void printHelpCommandText(const char* text, std::ostream& stream)
+    {
+        size_t textSize = strlen(text);
+        if (textSize > (cLeftColumnSize - 1) )
+        {
+            stream << text << std::endl;
+            stream << std::string(cLeftColumnSize, ' ');
+        }
+        else
+        {
+            stream << text << std::string(cLeftColumnSize - textSize, ' ');
+        }
+    }
+
+    template <typename T>
+    bool parseArg(const CharT* option, int argc, const CharT** argv, int& index, T& parsedValue, bool valueOptional)
+    {
+        const char* argValue = argv[ index ];
+        
+        if ( index >= argc || !argValue || isOption(argValue))
+        {
+            if (valueOptional)
+            {
+                return false;
+            }
+            else
+            {
+                throw std::runtime_error( std::string("Option '") + option + "' requires a value.");
+            }
+        }
+        if ( !convertTo( parsedValue, argValue))
+        {
+            throw std::runtime_error( std::string("Error parsing value '") + argValue + "' of option '" + option + "'.");
+        }
+        return true;
+    }
+
+    template <typename T>
+    void parseArgs(const CharT* option, int argc, const CharT** argv, int& index, T& container, size_t minCount, size_t maxCount)
+    {
+        size_t argsParsed = 0;
+        for (; argsParsed <= maxCount && index < argc; ++argsParsed, ++index)
+        {
+            typename T::value_type parsedValue;
+            if (!parseArg(option, argc, argv, index, parsedValue, true))
+            {
+                --index;
+                break;
+            }
+            container.push_back(parsedValue);
+        }
+        if (argsParsed < minCount)
+        {
+            throw std::runtime_error( std::string("Option '") + option + "' requires more values.");
+        }
+    }
+
+    bool convertTo( std::string& value, const char* arg)
+    {
+        value = arg;
+        return true;
+    }
+    
+    bool convertTo( std::wstring& value, const wchar_t* arg)
+    {
+        value = arg;
+        return true;
+    }
+
+    //helper function for converting parameters
+    template <typename T>
+    bool convertTo( T& value, const CharT* arg)
+    {
+        std::stringstream s;
+        s << arg;
+        s >> value;
+        return s.eof();
+    }
+
+private:    
+    bool m_HelpPassed;
+    bool m_CommandsPassed;
+    bool m_CommandFilesPassed;
+    bool m_InstantTemplateFilesPassed;
+    bool m_OutputDependenciesStylePassed;
+    bool m_PromptPassed;
+
+    std::vector<StringT> m_CommandsValue;
+    std::vector<StringT> m_CommandFilesValue;
+    std::vector<StringT> m_InstantTemplateFilesValue;
+    StringT m_OutputDependenciesStyleValue;
 };
-
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-

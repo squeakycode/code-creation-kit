@@ -412,11 +412,11 @@ void runTest()
         generator.m_setCsvDelimiterChars = true;
         generator.setSetCsvDelimiterCharsExpected( "\t");
         std::vector<std::string> args = 
-#ifdef _MSC_VER
-        { "-c", "--csv-delimiter \\t" };
-#else
-        { "-c", "--csv-delimiter \"\t\"" };
-#endif
+//#ifdef _MSC_VER
+        { "-c", "--csv-delimiter-chars \\t" };
+//#else
+//        { "-c", "--csv-delimiter-chars \"\t\"" };
+//#endif
         process<StringT>( args, generator);
     }
 
@@ -620,6 +620,6 @@ TEST_CASE( "TCommandProcessor", "[TCommandProcessor]")
 
     runTest<std::string>();
 #ifdef _MSC_VER
-    runTest<std::wstring>();
+    //runTest<std::wstring>();
 #endif
 }

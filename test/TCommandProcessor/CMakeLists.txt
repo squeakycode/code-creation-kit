@@ -12,8 +12,6 @@ $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>
 target_link_libraries(Test_CommandProcessorRunner
     PRIVATE
     cck_implementation
-    Boost::program_options
-    Boost::filesystem
 )
 
 add_dependencies(Test_CommandProcessorRunner cck_implementation)

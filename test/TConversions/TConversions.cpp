@@ -252,7 +252,6 @@ void testCalculation(const std::string& in, const std::string& out, const std::s
 template <typename StringT>
 void testCalculation()
 {
-    typedef typename StringT::value_type CharT;
     CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
     CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
     CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);

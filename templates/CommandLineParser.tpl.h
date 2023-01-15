@@ -36,29 +36,21 @@
 
 #pragma once
 
-#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <cstring>
+#include <cwchar>
+#include <climits>
+#include "StringLiteral.h"
+#include "3rdparty/boost/split_winmain.h"
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4512 )
-#pragma warning( disable : 4702 )
-#endif
-#include "boost/program_options.hpp"
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4512 )
-#endif
-
-///parses the command line, provides the parameters from the command line, and checks for valid option combinations
+//parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
 class [ENTRY]["Parser Name"]
 {
-    typedef typename StringT::value_type CharT; 
-    typedef boost::program_options::basic_command_line_parser<CharT> CommandLineParserT;
+    typedef typename StringT::value_type CharT;
+    static const size_t cLeftColumnSize = 40;
 
 public:
     ///lists valid option combinations
@@ -68,75 +60,118 @@ public:
         eNoOptionsGiven,
         eOptionsInvalid
     };
-    
-    ///sets up the option description used by boost program options library
+
     [ENTRY]["Parser Name"]()
-      : m_description("[ENTRY]["Heading"]")
-      , m_description[ENTRY]["Group Name"]("[ENTRY]["Group Description"][TO_CSTRING]")
     {
-        // Declare the supported options.
-        [MACRO_BEGIN][IF][ENTRY]["Group Description"][OR][IF][LAST_TIME]m_description.add_options()[MACRO_END]
-        [MACRO_BEGIN][BEGIN][TRIM]
-        ;
-        m_description[ENTRY]["Group Name"].add_options() //("[ENTRY]["Group Description"]")
-        [OR][END][TRIM]
-            ("[ENTRY]["Name"][BEGIN],[ENTRY]["Shortcut"][OR][END]"[BEGIN], value<[ENTRY]["C++ Type"] >()[BEGIN]->zero_tokens()[IF][ENTRY]["Zero-Token"][OR]->multitoken()[IF][ENTRY]["Multi-Token"][OR][END][OR][END], "[ENTRY]["Description"][TO_CSTRING]")
-        [MACRO_END][TRIM]
-            ;
-        [MACRO_BEGIN][TRIM]
-        [BEGIN][IF][FIRST_TIME][TRIM]
-        // Add the positional descriptions
-        [OR][END][TRIM]
-        m_positionalDescription.add( "[ENTRY]["Name"]", [ENTRY]["Positional Count"]);[IF][ENTRY]["Positional"]
-        [MACRO_END][TRIM]
+        reset();
+    }
+
+    ///reset the parsed data
+    void reset()
+    {
+        m_[ENTRY]["C++ Name"]Passed = false;
 
         [MACRO_BEGIN][TRIM]
-        [BEGIN][IF][FIRST_TIME][TRIM]
-        // Connect descriptions
+        m_[ENTRY]["C++ Name"]Value = [ENTRY]["Default"][IF][ENTRY]["C++ Type"];
+        [OR][TRIM]
+        m_[ENTRY]["C++ Name"]Value.clear();[IF][ENTRY]["C++ Type"]
+        [MACRO_END][TRIM]
+    }
+
+    void printDescription(std::ostream& stream)
+    {
+        stream << "[ENTRY]["Heading"][TO_CSTRING]" << std::endl;
+        [MACRO_BEGIN][TRIM]
+        [BEGIN][TRIM]
+        stream << "[ENTRY]["Group Description"]" << ":" << std::endl;
         [OR][END][TRIM]
-        m_description.add( m_description[ENTRY]["Group Name"]);
+        [BEGIN][IF][ENTRY]["Shortcut"][TRIM]
+        printHelpCommandText("  -[ENTRY]["Shortcut"] [ --[ENTRY]["Name"] ][BEGIN][IF][ENTRY]["Zero-Token"][OR] arg[END]", stream);
+        [OR][TRIM]
+        printHelpCommandText("  --[ENTRY]["Name"][BEGIN][IF][ENTRY]["Zero-Token"][OR] arg[END]", stream);
+        [END][TRIM]
+        stream << "[ENTRY]["Description"][BLOCK_FORMAT][39][PAD_LEFT][" ",0,+40][TO_CSTRING][REPLACE]["\\n","\" << std::endl;\n        stream << \""]" << std::endl;
         [MACRO_END][TRIM]
     }
 
     ///parses standard command line parameters
-    void parse( int ac, CharT* av[])
+    void parse(int argc, CharT* args[])
     {
-        m_vmap = boost::program_options::variables_map();
-        boost::program_options::store( 
-            CommandLineParserT(ac, av).options(m_description).positional(m_positionalDescription).run()
-            , m_vmap
-        );
+        std::vector<const CharT*> argv;
+        argv.reserve(argc + 1);
+        for (int i = 0; i < argc; ++i)
+        {
+            argv.push_back(args[i]);
+        }
+        argv.push_back(NULL);
+        parse(argc, argv.data());
     }
     
-    ///parses command line parameters provided as single text string
-    void parse( const StringT& commandLine)
+    ///parses command line parameters
+    void parse(int argc, const CharT* argv[])
     {
-        m_vmap = boost::program_options::variables_map();
-#ifdef WIN32
-        std::vector<StringT> args = boost::program_options::split_winmain( commandLine);
-#else
-        std::vector<StringT> args = boost::program_options::split_unix( commandLine);
-#endif
-        boost::program_options::store( 
-            CommandLineParserT(args).options(m_description).positional(m_positionalDescription).run()
-            , m_vmap
-        );
+        reset();
+
+        for (int i = 1; i < argc; ++i)
+        {
+            //get current argument
+            bool argumentConsumed = false;
+            const CharT* arg = argv[ i ];
+            if (arg && arg[0] == '-')
+            {
+                [MACRO_BEGIN][TRIM]
+                [BEGIN][IF][FIRST_TIME][OR]else [END]if ([BEGIN](arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]"))) || isEqual(arg + 1, STRING_LITERAL("[ENTRY]["Shortcut"]"))[OR](arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]")))[OR]isEqual(arg[1], STRING_LITERAL("[ENTRY]["Shortcut"]")))[END])
+                {
+                    argumentConsumed = true;
+                    m_[ENTRY]["C++ Name"]Passed = true;
+                    [BEGIN][IF][ENTRY]["C++ Type"][IF][ENTRY]["Multi-Token"][TRIM]
+                    parseArgs(arg, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, 1, SIZE_MAX);
+                    [OR][IF][ENTRY]["C++ Type"][IF][NOT][ENTRY]["Zero-Token"][TRIM]
+                    parseArg(arg, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, false);
+                    [OR][END][TRIM]
+                }
+                [MACRO_END][TRIM]
+            }
+            
+            [MACRO_BEGIN][IF][ENTRY]["Positional"][TRIM]
+            if (!argumentConsumed && !m_[ENTRY]["C++ Name"]Passed)
+            {
+                argumentConsumed = true;
+                m_[ENTRY]["C++ Name"]Passed = true;
+                [BEGIN][IF][ENTRY]["C++ Type"][IF][ENTRY]["Multi-Token"][TRIM]
+                parseArgs("[BEGIN]--[ENTRY]["Name"][OR]-[ENTRY]["Shortcut"][END]", argc, argv, i, m_[ENTRY]["C++ Name"]Value, 1, static_cast<size_t>([ENTRY]["Positional Count"]));
+                [OR][IF][ENTRY]["C++ Type"][IF][NOT][ENTRY]["Zero-Token"][TRIM]
+                parseArg(STRING_LITERAL("[BEGIN]--[ENTRY]["Name"][OR]-[ENTRY]["Shortcut"][END]"), argc, argv, i, m_[ENTRY]["C++ Name"]Value, false);
+                [OR][END][TRIM]                
+            }
+            [MACRO_END][TRIM]
+            if (!argumentConsumed)
+            {
+                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
+            }
+        }
     }
-    
-    ///prints the option description to cout
-    void printDescription() const
+
+    void parse(const StringT& commandLine)
     {
-        std::cout << m_description << std::endl;
+        std::vector<StringT> args = boost::program_options::split_winmain(commandLine);
+        std::vector<const CharT*> argv;
+        argv.reserve(args.size() + 2);
+        argv.push_back("");
+        for (const StringT& arg : args)
+        {
+            argv.push_back(arg.c_str());
+        }
+        argv.push_back(NULL);
+        parse(static_cast<int>(args.size() + 1), argv.data());
     }
-    
+
     ///determines the command by checking the combination of parameters provided
     ECommand getCommand() const
     {
-        bool provided[ENTRY]["C++ Name"] = has[ENTRY]["C++ Name"]();
-    
         [MACRO_BEGIN][TRIM]
         if (
-            [BEGIN.][IF.][FIRST_TIME.]   [OR.]&& [END.]provided[ENTRY.]["C++ Name"][BEGIN.] == true[IF.][ENTRY.]["[ENTRY]["Program Options"]"][EQUALS.]["yes"][OR.] == false[IF.][ENTRY.]["[ENTRY]["Program Options"]"][EQUALS.]["no"][END.]
+            [BEGIN.][IF.][FIRST_TIME.]   [OR.]&& [END.]m_[ENTRY.]["C++ Name"]Passed[BEGIN.] == true[IF.][ENTRY.]["[ENTRY]["Program Options"]"][EQUALS.]["yes"][OR.] == false[IF.][ENTRY.]["[ENTRY]["Program Options"]"][EQUALS.]["no"][END.]
         )
         {
             return e[ENTRY]["Program Options"][IF][ENTRY]["Combination"];
@@ -145,7 +180,7 @@ public:
         [MACRO_END][TRIM]
         
         if (
-            [BEGIN][IF][FIRST_TIME]   [OR]&& [END]!provided[ENTRY]["C++ Name"]
+            [BEGIN][IF][FIRST_TIME]   [OR]&& [END]!m_[ENTRY]["C++ Name"]Passed
         )
         {
             return eNoOptionsGiven;
@@ -153,53 +188,149 @@ public:
         
         return eOptionsInvalid;
     }
-
+    
     [MACRO_BEGIN][TRIM]
-    ///returns the provided value[BEGIN] or [ENTRY]["Default"] as default[OR][END]
     [ENTRY]["C++ Type"] get[ENTRY]["C++ Name"]() const
     {
-        [BEGIN][TRIM]
-        if ( has[ENTRY]["C++ Name"]())
-        {
-            return m_vmap["[ENTRY]["Name"]"].template as<[ENTRY]["C++ Type"] >();
-        }
-        return [ENTRY]["Default"];
-        [OR][TRIM]
-        return m_vmap["[ENTRY]["Name"]"].template as<[ENTRY]["C++ Type"] >();
-        [END][TRIM]
+        return m_[ENTRY]["C++ Name"]Value;
+    }
+
+    [OR][TRIM]
+    bool get[ENTRY]["C++ Name"]() const
+    {
+        return m_[ENTRY]["C++ Name"]Passed;
     }
     
     [MACRO_END][TRIM]
-
+    
     [MACRO_BEGIN][TRIM]
-    ///indicates that the option [ENTRY]["Name"] has been provided
     bool has[ENTRY]["C++ Name"]() const
     {
-        return m_vmap.count( "[ENTRY]["Name"]") != 0;
+        return m_[ENTRY]["C++ Name"]Passed;
     }
     
     [MACRO_END][TRIM]
+
     
-private:
-    ///assignment not supported
-    void operator=( const CCommandLineParser<StringT>&);
-    
-    ///creates the right value object depending on the character type
-    template<class T>
-    boost::program_options::typed_value<T, CharT>*
-    value()
+private:    
+    bool isOption(const CharT* arg)
     {
-        boost::program_options::typed_value<T, CharT>* r = new boost::program_options::typed_value<T, CharT>(0);
-        return r;        
+        bool result = false;
+        if (arg && arg[0] == '-')
+        {
+            if (arg[1] == '-')
+            {
+                if(
+                    [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]"))
+                )
+                {
+                    result = true;
+                }
+                
+            }
+            else if(
+                [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(arg + 1, STRING_LITERAL("[ENTRY]["Shortcut"]"))
+            )
+            {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
+    bool isEqual(const char* a, const char* b)
+    {
+        bool result = (strcmp(a,b) == 0);
+        return result;
     }
 
-    boost::program_options::variables_map m_vmap; ///<map of the provided values
-    boost::program_options::options_description m_description; ///<the option description
-    boost::program_options::options_description m_description[ENTRY]["Group Name"]; ///<the option description of group: [ENTRY]["Group Description"]
-    boost::program_options::positional_options_description m_positionalDescription; ///<description of positional options 
+    bool isEqual(const wchar_t* a, const wchar_t* b)
+    {
+        bool result = (wcscmp(a,b) == 0);
+        return result;
+    }
+
+    void printHelpCommandText(const char* text, std::ostream& stream)
+    {
+        size_t textSize = strlen(text);
+        if (textSize > (cLeftColumnSize - 1) )
+        {
+            stream << text << std::endl;
+            stream << std::string(cLeftColumnSize, ' ');
+        }
+        else
+        {
+            stream << text << std::string(cLeftColumnSize - textSize, ' ');
+        }
+    }
+
+    template <typename T>
+    bool parseArg(const CharT* option, int argc, const CharT** argv, int& index, T& parsedValue, bool valueOptional)
+    {
+        const char* argValue = argv[ index ];
+        
+        if ( index >= argc || !argValue || isOption(argValue))
+        {
+            if (valueOptional)
+            {
+                return false;
+            }
+            else
+            {
+                throw std::runtime_error( std::string("Option '") + option + "' requires a value.");
+            }
+        }
+        if ( !convertTo( parsedValue, argValue))
+        {
+            throw std::runtime_error( std::string("Error parsing value '") + argValue + "' of option '" + option + "'.");
+        }
+        return true;
+    }
+
+    template <typename T>
+    void parseArgs(const CharT* option, int argc, const CharT** argv, int& index, T& container, size_t minCount, size_t maxCount)
+    {
+        size_t argsParsed = 0;
+        for (; argsParsed <= maxCount && index < argc; ++argsParsed, ++index)
+        {
+            typename T::value_type parsedValue;
+            if (!parseArg(option, argc, argv, index, parsedValue, true))
+            {
+                --index;
+                break;
+            }
+            container.push_back(parsedValue);
+        }
+        if (argsParsed < minCount)
+        {
+            throw std::runtime_error( std::string("Option '") + option + "' requires more values.");
+        }
+    }
+
+    bool convertTo( std::string& value, const char* arg)
+    {
+        value = arg;
+        return true;
+    }
+    
+    bool convertTo( std::wstring& value, const wchar_t* arg)
+    {
+        value = arg;
+        return true;
+    }
+
+    //helper function for converting parameters
+    template <typename T>
+    bool convertTo( T& value, const CharT* arg)
+    {
+        std::stringstream s;
+        s << arg;
+        s >> value;
+        return s.eof();
+    }
+
+private:    
+    bool m_[ENTRY]["C++ Name"]Passed;
+
+    [ENTRY]["C++ Type"] m_[ENTRY]["C++ Name"]Value;
 };
-
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
-

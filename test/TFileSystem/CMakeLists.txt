@@ -9,7 +9,6 @@ $<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>
 target_link_libraries(Test_FileSystemRunner
     PRIVATE
     cck_implementation
-    Boost::filesystem
 )
 
 add_dependencies(Test_FileSystemRunner cck_implementation)

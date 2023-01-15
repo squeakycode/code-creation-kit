@@ -30,7 +30,6 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
 set(CCK_WITH_TESTS ON CACHE BOOL "Generate code-creation-kit test projects.")
 set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
 set(CCK_WITH_WIN32_STATIC_RUNTIME ON CACHE BOOL "Generate code-creation-kit with static runtime under Windows.")
-set(CCK_WITH_BOOST_STATIC_LIBS ON CACHE BOOL "Generate code-creation-kit link boost statically.")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -82,17 +81,8 @@ if(MSVC)
         foreach(CompilerFlag ${CompilerFlags})
           string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
         endforeach()  
-
-        set(Boost_USE_STATIC_RUNTIME ON)
     endif()
 endif()
-
-
-#setup boost usage
-set(Boost_USE_STATIC_LIBS ${CCK_WITH_BOOST_STATIC_LIBS}) 
-set(Boost_USE_MULTITHREADED ON)  
-#set(Boost_DEBUG 1)
-find_package(Boost 1.50.0 COMPONENTS unit_test_framework program_options filesystem)
 
 #add the sub directories to build
 add_subdirectory(implementation)

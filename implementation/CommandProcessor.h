@@ -69,7 +69,7 @@ namespace code_creation_kit
                 if ( CCommandLineParser<StringT>::eHelp == command )
                 {
                     printVersionInfo();
-                    parser.printDescription();
+                    parser.printDescription(std::cout);
                     generatorCommandProcessor.printDescription();
                 }
                 else if ( CCommandLineParser<StringT>::eExecuteCommand == command )
