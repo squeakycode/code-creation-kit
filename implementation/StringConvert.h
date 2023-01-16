@@ -38,7 +38,7 @@ namespace code_creation_kit
     }
 
     template <typename StringOutT, typename IntT>
-    inline StringOutT ToString(IntT number)
+    inline StringOutT ToString(IntT /*number*/)
     {
         //extend the ToString variants below if you get compile errors here
     }
