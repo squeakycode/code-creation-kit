@@ -1,5 +1,6 @@
 Change Type;Tracker ID;Description;Release Version;Release Date
 ;;;;
+Bugfix;;Fixed an issue where a CSV-file failed to load when then last cell was empty and not terminated by a new line character.;;
 New Feature;;Added TO_SIZE conversion tag. This tag can be used for determinating the size of text entries.;;
 New Feature;;Added TO_CSV conversion tag. This can be used for putting text items in quotes correctly when creating CSV tables.;;
 Bugfix;;Fixed an issue that could cause to paths to not be determined correctly on Unix based operating systems. Furthermore absolute paths are now normalized instead of using the provided path directly.;;
