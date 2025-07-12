@@ -3,4 +3,4 @@
 
 "../requirements/Tag Specification.csv"
 
--s ESubstitutions.tpl.h -o ESubstitutions.gen.h
+-s ESubstitutions.tpl.h -o ../include/code-creation-kit/ESubstitutions.gen.h

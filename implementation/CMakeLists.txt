@@ -94,7 +94,7 @@ add_library(cck_implementation STATIC
     ParameterParser.h
     Parser.tccmd
     ParserExtensions.csv
-    ParserExtensions.gen.h
+        ../include/code-creation-kit/ParserExtensions.gen.h
     ParserExtensions.tpl.h
     ParserExtensions.xls
         ../include/code-creation-kit/StringConvert.h
@@ -109,6 +109,7 @@ INTERFACE
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 ${PROJECT_SOURCE_DIR}/include/code-creation-kit
 PRIVATE
+${PROJECT_SOURCE_DIR}/include/code-creation-kit
 )
 
 custom_target_use_highest_warning_level(cck_implementation)
@@ -145,7 +146,7 @@ if (CCK_TCCMD_EXECUTABLE)
 
     #Parser.tccmd >> ConstraintDirectives.gen.h ConversionDirectives.gen.h ParserExtensions.gen.h << "../requirements/Tag Specification.csv" ParserExtensions.csv ConstraintDirectives.tpl.h ConversionDirectives.tpl.h ParserExtensions.tpl.h 
     add_custom_command(
-        OUTPUT "../include/code-creation-kit/ConstraintDirectives.gen.h" "../include/code-creation-kit/ConversionDirectives.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/ParserExtensions.gen.h"
+        OUTPUT "../include/code-creation-kit/ConstraintDirectives.gen.h" "../include/code-creation-kit/ConversionDirectives.gen.h" "../include/code-creation-kit/ParserExtensions.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Parser.tccmd"
         MAIN_DEPENDENCY Parser.tccmd
         DEPENDS "../requirements/Tag Specification.csv" ParserExtensions.csv ConstraintDirectives.tpl.h ConversionDirectives.tpl.h ParserExtensions.tpl.h 

@@ -4,6 +4,6 @@
 "../requirements/Tag Specification.csv"
 ParserExtensions.csv
 
--s ConstraintDirectives.tpl.h -o ConstraintDirectives.gen.h
--s ConversionDirectives.tpl.h -o ConversionDirectives.gen.h
--s ParserExtensions.tpl.h -o ParserExtensions.gen.h
+-s ConstraintDirectives.tpl.h -o ../include/code-creation-kit/ConstraintDirectives.gen.h
+-s ConversionDirectives.tpl.h -o ../include/code-creation-kit/ConversionDirectives.gen.h
+-s ParserExtensions.tpl.h -o ../include/code-creation-kit/ParserExtensions.gen.h

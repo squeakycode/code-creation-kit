@@ -3,7 +3,7 @@
 
 "../requirements/Tag Specification.csv"
 
--s ETokens.tpl.h -o ETokens.gen.h
--s CTokenizer.tpl.h -o CTokenizer.gen.h -p Tokenizer=CTokenizer
--s CTokenizer.tpl.h -o CBackEndTokenizer.gen.h -p Tokenizer=CBackEndTokenizer
+-s ETokens.tpl.h -o ../include/code-creation-kit/ETokens.gen.h
+-s CTokenizer.tpl.h -o ../include/code-creation-kit/CTokenizer.gen.h -p Tokenizer=CTokenizer
+-s CTokenizer.tpl.h -o ../include/code-creation-kit/CBackEndTokenizer.gen.h -p Tokenizer=CBackEndTokenizer
 -s ../test/TTokenizer/TokenizerTest.tpl.h -o ../test/TTokenizer/TokenizerTest.gen.h
