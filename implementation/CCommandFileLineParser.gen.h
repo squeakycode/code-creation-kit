@@ -1,3 +1,6 @@
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
+
 //------------------------------------------------------------------------------
 /**
 \file
