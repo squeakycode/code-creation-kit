@@ -23,27 +23,27 @@ namespace code_creation_kit
         }
 
         ///flush
-        virtual void flush( bool flush) 
-        { 
+        void flush( bool flush) override
+        {
             m_flush = flush; 
         }
-        virtual bool flush() const { return m_flush; }
+        bool flush() const override { return m_flush; }
 
         ///forAll
-        virtual void forAll( bool forAll) 
-        { 
+        void forAll( bool forAll) override
+        {
             m_forAll = forAll; 
         }
-        virtual bool forAll() const { return m_forAll; }
+        bool forAll() const override { return m_forAll; }
 
         ///forAll
-        virtual void not_( bool not_) 
-        { 
+        virtual void not_( bool not_)
+        {
             m_not_ = not_;
         }
         virtual bool not_() const { return m_not_; }
 
-        bool operator == ( const CConstraintBase<StringT>& rhs)
+        bool equalBaseProperties( const CConstraintBase<StringT>& rhs) const
         {
             if ( 
                 m_flush != rhs.m_flush
@@ -76,24 +76,24 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase) 
-        { 
+        void ignoreCase( bool ignoreCase) override
+        {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const
-        { 
+        bool ignoreCase() const override
+        {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConstraint<StringT>& constraint) const
+        bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            if ( m)
+            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            if (pRhs)
             {
-                if ( !(((CConstraintBase<StringT>&)*this) == ((CConstraintBase<StringT>&)*m))
-                    || m_ignoreCase != m->m_ignoreCase
-                    || m_matches != m->m_matches
+                if ( !this->equalBaseProperties(*pRhs)
+                    || m_ignoreCase != pRhs->m_ignoreCase
+                    || m_matches != pRhs->m_matches
                     )
                 {
                     return false;
@@ -103,7 +103,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual bool matchesConstraint( const StringT& text) const
+        bool matchesConstraint( const StringT& text) const override
         {
             if ( m_ignoreCase)
             {
@@ -132,24 +132,24 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase)
+        void ignoreCase( bool ignoreCase) override
         {
             m_ignoreCase = ignoreCase;
         }
 
-        virtual bool ignoreCase() const
+        bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConstraint<StringT>& constraint) const
+        bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            if ( m)
+            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            if (pRhs)
             {
-                if ( !(((CConstraintBase<StringT>&)*this) == ((CConstraintBase<StringT>&)*m))
-                    || m_ignoreCase != m->m_ignoreCase
-                    || m_testText != m->m_testText
+                if ( !this->equalBaseProperties(*pRhs)
+                    || m_ignoreCase != pRhs->m_ignoreCase
+                    || m_testText != pRhs->m_testText
                     )
                 {
                     return false;
@@ -159,7 +159,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual bool matchesConstraint( const StringT& text) const
+        bool matchesConstraint( const StringT& text) const override
         {
             if ( m_ignoreCase)
             {
@@ -188,24 +188,24 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase)
+        void ignoreCase( bool ignoreCase) override
         {
             m_ignoreCase = ignoreCase;
         }
 
-        virtual bool ignoreCase() const
+        bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConstraint<StringT>& constraint) const
+        bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            if ( m)
+            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            if (pRhs)
             {
-                if ( !(((CConstraintBase<StringT>&)*this) == ((CConstraintBase<StringT>&)*m))
-                    || m_ignoreCase != m->m_ignoreCase
-                    || m_testText != m->m_testText
+                if ( !this->equalBaseProperties(*pRhs)
+                    || m_ignoreCase != pRhs->m_ignoreCase
+                    || m_testText != pRhs->m_testText
                     )
                 {
                     return false;
@@ -215,7 +215,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual bool matchesConstraint( const StringT& text) const
+        bool matchesConstraint( const StringT& text) const override
         {
             if ( m_ignoreCase)
             {
@@ -244,24 +244,24 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase)
+        void ignoreCase( bool ignoreCase) override
         {
             m_ignoreCase = ignoreCase;
         }
 
-        virtual bool ignoreCase() const
+        bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConstraint<StringT>& constraint) const
+        bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            if ( m)
+            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            if (pRhs)
             {
-                if ( !(((CConstraintBase<StringT>&)*this) == ((CConstraintBase<StringT>&)*m))
-                    || m_ignoreCase != m->m_ignoreCase
-                    || m_testText != m->m_testText
+                if ( !this->equalBaseProperties(*pRhs)
+                    || m_ignoreCase != pRhs->m_ignoreCase
+                    || m_testText != pRhs->m_testText
                     )
                 {
                     return false;
@@ -271,7 +271,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual bool matchesConstraint( const StringT& text) const
+        bool matchesConstraint( const StringT& text) const override
         {
             if ( m_ignoreCase)
             {
@@ -318,24 +318,24 @@ namespace code_creation_kit
             }
         }
 
-        virtual void ignoreCase( bool ignoreCase) 
-        { 
+        void ignoreCase( bool ignoreCase) override
+        {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const
-        { 
+        bool ignoreCase() const override
+        {
             return m_ignoreCase;
         }
 
-        virtual bool operator == ( const IConstraint<StringT>& constraint) const
+        bool operator == ( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            if ( m)
+            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            if (pRhs)
             {
-                if ( !(((CConstraintBase<StringT>&)*this) == ((CConstraintBase<StringT>&)*m))
-                    || m_ignoreCase != m->m_ignoreCase
-                    || m_matches != m->m_matches
+                if ( !this->equalBaseProperties(*pRhs)
+                    || m_ignoreCase != pRhs->m_ignoreCase
+                    || m_matches != pRhs->m_matches
                     )
                 {
                     return false;
@@ -345,7 +345,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual bool matchesConstraint( const StringT& text) const
+        bool matchesConstraint( const StringT& text) const override
         {
             if ( m_ignoreCase)
             {
@@ -371,27 +371,27 @@ namespace code_creation_kit
     public:
         typedef CAnyConstraint<StringT> ThisT;
 
-        virtual bool operator==( const IConstraint<StringT>& constraint) const
+        bool operator==( const IConstraint<StringT>& constraint) const override
         {
             const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            return m != 0;
+            return m != nullptr;
         }
 
-        virtual bool forAll() const
+        bool forAll() const override
         {
             return false;
         }
 
-        virtual bool flush() const
+        bool flush() const override
         {
             return true;
         }
 
-        void not_(bool)
+        static void not_(bool)
         {
         }
 
-        virtual bool matchesConstraint( const StringT&) const
+        bool matchesConstraint( const StringT&) const override
         {
             return true;
         }
