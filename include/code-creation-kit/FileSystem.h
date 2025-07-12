@@ -3,21 +3,22 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4127 )
-#endif
-#include "3rdparty/ghc/filesystem.hpp"
-#ifdef _MSC_VER
-#pragma warning( pop ) 
-#endif
+// #ifdef _MSC_VER
+// #pragma warning( push )
+// #pragma warning( disable : 4127 )
+// #endif
+// #include "3rdparty/ghc/filesystem.hpp"
+// #ifdef _MSC_VER
+// #pragma warning( pop )
+// #endif
 
 #include "StringLiteral.h"
 #include "cppstringx.hpp"
 
 #include <iostream>
+#include <filesystem>
 
-namespace filesystem_namespace = ghc;
+namespace filesystem_namespace = std;
 
 namespace code_creation_kit
 {

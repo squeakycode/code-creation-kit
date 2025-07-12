@@ -6,7 +6,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
 set(CCK_WITH_TESTS ON CACHE BOOL "Generate code-creation-kit test projects.")
 set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
 set(CCK_WITH_WIN32_STATIC_RUNTIME ON CACHE BOOL "Generate code-creation-kit with static runtime under Windows.")
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
