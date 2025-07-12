@@ -27,21 +27,21 @@ namespace code_creation_kit
         {
             m_flush = flush; 
         }
-        bool flush() const override { return m_flush; }
+        [[nodiscard]] bool flush() const override { return m_flush; }
 
         ///forAll
         void forAll( bool forAll) override
         {
             m_forAll = forAll; 
         }
-        bool forAll() const override { return m_forAll; }
+        [[nodiscard]] bool forAll() const override { return m_forAll; }
 
         ///forAll
         virtual void not_( bool not_)
         {
             m_not_ = not_;
         }
-        virtual bool not_() const { return m_not_; }
+        [[nodiscard]] virtual bool not_() const { return m_not_; }
 
         bool equalBaseProperties( const CConstraintBase<StringT>& rhs) const
         {
@@ -70,7 +70,7 @@ namespace code_creation_kit
         typedef CMatchesConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
-        CMatchesConstraint( const StringT& matchesText)
+        explicit CMatchesConstraint( const StringT& matchesText)
             : m_ignoreCase( false)
             , m_matches( matchesText)
         {
@@ -81,14 +81,14 @@ namespace code_creation_kit
             m_ignoreCase = ignoreCase; 
         }
 
-        bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
             if (pRhs)
             {
                 if ( !this->equalBaseProperties(*pRhs)
@@ -126,7 +126,7 @@ namespace code_creation_kit
         typedef CStartsWithConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
-        CStartsWithConstraint( const StringT& testText)
+        explicit CStartsWithConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -137,14 +137,14 @@ namespace code_creation_kit
             m_ignoreCase = ignoreCase;
         }
 
-        bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
             if (pRhs)
             {
                 if ( !this->equalBaseProperties(*pRhs)
@@ -182,7 +182,7 @@ namespace code_creation_kit
         typedef CEndsWithConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
-        CEndsWithConstraint( const StringT& testText)
+        explicit CEndsWithConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -193,14 +193,14 @@ namespace code_creation_kit
             m_ignoreCase = ignoreCase;
         }
 
-        bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
             if (pRhs)
             {
                 if ( !this->equalBaseProperties(*pRhs)
@@ -238,7 +238,7 @@ namespace code_creation_kit
         typedef CContainsConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
-        CContainsConstraint( const StringT& testText)
+        explicit CContainsConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -249,14 +249,14 @@ namespace code_creation_kit
             m_ignoreCase = ignoreCase;
         }
 
-        bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
             if (pRhs)
             {
                 if ( !this->equalBaseProperties(*pRhs)
@@ -303,7 +303,7 @@ namespace code_creation_kit
         typedef CRegexMatchesConstraint<StringT> ThisT;
         using CConstraintBase<StringT>::m_not_;
 
-        CRegexMatchesConstraint( const StringT& matchesText)
+        explicit CRegexMatchesConstraint( const StringT& matchesText)
             : m_ignoreCase( false)
             , m_matches( matchesText)
         {
@@ -323,14 +323,14 @@ namespace code_creation_kit
             m_ignoreCase = ignoreCase; 
         }
 
-        bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
         bool operator == ( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* pRhs = dynamic_cast<const ThisT*>(&constraint);
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
             if (pRhs)
             {
                 if ( !this->equalBaseProperties(*pRhs)
@@ -373,16 +373,16 @@ namespace code_creation_kit
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {
-            const ThisT* m = dynamic_cast<const ThisT*>(&constraint);
-            return m != nullptr;
+            auto pRhs = dynamic_cast<const ThisT*>(&constraint);
+            return pRhs != nullptr;
         }
 
-        bool forAll() const override
+        [[nodiscard]] bool forAll() const override
         {
             return false;
         }
 
-        bool flush() const override
+        [[nodiscard]] bool flush() const override
         {
             return true;
         }

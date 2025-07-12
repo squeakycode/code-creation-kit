@@ -20,11 +20,11 @@ namespace code_creation_kit
         typedef std::shared_ptr<const StringListT> ConstSharedStringListT;
 
         CToken()
-            : m_token((ETokenT)0)
+            : m_token(static_cast<ETokenT>(0))
         {
         }
 
-        CToken( ETokenT token)
+        explicit CToken( ETokenT token)
             : m_token( token)
         {
         }
@@ -143,7 +143,7 @@ namespace code_creation_kit
 
 
 
-        size_t getTextSize() const
+        [[nodiscard]] size_t getTextSize() const
         {
             if ( m_stringList)
             {

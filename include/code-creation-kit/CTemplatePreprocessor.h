@@ -39,9 +39,9 @@ namespace code_creation_kit
     {
     public:
         CTemplatePreprocessor()
-            : m_preprocessedStream(0)
-            , m_markupObserver(0)
-            , m_templateLoader(0)
+            : m_preprocessedStream(nullptr)
+            , m_markupObserver(nullptr)
+            , m_templateLoader(nullptr)
         {
         }
 

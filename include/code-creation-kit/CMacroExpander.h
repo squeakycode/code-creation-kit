@@ -4,7 +4,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
 #include "StringConvert.h"
 
 #ifdef _MSC_VER
@@ -22,12 +21,9 @@ namespace code_creation_kit
         class ExErrorTagExpanded : public std::runtime_error 
         { 
         public: 
-            ExErrorTagExpanded( const StringT& message) 
+            explicit ExErrorTagExpanded( const StringT& message)
                 : std::runtime_error( "An error tag has been triggered.") 
                 , m_message( message)
-            {
-            }
-            ~ExErrorTagExpanded()
             {
             }
             const StringT& getMessage()
@@ -90,7 +86,7 @@ namespace code_creation_kit
         }
 
         //return true if all requirements are met
-        bool canExpand()
+        [[nodiscard]] bool canExpand() const
         {
             return m_canExpand;
         }
@@ -257,7 +253,6 @@ namespace code_creation_kit
         bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
         {
             typedef const typename ConstraintListT::value_type ConstraintT;
-            bool flush = false;
 
             if ( constraintList.empty())
             {
@@ -278,6 +273,8 @@ namespace code_creation_kit
             }
             else
             {
+                bool flush = false;
+
                 // check constraints with flush flag first, if one entry meets the constraint the 
                 for (ConstraintT& constraint : constraintList)
                 {

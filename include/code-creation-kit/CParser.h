@@ -785,12 +785,11 @@ namespace code_creation_kit
             //log
             logStackSourceText("Found macro");
 
-            MacroExpressionT expression;
-
             PosT pos = m_stack.begin();
 
             try
             {
+                MacroExpressionT expression;
                 if (  pos != m_stack.end())
                 {
                     if ( *pos == TokenT::eMacroBegin)
@@ -950,10 +949,10 @@ namespace code_creation_kit
         size_t m_currentMacroTextSize;
         size_t m_level; ///<used for logging purposes
         size_t m_partExpansionRecursionLevel; ///<user can use parts in a way that caused endless recursion
-        static const size_t m_partExpansionRecursionLevelLimit = 32; ///<user can use parts in a way that caused endless recursion
+        constexpr static size_t m_partExpansionRecursionLevelLimit = 32; ///<user can use parts in a way that caused endless recursion
         LogOutputStreamT* m_pLogOutputStream; ///<used for logging purposes; NULL if not logging
         PartMapT* m_pPartMap;
         TemplateProvidedTableLoaderT* m_pTemplateProvidedTableLoader;
-        static const size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
+        constexpr static size_t cMaxAllowedMacroSize = 2 * 1024 * 1024; ///<randomly chosen value for catching error conditions
     };
 }

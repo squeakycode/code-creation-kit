@@ -59,7 +59,7 @@ namespace code_creation_kit
         class TokenData
         {
         public:
-            TokenData(typename TokenT::ETokenT tokenId = TokenT::eInvalid, size_t parameterCount = 0, ParseParameters parseFunction = 0, CheckParameters checkParameters = 0)
+            TokenData(typename TokenT::ETokenT tokenId = TokenT::eInvalid, size_t parameterCount = 0, ParseParameters parseFunction = nullptr, CheckParameters checkParameters = nullptr)
                 : TokenId(tokenId)
                 , ParameterCount(parameterCount)
                 , ParseFunction(parseFunction)
@@ -75,10 +75,10 @@ namespace code_creation_kit
     public:
 
         CTokenizer()
-            : m_outputStream(0)
-            , m_finalOutputStream(0)
+            : m_pOutputStream(nullptr)
+            , m_pFinalOutputStream(nullptr)
             , m_inlineTemplateMode(false)
-            , m_logOutputStream(0)
+            , m_pLogOutputStream(nullptr)
         {
         }
 
@@ -142,9 +142,9 @@ namespace code_creation_kit
         }
 
         ///connect output file stream
-        void connectFinalOutputStream( FinalOutputStreamT* stream)
+        void connectFinalOutputStream( FinalOutputStreamT* pStream)
         {
-            m_finalOutputStream = stream;
+            m_pFinalOutputStream = pStream;
         }
 
         ///switches inline template mode
@@ -155,9 +155,9 @@ namespace code_creation_kit
 
 
         ///connect log output stream
-        void connectLogOutputStream( LogOutputStreamT* stream)
+        void connectLogOutputStream( LogOutputStreamT* pStream)
         {
-            m_logOutputStream = stream;
+            m_pLogOutputStream = pStream;
         }
 
         ///sets up regex search expression; 
@@ -289,9 +289,9 @@ namespace code_creation_kit
         }
 
         ///connect receiver of processed stream
-        void connectOutputStream( OutputStreamT* stream)
+        void connectOutputStream( OutputStreamT* pStream)
         {
-            m_outputStream = stream;
+            m_pOutputStream = pStream;
         }
 
         ///get the range of characters without surrounding white space
@@ -342,7 +342,7 @@ namespace code_creation_kit
                     }
 
                     //write the line to the output file
-                    *m_finalOutputStream << line;
+                    *m_pFinalOutputStream << line;
 
                     //check whether the line contains template content
                     if (    cppstringx::starts_with( range, m_inlinePrefix) // must start with inline prefix
@@ -418,7 +418,7 @@ namespace code_creation_kit
                 //forward preceding text as token, if not empty
                 if ( textBegin != tokenBegin )
                 {
-                    *m_outputStream << TokenT( TokenT::eTextFragment, textBegin, tokenBegin);
+                    *m_pOutputStream << TokenT( TokenT::eTextFragment, textBegin, tokenBegin);
                 }
 
                 //set textBegin position for next loop iteration
@@ -427,7 +427,7 @@ namespace code_creation_kit
                 //process tokens
                 if ( TokenT::eNewLine == tokenData.TokenId )
                 {
-                    *m_outputStream << TokenT( TokenT::eNewLine, tokenBegin, tokenEnd);
+                    *m_pOutputStream << TokenT( TokenT::eNewLine, tokenBegin, tokenEnd);
                 }
                 else if ( tokenData.ParseFunction )
                 {
@@ -449,42 +449,42 @@ namespace code_creation_kit
                         //log
                         if ( isLoggingEnabled())
                         {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineBegin,textBegin) << "\n";
+                            *m_pLogOutputStream << "Error parsing parameters in line:\n";
+                            *m_pLogOutputStream << line;
+                            *m_pLogOutputStream << StringT(fullLineBegin,textBegin) << "\n";
                         }
                         throw;
                     }
                     if ( isLoggingEnabled())
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, list, getSourceText( tokenBegin, textBegin /*has been updated*/));
+                        *m_pOutputStream << TokenT( tokenData.TokenId, list, getSourceText( tokenBegin, textBegin /*has been updated*/));
                     }
                     else
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, list);
+                        *m_pOutputStream << TokenT( tokenData.TokenId, list);
                     }
                 }
                 else
                 {
                     if ( isLoggingEnabled())
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, SharedStringListT(), getSourceText( tokenBegin, tokenEnd));
+                        *m_pOutputStream << TokenT( tokenData.TokenId, SharedStringListT(), getSourceText( tokenBegin, tokenEnd));
                     }
                     else
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId);
+                        *m_pOutputStream << TokenT( tokenData.TokenId);
                     }
                 }
             }
 
             if ( textBegin != textEnd)
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, textBegin, textEnd);
+                *m_pOutputStream << TokenT( TokenT::eTextFragment, textBegin, textEnd);
             }
             if ( trimmedRight)
             {
                 //a right trimmed line is treated as line macro
-                *m_outputStream << TokenT( TokenT::eNewLine);
+                *m_pOutputStream << TokenT( TokenT::eNewLine);
             }
             else if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextEnd)
             {
@@ -495,13 +495,13 @@ namespace code_creation_kit
                     //only new line?
                     if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextNewLine)
                     {
-                        *m_outputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
+                        *m_pOutputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
                     }
-                    *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
+                    *m_pOutputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
                 }
                 else
                 {
-                    *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
+                    *m_pOutputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
                 }
             }
             return *this;
@@ -509,12 +509,12 @@ namespace code_creation_kit
     private:
         bool isLoggingEnabled()
         {
-            return m_logOutputStream != NULL;
+            return m_pLogOutputStream != nullptr;
         }
     private:
         std::vector<TokenData> m_tokenData;
         cpptokenfinder::token_finder<CharT, size_t, size_t, size_t(-1)> m_tokenFinder;
-        OutputStreamT* m_outputStream; ///<sink for tokens
+        OutputStreamT* m_pOutputStream; ///<sink for tokens
         StringT m_commentKeyword; ///<used for special preprocessing action
         StringT m_trimKeyword; ///<used for special preprocessing action
         StringT m_trimLeftKeyword; ///<used for special preprocessing action
@@ -523,8 +523,8 @@ namespace code_creation_kit
         StringT m_inlinePostfix; ///< markup for inline template line
         StringT m_inlineGeneratedPostfix; ///< marks a generated line
         StringT m_temporaryInlineTemplateLine; ///< stores a line; recursion level is greater than 1 when not empty
-        FinalOutputStreamT* m_finalOutputStream; ///<the final ouput file
+        FinalOutputStreamT* m_pFinalOutputStream; ///<the final ouput file
         bool m_inlineTemplateMode; ///<toggles inline template processing
-        LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
+        LogOutputStreamT* m_pLogOutputStream; ///< used for logging purposes; NULL if not logging
     };
 }

@@ -29,19 +29,19 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase) override
+        void ignoreCase( bool ignoreCase) override
         {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const override
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 if ( 
@@ -109,19 +109,19 @@ namespace code_creation_kit
             }
         }
 
-        virtual void ignoreCase( bool ignoreCase) override
+        void ignoreCase( bool ignoreCase) override
         {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const override
+        [[nodiscard]] bool ignoreCase() const override
         {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const override
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 if ( 
@@ -167,14 +167,14 @@ namespace code_creation_kit
         typedef CMergeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        CMergeConversion( const StringT& separator)
+        explicit CMergeConversion( const StringT& separator)
             : m_separator( separator)
         {
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const override
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 if ( 
@@ -220,7 +220,7 @@ namespace code_creation_kit
 
         bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 return true;
@@ -244,9 +244,9 @@ namespace code_creation_kit
         typedef CToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const override
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 return true;
@@ -271,9 +271,9 @@ namespace code_creation_kit
         typedef CToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const override
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
             {
                 return true;
@@ -327,9 +327,9 @@ namespace code_creation_kit
         typedef CHtmlEscapeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 return true;
@@ -451,10 +451,10 @@ namespace code_creation_kit
 
             //get line based info used for padding
             m_padWidthInfos.reserve(1 + (padWidthOptionalEnd == padWidthOptionalBegin ? 0 : padWidthOptionalEnd - padWidthOptionalBegin));
-            m_padWidthInfos.push_back(padWidthFirst);
+            m_padWidthInfos.push_back(SPadWidthInfo(padWidthFirst));
             for (IteratorT it = padWidthOptionalBegin; it != padWidthOptionalEnd; ++it)
             {
-                m_padWidthInfos.push_back(*it);
+                m_padWidthInfos.push_back(SPadWidthInfo(*it));
             }
             
             //remove unsupported chars
@@ -604,21 +604,19 @@ namespace code_creation_kit
         class SPadWidthInfo
         {
         public:
-            SPadWidthInfo(size_t padWidth_ = 0, bool extend_ = false)
+            explicit SPadWidthInfo(size_t padWidth_ = 0, bool extend_ = false)
                 : padWidth(padWidth_)
                 , extend(extend_)
             {
             }
 
-            SPadWidthInfo(const StringT& padWidth)
+            explicit SPadWidthInfo(const StringT& padWidth)
                 : padWidth(static_cast<size_t>(std::stoul(padWidth)))
                 , extend(!padWidth.empty() && padWidth[0] == STRING_LITERAL('+'))
             {
             }
 
-            ~SPadWidthInfo()
-            {
-            }
+            ~SPadWidthInfo() = default;
 
             bool operator != (const SPadWidthInfo& rhs) const
             {
@@ -656,9 +654,9 @@ namespace code_creation_kit
         typedef CPadLeftConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 bool result = this->baseEquals(*pConversionRhs);
@@ -719,9 +717,9 @@ namespace code_creation_kit
         typedef CPadRightConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 bool result = this->baseEquals(*pConversionRhs);
@@ -747,7 +745,7 @@ namespace code_creation_kit
     {
         typedef typename StringT::value_type CharT;
     public:
-        CBlockFormatConversion(const StringT& blockWidth)
+        explicit CBlockFormatConversion(const StringT& blockWidth)
         {
             m_blockWidth = static_cast<size_t>(std::stoul(blockWidth));
         }
@@ -755,9 +753,9 @@ namespace code_creation_kit
         typedef CBlockFormatConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 if (this->m_blockWidth != pConversionRhs->m_blockWidth)
@@ -907,7 +905,7 @@ namespace code_creation_kit
         typedef CCalcConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        CCalcConversion(const StringT& expression)
+        explicit CCalcConversion(const StringT& expression)
             : m_expression(expression)
         {
             IteratorT pos = expression.cbegin();
@@ -923,9 +921,9 @@ namespace code_creation_kit
         CCalcConversion& operator=(const ThisT&) = delete;
 
     
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 if (this->m_expression != pConversionRhs->m_expression)
@@ -975,7 +973,7 @@ namespace code_creation_kit
         class Value
         {
         public:
-            Value(int64_t intValue_ = 0)
+            explicit Value(int64_t intValue_ = 0)
             {
                 data.intValue = intValue_;
             }
@@ -1030,9 +1028,7 @@ namespace code_creation_kit
         {
         public:
             virtual Value calculate() const = 0;
-            virtual ~ICalculation()
-            {
-            }
+            virtual ~ICalculation() = default;
         };
 
         typedef std::shared_ptr<ICalculation> SharedCalculationT;
@@ -1040,10 +1036,8 @@ namespace code_creation_kit
         class Variable : public ICalculation
         {
         public:
-            Variable()
-            {
-            }
-            virtual Value calculate() const override
+            Variable() = default;
+            Value calculate() const override
             {
                 if (m_resolvedExpression)
                 {
@@ -1062,9 +1056,7 @@ namespace code_creation_kit
             {
                 m_resolvedExpression.reset();
             }
-            ~Variable() override
-            {
-            }
+            ~Variable() override = default;
             SharedCalculationT m_resolvedExpression;
         };
 
@@ -1074,7 +1066,7 @@ namespace code_creation_kit
         class IntegerValue : public ICalculation
         {
         public:
-            IntegerValue(int64_t intValue_ = 0)
+            explicit IntegerValue(int64_t intValue_ = 0)
                 : intValue(intValue_)
             {
             }
@@ -1082,22 +1074,18 @@ namespace code_creation_kit
             {
                 return Value(intValue);
             }
-            ~IntegerValue() override
-            {
-            }
+            ~IntegerValue() override = default;
             int64_t intValue;
         };
 
         class Operation : public ICalculation
         {
         public:
-            virtual Value calculate() const override
+            Value calculate() const override
             {
                 return calculateImpl();
             }
-            ~Operation() override
-            {
-            }
+            ~Operation() override = default;
             void addOperand(SharedCalculationT ptr)
             {
                 assert(ptr);
@@ -1117,13 +1105,11 @@ namespace code_creation_kit
         class OperationT : public Operation
         {
         public:
-            OperationT(SharedCalculationT ptr = SharedCalculationT())
+            explicit OperationT(SharedCalculationT ptr = SharedCalculationT())
             {
                 this->addOperand(ptr);
             }
-            ~OperationT() override
-            {
-            }
+            ~OperationT() override = default;
         protected:
             Value calculateImpl() const override
             {
@@ -1153,9 +1139,7 @@ namespace code_creation_kit
             {
                 this->addOperand(ptr);
             }
-            ~MinusSign() override
-            {
-            }
+            ~MinusSign() override = default;
         protected:
             Value calculateImpl() const override
             {
@@ -1476,7 +1460,7 @@ namespace code_creation_kit
 
         bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 if (this->m_csvDelimiterChars != pConversionRhs->m_csvDelimiterChars
@@ -1600,9 +1584,9 @@ namespace code_creation_kit
         typedef CToSizeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const override
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
-            const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
+            auto pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
                 if (this->m_requestedSizeType != pConversionRhs->m_requestedSizeType

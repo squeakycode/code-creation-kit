@@ -78,9 +78,7 @@ namespace code_creation_kit
         }
 
 
-        ~CTemplateProvidedTableLoader()
-        {
-        }
+        ~CTemplateProvidedTableLoader() = default;
 
 
         ///connect log output stream
@@ -259,19 +257,19 @@ namespace code_creation_kit
 
 
         ///is empty when currently not loading, this is used to report error information
-        StringT getTableLoadFileNameWithFailure()
+        [[nodiscard]] StringT getTableLoadFileNameWithFailure() const
         {
             return m_tableFileNameLoading;
         }
 
 
-        size_t getLastCsvRowNumberWithFailure()
+        [[nodiscard]] size_t getLastCsvRowNumberWithFailure() const
         {
             return m_lastRowNumberWithFailure;
         }
 
 
-        CPositionTracker getCsvPositionWithFailure()
+        [[nodiscard]] CPositionTracker getCsvPositionWithFailure() const
         {
             return m_positionTracker;
         }

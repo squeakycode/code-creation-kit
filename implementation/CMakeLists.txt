@@ -48,7 +48,7 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/CMacroExpression.h
         ../include/code-creation-kit/CMacroProcessor.h
     CMakeLists.txt
-    CNul.h
+        ../include/code-creation-kit/CNul.h
         ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
     CombiKeywordParameterParser.tccmd
     CombiKeywordParameterParser.tpl.h

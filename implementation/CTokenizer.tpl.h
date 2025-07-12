@@ -63,7 +63,7 @@ namespace code_creation_kit
         class TokenData
         {
         public:
-            TokenData(typename TokenT::ETokenT tokenId = TokenT::eInvalid, size_t parameterCount = 0, ParseParameters parseFunction = 0, CheckParameters checkParameters = 0)
+            TokenData(typename TokenT::ETokenT tokenId = TokenT::eInvalid, size_t parameterCount = 0, ParseParameters parseFunction = nullptr, CheckParameters checkParameters = nullptr)
                 : TokenId(tokenId)
                 , ParameterCount(parameterCount)
                 , ParseFunction(parseFunction)
@@ -79,12 +79,12 @@ namespace code_creation_kit
     public:
 
         [ENTRY]["Tokenizer"]()
-            : m_outputStream(0)
+            : m_pOutputStream(nullptr)
             , m_closing(false)[PART]["if back end"]
             , m_bypassMode(false)[PART]["if back end"]
-            , m_finalOutputStream(0)[PART]["if front end"]
+            , m_pFinalOutputStream(nullptr)[PART]["if front end"]
             , m_inlineTemplateMode(false)[PART]["if front end"]
-            , m_logOutputStream(0)
+            , m_pLogOutputStream(nullptr)
         {
         }
 
@@ -149,9 +149,9 @@ namespace code_creation_kit
         }
 
         ///connect output file stream
-        void connectFinalOutputStream( FinalOutputStreamT* stream)
+        void connectFinalOutputStream( FinalOutputStreamT* pStream)
         {
-            m_finalOutputStream = stream;
+            m_pFinalOutputStream = pStream;
         }
 
         ///switches inline template mode
@@ -163,9 +163,9 @@ namespace code_creation_kit
         [MACRO_END][TRIM]
 
         ///connect log output stream
-        void connectLogOutputStream( LogOutputStreamT* stream)
+        void connectLogOutputStream( LogOutputStreamT* pStream)
         {
-            m_logOutputStream = stream;
+            m_pLogOutputStream = pStream;
         }
 
         [MACRO_BEGIN][PART]["if back end"][TRIM]
@@ -211,9 +211,9 @@ namespace code_creation_kit
         }
 
         ///connect receiver of processed stream
-        void connectOutputStream( OutputStreamT* stream)
+        void connectOutputStream( OutputStreamT* pStream)
         {
-            m_outputStream = stream;
+            m_pOutputStream = pStream;
         }
 
         ///get the range of characters without surrounding white space
@@ -237,13 +237,13 @@ namespace code_creation_kit
             // remove delay mark and output in bypass mode in any case
             if ( (dotsEnd - dotsBegin) > (m_bypassMode ? 0 : 1) )
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, tokenBegin, dotsBegin);
-                *m_outputStream << TokenT( TokenT::eTextFragment, dotsBegin + 1, tokenEnd);
+                *m_pOutputStream << TokenT( TokenT::eTextFragment, tokenBegin, dotsBegin);
+                *m_pOutputStream << TokenT( TokenT::eTextFragment, dotsBegin + 1, tokenEnd);
                 return true;
             }
             else if ( m_bypassMode) // output in bypass mode
             {
-                *m_outputStream << TokenT( TokenT::eTextFragment, tokenBegin, tokenEnd);
+                *m_pOutputStream << TokenT( TokenT::eTextFragment, tokenBegin, tokenEnd);
                 return true;
             }
 
@@ -299,7 +299,7 @@ namespace code_creation_kit
                     }
 
                     //write the line to the output file
-                    *m_finalOutputStream << line;
+                    *m_pFinalOutputStream << line;
 
                     //check whether the line contains template content
                     if (    cppstringx::starts_with( range, m_inlinePrefix) // must start with inline prefix
@@ -368,7 +368,7 @@ namespace code_creation_kit
                 //if full line without tags, output as special token
                 if ( TokenT::eNewLine == tokenData.TokenId && textBegin == fullLineBegin )
                 {
-                    *m_outputStream << TokenT( TokenT::eFullLineWithoutTags, textBegin, tokenEnd);
+                    *m_pOutputStream << TokenT( TokenT::eFullLineWithoutTags, textBegin, tokenEnd);
                     textBegin = tokenEnd;
                     if ( tokenEnd == textEnd)
                     {
@@ -410,7 +410,7 @@ namespace code_creation_kit
                 //forward preceding text as token, if not empty
                 if ( textBegin != tokenBegin )
                 {
-                    *m_outputStream << TokenT( TokenT::eTextFragment, textBegin, tokenBegin);
+                    *m_pOutputStream << TokenT( TokenT::eTextFragment, textBegin, tokenBegin);
                 }
 
                 //set textBegin position for next loop iteration
@@ -419,7 +419,7 @@ namespace code_creation_kit
                 //process tokens
                 if ( TokenT::eNewLine == tokenData.TokenId )
                 {
-                    *m_outputStream << TokenT( TokenT::eNewLine, tokenBegin, tokenEnd);
+                    *m_pOutputStream << TokenT( TokenT::eNewLine, tokenBegin, tokenEnd);
                 }
                 else if ( tokenData.ParseFunction )
                 {
@@ -447,19 +447,19 @@ namespace code_creation_kit
                         //log
                         if ( isLoggingEnabled())
                         {
-                            *m_logOutputStream << "Error parsing parameters in line:\n";
-                            *m_logOutputStream << line;
-                            *m_logOutputStream << StringT(fullLineBegin,textBegin) << "\n";
+                            *m_pLogOutputStream << "Error parsing parameters in line:\n";
+                            *m_pLogOutputStream << line;
+                            *m_pLogOutputStream << StringT(fullLineBegin,textBegin) << "\n";
                         }
                         throw;
                     }
                     if ( isLoggingEnabled())
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, list, getSourceText( tokenBegin, [BEGIN.]dotsBegin, dotsEnd, [PART.]["if back end"][OR.][END.]textBegin /*has been updated*/));
+                        *m_pOutputStream << TokenT( tokenData.TokenId, list, getSourceText( tokenBegin, [BEGIN.]dotsBegin, dotsEnd, [PART.]["if back end"][OR.][END.]textBegin /*has been updated*/));
                     }
                     else
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, list);
+                        *m_pOutputStream << TokenT( tokenData.TokenId, list);
                     }
                 }
                 else
@@ -468,7 +468,7 @@ namespace code_creation_kit
                     if (tokenData.TokenId == TokenT::eSetRecursionLevelLimit)
                     {
                         // Turn limit off to make sure that the new limit gets processed
-                        *m_outputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
+                        *m_pOutputStream << TokenT( TokenT::eSetRecursionLevelLimitOff);
                     }
                     if (tokenData.TokenId == TokenT::eSetRecursionLevelLimitOff)
                     {
@@ -481,11 +481,11 @@ namespace code_creation_kit
                     [MACRO_END.][TRIM]
                     if ( isLoggingEnabled())
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId, SharedStringListT(), getSourceText( tokenBegin, [BEGIN.]dotsBegin, dotsEnd, [PART.]["if back end"][OR.][END.]tokenEnd));
+                        *m_pOutputStream << TokenT( tokenData.TokenId, SharedStringListT(), getSourceText( tokenBegin, [BEGIN.]dotsBegin, dotsEnd, [PART.]["if back end"][OR.][END.]tokenEnd));
                     }
                     else
                     {
-                        *m_outputStream << TokenT( tokenData.TokenId);
+                        *m_pOutputStream << TokenT( tokenData.TokenId);
                     }
                 }
             }
@@ -494,15 +494,15 @@ namespace code_creation_kit
             {
                 [MACRO_BEGIN][PART]["if back end"][TRIM]
                 //if full line without tags, output as special token used for optimizations, otherwise output text fragment
-                *m_outputStream << TokenT( (textBegin == fullLineBegin && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, textBegin, textEnd);
+                *m_pOutputStream << TokenT( (textBegin == fullLineBegin && m_closing) ? TokenT::eFullLineWithoutTags : TokenT::eTextFragment, textBegin, textEnd);
                 [OR][TRIM]
-                *m_outputStream << TokenT( TokenT::eTextFragment, textBegin, textEnd);
+                *m_pOutputStream << TokenT( TokenT::eTextFragment, textBegin, textEnd);
                 [MACRO_END][TRIM]
             }
             if ( trimmedRight)
             {
                 //a right trimmed line is treated as line macro
-                *m_outputStream << TokenT( TokenT::eNewLine);
+                *m_pOutputStream << TokenT( TokenT::eNewLine);
             }
             else if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextEnd)
             {
@@ -513,13 +513,13 @@ namespace code_creation_kit
                     //only new line?
                     if (trimLeftTokenTrailingTextBegin != trimLeftTokenTrailingTextNewLine)
                     {
-                        *m_outputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
+                        *m_pOutputStream << TokenT(TokenT::eTextFragment, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextNewLine);
                     }
-                    *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
+                    *m_pOutputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextNewLine, trimLeftTokenTrailingTextEnd);
                 }
                 else
                 {
-                    *m_outputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
+                    *m_pOutputStream << TokenT(TokenT::eNewLine, trimLeftTokenTrailingTextBegin, trimLeftTokenTrailingTextEnd);
                 }
             }
             return *this;
@@ -527,12 +527,12 @@ namespace code_creation_kit
     private:
         bool isLoggingEnabled()
         {
-            return m_logOutputStream != NULL;
+            return m_pLogOutputStream != nullptr;
         }
     private:
         std::vector<TokenData> m_tokenData;
         cpptokenfinder::token_finder<CharT, size_t, size_t, size_t(-1)> m_tokenFinder;
-        OutputStreamT* m_outputStream; ///<sink for tokens
+        OutputStreamT* m_pOutputStream; ///<sink for tokens
         bool m_closing;///<output line fragments as full line if closing to force flush[PART]["if back end"]
         bool m_bypassMode;///<used when limiting recursion level, forces text output with tick removal[PART]["if back end"]
         StringT m_markupPostfix;///<used when processing tick marks in back textEnd[PART]["if back end"]
@@ -545,9 +545,9 @@ namespace code_creation_kit
         StringT m_inlinePostfix; ///< markup for inline template line
         StringT m_inlineGeneratedPostfix; ///< marks a generated line
         StringT m_temporaryInlineTemplateLine; ///< stores a line; recursion level is greater than 1 when not empty
-        FinalOutputStreamT* m_finalOutputStream; ///<the final ouput file
+        FinalOutputStreamT* m_pFinalOutputStream; ///<the final ouput file
         bool m_inlineTemplateMode; ///<toggles inline template processing
         [MACRO_END][TRIM]
-        LogOutputStreamT* m_logOutputStream; ///< used for logging purposes; NULL if not logging
+        LogOutputStreamT* m_pLogOutputStream; ///< used for logging purposes; NULL if not logging
     };
 }

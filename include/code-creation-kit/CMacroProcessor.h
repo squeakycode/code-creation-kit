@@ -96,16 +96,14 @@ namespace code_creation_kit
                 rotatedTableIndex.readTable( rowHeaderIndex);
             }
 
-            ~TableData()
-            {
-            }
+            ~TableData() = default;
 
             const StringT& getLabel() const
             {
                 return label;
             }
             
-            bool isTemporary() const
+            [[nodiscard]] bool isTemporary() const
             {
                 return isTemporaryFlag;
             }
@@ -126,8 +124,8 @@ namespace code_creation_kit
 
     public:
         CMacroProcessor()
-            : m_outputStream(0)
-            , m_pLogOutputStream(0)
+            : m_outputStream(nullptr)
+            , m_pLogOutputStream(nullptr)
             , m_canChangeNonTemporaryTableList(true)
         {
         }

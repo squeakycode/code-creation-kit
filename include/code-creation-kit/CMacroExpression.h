@@ -28,24 +28,24 @@ namespace code_creation_kit
         const SubExpressionListT& getSubExpressions() const { return m_subExpressions; }
         const StringT& getText() const { return m_macroExpression; }
         StringT& getText() { return m_macroExpression; }
-        IndexT getIndex() const { return m_index; }
-        bool isOred() const { return m_ored; }
-        bool isSubstitution() const { return m_substitution; }
+        [[nodiscard]] IndexT getIndex() const { return m_index; }
+        [[nodiscard]] bool isOred() const { return m_ored; }
+        [[nodiscard]] bool isSubstitution() const { return m_substitution; }
 
         ///true if node is leaf of expression tree
-        bool isLeaf() const
+        [[nodiscard]] bool isLeaf() const
         {
             return m_subExpressions.empty();
         }
 
         ///true if node is a leaf of expression tree that contains text
-        bool isTextLeaf() const
+        [[nodiscard]] bool isTextLeaf() const
         {
             return isLeaf() && !m_substitution;
         }
 
         ///true if text only and no text
-        bool isEmpty() const 
+        [[nodiscard]] bool isEmpty() const
         { 
             return isTextLeaf() && m_macroExpression.empty(); 
         }

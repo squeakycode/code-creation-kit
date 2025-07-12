@@ -14,7 +14,7 @@ namespace code_creation_kit
     public:
         typedef typename TableT::value_type::value_type StringT;
 
-        CVerticalTableRotator( const TableT* table)
+        explicit CVerticalTableRotator( const TableT* table)
             : m_table(table)
         {
         }
@@ -34,7 +34,7 @@ namespace code_creation_kit
                 return (*m_table)[ index ][ m_index ];
             }
 
-            SizeT size() const
+            [[nodiscard]] SizeT size() const
             {
                 return m_table->size();
             }
@@ -52,7 +52,7 @@ namespace code_creation_kit
         }
 
         ///returns the size
-        SizeT size() const
+        [[nodiscard]] SizeT size() const
         {
             if ( !m_table->empty())
             {
@@ -61,7 +61,7 @@ namespace code_creation_kit
             return 0;
         }
 
-        bool empty() const
+        [[nodiscard]] bool empty() const
         {
             if ( !m_table->empty())
             {

@@ -126,7 +126,7 @@ namespace code_creation_kit
     private:
 
         ///used for over- and underflowchecks when not in first row
-        bool isFirstRow()
+        [[nodiscard]] bool isFirstRow() const
         {
             return m_currentRowIndex == 0;
         }
