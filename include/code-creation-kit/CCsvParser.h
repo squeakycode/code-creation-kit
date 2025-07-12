@@ -1,27 +1,5 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
@@ -29,23 +7,34 @@
 
 namespace code_creation_kit
 {
+    /*
+      tablebuilder duck-typing interface
+        void addItem(const std::string& item); // called when a table entry has been parsed
+        void addRow(); // called when the end of a row has been parsed
+        void finished(); // called when table end has been reached
+      position tracker duck-typing interface
+        void reset();
+        void nextLine();
+        void nextColumn();
+    */
     ///parses a csv file, csv data is fed into a table builder, position can be tracked
     class CCsvParser
     {
     public:
         class ExBadDelimiter : public std::invalid_argument
         {
-        public: ExBadDelimiter(const std::string& name) : std::invalid_argument(name + " cannot be used as delimiting character.") {}
+        public:
+            explicit ExBadDelimiter(const std::string& name) : std::invalid_argument(name + " cannot be used as delimiting character.") {}
         };
 
         class ExBadCommentChars : public std::invalid_argument
         {
-        public: ExBadCommentChars(const std::string& name) : std::invalid_argument(name + " cannot be used for commenting lines.") {}
+        public: explicit ExBadCommentChars(const std::string& name) : std::invalid_argument(name + " cannot be used for commenting lines.") {}
         };
 
         class ExBadQuoteChars : public std::invalid_argument
         {
-        public: ExBadQuoteChars(const std::string& name) : std::invalid_argument(name + " cannot be used for text item quote.") {}
+        public: explicit ExBadQuoteChars(const std::string& name) : std::invalid_argument(name + " cannot be used for text item quote.") {}
         };
 
         class ExRequireDelimitingChar : public std::runtime_error
@@ -68,35 +57,6 @@ namespace code_creation_kit
         public: ExStreamBad() : std::runtime_error("Failed to read from parser input stream.") {}
         };
 
-    protected:
-         ///check chars used for throw exception when bad
-        template <typename StringT, typename ExceptionT>
-        static void checkChars(const StringT& chars, const StringT& forbiddenChars, const char* forbiddenCharsName)
-        {
-            typedef typename StringT::value_type CharT;
-            const CharT new_line = '\n';
-            const CharT carriage_return = '\r';
-
-            for (auto c : chars)
-            {
-                for (auto f : forbiddenChars)
-                {
-                    if (f == c)
-                    {
-                        throw ExceptionT(std::string(forbiddenCharsName) + static_cast<char>(c)); //TODO
-                    }
-                }
-                if (c == new_line)
-                {
-                    throw ExceptionT("New line");
-                }
-                if (c == carriage_return)
-                {
-                    throw ExceptionT("Carriage return");
-                }
-            }
-        }
-    public:
         enum EUsedCsvCharsCheck
         {
             UsedCsvCharsCheck_Delimiter,
@@ -324,8 +284,36 @@ namespace code_creation_kit
             parse(stream, tableBuilder, delimiterChars, commentChars, quoteChars, noTracker);
         }
 
-    private:
+    protected:
+         ///check chars used for throw exception when bad
+        template <typename StringT, typename ExceptionT>
+        static void checkChars(const StringT& chars, const StringT& forbiddenChars, const char* forbiddenCharsName)
+        {
+            typedef typename StringT::value_type CharT;
+            const CharT new_line = '\n';
+            const CharT carriage_return = '\r';
+
+            for (auto c : chars)
+            {
+                for (auto f : forbiddenChars)
+                {
+                    if (f == c)
+                    {
+                        throw ExceptionT(std::string(forbiddenCharsName) + static_cast<char>(c));
+                    }
+                }
+                if (c == new_line)
+                {
+                    throw ExceptionT("New line");
+                }
+                if (c == carriage_return)
+                {
+                    throw ExceptionT("Carriage return");
+                }
+            }
+        }
+
         ///dummy position tracker used when prosition tracking is not required
-        struct CNoTracker { void reset() {}void nextLine() {}void nextColumn() {} };
+        struct CNoTracker { static void reset(){} static void nextLine(){} static void nextColumn(){} };
     };
 }

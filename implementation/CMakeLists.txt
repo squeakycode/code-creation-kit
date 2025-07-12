@@ -42,7 +42,7 @@ add_library(cck_implementation STATIC
     CGeneratorCommandProcessor.h
     CGeneratorStatistic.h
     CInlineTemplateParameters.h
-    CLineCollector.h
+        ../include/code-creation-kit/CLineCollector.h
     CMacro.h
     CMacroExpander.h
     CMacroExpression.h

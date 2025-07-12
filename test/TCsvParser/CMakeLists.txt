@@ -1,6 +1,5 @@
 add_executable(Test_CsvParserRunner
     TCsvParser.cpp
-    TCsvParserTestFiles.h
 )
 
 target_include_directories(Test_CsvParserRunner
