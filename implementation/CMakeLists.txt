@@ -69,7 +69,7 @@ add_library(cck_implementation STATIC
     CSpecialRegexCharacterPrefixer.h
     CSubstitution.h
     CTableIndex.h
-    CTargetFile.h
+        ../include/code-creation-kit/CTargetFile.h
     CTemplateLoader.h
     CTemplatePreprocessor.h
     CTemplateProcessor.h
