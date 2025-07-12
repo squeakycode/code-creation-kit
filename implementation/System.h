@@ -7,7 +7,6 @@
 
 #include "StringLiteral.h"
 #include <stdlib.h>
-#include <stdexcept>
 
     namespace code_creation_kit
 {

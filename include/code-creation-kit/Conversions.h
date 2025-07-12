@@ -29,17 +29,17 @@ namespace code_creation_kit
         {
         }
 
-        virtual void ignoreCase( bool ignoreCase) 
-        { 
+        virtual void ignoreCase( bool ignoreCase) override
+        {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const
-        { 
+        virtual bool ignoreCase() const override
+        {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        virtual bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -57,7 +57,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -109,17 +109,17 @@ namespace code_creation_kit
             }
         }
 
-        virtual void ignoreCase( bool ignoreCase) 
-        { 
+        virtual void ignoreCase( bool ignoreCase) override
+        {
             m_ignoreCase = ignoreCase; 
         }
 
-        virtual bool ignoreCase() const
-        { 
+        virtual bool ignoreCase() const override
+        {
             return m_ignoreCase;
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        virtual bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -137,7 +137,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -172,7 +172,7 @@ namespace code_creation_kit
         {
         }
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        virtual bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -188,7 +188,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             StringT merged;
             bool first = true;
@@ -218,7 +218,7 @@ namespace code_creation_kit
         typedef CToLowerConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -228,7 +228,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -244,7 +244,7 @@ namespace code_creation_kit
         typedef CToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        virtual bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -254,7 +254,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -271,7 +271,7 @@ namespace code_creation_kit
         typedef CToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==( const IConversion<StringT>& conversion) const
+        virtual bool operator==( const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if ( pConversionRhs)
@@ -304,7 +304,7 @@ namespace code_creation_kit
             return result;
         }
 
-        virtual void modify( StringListT& textList) const
+        void modify( StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -327,7 +327,7 @@ namespace code_creation_kit
         typedef CHtmlEscapeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -345,21 +345,21 @@ namespace code_creation_kit
                     {'<' , STRING_LITERAL("&lt;")  },
                     {'>' , STRING_LITERAL("&gt;")  },
                     {'"' , STRING_LITERAL("&quot;")},
-                    {'\'', NULL   },
-                    {'`' , NULL   },
-                    {'(' , NULL   },
-                    {')' , NULL   },
-                    {'{' , NULL   },
-                    {'}' , NULL   },
-                    {'[' , NULL   },
-                    {']' , NULL   },
-                    {'!' , NULL   },
-                    {'@' , NULL   },
-                    {'$' , NULL   },
-                    {'%' , NULL   },
-                    {'=' , NULL   },
-                    {'+' , NULL   },
-                    {  0 , NULL   }
+                    {'\'', nullptr   },
+                    {'`' , nullptr   },
+                    {'(' , nullptr   },
+                    {')' , nullptr   },
+                    {'{' , nullptr   },
+                    {'}' , nullptr   },
+                    {'[' , nullptr   },
+                    {']' , nullptr   },
+                    {'!' , nullptr   },
+                    {'@' , nullptr   },
+                    {'$' , nullptr   },
+                    {'%' , nullptr   },
+                    {'=' , nullptr   },
+                    {'+' , nullptr   },
+                    {  0 , nullptr   }
                 };
 
             // iterate all chars of text
@@ -395,7 +395,7 @@ namespace code_creation_kit
             return result;
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
@@ -633,7 +633,7 @@ namespace code_creation_kit
         StringT m_extensionText;
         CharT m_padChar;
         std::vector<SPadWidthInfo> m_padWidthInfos;
-        static const size_t cTabSize = 4;
+        constexpr static size_t cTabSize = 4;
     };
 
 
@@ -656,16 +656,13 @@ namespace code_creation_kit
         typedef CPadLeftConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
             {
-                if (pConversionRhs)
-                {
-                    bool result = this->baseEquals(*pConversionRhs);
-                    return result;
-                }
+                bool result = this->baseEquals(*pConversionRhs);
+                return result;
             }
             return false;
         }
@@ -691,7 +688,7 @@ namespace code_creation_kit
             return dummy.front();
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             if (this->m_padChar)
             {
@@ -722,7 +719,7 @@ namespace code_creation_kit
         typedef CPadRightConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -733,7 +730,7 @@ namespace code_creation_kit
             return false;
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             if (this->m_padChar)
             {
@@ -758,7 +755,7 @@ namespace code_creation_kit
         typedef CBlockFormatConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -783,7 +780,7 @@ namespace code_creation_kit
             typename StringT::const_iterator lineStart = text.begin();
             typename StringT::const_iterator lastWhiteSpace = text.begin();
             typename StringT::const_iterator it = text.begin();
-            for (;it != text.end();)
+            while (it != text.end())
             {
                 CharT c = *it;
                 if (c == tab)
@@ -866,7 +863,7 @@ namespace code_creation_kit
             return result;
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             if (m_blockWidth)
             {
@@ -879,7 +876,7 @@ namespace code_creation_kit
 
     private:
         size_t m_blockWidth;
-        static const size_t cTabSize = 4;
+        constexpr static size_t cTabSize = 4;
     };
 
     ///defines exceptions thrown by CCaclulationConversion for template argument independent access
@@ -926,7 +923,7 @@ namespace code_creation_kit
         CCalcConversion& operator=(const ThisT&) = delete;
 
     
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -941,7 +938,7 @@ namespace code_creation_kit
         }
     
     
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             if (m_parsedExpression)
             {
@@ -1065,7 +1062,7 @@ namespace code_creation_kit
             {
                 m_resolvedExpression.reset();
             }
-            virtual ~Variable()
+            ~Variable() override
             {
             }
             SharedCalculationT m_resolvedExpression;
@@ -1081,11 +1078,11 @@ namespace code_creation_kit
                 : intValue(intValue_)
             {
             }
-            virtual Value calculate() const override
+            Value calculate() const override
             {
                 return Value(intValue);
             }
-            virtual ~IntegerValue()
+            ~IntegerValue() override
             {
             }
             int64_t intValue;
@@ -1098,7 +1095,7 @@ namespace code_creation_kit
             {
                 return calculateImpl();
             }
-            virtual ~Operation()
+            ~Operation() override
             {
             }
             void addOperand(SharedCalculationT ptr)
@@ -1124,11 +1121,11 @@ namespace code_creation_kit
             {
                 this->addOperand(ptr);
             }
-            virtual ~OperationT()
+            ~OperationT() override
             {
             }
         protected:
-            virtual Value calculateImpl() const
+            Value calculateImpl() const override
             {
                 assert(!this->m_operands.empty());
                 if (!this->m_operands.empty())
@@ -1152,15 +1149,15 @@ namespace code_creation_kit
         class MinusSign : public Operation
         {
         public:
-            MinusSign(SharedCalculationT ptr = SharedCalculationT())
+            explicit MinusSign(SharedCalculationT ptr = SharedCalculationT())
             {
                 this->addOperand(ptr);
             }
-            virtual ~MinusSign()
+            ~MinusSign() override
             {
             }
         protected:
-            virtual Value calculateImpl() const
+            Value calculateImpl() const override
             {
                 assert(this->m_operands.size() == 1);
                 if (this->m_operands.size() == 1)
@@ -1348,7 +1345,7 @@ namespace code_creation_kit
             //make corresponding operation
             SharedOperationT ptrOperation = makeOperation(myOperator, ptrInOut);
             bool skipParseTerminal = false; //operand is a subexpression
-            for (;;)
+            while (true)
             {
                 //parse next terminal value
                 if (skipParseTerminal || parseTerminal(posCurrent, end, ptrInOut, variablesMap))
@@ -1457,7 +1454,7 @@ namespace code_creation_kit
     {
         typedef typename StringT::value_type CharT;
     public:
-        CToCsvConversion(
+        explicit CToCsvConversion(
             const StringT& csvDelimiterChars
         )
             : m_csvDelimiterChars(csvDelimiterChars)
@@ -1477,7 +1474,7 @@ namespace code_creation_kit
         typedef CToCsvConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -1549,7 +1546,7 @@ namespace code_creation_kit
             }
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             if (!m_csvQuoteChars.empty())
             {
@@ -1589,7 +1586,7 @@ namespace code_creation_kit
         };
 
     public:
-        CToSizeConversion(
+        explicit CToSizeConversion(
             const StringT& properties
         )
             : m_requestedSizeType(RequestedSizeType_ArrayElements)
@@ -1603,7 +1600,7 @@ namespace code_creation_kit
         typedef CToSizeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        virtual bool operator==(const IConversion<StringT>& conversion) const
+        virtual bool operator==(const IConversion<StringT>& conversion) const override
         {
             const ThisT* pConversionRhs = dynamic_cast<const ThisT*>(&conversion);
             if (pConversionRhs)
@@ -1624,7 +1621,7 @@ namespace code_creation_kit
             return result;
         }
 
-        virtual void modify(StringListT& textList) const
+        void modify(StringListT& textList) const override
         {
             for (StringT& text : textList)
             {
