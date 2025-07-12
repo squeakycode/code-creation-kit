@@ -6,7 +6,7 @@ add_executable(Test_CsvParserRunner
 target_include_directories(Test_CsvParserRunner
 PRIVATE
 ${PROJECT_SOURCE_DIR}/test/include
-$<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>
+${PROJECT_SOURCE_DIR}/include/code-creation-kit
 )
 
 add_dependencies(Test_CsvParserRunner cck_implementation)

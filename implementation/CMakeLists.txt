@@ -34,7 +34,6 @@ add_library(cck_implementation STATIC
     CCommandLineParser.tccmd
     CCommandLineParser.xls
     CComparableSharedObject.h
-    CCsvParser.h
     CErrorPrinter.gen.h
     CErrorPrinter.tccmd
     CErrorPrinter.tpl.h
@@ -61,7 +60,7 @@ add_library(cck_implementation STATIC
     ConversionDirectives.tpl.h
     Conversions.h
     CParser.h
-    CPositionTracker.h
+        ../include/code-creation-kit/CPositionTracker.h
     cppstringx.hpp
     cpptokenfinder.hpp
     CProcessingLevelControl.h
@@ -108,6 +107,7 @@ add_library(cck_implementation STATIC
 target_include_directories(cck_implementation
 INTERFACE
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+${PROJECT_SOURCE_DIR}/include/code-creation-kit
 PRIVATE
 )
 

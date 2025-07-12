@@ -84,3 +84,4 @@ CMakeSettings.json
 *~
 #test input files
 TestInputFile_*
+cmake-build-*
