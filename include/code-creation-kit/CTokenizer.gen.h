@@ -10,7 +10,6 @@
 #include <ostream>
 
 #include "CombiKeywordParameterParser.gen.h"
-#include "CSpecialRegexCharacterPrefixer.h"
 #include "KeywordParameterCheckFunctions.h"
 #include "cpptokenfinder.hpp"
 #include "cppstringx.hpp"

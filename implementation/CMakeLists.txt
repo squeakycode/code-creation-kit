@@ -66,7 +66,6 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/CProcessingLevelControl.h
     CSimpleFormat.h
         ../include/code-creation-kit/CSourceFile.h
-    CSpecialRegexCharacterPrefixer.h
         ../include/code-creation-kit/CSubstitution.h
         ../include/code-creation-kit/CTableIndex.h
         ../include/code-creation-kit/CTargetFile.h
