@@ -36,7 +36,7 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/CComparableSharedObject.h
     CErrorPrinter.gen.h
     CErrorPrinter.tccmd
-    CErrorPrinter.tpl.h
+        ../codegen/templates/CErrorPrinter.tpl.h
     CFilesBinaryEqual.h
     CGenerator.h
     CGeneratorCommandProcessor.h
@@ -51,13 +51,13 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/CNul.h
         ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
     CombiKeywordParameterParser.tccmd
-    CombiKeywordParameterParser.tpl.h
+        ../codegen/templates/CombiKeywordParameterParser.tpl.h
     CommandProcessor.h
         ../include/code-creation-kit/ConstraintDirectives.gen.h
-    ConstraintDirectives.tpl.h
+        ../codegen/templates/ConstraintDirectives.tpl.h
         ../include/code-creation-kit/Constraints.h
         ../include/code-creation-kit/ConversionDirectives.gen.h
-    ConversionDirectives.tpl.h
+        ../codegen/templates/ConversionDirectives.tpl.h
         ../include/code-creation-kit/Conversions.h
         ../include/code-creation-kit/CParser.h
         ../include/code-creation-kit/CPositionTracker.h
@@ -74,12 +74,12 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/CTemplateProcessor.h
         ../include/code-creation-kit/CToken.h
         ../include/code-creation-kit/CTokenizer.gen.h
-    CTokenizer.tpl.h
+        ../codegen/templates/CTokenizer.tpl.h
         ../include/code-creation-kit/CVerticalTableBuilder.h
         ../include/code-creation-kit/CVerticalTableRotator.h
     DependencyPrinter.h
         ../include/code-creation-kit/ESubstitutions.gen.h
-    ESubstitutions.tpl.h
+        ../codegen/templates/ESubstitutions.tpl.h
         ../include/code-creation-kit/ETokens.gen.h
     ETokens.tpl.h
     Exceptions.csv
@@ -94,7 +94,7 @@ add_library(cck_implementation STATIC
     Parser.tccmd
     ParserExtensions.csv
         ../include/code-creation-kit/ParserExtensions.gen.h
-    ParserExtensions.tpl.h
+        ../codegen/templates/ParserExtensions.tpl.h
     ParserExtensions.xls
         ../include/code-creation-kit/StringConvert.h
         ../include/code-creation-kit/StringLiteral.h
@@ -139,7 +139,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.tccmd"
         MAIN_DEPENDENCY CErrorPrinter.tccmd
-        DEPENDS Exceptions.csv CErrorPrinter.tpl.h
+        DEPENDS Exceptions.csv ../codegen/templates/CErrorPrinter.tpl.h
         COMMENT "Generating CErrorPrinter.tccmd"
     )
 
@@ -148,7 +148,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "../include/code-creation-kit/ConstraintDirectives.gen.h" "../include/code-creation-kit/ConversionDirectives.gen.h" "../include/code-creation-kit/ParserExtensions.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Parser.tccmd"
         MAIN_DEPENDENCY Parser.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" ParserExtensions.csv ConstraintDirectives.tpl.h ConversionDirectives.tpl.h ParserExtensions.tpl.h 
+        DEPENDS "../requirements/Tag Specification.csv" ParserExtensions.csv ../codegen/templates/ConstraintDirectives.tpl.h ../codegen/templates/ConversionDirectives.tpl.h ../codegen/templates/ParserExtensions.tpl.h
         COMMENT "Generating Parser.tccmd"
     )
 
@@ -157,7 +157,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "../include/code-creation-kit/ESubstitutions.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Substitutions.tccmd"
         MAIN_DEPENDENCY Substitutions.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" ESubstitutions.tpl.h 
+        DEPENDS "../requirements/Tag Specification.csv" ../codegen/templates/ESubstitutions.tpl.h
         COMMENT "Generating Substitutions.tccmd"
     )
 
@@ -166,7 +166,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "../include/code-creation-kit/CBackEndTokenizer.gen.h" "../include/code-creation-kit/CTokenizer.gen.h" "../include/code-creation-kit/ETokens.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/../test/TTokenizer/TokenizerTest.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Tokens.tccmd"
         MAIN_DEPENDENCY Tokens.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h ../test/TTokenizer/TokenizerTest.tpl.h 
+        DEPENDS "../requirements/Tag Specification.csv" ../codegen/templates/CTokenizer.tpl.h ETokens.tpl.h ../test/TTokenizer/TokenizerTest.tpl.h
         COMMENT "Generating Tokens.tccmd"
     )
 
@@ -175,7 +175,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "../include/code-creation-kit/CombiKeywordParameterParser.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CombiKeywordParameterParser.tccmd"
         MAIN_DEPENDENCY CombiKeywordParameterParser.tccmd
-        DEPENDS "../requirements/Tag Specification.CombiParsers.csv" CombiKeywordParameterParser.tpl.h
+        DEPENDS "../requirements/Tag Specification.CombiParsers.csv" ../codegen/templates/CombiKeywordParameterParser.tpl.h
         COMMENT "Generating CombiKeywordParameterParser.tccmd"
     )
 
