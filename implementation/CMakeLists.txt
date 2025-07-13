@@ -88,7 +88,7 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/FileSystem.h
         ../include/code-creation-kit/IConstraint.h
         ../include/code-creation-kit/IConversion.h
-    KeywordParameterCheckFunctions.h
+        ../include/code-creation-kit/KeywordParameterCheckFunctions.h
         ../include/code-creation-kit/KeywordParameterParser.h
     ParameterParser.h
     Parser.tccmd
@@ -113,7 +113,7 @@ ${PROJECT_SOURCE_DIR}/include/code-creation-kit
 
 custom_target_use_highest_warning_level(cck_implementation)
 
-if (CCK_TCCMD_EXECUTABLE)
+if (CCK_TCCMD_EXECUTABLE_NEVER)
     message(STATUS "Adding cck_implementation tccmd execution.")
     
     #CCommandFileLineParser.tccmd >> CCommandFileLineParser.gen.h << CCommandFileLineParser.csv ../templates/CommandLineParser.tpl.h 

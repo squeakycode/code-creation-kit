@@ -16,8 +16,6 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConstraint& conversion) const = 0;
 
-        virtual ~IConstraint() 
-        {
-        };
+        virtual ~IConstraint() = default;
     };
 }

@@ -13,15 +13,13 @@
 #include <cstring>
 #include <cwchar>
 #include <climits>
-#include "StringLiteral.h"
-#include "3rdparty/boost/split_winmain.h"
 
 //parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
 class CCommandLineParser
 {
     typedef typename StringT::value_type CharT;
-    static const size_t cLeftColumnSize = 40;
+    constexpr static size_t cLeftColumnSize = 40;
 
 public:
     ///lists valid option combinations
@@ -118,39 +116,39 @@ public:
         {
             //get current argument
             bool argumentConsumed = false;
-            const CharT* arg = argv[ i ];
-            if (arg && arg[0] == '-')
+            const CharT* pArgument = argv[ i ];
+            if (pArgument && pArgument[0] == '-')
             {
-                if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("help"))) || isEqual(arg + 1, STRING_LITERAL("h")))
+                if ((pArgument[1] == '-' && isEqual(pArgument + 2, "help")) || isEqual(pArgument + 1, "h"))
                 {
                     argumentConsumed = true;
                     m_HelpPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("command"))) || isEqual(arg + 1, STRING_LITERAL("c")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "command")) || isEqual(pArgument + 1, "c"))
                 {
                     argumentConsumed = true;
                     m_CommandsPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_CommandsValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_CommandsValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("command-file"))) || isEqual(arg + 1, STRING_LITERAL("f")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "command-file")) || isEqual(pArgument + 1, "f"))
                 {
                     argumentConsumed = true;
                     m_CommandFilesPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_CommandFilesValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_CommandFilesValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("process-instant-template"))) || isEqual(arg + 1, STRING_LITERAL("t")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "process-instant-template")) || isEqual(pArgument + 1, "t"))
                 {
                     argumentConsumed = true;
                     m_InstantTemplateFilesPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_InstantTemplateFilesValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_InstantTemplateFilesValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("output-dependencies"))) || isEqual(arg + 1, STRING_LITERAL("d")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "output-dependencies")) || isEqual(pArgument + 1, "d"))
                 {
                     argumentConsumed = true;
                     m_OutputDependenciesStylePassed = true;
-                    parseArg(arg, argc, argv, ++i, m_OutputDependenciesStyleValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_OutputDependenciesStyleValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("prompt"))) || isEqual(arg + 1, STRING_LITERAL("p")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "prompt")) || isEqual(pArgument + 1, "p"))
                 {
                     argumentConsumed = true;
                     m_PromptPassed = true;
@@ -165,27 +163,86 @@ public:
             }
             if (!argumentConsumed)
             {
-                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
+                throw std::runtime_error( std::string("Error unknown program option '") + toStdString(pArgument) + "'." );
             }
         }
     }
 
+    std::vector<StringT> splitCommandLine(const StringT& input)
+    {
+        typedef typename StringT::value_type CharT;
+        std::vector<StringT> arguments;
+        StringT currentArgument;
+        bool inQuotes = false;
+        bool seenQuotes = false;
+
+        for (auto it = input.cbegin() ; it != input.cend(); ++it)
+        {
+            const CharT c = *it;
+
+            if (c == '\\')
+            {
+                // escaping is only relevant inside of quotes
+                if (inQuotes && (it + 1) != input.cend())
+                {
+                    const CharT nextC = *(it + 1);
+                    if (nextC == '"' || nextC == '\\')
+                    {
+                        currentArgument += nextC;
+                        ++it;
+                    }
+                    else
+                    {
+                        currentArgument += c;
+                    }
+                }
+                else
+                {
+                    currentArgument += c;
+                }
+            }
+            else if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                seenQuotes = true;
+            }
+            else if ((c == ' ' || c == '\t') && !inQuotes)
+            {
+                if (!currentArgument.empty() || seenQuotes)
+                {
+                    arguments.push_back(currentArgument);
+                    currentArgument.clear();
+                    seenQuotes = false;
+                }
+            }
+            else
+            {
+                currentArgument += c;
+            }
+        }
+        if (!currentArgument.empty())
+        {
+            arguments.push_back(currentArgument);
+        }
+        return arguments;
+    }
+
     void parse(const StringT& commandLine)
     {
-        std::vector<StringT> args = boost::program_options::split_winmain(commandLine);
+        std::vector<StringT> arguments = splitCommandLine(commandLine);
         std::vector<const CharT*> argv;
-        argv.reserve(args.size() + 2);
-        argv.push_back("");
-        for (const StringT& arg : args)
+        argv.reserve(arguments.size() + 2);
+        argv.emplace_back();
+        for (const StringT& argument : arguments)
         {
-            argv.push_back(arg.c_str());
+            argv.push_back(argument.c_str());
         }
         argv.push_back(NULL);
-        parse(static_cast<int>(args.size() + 1), argv.data());
+        parse(static_cast<int>(arguments.size() + 1), argv.data());
     }
 
     ///determines the command by checking the combination of parameters provided
-    ECommand getCommand() const
+    [[nodiscard]] ECommand getCommand() const
     {
         if (
                m_HelpPassed == true
@@ -260,84 +317,84 @@ public:
         return eOptionsInvalid;
     }
     
-    bool getHelp() const
+    [[nodiscard]] bool getHelp() const
     {
         return m_HelpPassed;
     }
     
-    std::vector<StringT> getCommands() const
+    [[nodiscard]] std::vector<StringT> getCommands() const
     {
         return m_CommandsValue;
     }
 
-    std::vector<StringT> getCommandFiles() const
+    [[nodiscard]] std::vector<StringT> getCommandFiles() const
     {
         return m_CommandFilesValue;
     }
 
-    std::vector<StringT> getInstantTemplateFiles() const
+    [[nodiscard]] std::vector<StringT> getInstantTemplateFiles() const
     {
         return m_InstantTemplateFilesValue;
     }
 
-    StringT getOutputDependenciesStyle() const
+    [[nodiscard]] StringT getOutputDependenciesStyle() const
     {
         return m_OutputDependenciesStyleValue;
     }
 
-    bool getPrompt() const
+    [[nodiscard]] bool getPrompt() const
     {
         return m_PromptPassed;
     }
     
     
-    bool hasHelp() const
+    [[nodiscard]] bool hasHelp() const
     {
         return m_HelpPassed;
     }
     
-    bool hasCommands() const
+    [[nodiscard]] bool hasCommands() const
     {
         return m_CommandsPassed;
     }
     
-    bool hasCommandFiles() const
+    [[nodiscard]] bool hasCommandFiles() const
     {
         return m_CommandFilesPassed;
     }
     
-    bool hasInstantTemplateFiles() const
+    [[nodiscard]] bool hasInstantTemplateFiles() const
     {
         return m_InstantTemplateFilesPassed;
     }
     
-    bool hasOutputDependenciesStyle() const
+    [[nodiscard]] bool hasOutputDependenciesStyle() const
     {
         return m_OutputDependenciesStylePassed;
     }
     
-    bool hasPrompt() const
+    [[nodiscard]] bool hasPrompt() const
     {
         return m_PromptPassed;
     }
     
 
-    
-private:    
-    bool isOption(const CharT* arg)
+private:
+    template <typename LocalCharT>
+    static bool isOption(const LocalCharT* pArgument)
     {
         bool result = false;
-        if (arg && arg[0] == '-')
+        if (pArgument && pArgument[0] == '-')
         {
-            if (arg[1] == '-')
+            if (pArgument[1] == '-')
             {
                 if(
-                       isEqual(arg + 2, STRING_LITERAL("help"))
-                    || isEqual(arg + 2, STRING_LITERAL("command"))
-                    || isEqual(arg + 2, STRING_LITERAL("command-file"))
-                    || isEqual(arg + 2, STRING_LITERAL("process-instant-template"))
-                    || isEqual(arg + 2, STRING_LITERAL("output-dependencies"))
-                    || isEqual(arg + 2, STRING_LITERAL("prompt"))
+                       isEqual(pArgument + 2, "help")
+                    || isEqual(pArgument + 2, "command")
+                    || isEqual(pArgument + 2, "command-file")
+                    || isEqual(pArgument + 2, "process-instant-template")
+                    || isEqual(pArgument + 2, "output-dependencies")
+                    || isEqual(pArgument + 2, "prompt")
                 )
                 {
                     result = true;
@@ -345,12 +402,12 @@ private:
                 
             }
             else if(
-                   isEqual(arg + 1, STRING_LITERAL("h"))
-                || isEqual(arg + 1, STRING_LITERAL("c"))
-                || isEqual(arg + 1, STRING_LITERAL("f"))
-                || isEqual(arg + 1, STRING_LITERAL("t"))
-                || isEqual(arg + 1, STRING_LITERAL("d"))
-                || isEqual(arg + 1, STRING_LITERAL("p"))
+                   isEqual(pArgument + 1, "h")
+                || isEqual(pArgument + 1, "c")
+                || isEqual(pArgument + 1, "f")
+                || isEqual(pArgument + 1, "t")
+                || isEqual(pArgument + 1, "d")
+                || isEqual(pArgument + 1, "p")
             )
             {
                 result = true;
@@ -359,19 +416,25 @@ private:
         return result;
     }
     
-    bool isEqual(const char* a, const char* b)
+    // command line parameters are expected to be ASCII encoded.
+    template <typename LocalCharTA, typename LocalCharTB>
+    static bool isEqual(const LocalCharTA* pA, const LocalCharTB* pB)
     {
-        bool result = (strcmp(a,b) == 0);
-        return result;
+        if (pA != nullptr && pB != nullptr)
+        {
+            for (;*pA != 0 && *pB != 0; ++pA, ++pB)
+            {
+                if (*pA != *pB)
+                {
+                    return false;
+                }
+            }
+            return (*pA == *pB);
+        }
+        return false;
     }
 
-    bool isEqual(const wchar_t* a, const wchar_t* b)
-    {
-        bool result = (wcscmp(a,b) == 0);
-        return result;
-    }
-
-    void printHelpCommandText(const char* text, std::ostream& stream)
+    static void printHelpCommandText(const char* text, std::ostream& stream)
     {
         size_t textSize = strlen(text);
         if (textSize > (cLeftColumnSize - 1) )
@@ -385,10 +448,10 @@ private:
         }
     }
 
-    template <typename T>
-    bool parseArg(const CharT* option, int argc, const CharT** argv, int& index, T& parsedValue, bool valueOptional)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    bool parseArg(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& parsedValue, bool valueOptional)
     {
-        const char* argValue = argv[ index ];
+        const LocalCharTB* argValue = argv[ index ];
         
         if ( index >= argc || !argValue || isOption(argValue))
         {
@@ -398,24 +461,24 @@ private:
             }
             else
             {
-                throw std::runtime_error( std::string("Option '") + option + "' requires a value.");
+                throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires a value.");
             }
         }
         if ( !convertTo( parsedValue, argValue))
         {
-            throw std::runtime_error( std::string("Error parsing value '") + argValue + "' of option '" + option + "'.");
+            throw std::runtime_error( std::string("Error parsing value '") + toStdString(argValue) + "' of option '" + toStdString(pOption) + "'.");
         }
         return true;
     }
 
-    template <typename T>
-    void parseArgs(const CharT* option, int argc, const CharT** argv, int& index, T& container, size_t minCount, size_t maxCount)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    void parseArgs(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& container, size_t minCount, size_t maxCount)
     {
         size_t argsParsed = 0;
         for (; argsParsed <= maxCount && index < argc; ++argsParsed, ++index)
         {
             typename T::value_type parsedValue;
-            if (!parseArg(option, argc, argv, index, parsedValue, true))
+            if (!parseArg(pOption, argc, argv, index, parsedValue, true))
             {
                 --index;
                 break;
@@ -424,33 +487,53 @@ private:
         }
         if (argsParsed < minCount)
         {
-            throw std::runtime_error( std::string("Option '") + option + "' requires more values.");
+            throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires more values.");
         }
     }
 
-    bool convertTo( std::string& value, const char* arg)
+    //helper function for converting parameters
+    static bool convertTo( std::string& value, const char* pArgument)
     {
-        value = arg;
-        return true;
-    }
-    
-    bool convertTo( std::wstring& value, const wchar_t* arg)
-    {
-        value = arg;
+        value = pArgument;
         return true;
     }
 
     //helper function for converting parameters
-    template <typename T>
-    bool convertTo( T& value, const CharT* arg)
+    static bool convertTo( std::wstring& value, const wchar_t* pArgument)
     {
-        std::stringstream s;
-        s << arg;
+        value = pArgument;
+        return true;
+    }
+
+    //helper function for converting parameters
+    template <typename T, typename LocalCharT>
+    static bool convertTo( T& value, const LocalCharT* pArgument)
+    {
+        std::basic_stringstream<CharT, std::char_traits<CharT>, std::allocator<CharT>> s;
+        s << pArgument;
         s >> value;
         return s.eof();
     }
 
-private:    
+    //helper function for converting parameters
+    std::string toStdString( const wchar_t* pText)
+    {
+        std::string result;
+        for(;pText && *pText;++pText)
+        {
+            //will only work well with ASCII encoded options
+            result += static_cast<char>(*pText);
+        }
+        return result;
+    }
+
+    //helper function for converting parameters
+    std::string toStdString( const char* pText)
+    {
+        std::string result(pText);
+        return result;
+    }
+private:
     bool m_HelpPassed;
     bool m_CommandsPassed;
     bool m_CommandFilesPassed;

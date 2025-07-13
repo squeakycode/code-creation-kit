@@ -598,6 +598,82 @@ TEST_CASE( "TCommandProcessor", "[TCommandProcessor]")
 
     runTest<std::string>();
 #ifdef _MSC_VER
-    //runTest<std::wstring>();
+    runTest<std::wstring>();
 #endif
+}
+
+template <typename StringT>
+std::vector<StringT> splitCommandLine(const StringT& input)
+{
+    typedef typename StringT::value_type CharT;
+    std::vector<StringT> arguments;
+    StringT currentArgument;
+    bool inQuotes = false;
+    bool seenQuotes = false;
+
+    for (auto it = input.cbegin() ; it != input.cend(); ++it)
+    {
+        const CharT c = *it;
+
+        if (c == '\\')
+        {
+            // escaping is only relevant inside of quotes
+            if (inQuotes && (it + 1) != input.cend())
+            {
+                const CharT nextC = *(it + 1);
+                if (nextC == '"' || nextC == '\\')
+                {
+                    currentArgument += nextC;
+                    ++it;
+                }
+                else
+                {
+                    currentArgument += c;
+                }
+            }
+            else
+            {
+                currentArgument += c;
+            }
+        }
+        else if (c == '"')
+        {
+            inQuotes = !inQuotes;
+            seenQuotes = true;
+        }
+        else if ((c == ' ' || c == '\t') && !inQuotes)
+        {
+            if (!currentArgument.empty() || seenQuotes)
+            {
+                arguments.push_back(currentArgument);
+                currentArgument.clear();
+                seenQuotes = false;
+            }
+        }
+        else
+        {
+            currentArgument += c;
+        }
+    }
+    if (!currentArgument.empty())
+    {
+        arguments.push_back(currentArgument);
+    }
+    return arguments;
+}
+
+TEST_CASE( "TSplitCommandLine", "[TCommandProcessor]")
+{
+    auto result = splitCommandLine<std::string>(R"(  arg1\path\path\path " arg2 " "" "\\\"" \\      last   )");
+    REQUIRE(result.size() == 6);
+    CHECK(result[0] == "arg1\\path\\path\\path");
+    CHECK(result[1] == " arg2 ");
+    CHECK(result[2] == "");
+    CHECK(result[3] == "\\\"");
+    CHECK(result[4] == "\\\\");
+    CHECK(result[5] == "last");
+    auto result2 = splitCommandLine<std::wstring>(L"a\tb");
+    REQUIRE(result2.size() == 2);
+    CHECK(result2[0] == L"a");
+    CHECK(result2[1] == L"b");
 }

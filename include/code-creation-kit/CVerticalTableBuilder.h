@@ -4,7 +4,6 @@
 #pragma once
 
 #include <stdexcept>
-#include <assert.h>
 
 #ifdef _MSC_VER
 #pragma warning( push )

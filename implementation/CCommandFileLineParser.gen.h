@@ -13,15 +13,13 @@
 #include <cstring>
 #include <cwchar>
 #include <climits>
-#include "StringLiteral.h"
-#include "3rdparty/boost/split_winmain.h"
 
 //parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
 class CCommandFileLineParser
 {
     typedef typename StringT::value_type CharT;
-    static const size_t cLeftColumnSize = 40;
+    constexpr static size_t cLeftColumnSize = 40;
 
 public:
     ///lists valid option combinations
@@ -279,179 +277,179 @@ public:
         {
             //get current argument
             bool argumentConsumed = false;
-            const CharT* arg = argv[ i ];
-            if (arg && arg[0] == '-')
+            const CharT* pArgument = argv[ i ];
+            if (pArgument && pArgument[0] == '-')
             {
-                if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("load-table"))))
+                if ((pArgument[1] == '-' && isEqual(pArgument + 2, "load-table")))
                 {
                     argumentConsumed = true;
                     m_TableFilePassed = true;
-                    parseArg(arg, argc, argv, ++i, m_TableFileValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_TableFileValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("label"))) || isEqual(arg + 1, STRING_LITERAL("a")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "label")) || isEqual(pArgument + 1, "a"))
                 {
                     argumentConsumed = true;
                     m_LabelPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_LabelValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_LabelValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("top-down"))) || isEqual(arg + 1, STRING_LITERAL("t")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "top-down")) || isEqual(pArgument + 1, "t"))
                 {
                     argumentConsumed = true;
                     m_TopDownPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("left-to-right"))) || isEqual(arg + 1, STRING_LITERAL("l")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "left-to-right")) || isEqual(pArgument + 1, "l"))
                 {
                     argumentConsumed = true;
                     m_LeftToRightPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("row-header-index"))) || isEqual(arg + 1, STRING_LITERAL("w")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "row-header-index")) || isEqual(pArgument + 1, "w"))
                 {
                     argumentConsumed = true;
                     m_RowHeaderIndexPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_RowHeaderIndexValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_RowHeaderIndexValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("column-header-index"))) || isEqual(arg + 1, STRING_LITERAL("n")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "column-header-index")) || isEqual(pArgument + 1, "n"))
                 {
                     argumentConsumed = true;
                     m_ColumnHeaderIndexPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_ColumnHeaderIndexValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_ColumnHeaderIndexValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("pad-rows"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "pad-rows")))
                 {
                     argumentConsumed = true;
                     m_PadRowsPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("unload-table"))) || isEqual(arg + 1, STRING_LITERAL("x")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "unload-table")) || isEqual(pArgument + 1, "x"))
                 {
                     argumentConsumed = true;
                     m_LabelsOfTableFilesToUnloadPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_LabelsOfTableFilesToUnloadValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_LabelsOfTableFilesToUnloadValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("template-source-file"))) || isEqual(arg + 1, STRING_LITERAL("s")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "template-source-file")) || isEqual(pArgument + 1, "s"))
                 {
                     argumentConsumed = true;
                     m_TemplateFilePassed = true;
-                    parseArg(arg, argc, argv, ++i, m_TemplateFileValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_TemplateFileValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("output-file"))) || isEqual(arg + 1, STRING_LITERAL("o")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "output-file")) || isEqual(pArgument + 1, "o"))
                 {
                     argumentConsumed = true;
                     m_OutputFilePassed = true;
-                    parseArg(arg, argc, argv, ++i, m_OutputFileValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_OutputFileValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("parameter"))) || isEqual(arg + 1, STRING_LITERAL("p")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "parameter")) || isEqual(pArgument + 1, "p"))
                 {
                     argumentConsumed = true;
                     m_ParametersPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_ParametersValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_ParametersValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("use-intermediate-output-file"))) || isEqual(arg + 1, STRING_LITERAL("u")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "use-intermediate-output-file")) || isEqual(pArgument + 1, "u"))
                 {
                     argumentConsumed = true;
                     m_UseIntermediateOutputFilePassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("intermediate-file-extension"))) || isEqual(arg + 1, STRING_LITERAL("e")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "intermediate-file-extension")) || isEqual(pArgument + 1, "e"))
                 {
                     argumentConsumed = true;
                     m_IntermediateOutputFileExtensionPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_IntermediateOutputFileExtensionValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_IntermediateOutputFileExtensionValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("markup-prefix"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "markup-prefix")))
                 {
                     argumentConsumed = true;
                     m_MarkupPrefixPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_MarkupPrefixValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_MarkupPrefixValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("markup-postfix"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "markup-postfix")))
                 {
                     argumentConsumed = true;
                     m_MarkupPostfixPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_MarkupPostfixValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_MarkupPostfixValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("markup"))) || isEqual(arg + 1, STRING_LITERAL("m")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "markup")) || isEqual(pArgument + 1, "m"))
                 {
                     argumentConsumed = true;
                     m_MarkupPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_MarkupValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_MarkupValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("append-to-file"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "append-to-file")))
                 {
                     argumentConsumed = true;
                     m_AppendToFilePassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("inlined"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "inlined")))
                 {
                     argumentConsumed = true;
                     m_InlinePassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("inline-prefix"))) || isEqual(arg + 1, STRING_LITERAL("b")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "inline-prefix")) || isEqual(pArgument + 1, "b"))
                 {
                     argumentConsumed = true;
                     m_InlinePrefixPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_InlinePrefixValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_InlinePrefixValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("inline-postfix"))) || isEqual(arg + 1, STRING_LITERAL("c")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "inline-postfix")) || isEqual(pArgument + 1, "c"))
                 {
                     argumentConsumed = true;
                     m_InlinePostfixPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_InlinePostfixValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_InlinePostfixValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("inline-generated-postfix"))) || isEqual(arg + 1, STRING_LITERAL("d")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "inline-generated-postfix")) || isEqual(pArgument + 1, "d"))
                 {
                     argumentConsumed = true;
                     m_InlineGeneratedPostfixPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_InlineGeneratedPostfixValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_InlineGeneratedPostfixValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("inline-pad"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "inline-pad")))
                 {
                     argumentConsumed = true;
                     m_InlinePadPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_InlinePadValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_InlinePadValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("recycle"))) || isEqual(arg + 1, STRING_LITERAL("y")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "recycle")) || isEqual(pArgument + 1, "y"))
                 {
                     argumentConsumed = true;
                     m_RecyclePassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("can-change-table-list"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "can-change-table-list")))
                 {
                     argumentConsumed = true;
                     m_CanChangeTableListPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("reset"))) || isEqual(arg + 1, STRING_LITERAL("r")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "reset")) || isEqual(pArgument + 1, "r"))
                 {
                     argumentConsumed = true;
                     m_ResetPassed = true;
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("add-include-directory"))) || isEqual(arg + 1, STRING_LITERAL("i")))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "add-include-directory")) || isEqual(pArgument + 1, "i"))
                 {
                     argumentConsumed = true;
                     m_IncludeDirectoriesPassed = true;
-                    parseArgs(arg, argc, argv, ++i, m_IncludeDirectoriesValue, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_IncludeDirectoriesValue, 1, SIZE_MAX);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("csv-delimiter-chars"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "csv-delimiter-chars")))
                 {
                     argumentConsumed = true;
                     m_CsvDelimiterCharsPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_CsvDelimiterCharsValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_CsvDelimiterCharsValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("csv-comment-chars"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "csv-comment-chars")))
                 {
                     argumentConsumed = true;
                     m_CsvCommentCharsPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_CsvCommentCharsValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_CsvCommentCharsValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("csv-quote-chars"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "csv-quote-chars")))
                 {
                     argumentConsumed = true;
                     m_CsvQuoteCharsPassed = true;
-                    parseArg(arg, argc, argv, ++i, m_CsvQuoteCharsValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_CsvQuoteCharsValue, false);
                 }
-                else if ((arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("log-file"))))
+                else if ((pArgument[1] == '-' && isEqual(pArgument + 2, "log-file")))
                 {
                     argumentConsumed = true;
                     m_LogFilePassed = true;
-                    parseArg(arg, argc, argv, ++i, m_LogFileValue, false);
+                    parseArg(pArgument, argc, argv, ++i, m_LogFileValue, false);
                 }
             }
             
@@ -459,31 +457,90 @@ public:
             {
                 argumentConsumed = true;
                 m_TableFilePassed = true;
-                parseArg(STRING_LITERAL("--load-table"), argc, argv, i, m_TableFileValue, false);
+                parseArg("--load-table", argc, argv, i, m_TableFileValue, false);
             }
             if (!argumentConsumed)
             {
-                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
+                throw std::runtime_error( std::string("Error unknown program option '") + toStdString(pArgument) + "'." );
             }
         }
+    }
+
+    std::vector<StringT> splitCommandLine(const StringT& input)
+    {
+        typedef typename StringT::value_type CharT;
+        std::vector<StringT> arguments;
+        StringT currentArgument;
+        bool inQuotes = false;
+        bool seenQuotes = false;
+
+        for (auto it = input.cbegin() ; it != input.cend(); ++it)
+        {
+            const CharT c = *it;
+
+            if (c == '\\')
+            {
+                // escaping is only relevant inside of quotes
+                if (inQuotes && (it + 1) != input.cend())
+                {
+                    const CharT nextC = *(it + 1);
+                    if (nextC == '"' || nextC == '\\')
+                    {
+                        currentArgument += nextC;
+                        ++it;
+                    }
+                    else
+                    {
+                        currentArgument += c;
+                    }
+                }
+                else
+                {
+                    currentArgument += c;
+                }
+            }
+            else if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                seenQuotes = true;
+            }
+            else if ((c == ' ' || c == '\t') && !inQuotes)
+            {
+                if (!currentArgument.empty() || seenQuotes)
+                {
+                    arguments.push_back(currentArgument);
+                    currentArgument.clear();
+                    seenQuotes = false;
+                }
+            }
+            else
+            {
+                currentArgument += c;
+            }
+        }
+        if (!currentArgument.empty())
+        {
+            arguments.push_back(currentArgument);
+        }
+        return arguments;
     }
 
     void parse(const StringT& commandLine)
     {
-        std::vector<StringT> args = boost::program_options::split_winmain(commandLine);
+        std::vector<StringT> arguments = splitCommandLine(commandLine);
         std::vector<const CharT*> argv;
-        argv.reserve(args.size() + 2);
-        argv.push_back("");
-        for (const StringT& arg : args)
+        argv.reserve(arguments.size() + 2);
+        argv.emplace_back();
+        for (const StringT& argument : arguments)
         {
-            argv.push_back(arg.c_str());
+            argv.push_back(argument.c_str());
         }
         argv.push_back(NULL);
-        parse(static_cast<int>(args.size() + 1), argv.data());
+        parse(static_cast<int>(arguments.size() + 1), argv.data());
     }
 
     ///determines the command by checking the combination of parameters provided
-    ECommand getCommand() const
+    [[nodiscard]] ECommand getCommand() const
     {
         if (
                m_TableFilePassed == false
@@ -889,348 +946,348 @@ public:
         return eOptionsInvalid;
     }
     
-    StringT getTableFile() const
+    [[nodiscard]] StringT getTableFile() const
     {
         return m_TableFileValue;
     }
 
-    StringT getLabel() const
+    [[nodiscard]] StringT getLabel() const
     {
         return m_LabelValue;
     }
 
-    bool getTopDown() const
+    [[nodiscard]] bool getTopDown() const
     {
         return m_TopDownPassed;
     }
     
-    bool getLeftToRight() const
+    [[nodiscard]] bool getLeftToRight() const
     {
         return m_LeftToRightPassed;
     }
     
-    unsigned int getRowHeaderIndex() const
+    [[nodiscard]] unsigned int getRowHeaderIndex() const
     {
         return m_RowHeaderIndexValue;
     }
 
-    unsigned int getColumnHeaderIndex() const
+    [[nodiscard]] unsigned int getColumnHeaderIndex() const
     {
         return m_ColumnHeaderIndexValue;
     }
 
-    bool getPadRows() const
+    [[nodiscard]] bool getPadRows() const
     {
         return m_PadRowsPassed;
     }
     
-    std::vector<StringT> getLabelsOfTableFilesToUnload() const
+    [[nodiscard]] std::vector<StringT> getLabelsOfTableFilesToUnload() const
     {
         return m_LabelsOfTableFilesToUnloadValue;
     }
 
-    StringT getTemplateFile() const
+    [[nodiscard]] StringT getTemplateFile() const
     {
         return m_TemplateFileValue;
     }
 
-    StringT getOutputFile() const
+    [[nodiscard]] StringT getOutputFile() const
     {
         return m_OutputFileValue;
     }
 
-    std::vector<StringT> getParameters() const
+    [[nodiscard]] std::vector<StringT> getParameters() const
     {
         return m_ParametersValue;
     }
 
-    bool getUseIntermediateOutputFile() const
+    [[nodiscard]] bool getUseIntermediateOutputFile() const
     {
         return m_UseIntermediateOutputFilePassed;
     }
     
-    StringT getIntermediateOutputFileExtension() const
+    [[nodiscard]] StringT getIntermediateOutputFileExtension() const
     {
         return m_IntermediateOutputFileExtensionValue;
     }
 
-    StringT getMarkupPrefix() const
+    [[nodiscard]] StringT getMarkupPrefix() const
     {
         return m_MarkupPrefixValue;
     }
 
-    StringT getMarkupPostfix() const
+    [[nodiscard]] StringT getMarkupPostfix() const
     {
         return m_MarkupPostfixValue;
     }
 
-    StringT getMarkup() const
+    [[nodiscard]] StringT getMarkup() const
     {
         return m_MarkupValue;
     }
 
-    bool getAppendToFile() const
+    [[nodiscard]] bool getAppendToFile() const
     {
         return m_AppendToFilePassed;
     }
     
-    bool getInline() const
+    [[nodiscard]] bool getInline() const
     {
         return m_InlinePassed;
     }
     
-    StringT getInlinePrefix() const
+    [[nodiscard]] StringT getInlinePrefix() const
     {
         return m_InlinePrefixValue;
     }
 
-    StringT getInlinePostfix() const
+    [[nodiscard]] StringT getInlinePostfix() const
     {
         return m_InlinePostfixValue;
     }
 
-    StringT getInlineGeneratedPostfix() const
+    [[nodiscard]] StringT getInlineGeneratedPostfix() const
     {
         return m_InlineGeneratedPostfixValue;
     }
 
-    unsigned int getInlinePad() const
+    [[nodiscard]] unsigned int getInlinePad() const
     {
         return m_InlinePadValue;
     }
 
-    bool getRecycle() const
+    [[nodiscard]] bool getRecycle() const
     {
         return m_RecyclePassed;
     }
     
-    bool getCanChangeTableList() const
+    [[nodiscard]] bool getCanChangeTableList() const
     {
         return m_CanChangeTableListPassed;
     }
     
-    bool getReset() const
+    [[nodiscard]] bool getReset() const
     {
         return m_ResetPassed;
     }
     
-    std::vector<StringT> getIncludeDirectories() const
+    [[nodiscard]] std::vector<StringT> getIncludeDirectories() const
     {
         return m_IncludeDirectoriesValue;
     }
 
-    StringT getCsvDelimiterChars() const
+    [[nodiscard]] StringT getCsvDelimiterChars() const
     {
         return m_CsvDelimiterCharsValue;
     }
 
-    StringT getCsvCommentChars() const
+    [[nodiscard]] StringT getCsvCommentChars() const
     {
         return m_CsvCommentCharsValue;
     }
 
-    StringT getCsvQuoteChars() const
+    [[nodiscard]] StringT getCsvQuoteChars() const
     {
         return m_CsvQuoteCharsValue;
     }
 
-    StringT getLogFile() const
+    [[nodiscard]] StringT getLogFile() const
     {
         return m_LogFileValue;
     }
 
     
-    bool hasTableFile() const
+    [[nodiscard]] bool hasTableFile() const
     {
         return m_TableFilePassed;
     }
     
-    bool hasLabel() const
+    [[nodiscard]] bool hasLabel() const
     {
         return m_LabelPassed;
     }
     
-    bool hasTopDown() const
+    [[nodiscard]] bool hasTopDown() const
     {
         return m_TopDownPassed;
     }
     
-    bool hasLeftToRight() const
+    [[nodiscard]] bool hasLeftToRight() const
     {
         return m_LeftToRightPassed;
     }
     
-    bool hasRowHeaderIndex() const
+    [[nodiscard]] bool hasRowHeaderIndex() const
     {
         return m_RowHeaderIndexPassed;
     }
     
-    bool hasColumnHeaderIndex() const
+    [[nodiscard]] bool hasColumnHeaderIndex() const
     {
         return m_ColumnHeaderIndexPassed;
     }
     
-    bool hasPadRows() const
+    [[nodiscard]] bool hasPadRows() const
     {
         return m_PadRowsPassed;
     }
     
-    bool hasLabelsOfTableFilesToUnload() const
+    [[nodiscard]] bool hasLabelsOfTableFilesToUnload() const
     {
         return m_LabelsOfTableFilesToUnloadPassed;
     }
     
-    bool hasTemplateFile() const
+    [[nodiscard]] bool hasTemplateFile() const
     {
         return m_TemplateFilePassed;
     }
     
-    bool hasOutputFile() const
+    [[nodiscard]] bool hasOutputFile() const
     {
         return m_OutputFilePassed;
     }
     
-    bool hasParameters() const
+    [[nodiscard]] bool hasParameters() const
     {
         return m_ParametersPassed;
     }
     
-    bool hasUseIntermediateOutputFile() const
+    [[nodiscard]] bool hasUseIntermediateOutputFile() const
     {
         return m_UseIntermediateOutputFilePassed;
     }
     
-    bool hasIntermediateOutputFileExtension() const
+    [[nodiscard]] bool hasIntermediateOutputFileExtension() const
     {
         return m_IntermediateOutputFileExtensionPassed;
     }
     
-    bool hasMarkupPrefix() const
+    [[nodiscard]] bool hasMarkupPrefix() const
     {
         return m_MarkupPrefixPassed;
     }
     
-    bool hasMarkupPostfix() const
+    [[nodiscard]] bool hasMarkupPostfix() const
     {
         return m_MarkupPostfixPassed;
     }
     
-    bool hasMarkup() const
+    [[nodiscard]] bool hasMarkup() const
     {
         return m_MarkupPassed;
     }
     
-    bool hasAppendToFile() const
+    [[nodiscard]] bool hasAppendToFile() const
     {
         return m_AppendToFilePassed;
     }
     
-    bool hasInline() const
+    [[nodiscard]] bool hasInline() const
     {
         return m_InlinePassed;
     }
     
-    bool hasInlinePrefix() const
+    [[nodiscard]] bool hasInlinePrefix() const
     {
         return m_InlinePrefixPassed;
     }
     
-    bool hasInlinePostfix() const
+    [[nodiscard]] bool hasInlinePostfix() const
     {
         return m_InlinePostfixPassed;
     }
     
-    bool hasInlineGeneratedPostfix() const
+    [[nodiscard]] bool hasInlineGeneratedPostfix() const
     {
         return m_InlineGeneratedPostfixPassed;
     }
     
-    bool hasInlinePad() const
+    [[nodiscard]] bool hasInlinePad() const
     {
         return m_InlinePadPassed;
     }
     
-    bool hasRecycle() const
+    [[nodiscard]] bool hasRecycle() const
     {
         return m_RecyclePassed;
     }
     
-    bool hasCanChangeTableList() const
+    [[nodiscard]] bool hasCanChangeTableList() const
     {
         return m_CanChangeTableListPassed;
     }
     
-    bool hasReset() const
+    [[nodiscard]] bool hasReset() const
     {
         return m_ResetPassed;
     }
     
-    bool hasIncludeDirectories() const
+    [[nodiscard]] bool hasIncludeDirectories() const
     {
         return m_IncludeDirectoriesPassed;
     }
     
-    bool hasCsvDelimiterChars() const
+    [[nodiscard]] bool hasCsvDelimiterChars() const
     {
         return m_CsvDelimiterCharsPassed;
     }
     
-    bool hasCsvCommentChars() const
+    [[nodiscard]] bool hasCsvCommentChars() const
     {
         return m_CsvCommentCharsPassed;
     }
     
-    bool hasCsvQuoteChars() const
+    [[nodiscard]] bool hasCsvQuoteChars() const
     {
         return m_CsvQuoteCharsPassed;
     }
     
-    bool hasLogFile() const
+    [[nodiscard]] bool hasLogFile() const
     {
         return m_LogFilePassed;
     }
     
 
-    
-private:    
-    bool isOption(const CharT* arg)
+private:
+    template <typename LocalCharT>
+    static bool isOption(const LocalCharT* pArgument)
     {
         bool result = false;
-        if (arg && arg[0] == '-')
+        if (pArgument && pArgument[0] == '-')
         {
-            if (arg[1] == '-')
+            if (pArgument[1] == '-')
             {
                 if(
-                       isEqual(arg + 2, STRING_LITERAL("load-table"))
-                    || isEqual(arg + 2, STRING_LITERAL("label"))
-                    || isEqual(arg + 2, STRING_LITERAL("top-down"))
-                    || isEqual(arg + 2, STRING_LITERAL("left-to-right"))
-                    || isEqual(arg + 2, STRING_LITERAL("row-header-index"))
-                    || isEqual(arg + 2, STRING_LITERAL("column-header-index"))
-                    || isEqual(arg + 2, STRING_LITERAL("pad-rows"))
-                    || isEqual(arg + 2, STRING_LITERAL("unload-table"))
-                    || isEqual(arg + 2, STRING_LITERAL("template-source-file"))
-                    || isEqual(arg + 2, STRING_LITERAL("output-file"))
-                    || isEqual(arg + 2, STRING_LITERAL("parameter"))
-                    || isEqual(arg + 2, STRING_LITERAL("use-intermediate-output-file"))
-                    || isEqual(arg + 2, STRING_LITERAL("intermediate-file-extension"))
-                    || isEqual(arg + 2, STRING_LITERAL("markup-prefix"))
-                    || isEqual(arg + 2, STRING_LITERAL("markup-postfix"))
-                    || isEqual(arg + 2, STRING_LITERAL("markup"))
-                    || isEqual(arg + 2, STRING_LITERAL("append-to-file"))
-                    || isEqual(arg + 2, STRING_LITERAL("inlined"))
-                    || isEqual(arg + 2, STRING_LITERAL("inline-prefix"))
-                    || isEqual(arg + 2, STRING_LITERAL("inline-postfix"))
-                    || isEqual(arg + 2, STRING_LITERAL("inline-generated-postfix"))
-                    || isEqual(arg + 2, STRING_LITERAL("inline-pad"))
-                    || isEqual(arg + 2, STRING_LITERAL("recycle"))
-                    || isEqual(arg + 2, STRING_LITERAL("can-change-table-list"))
-                    || isEqual(arg + 2, STRING_LITERAL("reset"))
-                    || isEqual(arg + 2, STRING_LITERAL("add-include-directory"))
-                    || isEqual(arg + 2, STRING_LITERAL("csv-delimiter-chars"))
-                    || isEqual(arg + 2, STRING_LITERAL("csv-comment-chars"))
-                    || isEqual(arg + 2, STRING_LITERAL("csv-quote-chars"))
-                    || isEqual(arg + 2, STRING_LITERAL("log-file"))
+                       isEqual(pArgument + 2, "load-table")
+                    || isEqual(pArgument + 2, "label")
+                    || isEqual(pArgument + 2, "top-down")
+                    || isEqual(pArgument + 2, "left-to-right")
+                    || isEqual(pArgument + 2, "row-header-index")
+                    || isEqual(pArgument + 2, "column-header-index")
+                    || isEqual(pArgument + 2, "pad-rows")
+                    || isEqual(pArgument + 2, "unload-table")
+                    || isEqual(pArgument + 2, "template-source-file")
+                    || isEqual(pArgument + 2, "output-file")
+                    || isEqual(pArgument + 2, "parameter")
+                    || isEqual(pArgument + 2, "use-intermediate-output-file")
+                    || isEqual(pArgument + 2, "intermediate-file-extension")
+                    || isEqual(pArgument + 2, "markup-prefix")
+                    || isEqual(pArgument + 2, "markup-postfix")
+                    || isEqual(pArgument + 2, "markup")
+                    || isEqual(pArgument + 2, "append-to-file")
+                    || isEqual(pArgument + 2, "inlined")
+                    || isEqual(pArgument + 2, "inline-prefix")
+                    || isEqual(pArgument + 2, "inline-postfix")
+                    || isEqual(pArgument + 2, "inline-generated-postfix")
+                    || isEqual(pArgument + 2, "inline-pad")
+                    || isEqual(pArgument + 2, "recycle")
+                    || isEqual(pArgument + 2, "can-change-table-list")
+                    || isEqual(pArgument + 2, "reset")
+                    || isEqual(pArgument + 2, "add-include-directory")
+                    || isEqual(pArgument + 2, "csv-delimiter-chars")
+                    || isEqual(pArgument + 2, "csv-comment-chars")
+                    || isEqual(pArgument + 2, "csv-quote-chars")
+                    || isEqual(pArgument + 2, "log-file")
                 )
                 {
                     result = true;
@@ -1238,24 +1295,24 @@ private:
                 
             }
             else if(
-                   isEqual(arg + 1, STRING_LITERAL("a"))
-                || isEqual(arg + 1, STRING_LITERAL("t"))
-                || isEqual(arg + 1, STRING_LITERAL("l"))
-                || isEqual(arg + 1, STRING_LITERAL("w"))
-                || isEqual(arg + 1, STRING_LITERAL("n"))
-                || isEqual(arg + 1, STRING_LITERAL("x"))
-                || isEqual(arg + 1, STRING_LITERAL("s"))
-                || isEqual(arg + 1, STRING_LITERAL("o"))
-                || isEqual(arg + 1, STRING_LITERAL("p"))
-                || isEqual(arg + 1, STRING_LITERAL("u"))
-                || isEqual(arg + 1, STRING_LITERAL("e"))
-                || isEqual(arg + 1, STRING_LITERAL("m"))
-                || isEqual(arg + 1, STRING_LITERAL("b"))
-                || isEqual(arg + 1, STRING_LITERAL("c"))
-                || isEqual(arg + 1, STRING_LITERAL("d"))
-                || isEqual(arg + 1, STRING_LITERAL("y"))
-                || isEqual(arg + 1, STRING_LITERAL("r"))
-                || isEqual(arg + 1, STRING_LITERAL("i"))
+                   isEqual(pArgument + 1, "a")
+                || isEqual(pArgument + 1, "t")
+                || isEqual(pArgument + 1, "l")
+                || isEqual(pArgument + 1, "w")
+                || isEqual(pArgument + 1, "n")
+                || isEqual(pArgument + 1, "x")
+                || isEqual(pArgument + 1, "s")
+                || isEqual(pArgument + 1, "o")
+                || isEqual(pArgument + 1, "p")
+                || isEqual(pArgument + 1, "u")
+                || isEqual(pArgument + 1, "e")
+                || isEqual(pArgument + 1, "m")
+                || isEqual(pArgument + 1, "b")
+                || isEqual(pArgument + 1, "c")
+                || isEqual(pArgument + 1, "d")
+                || isEqual(pArgument + 1, "y")
+                || isEqual(pArgument + 1, "r")
+                || isEqual(pArgument + 1, "i")
             )
             {
                 result = true;
@@ -1264,19 +1321,25 @@ private:
         return result;
     }
     
-    bool isEqual(const char* a, const char* b)
+    // command line parameters are expected to be ASCII encoded.
+    template <typename LocalCharTA, typename LocalCharTB>
+    static bool isEqual(const LocalCharTA* pA, const LocalCharTB* pB)
     {
-        bool result = (strcmp(a,b) == 0);
-        return result;
+        if (pA != nullptr && pB != nullptr)
+        {
+            for (;*pA != 0 && *pB != 0; ++pA, ++pB)
+            {
+                if (*pA != *pB)
+                {
+                    return false;
+                }
+            }
+            return (*pA == *pB);
+        }
+        return false;
     }
 
-    bool isEqual(const wchar_t* a, const wchar_t* b)
-    {
-        bool result = (wcscmp(a,b) == 0);
-        return result;
-    }
-
-    void printHelpCommandText(const char* text, std::ostream& stream)
+    static void printHelpCommandText(const char* text, std::ostream& stream)
     {
         size_t textSize = strlen(text);
         if (textSize > (cLeftColumnSize - 1) )
@@ -1290,10 +1353,10 @@ private:
         }
     }
 
-    template <typename T>
-    bool parseArg(const CharT* option, int argc, const CharT** argv, int& index, T& parsedValue, bool valueOptional)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    bool parseArg(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& parsedValue, bool valueOptional)
     {
-        const char* argValue = argv[ index ];
+        const LocalCharTB* argValue = argv[ index ];
         
         if ( index >= argc || !argValue || isOption(argValue))
         {
@@ -1303,24 +1366,24 @@ private:
             }
             else
             {
-                throw std::runtime_error( std::string("Option '") + option + "' requires a value.");
+                throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires a value.");
             }
         }
         if ( !convertTo( parsedValue, argValue))
         {
-            throw std::runtime_error( std::string("Error parsing value '") + argValue + "' of option '" + option + "'.");
+            throw std::runtime_error( std::string("Error parsing value '") + toStdString(argValue) + "' of option '" + toStdString(pOption) + "'.");
         }
         return true;
     }
 
-    template <typename T>
-    void parseArgs(const CharT* option, int argc, const CharT** argv, int& index, T& container, size_t minCount, size_t maxCount)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    void parseArgs(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& container, size_t minCount, size_t maxCount)
     {
         size_t argsParsed = 0;
         for (; argsParsed <= maxCount && index < argc; ++argsParsed, ++index)
         {
             typename T::value_type parsedValue;
-            if (!parseArg(option, argc, argv, index, parsedValue, true))
+            if (!parseArg(pOption, argc, argv, index, parsedValue, true))
             {
                 --index;
                 break;
@@ -1329,33 +1392,53 @@ private:
         }
         if (argsParsed < minCount)
         {
-            throw std::runtime_error( std::string("Option '") + option + "' requires more values.");
+            throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires more values.");
         }
     }
 
-    bool convertTo( std::string& value, const char* arg)
+    //helper function for converting parameters
+    static bool convertTo( std::string& value, const char* pArgument)
     {
-        value = arg;
-        return true;
-    }
-    
-    bool convertTo( std::wstring& value, const wchar_t* arg)
-    {
-        value = arg;
+        value = pArgument;
         return true;
     }
 
     //helper function for converting parameters
-    template <typename T>
-    bool convertTo( T& value, const CharT* arg)
+    static bool convertTo( std::wstring& value, const wchar_t* pArgument)
     {
-        std::stringstream s;
-        s << arg;
+        value = pArgument;
+        return true;
+    }
+
+    //helper function for converting parameters
+    template <typename T, typename LocalCharT>
+    static bool convertTo( T& value, const LocalCharT* pArgument)
+    {
+        std::basic_stringstream<CharT, std::char_traits<CharT>, std::allocator<CharT>> s;
+        s << pArgument;
         s >> value;
         return s.eof();
     }
 
-private:    
+    //helper function for converting parameters
+    std::string toStdString( const wchar_t* pText)
+    {
+        std::string result;
+        for(;pText && *pText;++pText)
+        {
+            //will only work well with ASCII encoded options
+            result += static_cast<char>(*pText);
+        }
+        return result;
+    }
+
+    //helper function for converting parameters
+    std::string toStdString( const char* pText)
+    {
+        std::string result(pText);
+        return result;
+    }
+private:
     bool m_TableFilePassed;
     bool m_LabelPassed;
     bool m_TopDownPassed;

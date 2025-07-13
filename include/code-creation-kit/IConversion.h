@@ -18,8 +18,6 @@ namespace code_creation_kit
 
         virtual bool operator==( const IConversion& conversion) const = 0;
 
-        virtual ~IConversion() 
-        {
-        };
+        virtual ~IConversion() = default;
     };
 }

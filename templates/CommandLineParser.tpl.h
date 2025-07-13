@@ -1,32 +1,5 @@
-[COMMENT]  Copyright (c) 2011-2023 Andreas Gau
-[COMMENT]  All rights reserved.
-[COMMENT]
-[COMMENT]  Redistribution and use in source and binary forms, with or without
-[COMMENT]  modification, are permitted provided that the following conditions are met:
-[COMMENT]      * Redistributions of source code must retain the above copyright
-[COMMENT]        notice, this list of conditions and the following disclaimer.
-[COMMENT]      * Redistributions in binary form must reproduce the above copyright
-[COMMENT]        notice, this list of conditions and the following disclaimer in the
-[COMMENT]        documentation and/or other materials provided with the distribution.
-[COMMENT]      * Neither the name of the copyright holder nor the
-[COMMENT]        names of contributors may be used to endorse or promote products
-[COMMENT]        derived from this software without specific prior written permission.
-[COMMENT]
-[COMMENT]  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-[COMMENT]  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-[COMMENT]  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-[COMMENT]  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-[COMMENT]  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-[COMMENT]  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-[COMMENT]  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-[COMMENT]  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-[COMMENT]  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-[COMMENT]  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-[COMMENT]
-[COMMENT]
-[COMMENT] Required Parameters:
-[COMMENT] "Parser Name" - the name of the parser class, e.g. CCommandLineParser
-[COMMENT] "Heading" - heading of option description, e.g. Allowed Options
+[COMMENT]  Copyright (c) 2011-2025 Andreas Gau
+[COMMENT]  SPDX-License-Identifier: BSD-3-Clause
 //------------------------------------------------------------------------------
 /**
 \file
@@ -42,15 +15,13 @@
 #include <cstring>
 #include <cwchar>
 #include <climits>
-#include "StringLiteral.h"
-#include "3rdparty/boost/split_winmain.h"
 
 //parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
 class [ENTRY]["Parser Name"]
 {
     typedef typename StringT::value_type CharT;
-    static const size_t cLeftColumnSize = 40;
+    constexpr static size_t cLeftColumnSize = 40;
 
 public:
     ///lists valid option combinations
@@ -116,18 +87,18 @@ public:
         {
             //get current argument
             bool argumentConsumed = false;
-            const CharT* arg = argv[ i ];
-            if (arg && arg[0] == '-')
+            const CharT* pArgument = argv[ i ];
+            if (pArgument && pArgument[0] == '-')
             {
                 [MACRO_BEGIN][TRIM]
-                [BEGIN][IF][FIRST_TIME][OR]else [END]if ([BEGIN](arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]"))) || isEqual(arg + 1, STRING_LITERAL("[ENTRY]["Shortcut"]"))[OR](arg[1] == '-' && isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]")))[OR]isEqual(arg[1], STRING_LITERAL("[ENTRY]["Shortcut"]")))[END])
+                [BEGIN][IF][FIRST_TIME][OR]else [END]if ([BEGIN](pArgument[1] == '-' && isEqual(pArgument + 2, "[ENTRY]["Name"]")) || isEqual(pArgument + 1, "[ENTRY]["Shortcut"]")[OR](pArgument[1] == '-' && isEqual(pArgument + 2, "[ENTRY]["Name"]"))[OR]isEqual(pArgument[1], "[ENTRY]["Shortcut"]"))[END])
                 {
                     argumentConsumed = true;
                     m_[ENTRY]["C++ Name"]Passed = true;
                     [BEGIN][IF][ENTRY]["C++ Type"][IF][ENTRY]["Multi-Token"][TRIM]
-                    parseArgs(arg, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, 1, SIZE_MAX);
+                    parseArgs(pArgument, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, 1, SIZE_MAX);
                     [OR][IF][ENTRY]["C++ Type"][IF][NOT][ENTRY]["Zero-Token"][TRIM]
-                    parseArg(arg, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, false);
+                    parseArg(pArgument, argc, argv, ++i, m_[ENTRY]["C++ Name"]Value, false);
                     [OR][END][TRIM]
                 }
                 [MACRO_END][TRIM]
@@ -141,33 +112,92 @@ public:
                 [BEGIN][IF][ENTRY]["C++ Type"][IF][ENTRY]["Multi-Token"][TRIM]
                 parseArgs("[BEGIN]--[ENTRY]["Name"][OR]-[ENTRY]["Shortcut"][END]", argc, argv, i, m_[ENTRY]["C++ Name"]Value, 1, static_cast<size_t>([ENTRY]["Positional Count"]));
                 [OR][IF][ENTRY]["C++ Type"][IF][NOT][ENTRY]["Zero-Token"][TRIM]
-                parseArg(STRING_LITERAL("[BEGIN]--[ENTRY]["Name"][OR]-[ENTRY]["Shortcut"][END]"), argc, argv, i, m_[ENTRY]["C++ Name"]Value, false);
+                parseArg("[BEGIN]--[ENTRY]["Name"][OR]-[ENTRY]["Shortcut"][END]", argc, argv, i, m_[ENTRY]["C++ Name"]Value, false);
                 [OR][END][TRIM]                
             }
             [MACRO_END][TRIM]
             if (!argumentConsumed)
             {
-                throw std::runtime_error( std::string("Error unknown program option '") + arg + "'." );
+                throw std::runtime_error( std::string("Error unknown program option '") + toStdString(pArgument) + "'." );
             }
         }
     }
 
+    std::vector<StringT> splitCommandLine(const StringT& input)
+    {
+        typedef typename StringT::value_type CharT;
+        std::vector<StringT> arguments;
+        StringT currentArgument;
+        bool inQuotes = false;
+        bool seenQuotes = false;
+
+        for (auto it = input.cbegin() ; it != input.cend(); ++it)
+        {
+            const CharT c = *it;
+
+            if (c == '\\')
+            {
+                // escaping is only relevant inside of quotes
+                if (inQuotes && (it + 1) != input.cend())
+                {
+                    const CharT nextC = *(it + 1);
+                    if (nextC == '"' || nextC == '\\')
+                    {
+                        currentArgument += nextC;
+                        ++it;
+                    }
+                    else
+                    {
+                        currentArgument += c;
+                    }
+                }
+                else
+                {
+                    currentArgument += c;
+                }
+            }
+            else if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                seenQuotes = true;
+            }
+            else if ((c == ' ' || c == '\t') && !inQuotes)
+            {
+                if (!currentArgument.empty() || seenQuotes)
+                {
+                    arguments.push_back(currentArgument);
+                    currentArgument.clear();
+                    seenQuotes = false;
+                }
+            }
+            else
+            {
+                currentArgument += c;
+            }
+        }
+        if (!currentArgument.empty())
+        {
+            arguments.push_back(currentArgument);
+        }
+        return arguments;
+    }
+
     void parse(const StringT& commandLine)
     {
-        std::vector<StringT> args = boost::program_options::split_winmain(commandLine);
+        std::vector<StringT> arguments = splitCommandLine(commandLine);
         std::vector<const CharT*> argv;
-        argv.reserve(args.size() + 2);
-        argv.push_back("");
-        for (const StringT& arg : args)
+        argv.reserve(arguments.size() + 2);
+        argv.emplace_back();
+        for (const StringT& argument : arguments)
         {
-            argv.push_back(arg.c_str());
+            argv.push_back(argument.c_str());
         }
         argv.push_back(NULL);
-        parse(static_cast<int>(args.size() + 1), argv.data());
+        parse(static_cast<int>(arguments.size() + 1), argv.data());
     }
 
     ///determines the command by checking the combination of parameters provided
-    ECommand getCommand() const
+    [[nodiscard]] ECommand getCommand() const
     {
         [MACRO_BEGIN][TRIM]
         if (
@@ -190,13 +220,13 @@ public:
     }
     
     [MACRO_BEGIN][TRIM]
-    [ENTRY]["C++ Type"] get[ENTRY]["C++ Name"]() const
+    [[nodiscard]] [ENTRY]["C++ Type"] get[ENTRY]["C++ Name"]() const
     {
         return m_[ENTRY]["C++ Name"]Value;
     }
 
     [OR][TRIM]
-    bool get[ENTRY]["C++ Name"]() const
+    [[nodiscard]] bool get[ENTRY]["C++ Name"]() const
     {
         return m_[ENTRY]["C++ Name"]Passed;
     }
@@ -204,24 +234,24 @@ public:
     [MACRO_END][TRIM]
     
     [MACRO_BEGIN][TRIM]
-    bool has[ENTRY]["C++ Name"]() const
+    [[nodiscard]] bool has[ENTRY]["C++ Name"]() const
     {
         return m_[ENTRY]["C++ Name"]Passed;
     }
     
     [MACRO_END][TRIM]
 
-    
-private:    
-    bool isOption(const CharT* arg)
+private:
+    template <typename LocalCharT>
+    static bool isOption(const LocalCharT* pArgument)
     {
         bool result = false;
-        if (arg && arg[0] == '-')
+        if (pArgument && pArgument[0] == '-')
         {
-            if (arg[1] == '-')
+            if (pArgument[1] == '-')
             {
                 if(
-                    [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(arg + 2, STRING_LITERAL("[ENTRY]["Name"]"))
+                    [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(pArgument + 2, "[ENTRY]["Name"]")
                 )
                 {
                     result = true;
@@ -229,7 +259,7 @@ private:
                 
             }
             else if(
-                [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(arg + 1, STRING_LITERAL("[ENTRY]["Shortcut"]"))
+                [BEGIN][IF][FIRST_TIME]  [OR]||[END] isEqual(pArgument + 1, "[ENTRY]["Shortcut"]")
             )
             {
                 result = true;
@@ -238,19 +268,25 @@ private:
         return result;
     }
     
-    bool isEqual(const char* a, const char* b)
+    // command line parameters are expected to be ASCII encoded.
+    template <typename LocalCharTA, typename LocalCharTB>
+    static bool isEqual(const LocalCharTA* pA, const LocalCharTB* pB)
     {
-        bool result = (strcmp(a,b) == 0);
-        return result;
+        if (pA != nullptr && pB != nullptr)
+        {
+            for (;*pA != 0 && *pB != 0; ++pA, ++pB)
+            {
+                if (*pA != *pB)
+                {
+                    return false;
+                }
+            }
+            return (*pA == *pB);
+        }
+        return false;
     }
 
-    bool isEqual(const wchar_t* a, const wchar_t* b)
-    {
-        bool result = (wcscmp(a,b) == 0);
-        return result;
-    }
-
-    void printHelpCommandText(const char* text, std::ostream& stream)
+    static void printHelpCommandText(const char* text, std::ostream& stream)
     {
         size_t textSize = strlen(text);
         if (textSize > (cLeftColumnSize - 1) )
@@ -264,10 +300,10 @@ private:
         }
     }
 
-    template <typename T>
-    bool parseArg(const CharT* option, int argc, const CharT** argv, int& index, T& parsedValue, bool valueOptional)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    bool parseArg(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& parsedValue, bool valueOptional)
     {
-        const char* argValue = argv[ index ];
+        const LocalCharTB* argValue = argv[ index ];
         
         if ( index >= argc || !argValue || isOption(argValue))
         {
@@ -277,24 +313,24 @@ private:
             }
             else
             {
-                throw std::runtime_error( std::string("Option '") + option + "' requires a value.");
+                throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires a value.");
             }
         }
         if ( !convertTo( parsedValue, argValue))
         {
-            throw std::runtime_error( std::string("Error parsing value '") + argValue + "' of option '" + option + "'.");
+            throw std::runtime_error( std::string("Error parsing value '") + toStdString(argValue) + "' of option '" + toStdString(pOption) + "'.");
         }
         return true;
     }
 
-    template <typename T>
-    void parseArgs(const CharT* option, int argc, const CharT** argv, int& index, T& container, size_t minCount, size_t maxCount)
+    template <typename LocalCharTA, typename LocalCharTB, typename T>
+    void parseArgs(const LocalCharTA* pOption, int argc, const LocalCharTB** argv, int& index, T& container, size_t minCount, size_t maxCount)
     {
         size_t argsParsed = 0;
         for (; argsParsed <= maxCount && index < argc; ++argsParsed, ++index)
         {
             typename T::value_type parsedValue;
-            if (!parseArg(option, argc, argv, index, parsedValue, true))
+            if (!parseArg(pOption, argc, argv, index, parsedValue, true))
             {
                 --index;
                 break;
@@ -303,33 +339,53 @@ private:
         }
         if (argsParsed < minCount)
         {
-            throw std::runtime_error( std::string("Option '") + option + "' requires more values.");
+            throw std::runtime_error( std::string("Option '") + toStdString(pOption) + "' requires more values.");
         }
     }
 
-    bool convertTo( std::string& value, const char* arg)
+    //helper function for converting parameters
+    static bool convertTo( std::string& value, const char* pArgument)
     {
-        value = arg;
-        return true;
-    }
-    
-    bool convertTo( std::wstring& value, const wchar_t* arg)
-    {
-        value = arg;
+        value = pArgument;
         return true;
     }
 
     //helper function for converting parameters
-    template <typename T>
-    bool convertTo( T& value, const CharT* arg)
+    static bool convertTo( std::wstring& value, const wchar_t* pArgument)
     {
-        std::stringstream s;
-        s << arg;
+        value = pArgument;
+        return true;
+    }
+
+    //helper function for converting parameters
+    template <typename T, typename LocalCharT>
+    static bool convertTo( T& value, const LocalCharT* pArgument)
+    {
+        std::basic_stringstream<CharT, std::char_traits<CharT>, std::allocator<CharT>> s;
+        s << pArgument;
         s >> value;
         return s.eof();
     }
 
-private:    
+    //helper function for converting parameters
+    std::string toStdString( const wchar_t* pText)
+    {
+        std::string result;
+        for(;pText && *pText;++pText)
+        {
+            //will only work well with ASCII encoded options
+            result += static_cast<char>(*pText);
+        }
+        return result;
+    }
+
+    //helper function for converting parameters
+    std::string toStdString( const char* pText)
+    {
+        std::string result(pText);
+        return result;
+    }
+private:
     bool m_[ENTRY]["C++ Name"]Passed;
 
     [ENTRY]["C++ Type"] m_[ENTRY]["C++ Name"]Value;
