@@ -5,10 +5,10 @@
 
 #include <list>
 #include <memory.h>
-#include "CTableIndex.h"
-#include "CVerticalTableRotator.h"
-#include "CMacro.h"
-#include "CMacroExpander.h"
+#include "TableIndex.h"
+#include "VerticalTableRotator.h"
+#include "Macro.h"
+#include "MacroExpander.h"
 
 namespace code_creation_kit
 {

@@ -4,13 +4,13 @@
 #pragma once
 
 #include <set>
-#include "CTemplateLoader.h"
+#include "TemplateLoader.h"
 #include "ETokens.gen.h"
-#include "CToken.h"
-#include "CTokenizer.gen.h"
-#include "CTemplatePreprocessor.h"
+#include "Token.h"
+#include "Tokenizer.gen.h"
+#include "TemplatePreprocessor.h"
 #include "StringLiteral.h"
-#include "CInlineTemplateParameters.h"
+#include "InlineTemplateParameters.h"
 
 namespace code_creation_kit
 {

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "CMacroExpression.h"
-#include "CSubstitution.h"
+#include "MacroExpression.h"
+#include "Substitution.h"
 #include <vector>
 
 namespace code_creation_kit

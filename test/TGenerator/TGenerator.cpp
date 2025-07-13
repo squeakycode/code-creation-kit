@@ -6,7 +6,7 @@
 
 #include <string>
 #include <sstream>
-#include "CGenerator.h"
+#include "Generator.h"
 #include "TGeneratorTestFiles.h"
 
 using namespace code_creation_kit;

@@ -13,10 +13,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #we are building code creation kit
 project(cck CXX)
 
-if(MSVC)
-    cmake_policy(SET CMP0074 NEW) #The NEW behavior for this policy is to use <PackageName>_ROOT variables.
-endif()
-
 #if the code creation kit is installed use it for building, otherwise use pre generated files, that are checked in
 if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
     if(WIN32) # Windows

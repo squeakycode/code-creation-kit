@@ -6,7 +6,7 @@
 #include "ESubstitutions.gen.h"
 #include "IConstraint.h"
 #include "IConversion.h"
-#include "CComparableSharedObject.h"
+#include "ComparableSharedObject.h"
 #include <list>
 #include <vector>
 #include <stdexcept>

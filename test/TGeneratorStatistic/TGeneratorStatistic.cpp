@@ -6,7 +6,7 @@
 
 #include <string>
 #include <vector>
-#include "CGeneratorStatistic.h"
+#include "GeneratorStatistic.h"
 #include "TGeneratorStatisticTestFiles.h"
 
 using namespace code_creation_kit;

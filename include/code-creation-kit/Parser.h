@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "CMacro.h"
+#include "Macro.h"
 #include <vector>
 #include <map>
 #include <cassert>

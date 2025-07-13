@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "CComparableSharedObject.h"
+#include "ComparableSharedObject.h"
 #include <memory>
 #include <vector>
 

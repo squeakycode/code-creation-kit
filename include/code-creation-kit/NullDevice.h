@@ -5,7 +5,7 @@
 
 namespace code_creation_kit
 {
-    ///Nul device.
+    ///Null device.
     class CNul
     {
     public:

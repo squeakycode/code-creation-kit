@@ -4,13 +4,13 @@
 #pragma once
 
 #include <string>
-#include "CCommandLineParser.gen.h"
+#include "CommandLineParser.gen.h"
 #include <stdexcept>
-#include "CSourceFile.h"
+#include "SourceFile.h"
 #include "FileSystem.h"
 #include "DependencyPrinter.h"
 #include "version.gen.h"
-#include "CGeneratorCommandProcessor.h"
+#include "GeneratorCommandProcessor.h"
 #include "StringLiteral.h"
 
 class CommandFileT;

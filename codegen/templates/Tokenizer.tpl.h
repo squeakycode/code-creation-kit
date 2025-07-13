@@ -14,7 +14,7 @@
 #include "cpptokenfinder.hpp"
 #include "cppstringx.hpp"
 #include "StringLiteral.h"
-#include "CNul.h"
+#include "NullDevice.h"
 
 [PART_BEGIN]["if front end"][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][PART_END][TRIM]
 [PART_BEGIN]["if back end"][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][PART_END][TRIM]

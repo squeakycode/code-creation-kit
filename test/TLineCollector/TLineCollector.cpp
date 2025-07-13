@@ -4,7 +4,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "CLineCollector.h"
+#include "LineCollector.h"
 
 using namespace code_creation_kit;
 

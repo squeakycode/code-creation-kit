@@ -14,7 +14,7 @@
 class CErrorPrinted{};
 
 #include "CommandProcessor.h"
-#include "CTargetFile.h"
+#include "TargetFile.h"
 #include "StringConvert.h"
 using namespace code_creation_kit;
 

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <set>
-#include "CSimpleFormat.h"
+#include "SimpleFormat.h"
 #include "FileSystem.h"
 #include "StringLiteral.h"
 

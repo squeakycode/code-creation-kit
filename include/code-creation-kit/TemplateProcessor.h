@@ -4,16 +4,16 @@
 #pragma once
 
 #include "ETokens.gen.h"
-#include "CToken.h"
-#include "CTokenizer.gen.h"
-#include "CTemplatePreprocessor.h"
-#include "CParser.h"
-#include "CMacroProcessor.h"
-#include "CLineCollector.h"
-#include "CBackEndTokenizer.gen.h"
-#include "CProcessingLevelControl.h"
-#include "CInlineTemplateParameters.h"
-#include "CTemplateProvidedTableLoader.h"
+#include "Token.h"
+#include "Tokenizer.gen.h"
+#include "TemplatePreprocessor.h"
+#include "Parser.h"
+#include "MacroProcessor.h"
+#include "LineCollector.h"
+#include "BackEndTokenizer.gen.h"
+#include "ProcessingLevelControl.h"
+#include "InlineTemplateParameters.h"
+#include "TemplateProvidedTableLoader.h"
 #include "StringLiteral.h"
 
 namespace code_creation_kit

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
-#include "CTemplateProcessor.h"
+#include "TemplateProcessor.h"
 #include <sstream>
 #include <iostream>
 

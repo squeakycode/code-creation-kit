@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "CCommandFileLineParser.gen.h"
+#include "CommandFileLineParser.gen.h"
 #include <stdexcept>
 #include "FileSystem.h"
 #include "StringLiteral.h"
 #include "System.h"
-#include "CInlineTemplateParameters.h"
+#include "InlineTemplateParameters.h"
 #include "KeywordParameterParser.h"
 
 namespace code_creation_kit

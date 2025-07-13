@@ -7,8 +7,8 @@
 #include <stdexcept>
 #include <cassert>
 #include "FileSystem.h"
-#include "CSourceFile.h"
-#include "CNul.h"
+#include "SourceFile.h"
+#include "NullDevice.h"
 #include "StringLiteral.h"
 
 namespace code_creation_kit

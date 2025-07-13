@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include "CCsvParser.h"
-#include "CVerticalTableBuilder.h"
-#include "CNul.h"
+#include "CsvParser.h"
+#include "VerticalTableBuilder.h"
+#include "NullDevice.h"
 #include "StringLiteral.h"
-#include "CPositionTracker.h"
+#include "PositionTracker.h"
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <stdexcept>
-#include "CSourceFile.h"
+#include "SourceFile.h"
 #include "cppstringx.hpp"
 
 namespace code_creation_kit

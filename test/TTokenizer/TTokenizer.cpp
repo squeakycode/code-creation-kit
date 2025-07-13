@@ -3,10 +3,10 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "CTokenizer.gen.h"
-#include "CBackEndTokenizer.gen.h"
+#include "Tokenizer.gen.h"
+#include "BackEndTokenizer.gen.h"
 #include "ETokens.gen.h"
-#include "CToken.h"
+#include "Token.h"
 #include "TokenizerTest.gen.h"
 #include <string>
 #include <vector>

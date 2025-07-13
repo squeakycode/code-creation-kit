@@ -3,7 +3,7 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "CSourceFile.h"
+#include "SourceFile.h"
 #include "TSourceFileTestFiles.h"
 #include "StringConvert.h"
 

@@ -3,7 +3,7 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "CVerticalTableBuilder.h"
+#include "VerticalTableBuilder.h"
 #include <string>
 #include <vector>
 

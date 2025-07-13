@@ -5,8 +5,8 @@
 #include <catch2/catch.hpp>
 #include <string>
 #define CODE_CREATION_KIT_JUST_TESTING
-#include "CGenerator.h"
-#include "CErrorPrinter.gen.h"
+#include "Generator.h"
+#include "ErrorPrinter.gen.h"
 #include "TErrorPrinterTestFiles.h"
 
 using namespace code_creation_kit;

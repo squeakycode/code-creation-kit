@@ -1,5 +1,5 @@
 # Copyright (c) 2011-2025 Andreas Gau
 # SPDX-License-Identifier: BSD-3-Clause
 
-datamodels/CCommandFileLineParser.csv
--s templates/CommandLineParser.tpl.h -o ../ccktc/CCommandFileLineParser.gen.h -p "Parser Name=CCommandFileLineParser" "Heading=Command Options"
+datamodels/CommandFileLineParser.csv
+-s templates/CommandLineParser.tpl.h -o ../ccktc/CommandFileLineParser.gen.h -p "Parser Name=CCommandFileLineParser" "Heading=Command Options"

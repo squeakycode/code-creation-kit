@@ -4,7 +4,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "CTemplateLoader.h"
+#include "TemplateLoader.h"
 #include <string>
 #include <sstream>
 #include "TTemplateLoaderTestFiles.h"

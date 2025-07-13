@@ -6,11 +6,11 @@
 #ifdef WIN32
 #   include <conio.h>
 #endif
-#include "CGenerator.h"
-#include "CGeneratorStatistic.h"
-#include "CErrorPrinter.gen.h"
+#include "Generator.h"
+#include "GeneratorStatistic.h"
+#include "ErrorPrinter.gen.h"
 #include "CommandProcessor.h"
-#include "CTargetFile.h"
+#include "TargetFile.h"
 
 using namespace code_creation_kit;
 

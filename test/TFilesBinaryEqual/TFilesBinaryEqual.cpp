@@ -4,7 +4,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "CFilesBinaryEqual.h"
+#include "FilesBinaryEqual.h"
 #include <string>
 #include "TFilesBinaryEqualTestFiles.h"
 

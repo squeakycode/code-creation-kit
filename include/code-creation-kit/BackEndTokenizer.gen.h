@@ -14,7 +14,7 @@
 #include "cpptokenfinder.hpp"
 #include "cppstringx.hpp"
 #include "StringLiteral.h"
-#include "CNul.h"
+#include "NullDevice.h"
 
 
 namespace code_creation_kit

@@ -1,41 +1,41 @@
 add_executable(ccktc
-    ../include/code-creation-kit/CBackEndTokenizer.gen.h
-    ../include/code-creation-kit/CComparableSharedObject.h
-    ../include/code-creation-kit/CCsvParser.h
-    ../include/code-creation-kit/CErrorPrinter.gen.h
-    ../include/code-creation-kit/CFilesBinaryEqual.h
-    ../include/code-creation-kit/CGenerator.h
-    ../include/code-creation-kit/CGeneratorStatistic.h
-    ../include/code-creation-kit/CInlineTemplateParameters.h
-    ../include/code-creation-kit/CLineCollector.h
-    ../include/code-creation-kit/CMacro.h
-    ../include/code-creation-kit/CMacroExpander.h
-    ../include/code-creation-kit/CMacroExpression.h
-    ../include/code-creation-kit/CMacroProcessor.h
-    ../include/code-creation-kit/CNul.h
+    ../include/code-creation-kit/BackEndTokenizer.gen.h
+    ../include/code-creation-kit/ComparableSharedObject.h
+    ../include/code-creation-kit/CsvParser.h
+    ../include/code-creation-kit/ErrorPrinter.gen.h
+    ../include/code-creation-kit/FilesBinaryEqual.h
+    ../include/code-creation-kit/Generator.h
+    ../include/code-creation-kit/GeneratorStatistic.h
+    ../include/code-creation-kit/InlineTemplateParameters.h
+    ../include/code-creation-kit/LineCollector.h
+    ../include/code-creation-kit/Macro.h
+    ../include/code-creation-kit/MacroExpander.h
+    ../include/code-creation-kit/MacroExpression.h
+    ../include/code-creation-kit/MacroProcessor.h
+    ../include/code-creation-kit/Nul.h
     ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
     ../include/code-creation-kit/ConstraintDirectives.gen.h
     ../include/code-creation-kit/Constraints.h
     ../include/code-creation-kit/ConversionDirectives.gen.h
     ../include/code-creation-kit/Conversions.h
-    ../include/code-creation-kit/CParser.h
-    ../include/code-creation-kit/CPositionTracker.h
+    ../include/code-creation-kit/Parser.h
+    ../include/code-creation-kit/PositionTracker.h
     ../include/code-creation-kit/cppstringx.hpp
     ../include/code-creation-kit/cpptokenfinder.hpp
-    ../include/code-creation-kit/CProcessingLevelControl.h
-    ../include/code-creation-kit/CSimpleFormat.h
-    ../include/code-creation-kit/CSourceFile.h
-    ../include/code-creation-kit/CSubstitution.h
-    ../include/code-creation-kit/CTableIndex.h
-    ../include/code-creation-kit/CTargetFile.h
-    ../include/code-creation-kit/CTemplateLoader.h
-    ../include/code-creation-kit/CTemplatePreprocessor.h
-    ../include/code-creation-kit/CTemplateProcessor.h
-    ../include/code-creation-kit/CTemplateProvidedTableLoader.h
-    ../include/code-creation-kit/CToken.h
-    ../include/code-creation-kit/CTokenizer.gen.h
-    ../include/code-creation-kit/CVerticalTableBuilder.h
-    ../include/code-creation-kit/CVerticalTableRotator.h
+    ../include/code-creation-kit/ProcessingLevelControl.h
+    ../include/code-creation-kit/SimpleFormat.h
+    ../include/code-creation-kit/SourceFile.h
+    ../include/code-creation-kit/Substitution.h
+    ../include/code-creation-kit/TableIndex.h
+    ../include/code-creation-kit/TargetFile.h
+    ../include/code-creation-kit/TemplateLoader.h
+    ../include/code-creation-kit/TemplatePreprocessor.h
+    ../include/code-creation-kit/TemplateProcessor.h
+    ../include/code-creation-kit/TemplateProvidedTableLoader.h
+    ../include/code-creation-kit/Token.h
+    ../include/code-creation-kit/Tokenizer.gen.h
+    ../include/code-creation-kit/VerticalTableBuilder.h
+    ../include/code-creation-kit/VerticalTableRotator.h
     ../include/code-creation-kit/DependencyPrinter.h
     ../include/code-creation-kit/ESubstitutions.gen.h
     ../include/code-creation-kit/ETokens.gen.h

@@ -7,8 +7,8 @@
 #include <string>
 #include <sstream>
 
-#include "CCsvParser.h"
-#include "CPositionTracker.h"
+#include "CsvParser.h"
+#include "PositionTracker.h"
 
 using namespace code_creation_kit;
 

@@ -6,14 +6,14 @@
 #include <vector>
 #include <list>
 #include <fstream>
-#include "CTemplateProcessor.h"
-#include "CTemplateLoader.h"
-#include "CCsvParser.h"
-#include "CVerticalTableBuilder.h"
-#include "CFilesBinaryEqual.h"
-#include "CPositionTracker.h"
-#include "CSourceFile.h"
-#include "CTargetFile.h"
+#include "TemplateProcessor.h"
+#include "TemplateLoader.h"
+#include "CsvParser.h"
+#include "VerticalTableBuilder.h"
+#include "FilesBinaryEqual.h"
+#include "PositionTracker.h"
+#include "SourceFile.h"
+#include "TargetFile.h"
 #include <memory>
 #include "FileSystem.h"
 
