@@ -25,17 +25,17 @@
 
 add_library(cck_implementation STATIC
         ../include/code-creation-kit/CBackEndTokenizer.gen.h
-    CCommandFileLineParser.csv
+        ../codegen/datamodels/CCommandFileLineParser.csv
     CCommandFileLineParser.gen.h
-    CCommandFileLineParser.tccmd
-    CCommandFileLineParser.xls
-    CCommandLineParser.csv
+        ../codegen/CCommandFileLineParser.tccmd
+        ../codegen/datamodels/CCommandFileLineParser.xls
+        ../codegen/datamodels/CCommandLineParser.csv
     CCommandLineParser.gen.h
-    CCommandLineParser.tccmd
-    CCommandLineParser.xls
+        ../codegen/CCommandLineParser.tccmd
+        ../codegen/datamodels/CCommandLineParser.xls
         ../include/code-creation-kit/CComparableSharedObject.h
     CErrorPrinter.gen.h
-    CErrorPrinter.tccmd
+        ../codegen/CErrorPrinter.tccmd
         ../codegen/templates/CErrorPrinter.tpl.h
     CFilesBinaryEqual.h
     CGenerator.h
@@ -50,7 +50,7 @@ add_library(cck_implementation STATIC
     CMakeLists.txt
         ../include/code-creation-kit/CNul.h
         ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
-    CombiKeywordParameterParser.tccmd
+        ../codegen/CombiKeywordParameterParser.tccmd
         ../codegen/templates/CombiKeywordParameterParser.tpl.h
     CommandProcessor.h
         ../include/code-creation-kit/ConstraintDirectives.gen.h
@@ -81,9 +81,9 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/ESubstitutions.gen.h
         ../codegen/templates/ESubstitutions.tpl.h
         ../include/code-creation-kit/ETokens.gen.h
-    ETokens.tpl.h
-    Exceptions.csv
-    Exceptions.xls
+        ../codegen/templates/ETokens.tpl.h
+        ../codegen/datamodels/Exceptions.csv
+        ../codegen/datamodels/Exceptions.xls
     FileSystem.cpp
         ../include/code-creation-kit/FileSystem.h
         ../include/code-creation-kit/IConstraint.h
@@ -91,14 +91,14 @@ add_library(cck_implementation STATIC
         ../include/code-creation-kit/KeywordParameterCheckFunctions.h
         ../include/code-creation-kit/KeywordParameterParser.h
     ParameterParser.h
-    Parser.tccmd
-    ParserExtensions.csv
+        ../codegen/Parser.tccmd
+        ../codegen/datamodels/ParserExtensions.csv
         ../include/code-creation-kit/ParserExtensions.gen.h
         ../codegen/templates/ParserExtensions.tpl.h
-    ParserExtensions.xls
+        ../codegen/datamodels/ParserExtensions.xls
         ../include/code-creation-kit/StringConvert.h
         ../include/code-creation-kit/StringLiteral.h
-    Substitutions.tccmd
+        ../codegen/Substitutions.tccmd
     System.h
         ../include/code-creation-kit/CTemplateProvidedTableLoader.h
 )
@@ -119,44 +119,44 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
     #CCommandFileLineParser.tccmd >> CCommandFileLineParser.gen.h << CCommandFileLineParser.csv ../templates/CommandLineParser.tpl.h 
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CCommandFileLineParser.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CCommandFileLineParser.tccmd"
-        MAIN_DEPENDENCY CCommandFileLineParser.tccmd
-        DEPENDS CCommandFileLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/CCommandFileLineParser.tccmd"
+        MAIN_DEPENDENCY ../codegen/CCommandFileLineParser.tccmd
+        DEPENDS ../codegen/datamodels/CCommandFileLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
         COMMENT "Generating CCommandFileLineParser.tccmd"
     )
 
     #CCommandLineParser.tccmd >> CCommandLineParser.gen.h << CCommandLineParser.csv ../templates/CommandLineParser.tpl.h 
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CCommandLineParser.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CCommandLineParser.tccmd"
-        MAIN_DEPENDENCY CCommandLineParser.tccmd
-        DEPENDS CCommandLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/CCommandLineParser.tccmd"
+        MAIN_DEPENDENCY ../codegen/CCommandLineParser.tccmd
+        DEPENDS ../codegen/datamodels/CCommandLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
         COMMENT "Generating CCommandLineParser.tccmd"
     )
 
     #CErrorPrinter.tccmd >> CErrorPrinter.gen.h << Exceptions.csv CErrorPrinter.tpl.h
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CErrorPrinter.tccmd"
-        MAIN_DEPENDENCY CErrorPrinter.tccmd
-        DEPENDS Exceptions.csv ../codegen/templates/CErrorPrinter.tpl.h
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/CErrorPrinter.tccmd"
+        MAIN_DEPENDENCY ../codegen/CErrorPrinter.tccmd
+        DEPENDS ../codegen/datamodels/Exceptions.csv ../codegen/templates/CErrorPrinter.tpl.h
         COMMENT "Generating CErrorPrinter.tccmd"
     )
 
     #Parser.tccmd >> ConstraintDirectives.gen.h ConversionDirectives.gen.h ParserExtensions.gen.h << "../requirements/Tag Specification.csv" ParserExtensions.csv ConstraintDirectives.tpl.h ConversionDirectives.tpl.h ParserExtensions.tpl.h 
     add_custom_command(
         OUTPUT "../include/code-creation-kit/ConstraintDirectives.gen.h" "../include/code-creation-kit/ConversionDirectives.gen.h" "../include/code-creation-kit/ParserExtensions.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Parser.tccmd"
-        MAIN_DEPENDENCY Parser.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" ParserExtensions.csv ../codegen/templates/ConstraintDirectives.tpl.h ../codegen/templates/ConversionDirectives.tpl.h ../codegen/templates/ParserExtensions.tpl.h
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/Parser.tccmd"
+        MAIN_DEPENDENCY ../codegen/Parser.tccmd
+        DEPENDS "../requirements/Tag Specification.csv" ../codegen/datamodels/ParserExtensions.csv ../codegen/templates/ConstraintDirectives.tpl.h ../codegen/templates/ConversionDirectives.tpl.h ../codegen/templates/ParserExtensions.tpl.h
         COMMENT "Generating Parser.tccmd"
     )
 
     #Substitutions.tccmd >> ESubstitutions.gen.h << "../requirements/Tag Specification.csv" ESubstitutions.tpl.h 
     add_custom_command(
         OUTPUT "../include/code-creation-kit/ESubstitutions.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Substitutions.tccmd"
-        MAIN_DEPENDENCY Substitutions.tccmd
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/Substitutions.tccmd"
+        MAIN_DEPENDENCY ../codegen/Substitutions.tccmd
         DEPENDS "../requirements/Tag Specification.csv" ../codegen/templates/ESubstitutions.tpl.h
         COMMENT "Generating Substitutions.tccmd"
     )
@@ -164,17 +164,17 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
     #Tokens.tccmd >> CBackEndTokenizer.gen.h CTokenizer.gen.h ETokens.gen.h test/TTokenizer/TokenizerTest.gen.h << "../requirements/Tag Specification.csv" CTokenizer.tpl.h ETokens.tpl.h test/TTokenizer/TokenizerTest.tpl.h 
     add_custom_command(
         OUTPUT "../include/code-creation-kit/CBackEndTokenizer.gen.h" "../include/code-creation-kit/CTokenizer.gen.h" "../include/code-creation-kit/ETokens.gen.h" "${CMAKE_CURRENT_SOURCE_DIR}/../test/TTokenizer/TokenizerTest.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Tokens.tccmd"
-        MAIN_DEPENDENCY Tokens.tccmd
-        DEPENDS "../requirements/Tag Specification.csv" ../codegen/templates/CTokenizer.tpl.h ETokens.tpl.h ../test/TTokenizer/TokenizerTest.tpl.h
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/Tokens.tccmd"
+        MAIN_DEPENDENCY ../codegen/Tokens.tccmd
+        DEPENDS "../requirements/Tag Specification.csv" ../codegen/templates/CTokenizer.tpl.h ../codegen/templates/ETokens.tpl.h ../test/TTokenizer/TokenizerTest.tpl.h
         COMMENT "Generating Tokens.tccmd"
     )
 
     #CombiKeywordParameterParser.tccmd >> CombiKeywordParameterParser.gen.h << "../requirements/Tag Specification.CombiParsers.csv" CombiKeywordParameterParser.tpl.h
     add_custom_command(
         OUTPUT "../include/code-creation-kit/CombiKeywordParameterParser.gen.h"
-        COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CombiKeywordParameterParser.tccmd"
-        MAIN_DEPENDENCY CombiKeywordParameterParser.tccmd
+        COMMAND ${CCK_TCCMD_EXECUTABLE} "../codegen/CombiKeywordParameterParser.tccmd"
+        MAIN_DEPENDENCY ../codegen/CombiKeywordParameterParser.tccmd
         DEPENDS "../requirements/Tag Specification.CombiParsers.csv" ../codegen/templates/CombiKeywordParameterParser.tpl.h
         COMMENT "Generating CombiKeywordParameterParser.tccmd"
     )

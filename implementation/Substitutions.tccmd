@@ -1,6 +1,0 @@
-# Copyright (c) 2011-2025 Andreas Gau
-# SPDX-License-Identifier: BSD-3-Clause
-
-"../requirements/Tag Specification.csv"
-
--s ESubstitutions.tpl.h -o ../include/code-creation-kit/ESubstitutions.gen.h
