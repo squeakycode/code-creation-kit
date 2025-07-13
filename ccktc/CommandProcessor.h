@@ -9,7 +9,7 @@
 #include "CSourceFile.h"
 #include "FileSystem.h"
 #include "DependencyPrinter.h"
-#include "../version/version.gen.h"
+#include "version.gen.h"
 #include "CGeneratorCommandProcessor.h"
 #include "StringLiteral.h"
 

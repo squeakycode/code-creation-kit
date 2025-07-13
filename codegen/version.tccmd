@@ -1,0 +1,4 @@
+datamodels/version.csv
+-s templates/version.tpl.html -o ../docsource/version.gen.html -u
+-s templates/version.tpl.h -o ../ccktc/version.gen.h -u
+-s templates/version.tpl.ini -o ../setup/windows/version.gen.ini -u

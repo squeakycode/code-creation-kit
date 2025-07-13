@@ -48,6 +48,7 @@ add_executable(ccktc
     ../include/code-creation-kit/StringConvert.h
     ../include/code-creation-kit/StringLiteral.h
     ../include/code-creation-kit/System.h
+    version.gen.h
     ccktc.cpp
 )
 

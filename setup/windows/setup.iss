@@ -24,10 +24,10 @@
 ;  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define PackageName "code-creation-kit"
-#define PackageCopyright ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "copyrightinfo")
-#define PackageVersion ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontext")
-#define PackageVersionRaw ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontextraw")
-#define PackageReleaseType ReadIni(AddBackslash(SourcePath) + "..\..\version\version.gen.ini", "version", "versiontype")
+#define PackageCopyright ReadIni(AddBackslash(SourcePath) + "version.gen.ini", "version", "copyrightinfo")
+#define PackageVersion ReadIni(AddBackslash(SourcePath) + "version.gen.ini", "version", "versiontext")
+#define PackageVersionRaw ReadIni(AddBackslash(SourcePath) + "version.gen.ini", "version", "versiontextraw")
+#define PackageReleaseType ReadIni(AddBackslash(SourcePath) + "version.gen.ini", "version", "versiontype")
 
 [Messages]
 SetupAppTitle={#PackageName} {#PackageVersion}

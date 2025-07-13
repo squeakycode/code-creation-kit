@@ -1,4 +1,0 @@
-version.csv
--s version.tpl.html -o version.gen.html -u
--s version.tpl.h -o version.gen.h -u
--s version.tpl.ini -o version.gen.ini -u
