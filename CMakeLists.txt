@@ -41,27 +41,7 @@ else()
 endif()
 endmacro(custom_target_use_highest_warning_level)
 
-
-#static linking of c runtime for windows
-if(MSVC)
-    if (CCK_WITH_WIN32_STATIC_RUNTIME)
-        #compile with std runtime linked statically
-        set(CompilerFlags
-                CMAKE_CXX_FLAGS
-                CMAKE_CXX_FLAGS_DEBUG
-                CMAKE_CXX_FLAGS_RELEASE
-                CMAKE_C_FLAGS
-                CMAKE_C_FLAGS_DEBUG
-                CMAKE_C_FLAGS_RELEASE
-                )
-        foreach(CompilerFlag ${CompilerFlags})
-          string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-        endforeach()  
-    endif()
-endif()
-
 #add the sub directories to build
-add_subdirectory(implementation)
 add_subdirectory(ccktc)
 
 option(CCK_BUILD_TESTS "Determines whether to build tests." ON)

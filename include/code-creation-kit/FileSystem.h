@@ -12,6 +12,7 @@
 #include <filesystem>
 
 #include "cppstringx.hpp"
+#include "StringLiteral.h"
 
 namespace filesystem_namespace = std;
 
