@@ -10,7 +10,7 @@
 namespace code_creation_kit
 {
     ///base functionality for parameter policy classes, that define the parsing of a parameter value
-    class CParameterPolicyBase
+    class ParameterPolicyBase
     {
     protected:
         struct Chars
@@ -122,7 +122,7 @@ namespace code_creation_kit
     };
 
     ///for parameters without special characters and without double quotes
-    class CPlainParameterPolicy : public CParameterPolicyBase
+    class PlainParameterPolicy : public ParameterPolicyBase
     {
     public:
         ///match parameter expression value and extract it
@@ -153,7 +153,7 @@ namespace code_creation_kit
     };
 
     ///for usigned number parameters
-    class CUIntParameterPolicy : public CParameterPolicyBase
+    class UIntParameterPolicy : public ParameterPolicyBase
     {
     public:
         ///match parameter expression value and extract it
@@ -186,7 +186,7 @@ namespace code_creation_kit
     };
 
     ///for parameters with (almost) C-style parameters supporting \n  \\  \"  \t
-    class CCStyleParameterPolicy : public CParameterPolicyBase
+    class CStyleParameterPolicy : public ParameterPolicyBase
     {
     public:
         ///match parameter expression value and extract it
@@ -244,7 +244,7 @@ namespace code_creation_kit
     };
 
     ///for parameters with regular expressions
-    class CRegexParameterPolicy : public CParameterPolicyBase
+    class RegexParameterPolicy : public ParameterPolicyBase
     {
     public:
         ///match parameter expression value and extract it

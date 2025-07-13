@@ -16,13 +16,13 @@
 namespace code_creation_kit
 {
     template <typename StringT>
-    class CReplaceConversion : public ConversionDirectives<StringT>
+    class ReplaceConversion : public ConversionDirectives<StringT>
     {
     public:
-        typedef CReplaceConversion<StringT> ThisT;
+        typedef ReplaceConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        CReplaceConversion( const StringT& replaceText, const StringT& withText)
+        ReplaceConversion( const StringT& replaceText, const StringT& withText)
             : m_ignoreCase( false)
             , m_replace( replaceText)
             , m_with( withText)
@@ -77,7 +77,7 @@ namespace code_creation_kit
         StringT m_with;
     };
 
-    ///defines exceptions thrown by CRegexReplaceConversion for template argument independent access
+    ///defines exceptions thrown by RegexReplaceConversion for template argument independent access
     class RegexReplaceConversionExceptions
     {
     public:
@@ -86,14 +86,14 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CRegexReplaceConversion : public ConversionDirectives<StringT>, public RegexReplaceConversionExceptions
+    class RegexReplaceConversion : public ConversionDirectives<StringT>, public RegexReplaceConversionExceptions
     {
     public:
         typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;
-        typedef CRegexReplaceConversion<StringT> ThisT;
+        typedef RegexReplaceConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        CRegexReplaceConversion( const StringT& replaceText, const StringT& withText)
+        RegexReplaceConversion( const StringT& replaceText, const StringT& withText)
             : m_ignoreCase( false)
             , m_replace( replaceText)
             , m_with( withText)
@@ -161,13 +161,13 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CMergeConversion : public ConversionDirectives<StringT>
+    class MergeConversion : public ConversionDirectives<StringT>
     {
     public:
-        typedef CMergeConversion<StringT> ThisT;
+        typedef MergeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        explicit CMergeConversion( const StringT& separator)
+        explicit MergeConversion( const StringT& separator)
             : m_separator( separator)
         {
         }
@@ -212,10 +212,10 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CToLowerConversion : public ConversionDirectives<StringT>
+    class ToLowerConversion : public ConversionDirectives<StringT>
     {
     public:
-        typedef CToLowerConversion<StringT> ThisT;
+        typedef ToLowerConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==( const IConversion<StringT>& conversion) const override
@@ -238,10 +238,10 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CToUpperConversion : public ConversionDirectives<StringT>
+    class ToUpperConversion : public ConversionDirectives<StringT>
     {
     public:
-        typedef CToUpperConversion<StringT> ThisT;
+        typedef ToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==( const IConversion<StringT>& conversion) const override
@@ -265,10 +265,10 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CToCStringConversion : public ConversionDirectives<StringT>
+    class ToCStringConversion : public ConversionDirectives<StringT>
     {
     public:
-        typedef CToUpperConversion<StringT> ThisT;
+        typedef ToUpperConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==( const IConversion<StringT>& conversion) const override
@@ -314,7 +314,7 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CHtmlEscapeConversion : public ConversionDirectives<StringT>
+    class HtmlEscapeConversion : public ConversionDirectives<StringT>
     {
         typedef typename StringT::value_type CharT;
         struct SCharTable
@@ -324,7 +324,7 @@ namespace code_creation_kit
         };
 
     public:
-        typedef CHtmlEscapeConversion<StringT> ThisT;
+        typedef HtmlEscapeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -405,13 +405,13 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CPadConversionBase : public ConversionDirectives<StringT>
+    class PadConversionBase : public ConversionDirectives<StringT>
     {
     protected:
         typedef typename StringT::value_type CharT;
 
         template<typename IteratorT>
-        CPadConversionBase(
+        PadConversionBase(
             const StringT& padText
             , const StringT& padWidthFirst
             , const IteratorT& padWidthOptionalBegin
@@ -578,7 +578,7 @@ namespace code_creation_kit
             return result;
         }
 
-        bool baseEquals(const CPadConversionBase<StringT>& rhs) const
+        bool baseEquals(const PadConversionBase<StringT>& rhs) const
         {
             if (m_extensionText != rhs.m_extensionText
                 || m_padChar != rhs.m_padChar
@@ -636,22 +636,22 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CPadLeftConversion : public CPadConversionBase<StringT>
+    class PadLeftConversion : public PadConversionBase<StringT>
     {
     public:
         
         template<typename IteratorT>
-        CPadLeftConversion(
+        PadLeftConversion(
             const StringT& padText
             , const StringT& padWidthFirst
             , const IteratorT& padWidthOptionalBegin
             , const IteratorT& padWidthOptionalEnd
             )
-            : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, true)
+            : PadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, true)
         {
         }
 
-        typedef CPadLeftConversion<StringT> ThisT;
+        typedef PadLeftConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -669,17 +669,17 @@ namespace code_creation_kit
         static StringLocalT getStaticExtendingPadLeftText(const StringLocalT& padText, const StringLocalT& padWidthFirst)
         {
             typedef typename StringLocalT::value_type CharT;
-            typename CPadLeftConversion<StringLocalT>::StringListT dummy; //no additional width values
+            typename PadLeftConversion<StringLocalT>::StringListT dummy; //no additional width values
             if (padWidthFirst.empty()) //nothing provided
             {
-                CPadLeftConversion<StringLocalT> helper(padText, padWidthFirst, dummy.begin(), dummy.end());
+                PadLeftConversion<StringLocalT> helper(padText, padWidthFirst, dummy.begin(), dummy.end());
                 dummy.resize(1); //modify an empty sting to get the result
                 helper.modify(dummy);
             }
             else
             {
                 //use the special extending behavior used when the width is having the + sign prepended
-                CPadLeftConversion<StringLocalT> helper(padText, ((padWidthFirst[0] == STRING_LITERAL('+')) ? padWidthFirst : (STRING_LITERAL('+') + padWidthFirst)), dummy.begin(), dummy.end());
+                PadLeftConversion<StringLocalT> helper(padText, ((padWidthFirst[0] == STRING_LITERAL('+')) ? padWidthFirst : (STRING_LITERAL('+') + padWidthFirst)), dummy.begin(), dummy.end());
                 dummy.resize(1); //modify an empty sting to get the result
                 helper.modify(dummy);
             }
@@ -699,22 +699,22 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CPadRightConversion : public CPadConversionBase<StringT>
+    class PadRightConversion : public PadConversionBase<StringT>
     {
     public:
 
         template<typename IteratorT>
-        CPadRightConversion(
+        PadRightConversion(
             const StringT& padText
             , const StringT& padWidthFirst
             , const IteratorT& padWidthOptionalBegin
             , const IteratorT& padWidthOptionalEnd
             )
-            : CPadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, false)
+            : PadConversionBase<StringT>(padText, padWidthFirst, padWidthOptionalBegin, padWidthOptionalEnd, false)
         {
         }
 
-        typedef CPadRightConversion<StringT> ThisT;
+        typedef PadRightConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -741,16 +741,16 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CBlockFormatConversion : public ConversionDirectives<StringT>
+    class BlockFormatConversion : public ConversionDirectives<StringT>
     {
         typedef typename StringT::value_type CharT;
     public:
-        explicit CBlockFormatConversion(const StringT& blockWidth)
+        explicit BlockFormatConversion(const StringT& blockWidth)
         {
             m_blockWidth = static_cast<size_t>(std::stoul(blockWidth));
         }
 
-        typedef CBlockFormatConversion<StringT> ThisT;
+        typedef BlockFormatConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -897,15 +897,15 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CCalcConversion : public ConversionDirectives<StringT>, public CalcConversionExceptions
+    class CalcConversion : public ConversionDirectives<StringT>, public CalcConversionExceptions
     {
         typedef typename StringT::value_type CharT;
         typedef typename StringT::const_iterator IteratorT;
     public:
-        typedef CCalcConversion<StringT> ThisT;
+        typedef CalcConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
-        explicit CCalcConversion(const StringT& expression)
+        explicit CalcConversion(const StringT& expression)
             : m_expression(expression)
         {
             IteratorT pos = expression.cbegin();
@@ -917,8 +917,8 @@ namespace code_creation_kit
         }
 
         //noncopyable
-        CCalcConversion(const ThisT&) = delete;
-        CCalcConversion& operator=(const ThisT&) = delete;
+        CalcConversion(const ThisT&) = delete;
+        CalcConversion& operator=(const ThisT&) = delete;
 
     
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -1434,11 +1434,11 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CToCsvConversion : public ConversionDirectives<StringT>
+    class ToCsvConversion : public ConversionDirectives<StringT>
     {
         typedef typename StringT::value_type CharT;
     public:
-        explicit CToCsvConversion(
+        explicit ToCsvConversion(
             const StringT& csvDelimiterChars
         )
             : m_csvDelimiterChars(csvDelimiterChars)
@@ -1446,7 +1446,7 @@ namespace code_creation_kit
         {
         }
 
-        CToCsvConversion(
+        ToCsvConversion(
             const StringT& csvDelimiterChars,
             const StringT& csvQuoteChars
         )
@@ -1455,7 +1455,7 @@ namespace code_creation_kit
         {
         }
 
-        typedef CToCsvConversion<StringT> ThisT;
+        typedef ToCsvConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override
@@ -1547,7 +1547,7 @@ namespace code_creation_kit
     };
 
 
-    ///defines exceptions thrown by CToSizeConversion for template argument independent access
+    ///defines exceptions thrown by ToSizeConversion for template argument independent access
     class ToSizeConversionExceptions
     {
     public:
@@ -1559,7 +1559,7 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CToSizeConversion : public ConversionDirectives<StringT>, public ToSizeConversionExceptions
+    class ToSizeConversion : public ConversionDirectives<StringT>, public ToSizeConversionExceptions
     {
         typedef typename StringT::value_type CharT;
 
@@ -1570,7 +1570,7 @@ namespace code_creation_kit
         };
 
     public:
-        explicit CToSizeConversion(
+        explicit ToSizeConversion(
             const StringT& properties
         )
             : m_requestedSizeType(RequestedSizeType_ArrayElements)
@@ -1581,7 +1581,7 @@ namespace code_creation_kit
             }
         }
 
-        typedef CToSizeConversion<StringT> ThisT;
+        typedef ToSizeConversion<StringT> ThisT;
         typedef typename IConversion<StringT>::StringListT StringListT;
 
         bool operator==(const IConversion<StringT>& conversion) const override

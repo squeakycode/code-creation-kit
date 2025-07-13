@@ -44,9 +44,9 @@ void testMatches()
 
 TEST_CASE( "TConstraints", "[TConstraints]")
 {
-    testMatches<std::string, CMatchesConstraint<std::string> >();
-    testMatches<std::string, CRegexMatchesConstraint<std::string> >();
+    testMatches<std::string, MatchesConstraint<std::string> >();
+    testMatches<std::string, RegexMatchesConstraint<std::string> >();
 
-    CAnyConstraint<std::string> any;
+    AnyConstraint<std::string> any;
     CHECK( any.matchesConstraint( "text"));
 }

@@ -12,10 +12,10 @@
 namespace code_creation_kit
 {
     template <typename StringT>
-    class CConstraintBase : public ConstraintDirectives<StringT>
+    class ConstraintBase : public ConstraintDirectives<StringT>
     {
     public:
-        CConstraintBase()
+        ConstraintBase()
             : m_flush(false)
             , m_forAll(false)
             , m_not_(false)
@@ -43,7 +43,7 @@ namespace code_creation_kit
         }
         [[nodiscard]] virtual bool not_() const { return m_not_; }
 
-        bool equalBaseProperties( const CConstraintBase<StringT>& rhs) const
+        bool equalBaseProperties( const ConstraintBase<StringT>& rhs) const
         {
             if ( 
                 m_flush != rhs.m_flush
@@ -64,13 +64,13 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CMatchesConstraint : public CConstraintBase<StringT>
+    class MatchesConstraint : public ConstraintBase<StringT>
     {
     public:
-        typedef CMatchesConstraint<StringT> ThisT;
-        using CConstraintBase<StringT>::m_not_;
+        typedef MatchesConstraint<StringT> ThisT;
+        using ConstraintBase<StringT>::m_not_;
 
-        explicit CMatchesConstraint( const StringT& matchesText)
+        explicit MatchesConstraint( const StringT& matchesText)
             : m_ignoreCase( false)
             , m_matches( matchesText)
         {
@@ -120,13 +120,13 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CStartsWithConstraint : public CConstraintBase<StringT>
+    class StartsWithConstraint : public ConstraintBase<StringT>
     {
     public:
-        typedef CStartsWithConstraint<StringT> ThisT;
-        using CConstraintBase<StringT>::m_not_;
+        typedef StartsWithConstraint<StringT> ThisT;
+        using ConstraintBase<StringT>::m_not_;
 
-        explicit CStartsWithConstraint( const StringT& testText)
+        explicit StartsWithConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -176,13 +176,13 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CEndsWithConstraint : public CConstraintBase<StringT>
+    class EndsWithConstraint : public ConstraintBase<StringT>
     {
     public:
-        typedef CEndsWithConstraint<StringT> ThisT;
-        using CConstraintBase<StringT>::m_not_;
+        typedef EndsWithConstraint<StringT> ThisT;
+        using ConstraintBase<StringT>::m_not_;
 
-        explicit CEndsWithConstraint( const StringT& testText)
+        explicit EndsWithConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -232,13 +232,13 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CContainsConstraint : public CConstraintBase<StringT>
+    class ContainsConstraint : public ConstraintBase<StringT>
     {
     public:
-        typedef CContainsConstraint<StringT> ThisT;
-        using CConstraintBase<StringT>::m_not_;
+        typedef ContainsConstraint<StringT> ThisT;
+        using ConstraintBase<StringT>::m_not_;
 
-        explicit CContainsConstraint( const StringT& testText)
+        explicit ContainsConstraint( const StringT& testText)
             : m_ignoreCase( false)
             , m_testText( testText)
         {
@@ -287,7 +287,7 @@ namespace code_creation_kit
         StringT m_testText;
     };
 
-    ///defines exceptions thrown by CRegexMatchesConstraint for template argument independent access
+    ///defines exceptions thrown by RegexMatchesConstraint for template argument independent access
     class RegexMatchesConstraintExceptions
     {
     public:
@@ -296,14 +296,14 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CRegexMatchesConstraint : public CConstraintBase<StringT>, public RegexMatchesConstraintExceptions
+    class RegexMatchesConstraint : public ConstraintBase<StringT>, public RegexMatchesConstraintExceptions
     {
     public:
         typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;
-        typedef CRegexMatchesConstraint<StringT> ThisT;
-        using CConstraintBase<StringT>::m_not_;
+        typedef RegexMatchesConstraint<StringT> ThisT;
+        using ConstraintBase<StringT>::m_not_;
 
-        explicit CRegexMatchesConstraint( const StringT& matchesText)
+        explicit RegexMatchesConstraint( const StringT& matchesText)
             : m_ignoreCase( false)
             , m_matches( matchesText)
         {
@@ -366,10 +366,10 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CAnyConstraint : public ConstraintDirectives<StringT>
+    class AnyConstraint : public ConstraintDirectives<StringT>
     {
     public:
-        typedef CAnyConstraint<StringT> ThisT;
+        typedef AnyConstraint<StringT> ThisT;
 
         bool operator==( const IConstraint<StringT>& constraint) const override
         {

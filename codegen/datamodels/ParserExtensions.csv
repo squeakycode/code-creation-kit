@@ -1,20 +1,20 @@
 Subtype;Name for Subtype;Validation Error;Action;Parse;Parse;Parse;;;;
 directive for constraint;DirectiveForConstraint;ExCannotApplyDirectiveToConstraint;"if ( item.[ENTRY.][""Tag Name Small""]())
 {
-    throw CParserExceptions::ExDirectiveAlreadyApplied();
+    throw ParserExceptions::ExDirectiveAlreadyApplied();
 }
 else
 {
     item.[ENTRY.][""Tag Name Small""]( true);
 }";;;;;;;
 constraint;Constraint;ExCannotApplyConstraintToSubstitution;"typedef typename TokenT::StringListT::value_type StringT;
-std::shared_ptr<C[ENTRY.][""Tag Name Capital""]Constraint<StringT> > ptrConstraint = newItem[BEGIN.][ENTRY.][""Parameter Count""][OR.]0[END.][BEGIN.][IF.][ENTRY.][""Parameter Format""][STARTS_WITH.][""Combi""][ENTRY.][""Parameter Format""][OR.][END.]<C[ENTRY.][""Tag Name Capital""]Constraint<StringT> >( pos);
+std::shared_ptr<[ENTRY.][""Tag Name Capital""]Constraint<StringT> > ptrConstraint = newItem[BEGIN.][ENTRY.][""Parameter Count""][OR.]0[END.][BEGIN.][IF.][ENTRY.][""Parameter Format""][STARTS_WITH.][""Combi""][ENTRY.][""Parameter Format""][OR.][END.]<[ENTRY.][""Tag Name Capital""]Constraint<StringT> >( pos);
 item.attach( ptrConstraint);
 ConstraintDirectives<StringT>& newItem = *ptrConstraint;
 if ( not_ ) ptrConstraint->not_( not_);";DirectiveForConstraint;;;;;;
 directive for conversion;DirectiveForConversion;ExCannotApplyDirectiveToConversion;"if ( item.[ENTRY.][""Tag Name Small""]())
 {
-    throw CParserExceptions::ExDirectiveAlreadyApplied();
+    throw ParserExceptions::ExDirectiveAlreadyApplied();
 }
 else
 {
@@ -22,12 +22,12 @@ else
 }";;;;;;;
 conversion;Conversion;ExCannotApplyConversionToSubstitution;"typedef typename TokenT::StringListT::value_type StringT;
 
-std::shared_ptr<C[ENTRY.][""Tag Name Capital""]Conversion<StringT> > ptrConversion = newItem[BEGIN.][ENTRY.][""Parameter Count""][OR.]0[END.][BEGIN.][IF.][ENTRY.][""Parameter Format""][STARTS_WITH.][""Combi""][ENTRY.][""Parameter Format""][OR.][END.]<C[ENTRY.][""Tag Name Capital""]Conversion<StringT> >( pos);
+std::shared_ptr<[ENTRY.][""Tag Name Capital""]Conversion<StringT> > ptrConversion = newItem[BEGIN.][ENTRY.][""Parameter Count""][OR.]0[END.][BEGIN.][IF.][ENTRY.][""Parameter Format""][STARTS_WITH.][""Combi""][ENTRY.][""Parameter Format""][OR.][END.]<[ENTRY.][""Tag Name Capital""]Conversion<StringT> >( pos);
 item.attach( ptrConversion);
 ConversionDirectives<StringT>& newItem = *ptrConversion;";DirectiveForConversion;;;;;;
 directive for substitution;DirectiveForSubstitution;ExCannotApplyDirectiveToSubstitution;"if ( item.[ENTRY.][""Tag Name Small""]())
 {
-    throw CParserExceptions::ExDirectiveAlreadyApplied();
+    throw ParserExceptions::ExDirectiveAlreadyApplied();
 }
 else
 {

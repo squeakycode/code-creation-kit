@@ -23,7 +23,7 @@
 
 namespace code_creation_kit
 {
-    class CErrorPrinted{};
+    class ErrorPrinted{};
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -71,7 +71,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1060: Cannot open template file: %1%\n"));
                 formatter % addPath( getCurrentFileName());
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( SourceFileExceptions<TemplateFileT>::ExCannotReadFile& e)
             {
@@ -79,7 +79,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1061: An error occured reading template file: %1%\n"));
                 formatter % addPath( getCurrentFileName());
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TargetFileExceptions<GeneratedFileT>::ExCannotOpenFile& e)
             {
@@ -87,7 +87,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1070: Cannot open target file: %1%\n"));
                 formatter % targetFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TargetFileExceptions<GeneratedFileT>::ExCannotWriteToFile& e)
             {
@@ -95,7 +95,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1071: An error occured writing to target file: %1%\n"));
                 formatter % targetFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TargetFileExceptions<IntermediateFileT>::ExCannotOpenFile& e)
             {
@@ -103,7 +103,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1080: Cannot open intermediate file: %1%\n"));
                 formatter % intermediateFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TargetFileExceptions<IntermediateFileT>::ExCannotWriteToFile& e)
             {
@@ -111,7 +111,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1081: An error occured writing to intermediate file: %1%\n"));
                 formatter % intermediateFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( FilesBinaryEqualExceptions::ExStreamBad& e)
             {
@@ -119,7 +119,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1090: Failed to compare intermediate file '%1%' with target file '%2%'\n"));
                 formatter % intermediateFileName % targetFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( GeneratorExceptions::ExFailedToDeleteTempFile& e)
             {
@@ -127,7 +127,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1100: Failed to delete intermediate output file: %1%\n"));
                 formatter % intermediateFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( GeneratorExceptions::ExFailedToDeleteOldTargetFile& e)
             {
@@ -135,7 +135,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1101: Failed to delete old version of target file '%1%' for replacement with intermediate file.\n"));
                 formatter % targetFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( GeneratorExceptions::ExCannotMoveIntermediateFile& e)
             {
@@ -143,7 +143,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1102: Failed to move intermediate file '%1%' to target file '%2%'\n"));
                 formatter % intermediateFileName % targetFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( KeywordParameterParser::ExParameterStartExpected& e)
             {
@@ -151,7 +151,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1206: Parameter is missing or syntax is incorrect,  '[' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( KeywordParameterParser::ExParameterSeparatorExpected& e)
             {
@@ -159,7 +159,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1207: Less parameters then expected or syntax is incorrect, ',' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( KeywordParameterParser::ExParameterEndExpected& e)
             {
@@ -167,7 +167,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1208: More parameters then expected or syntax is incorrect, ']' is expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( KeywordParameterParser::ExParameterValueExpected& e)
             {
@@ -175,7 +175,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1209: Parameter value is missing or syntax is incorrect. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( KeywordParameterParser::ExCharsUsedForPaddingNotSupported& e)
             {
@@ -183,7 +183,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1215: The text passed for padding contains unsupported characters. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ProcessingLevelControlExceptions::ExPossibleInfiniteLoop& e)
             {
@@ -191,7 +191,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1250: Recursion exceeded the maximum of %3% levels while expanding macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getMaxNumberOfRecursionLevels();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit& e)
             {
@@ -199,7 +199,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1251: The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplateLoaderExceptions::ExCyclicInclusion& e)
             {
@@ -207,7 +207,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1300: Cyclic inclusion detected.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParameterParser::ExMissingDelimiterInParameterDescription& e)
             {
@@ -215,7 +215,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1400: Syntax bad for parameter option number %1%, expecting name=value but is: %2%\n"));
                 formatter % (m_generator.getIndexOfLastProcessedParameter() + 1) % parameters.at( m_generator.getIndexOfLastProcessedParameter());
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( RegexMatchesConstraintExceptions::ExRegexSyntaxError& e)
             {
@@ -223,7 +223,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( RegexReplaceConversionExceptions::ExRegexSyntaxError& e)
             {
@@ -231,7 +231,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CalcConversionExceptions::ExDivisionByZero& e)
             {
@@ -239,7 +239,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1510: Division by zero. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CalcConversionExceptions::ExArithmeticExpressionSyntaxError& e)
             {
@@ -247,7 +247,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1511: Syntax error in arithmetic expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplatePreprocessorExceptions::ExPrefixLeadingWhiteSpace& e)
             {
@@ -255,7 +255,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1602: Leading white space for markup prefix is not allowed.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplatePreprocessorExceptions::ExPostfixTrailingWhiteSpace& e)
             {
@@ -263,7 +263,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1603: Trailing white space for markup postfix is not allowed.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplatePreprocessorExceptions::ExBadlyPlacedTrim& e)
             {
@@ -271,7 +271,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1604: Trim directives are expected at the end of a line. Trailing whitespace is allowed.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplatePreprocessorExceptions::ExBadlyPlacedComment& e)
             {
@@ -279,7 +279,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1605: COMMENT is expected at the beginning of a line. Leading whitespace is allowed.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingBlockBegin& e)
             {
@@ -287,7 +287,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1801: Missing begin block marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingMacroBegin& e)
             {
@@ -295,7 +295,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1802: Missing begin macro marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingBlockEnd& e)
             {
@@ -303,7 +303,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1803: Missing block end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingMacroEnd& e)
             {
@@ -311,7 +311,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1804: Missing macro end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExUnexpectedKeyword& e)
             {
@@ -319,7 +319,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1810: Syntax error. Unexpected keyword found. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExUnexpectedEndOfMacro& e)
             {
@@ -327,7 +327,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1805: Unexpected end of macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExDirectiveAlreadyApplied& e)
             {
@@ -335,7 +335,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1820: Directive has been applied already. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExConstraintExpectedAfterNot& e)
             {
@@ -343,7 +343,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1821: Constraint following not expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExSubstitutionExpectedAfterIf& e)
             {
@@ -351,7 +351,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1822: Substitution following if expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExCannotApplyDirectiveToSubstitution& e)
             {
@@ -359,7 +359,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1823: Directive cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExCannotApplyDirectiveToConstraint& e)
             {
@@ -367,7 +367,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1824: Directive cannot be applied to this constraint. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExCannotApplyDirectiveToConversion& e)
             {
@@ -375,7 +375,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1825: Directive cannot be applied to this conversion. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExCannotApplyConstraintToSubstitution& e)
             {
@@ -383,7 +383,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1826: Constraint cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExCannotApplyConversionToSubstitution& e)
             {
@@ -391,7 +391,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1827: Conversion cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExSubstitutionParsingBadOrder& e)
             {
@@ -399,7 +399,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1828: Extensions fo a substitution are expected in the order directives, constraints, conversions. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExSubstitutionRequiresIf& e)
             {
@@ -407,7 +407,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1829: Substitution requires if. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMacroTooLarge& e)
             {
@@ -415,7 +415,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % (m_generator.getMaxMacroTextSizeBytes() / 1024);
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExPartBlocksCannotBeNested& e)
             {
@@ -423,7 +423,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1840: Part blocks cannot be nested.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingPartBegin& e)
             {
@@ -431,7 +431,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1841: Missing begin part marker.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingPartEnd& e)
             {
@@ -439,7 +439,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1842: Missing part end marker.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExPartAlreadyDefined& e)
             {
@@ -447,7 +447,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1843: Part already defined. Cannot add a second part with the same label.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExPartNotDefined& e)
             {
@@ -455,7 +455,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1844: Part not defined. Cannot expand part.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExPossibleInfiniteLoop& e)
             {
@@ -463,7 +463,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1845: Recursion exceeded the maximum of allowed levels while expanding part.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty& e)
             {
@@ -471,7 +471,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1860: Unexpected table property found for template-provided table.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingTableBegin& e)
             {
@@ -479,7 +479,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1861: Missing begin table marker.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExMissingTableEnd& e)
             {
@@ -487,7 +487,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1862: Missing table end marker.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroProcessorExceptions::ExCannotChangeTableList& e)
             {
@@ -495,7 +495,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1863: Changing the table list permanently is disabled. Only temporary tables can be added or removed.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( TemplateProvidedTableLoaderExceptions::ExTableLoadFileNameMustNotBeEmpty& e)
             {
@@ -503,7 +503,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1864: Table filename must not be empty.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ParserExceptions::ExUnexpectedPartPadding& e)
             {
@@ -511,7 +511,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1865: The part padding directives can only be used inside a part block.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( ToSizeConversionExceptions::ExUnexpectedToSizeProperty& e)
             {
@@ -519,7 +519,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1880: Unexpected property found for to size conversion.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExBadDelimiter& e)
             {
@@ -527,7 +527,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1001: Provided character cannot be used as delimiting character. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExRequireDelimitingChar& e)
             {
@@ -544,7 +544,7 @@ namespace code_creation_kit
                     formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastLineWithFailure();
                     toErrorStream( formatter.str());
                 }
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExUnexpectedQuote& e)
             {
@@ -561,7 +561,7 @@ namespace code_creation_kit
                     formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastLineWithFailure();
                     toErrorStream( formatter.str());
                 }
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExStreamBad& e)
             {
@@ -569,7 +569,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1004: An error occured reading table.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( SourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotOpenFile& e)
             {
@@ -577,7 +577,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1010: Cannot open table file: %1%\n"));
                 formatter % addPath(getTableLoadFileNameWithFailure());
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( SourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotReadFile& e)
             {
@@ -585,7 +585,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1011: An error occured reading table file: %1%\n"));
                 formatter % addPath(getTableLoadFileNameWithFailure());
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( VerticalTableBuilderExceptions::ExUnderflow& e)
             {
@@ -602,7 +602,7 @@ namespace code_creation_kit
                     formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure() % m_generator.getLastLineWithFailure();
                     toErrorStream( formatter.str());
                 }
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( VerticalTableBuilderExceptions::ExOverflow& e)
             {
@@ -619,7 +619,7 @@ namespace code_creation_kit
                     formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure() % m_generator.getLastLineWithFailure();
                     toErrorStream( formatter.str());
                 }
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExBadCommentChars& e)
             {
@@ -627,7 +627,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1030: The CSV comment char list contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExBadQuoteChars& e)
             {
@@ -635,7 +635,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1031: The CSV quote char list contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
             {
@@ -643,7 +643,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1053: Table label already defined. Cannot add a second table with the same label.\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
             {
@@ -651,7 +651,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1900: Error tag triggered: %3%\n"));
                 formatter % addPath( getCurrentFileName()) % getCurrentLineNumber() % e.getMessage();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 
@@ -673,7 +673,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
                 formatter % csvDelimiterChars;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 
@@ -690,7 +690,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
                 formatter % csvCommentChars;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 
@@ -706,7 +706,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
                 formatter % csvQuoteChars;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 
@@ -722,7 +722,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
                 formatter % m_generator.getCsvDelimiterChars();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExRequireDelimitingChar& e)
             {
@@ -730,7 +730,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1002: New line or delimiter at the end of item in quotes is expected.\n"));
                 formatter % addPath( tableFileName) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExUnexpectedQuote& e)
             {
@@ -738,7 +738,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1003: Unexpected quote.\n"));
                 formatter % addPath( tableFileName) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExStreamBad& e)
             {
@@ -746,7 +746,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1004: An error occured reading table file: %1%\n"));
                 formatter % tableFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( SourceFileExceptions<CsvFileT>::ExCannotOpenFile& e)
             {
@@ -754,7 +754,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1010: Cannot open table file: %1%\n"));
                 formatter % tableFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( SourceFileExceptions<CsvFileT>::ExCannotReadFile& e)
             {
@@ -762,7 +762,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1011: An error occured reading table file: %1%\n"));
                 formatter % tableFileName;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( VerticalTableBuilderExceptions::ExUnderflow& e)
             {
@@ -770,7 +770,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1020: Table row %4% contains less items than first row.\n"));
                 formatter % addPath( tableFileName) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( VerticalTableBuilderExceptions::ExOverflow& e)
             {
@@ -778,7 +778,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1021: Table row %4% contains more items than first row.\n"));
                 formatter % addPath( tableFileName) % m_generator.getLastLineWithFailure() % m_generator.getLastColumnWithFailure() % m_generator.getLastRowNumberWithFailure();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExBadCommentChars& e)
             {
@@ -786,7 +786,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
                 formatter % m_generator.getCsvCommentChars();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( CsvParser::ExBadQuoteChars& e)
             {
@@ -794,7 +794,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
                 formatter % m_generator.getCsvQuoteChars();
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroProcessorExceptions::ExRowHeaderIndexOutOfBounds& e)
             {
@@ -802,7 +802,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1051: Row header index %1% exceeds the bounds of the table.\n"));
                 formatter % rowHeaderIndex;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds& e)
             {
@@ -810,7 +810,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1052: Column header index  %1% exceeds the bounds of the table.\n"));
                 formatter % columnHeaderIndex;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
             catch( MacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
             {
@@ -818,7 +818,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1053: Table label '%1%' already defined. Cannot add a second table with the same label.\n"));
                 formatter % label;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 
@@ -834,7 +834,7 @@ namespace code_creation_kit
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1701: A table entry with the provided label '%1%' does not exist.\n"));
                 formatter % label;
                 toErrorStream( formatter.str());
-                throw CErrorPrinted();
+                throw ErrorPrinted();
             }
         }
 

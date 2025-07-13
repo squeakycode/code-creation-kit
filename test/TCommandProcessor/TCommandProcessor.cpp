@@ -11,7 +11,7 @@
 #include "TCommandProcessorTestFiles.h"
 
 ///externally provided exception class showing that an error has been printed
-class CErrorPrinted{};
+class ErrorPrinted{};
 
 #include "CommandProcessor.h"
 #include "TargetFile.h"
@@ -580,7 +580,7 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.h.itpl" };
         generator.m_reset = true;
-        CHECK_THROWS_AS(process<StringT>(args, generator), CErrorPrinted);
+        CHECK_THROWS_AS(process<StringT>(args, generator), ErrorPrinted);
     }
     
     {
@@ -588,7 +588,7 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.tccmd" };
         generator.m_reset = true;
-        CHECK_THROWS_AS( process<StringT>( args, generator), CErrorPrinted);
+        CHECK_THROWS_AS( process<StringT>( args, generator), ErrorPrinted);
     }
 }
 

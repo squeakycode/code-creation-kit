@@ -16,7 +16,7 @@
 
 //parses the command line, provides the parameters from the command line, and checks for valid option combinations
 template <typename StringT = std::string>
-class CCommandFileLineParser
+class CommandFileLineParser
 {
     typedef typename StringT::value_type CharT;
     constexpr static size_t cLeftColumnSize = 40;
@@ -40,7 +40,7 @@ public:
         eOptionsInvalid
     };
 
-    CCommandFileLineParser()
+    CommandFileLineParser()
     {
         reset();
     }

@@ -39,7 +39,7 @@ int process( int argc, char* argv[], bool& prompt, bool& logging)
         //execute command, which generator is used depends on the command
         CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, logFile, &prompt, &logging);
     }
-    catch( CErrorPrinted&)
+    catch( ErrorPrinted&)
     {
         return EXIT_FAILURE;
     }

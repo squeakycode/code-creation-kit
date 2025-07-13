@@ -404,7 +404,7 @@ namespace code_creation_kit
                     if (token.getStringList()->size() > 2 && !padding.empty()) //padding width supplied
                     {
                         StringT padWidth = token.getStringList()->at(2);
-                        padding = CPadLeftConversion<StringT>::getStaticExtendingPadLeftText(padding, padWidth);
+                        padding = PadLeftConversion<StringT>::getStaticExtendingPadLeftText(padding, padWidth);
                     }
                     if (!padding.empty())
                     {

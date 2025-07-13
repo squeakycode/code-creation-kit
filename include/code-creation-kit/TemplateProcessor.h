@@ -19,7 +19,7 @@
 namespace code_creation_kit
 {
     ///serves as default template loader
-    class CNoTemplateLoader
+    class NoTemplateLoader
     {
     public:
         ///dummy with no functionality
@@ -36,7 +36,7 @@ namespace code_creation_kit
     };
 
     ///sets up und operates the building blocks needed for processing a template to produce generated output
-    template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader, typename LogOutputStreamT = NullDevice >
+    template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = NoTemplateLoader, typename LogOutputStreamT = NullDevice >
     class TemplateProcessor
     {
         typedef TemplateProcessor<TableT, OutputStreamT, TemplateLoaderT, LogOutputStreamT> ThisT;

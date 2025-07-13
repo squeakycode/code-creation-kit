@@ -83,15 +83,15 @@ namespace code_creation_kit
         }
 
 
-        class CAutoLineClear
+        class AutoLineClear
         {
         public:
-            CAutoLineClear()
+            AutoLineClear()
                 : m_pLine(0)
             {
             }
 
-            ~CAutoLineClear()
+            ~AutoLineClear()
             {
                 if ( m_pLine)
                 {
@@ -174,9 +174,9 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("COMMENT") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eComment));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("INCLUDE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eInclude, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eInclude, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_MARKUP") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eMarkup, 2, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eMarkup, 2, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TRIM") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eTrim));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TRIM_LEFT") + postfix, m_tokenData.size());
@@ -186,7 +186,7 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::ePart, 0, KeywordParameterParser::getParametersCombi1Plain1CStyleOptional1UIntOptional<IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_BEGIN") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::ePartBegin, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::ePartBegin, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_END") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::ePartEnd));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_LAZY") + postfix, m_tokenData.size());
@@ -194,7 +194,7 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_PADDING") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::ePartPadding));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("PART_REMOVE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::ePartRemove, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::ePartRemove, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eSetRecursionLevelLimit));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("SET_RECURSION_LEVEL_LIMIT_OFF") + postfix, m_tokenData.size());
@@ -206,7 +206,7 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_LOAD") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eTableLoad, 0, KeywordParameterParser::getParametersCombi2Plain2CStyleOptional1PlainOptional1CStyleOptional<IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TABLE_REMOVE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eTableRemove, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eTableRemove, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("ANY") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eAny));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("AS_VOLATILE") + postfix, m_tokenData.size());
@@ -214,23 +214,23 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("BEGIN") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eBegin));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("BLOCK_FORMAT") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eBlockFormat, 1, KeywordParameterParser::getParameters<CUIntParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eBlockFormat, 1, KeywordParameterParser::getParameters<UIntParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("CALC") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eCalc, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eCalc, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("CONTAINS") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eContains, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eContains, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("COUNT") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eCount));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("END") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eEnd));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("ENDS_WITH") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eEndsWith, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eEndsWith, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("ENTRY") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eEntry, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eEntry, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("EQUALS") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eMatches, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eMatches, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("ERROR") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eError_, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eError_, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("FIRST_TIME") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eFirstTime));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("FLUSH") + postfix, m_tokenData.size());
@@ -252,9 +252,9 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("MACRO_END") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eMacroEnd));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("MATCHES_REGEX") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eRegexMatches, 1, KeywordParameterParser::getParameters<CRegexParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eRegexMatches, 1, KeywordParameterParser::getParameters<RegexParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("MERGE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eMerge, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eMerge, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("NOT") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eNot_));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("OR") + postfix, m_tokenData.size());
@@ -268,11 +268,11 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("READ_TOP_DOWN") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eTopDown));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("REGEX_REPLACE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eRegexReplace, 2, KeywordParameterParser::getParameters<CRegexParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eRegexReplace, 2, KeywordParameterParser::getParameters<RegexParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("REPLACE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eReplace, 2, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eReplace, 2, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("STARTS_WITH") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eStartsWith, 1, KeywordParameterParser::getParameters<CCStyleParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eStartsWith, 1, KeywordParameterParser::getParameters<CStyleParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_CSTRING") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eToCString));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_CSV") + postfix, m_tokenData.size());
@@ -280,7 +280,7 @@ namespace code_creation_kit
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_LOWER") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eToLower));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_SIZE") + postfix, m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::eToSize, 1, KeywordParameterParser::getParameters<CPlainParameterPolicy, IteratorT, StringListT>));
+            m_tokenData.push_back(TokenData(TokenT::eToSize, 1, KeywordParameterParser::getParameters<PlainParameterPolicy, IteratorT, StringListT>));
             m_tokenFinder.add_token(prefix + STRING_LITERAL("TO_UPPER") + postfix, m_tokenData.size());
             m_tokenData.push_back(TokenData(TokenT::eToUpper));
             m_tokenFinder.add_token(STRING_LITERAL("\r\n"), m_tokenData.size());
@@ -320,7 +320,7 @@ namespace code_creation_kit
         ThisT& operator <<( const StringT& line)
         {
             bool trimmedRight = false;
-            CAutoLineClear autoClear;
+            AutoLineClear autoClear;
             IteratorT textBegin = line.begin();
             IteratorT fullLineBegin = line.begin();
             IteratorT textEnd = line.end(); 

@@ -23,7 +23,7 @@ namespace code_creation_kit
 {
     [MACRO_BEGIN][PART]["if front end"][TRIM]
     ///defines exceptions thrown by Tokenizer for template argument independent access
-    class CTokenizerExceptions
+    class TokenizerExceptions
     {
     public:
         class ExInlinePrefixEmpty : public std::runtime_error //not in error printer table
@@ -90,15 +90,15 @@ namespace code_creation_kit
 
         [MACRO_BEGIN][PART]["if front end"][TRIM]
 
-        class CAutoLineClear
+        class AutoLineClear
         {
         public:
-            CAutoLineClear()
+            AutoLineClear()
                 : m_pLine(0)
             {
             }
 
-            ~CAutoLineClear()
+            ~AutoLineClear()
             {
                 if ( m_pLine)
                 {
@@ -128,19 +128,19 @@ namespace code_creation_kit
                 || generatedPostfix != cppstringx::trim_copy( generatedPostfix)
             )
             {
-                throw CTokenizerExceptions::ExInlineMarkupWhiteSpace();
+                throw TokenizerExceptions::ExInlineMarkupWhiteSpace();
             }
             if ( prefix.empty())
             {
-                throw CTokenizerExceptions::ExInlinePrefixEmpty();
+                throw TokenizerExceptions::ExInlinePrefixEmpty();
             }
             if ( generatedPostfix.empty())
             {
-                throw CTokenizerExceptions::ExInlineGeneratedPostfixEmpty();
+                throw TokenizerExceptions::ExInlineGeneratedPostfixEmpty();
             }
             if (cppstringx::ends_with( prefix+postfix, generatedPostfix))
             {
-                throw CTokenizerExceptions::ExBadInlineGeneratedPostfix();
+                throw TokenizerExceptions::ExBadInlineGeneratedPostfix();
             }
 
             m_inlinePrefix = prefix;
@@ -203,7 +203,7 @@ namespace code_creation_kit
 
             [MACRO_BEGIN][TRIM]
             m_tokenFinder.add_token(prefix + STRING_LITERAL("[ENTRY]["Tag Name"][READ_TOP_DOWN]")[BEGIN.][PART.]["if front end"] + postfix[OR.][END.], m_tokenData.size());
-            m_tokenData.push_back(TokenData(TokenT::e[ENTRY]["Tag Name Capital"][BEGIN], 0, KeywordParameterParser::getParameters[ENTRY]["Parameter Format"][STARTS_WITH]["Combi"]<IteratorT, StringListT>[OR], [ENTRY]["Parameter Count"], KeywordParameterParser::getParameters<C[ENTRY]["Parameter Format"]ParameterPolicy, IteratorT, StringListT>[OR][END][BEGIN], [ENTRY]["Parameter Check Function"][OR][END]));
+            m_tokenData.push_back(TokenData(TokenT::e[ENTRY]["Tag Name Capital"][BEGIN], 0, KeywordParameterParser::getParameters[ENTRY]["Parameter Format"][STARTS_WITH]["Combi"]<IteratorT, StringListT>[OR], [ENTRY]["Parameter Count"], KeywordParameterParser::getParameters<[ENTRY]["Parameter Format"]ParameterPolicy, IteratorT, StringListT>[OR][END][BEGIN], [ENTRY]["Parameter Check Function"][OR][END]));
             [MACRO_END][TRIM]
             m_tokenFinder.add_token(STRING_LITERAL("\r\n"), m_tokenData.size());
             m_tokenFinder.add_token(STRING_LITERAL("\n"), m_tokenData.size());
@@ -276,7 +276,7 @@ namespace code_creation_kit
         ThisT& operator <<( const StringT& line)
         {
             bool trimmedRight = false;
-            CAutoLineClear autoClear;[PART]["if front end"]
+            AutoLineClear autoClear;[PART]["if front end"]
             IteratorT textBegin = line.begin();
             IteratorT fullLineBegin = line.begin();
             IteratorT textEnd = line.end(); 

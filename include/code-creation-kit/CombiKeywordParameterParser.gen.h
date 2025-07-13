@@ -21,16 +21,16 @@ namespace code_creation_kit
             parameters.resize(2);
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
                 typename ContainerT::iterator it = parameters.begin();
                 //parse parameter of type CStyle
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 //parse the seperator, e.g. the comma and surrounding space
-                CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
+                ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
                 //parse parameter of type UInt
-                CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                UIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
@@ -39,18 +39,18 @@ namespace code_creation_kit
             {
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 IteratorT temp(start);
-                if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                 {
                     break;
                 }
                 start = temp;
                 typename ContainerT::value_type parameterValue;
-                CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                UIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
             }
 
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
 
 
@@ -62,11 +62,11 @@ namespace code_creation_kit
             parameters.resize(1);
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
                 typename ContainerT::iterator it = parameters.begin();
                 //parse parameter of type Plain
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
@@ -77,7 +77,7 @@ namespace code_creation_kit
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -85,13 +85,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -99,13 +99,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -113,13 +113,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type Plain
                 parameterValue.clear();
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -127,14 +127,14 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 break;
             }
 
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
 
 
@@ -146,16 +146,16 @@ namespace code_creation_kit
             parameters.resize(2);
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
                 typename ContainerT::iterator it = parameters.begin();
                 //parse parameter of type Plain
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 //parse the seperator, e.g. the comma and surrounding space
-                CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
+                ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
                 //parse parameter of type Plain
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
@@ -166,7 +166,7 @@ namespace code_creation_kit
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -174,13 +174,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -188,13 +188,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -202,13 +202,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type Plain
                 parameterValue.clear();
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -216,14 +216,14 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 break;
             }
 
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
 
 
@@ -235,11 +235,11 @@ namespace code_creation_kit
             parameters.resize(1);
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
                 typename ContainerT::iterator it = parameters.begin();
                 //parse parameter of type Plain
-                CPlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                PlainParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
@@ -250,7 +250,7 @@ namespace code_creation_kit
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -258,13 +258,13 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -272,14 +272,14 @@ namespace code_creation_kit
                 }
                 //parse parameter of type UInt
                 parameterValue.clear();
-                CUIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                UIntParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 break;
             }
 
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
 
 
@@ -291,11 +291,11 @@ namespace code_creation_kit
             parameters.resize(1);
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             {
                 typename ContainerT::iterator it = parameters.begin();
                 //parse parameter of type CStyle
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 assert(it == parameters.end()); //all fixed part parameters must be read defined by parameters.resize() above
             }
@@ -306,7 +306,7 @@ namespace code_creation_kit
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -314,14 +314,14 @@ namespace code_creation_kit
                 }
                 //parse parameter of type CStyle
                 parameterValue.clear();
-                CCStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                CStyleParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 break;
             }
 
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
     }
 }

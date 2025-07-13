@@ -127,7 +127,7 @@ namespace code_creation_kit
             [BEGIN][TRIM]
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::[ENTRY]["Validation Error"]();
+                throw ParserExceptions::[ENTRY]["Validation Error"]();
             }
 
             [OR][END][TRIM]
@@ -161,14 +161,14 @@ namespace code_creation_kit
         [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["constraint"][TRIM]
         if ( not_)
         {
-            throw CParserExceptions::ExConstraintExpectedAfterNot();
+            throw ParserExceptions::ExConstraintExpectedAfterNot();
         }
 
         [OR][END][TRIM]
         [BEGIN][IF][ENTRY]["Subtype"][EQUALS]["substitution"][TRIM]
         if ( if_)
         {
-            throw CParserExceptions::ExSubstitutionExpectedAfterIf();
+            throw ParserExceptions::ExSubstitutionExpectedAfterIf();
         }
 
         [OR][END][TRIM]

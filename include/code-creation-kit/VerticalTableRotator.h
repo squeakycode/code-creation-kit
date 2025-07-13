@@ -20,10 +20,10 @@ namespace code_creation_kit
         }
 
         ///represents a column
-        class CVerticalTableRotatorColumn
+        class VerticalTableRotatorColumn
         {
         public:
-            CVerticalTableRotatorColumn( const TableT* table, IndexT index)
+            VerticalTableRotatorColumn( const TableT* table, IndexT index)
                 : m_table(table)
                 , m_index(index)
             {
@@ -46,9 +46,9 @@ namespace code_creation_kit
         };
 
         ///returns a column
-        const CVerticalTableRotatorColumn operator[] ( IndexT index) const
+        const VerticalTableRotatorColumn operator[] ( IndexT index) const
         {
-            return CVerticalTableRotatorColumn( m_table, index);
+            return VerticalTableRotatorColumn( m_table, index);
         }
 
         ///returns the size
@@ -70,7 +70,7 @@ namespace code_creation_kit
             return true;
         }
 
-        typedef CVerticalTableRotatorColumn value_type;
+        typedef VerticalTableRotatorColumn value_type;
     private:
         const TableT* m_table; ///<the original table
     };

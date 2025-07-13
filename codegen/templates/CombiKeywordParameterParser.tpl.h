@@ -24,18 +24,18 @@ namespace code_creation_kit
             [OR][END][TRIM]
 
             //parse opening parentheses
-            CParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
+            ParameterPolicyBase::parseParameterStart<ExParameterStartExpected>(start, end);
             [BEGIN][TRIM]
             {
                 typename ContainerT::iterator it = parameters.begin();
                 [TABLE_BEGIN.]["Fixed Part Table"]Fixed Part Row;[ENTRY]["Fixed Part"][TABLE_END.][TRIM.]
                 [MACRO_BEGIN.][TRIM.]
                 //parse parameter of type [ENTRY.]["Fixed Part Row"]
-                C[ENTRY.]["Fixed Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
+                [ENTRY.]["Fixed Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, *it);
                 ++it; //set to the next value to parse
                 [BEGIN.][IF.][NOT.][LAST_TIME.][TRIM.]
                 //parse the seperator, e.g. the comma and surrounding space
-                CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
+                ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(start, end);
                 [OR.][END.][TRIM.]
                 [MACRO_END.][TRIM.]
                 [TABLE_REMOVE.]["Fixed Part Table"][TRIM.]
@@ -52,7 +52,7 @@ namespace code_creation_kit
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 {
                     IteratorT temp(start);
-                    if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                    if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                     {
                         break;
                     }
@@ -60,7 +60,7 @@ namespace code_creation_kit
                 }
                 //parse parameter of type [ENTRY.]["Optional Part Row"]
                 parameterValue.clear();
-                C[ENTRY.]["Optional Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                [ENTRY.]["Optional Part Row"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
                 
                 [MACRO_END.][TRIM.]
@@ -74,19 +74,19 @@ namespace code_creation_kit
             {
                 //try to find a seperator, e.g. the comma and surrounding space, otherwise there are no more parameters to parse
                 IteratorT temp(start);
-                if (!CParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
+                if (!ParameterPolicyBase::parseParameterSeparator<ExParameterSeparatorExpected>(temp, end, true))
                 {
                     break;
                 }
                 start = temp;
                 typename ContainerT::value_type parameterValue;
-                C[ENTRY]["Repeat Part"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
+                [ENTRY]["Repeat Part"]ParameterPolicy::parseParameterValue<ExParameterValueExpected>(start, end, parameterValue);
                 parameters.push_back(parameterValue);
             }
 
             [OR][END][TRIM]
             //parse closing parentheses
-            CParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
+            ParameterPolicyBase::parseParameterEnd<ExParameterEndExpected>(start, end);
         }
         [BEGIN][IF][NOT][LAST_TIME][TRIM]
 

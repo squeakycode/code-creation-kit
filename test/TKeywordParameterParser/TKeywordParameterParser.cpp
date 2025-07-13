@@ -49,40 +49,40 @@ TEST_CASE( "TKeywordParameterParser", "[TKeywordParameterParser]")
     { // one
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "test");
-        test<CPlainParameterPolicy>( "[ \"test\" ]-", expectedParameters, 1);
+        test<PlainParameterPolicy>( "[ \"test\" ]-", expectedParameters, 1);
     }
 
     { // two
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "testa");
         expectedParameters.push_back( "testb");
-        test<CPlainParameterPolicy>( "[\"testa\" , \"testb\"]-", expectedParameters, 2);
+        test<PlainParameterPolicy>( "[\"testa\" , \"testb\"]-", expectedParameters, 2);
     }
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
     }
 
     { // one + special chars
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "\n\t\"\\test");
-        test<CCStyleParameterPolicy>( "[\"\\n\\t\\\"\\\\test\"]-", expectedParameters, 1);
+        test<CStyleParameterPolicy>( "[\"\\n\\t\\\"\\\\test\"]-", expectedParameters, 1);
     }
 
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        CHECK_THROWS_AS( test<CCStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<CStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
     }
 
     { // one + special chars
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "a'b");
-        test<CRegexParameterPolicy>( "['a''b']-", expectedParameters, 1);
+        test<RegexParameterPolicy>( "['a''b']-", expectedParameters, 1);
     }
 
     { // getParametersCombiCStyleUIntUIntRepeat

@@ -34,8 +34,8 @@ namespace code_creation_kit
         {
             typedef std::basic_string<CharT, std::char_traits<CharT> > StringT;
 
-            CCommandLineParser<StringT> parser;
-            CGeneratorCommandProcessor<StringT> generatorCommandProcessor;
+            CommandLineParser<StringT> parser;
+            GeneratorCommandProcessor<StringT> generatorCommandProcessor;
             StringT commandFileAbsolutePath;
             StringT instantTemplateFileNameAbsolutePath;
 
@@ -43,14 +43,14 @@ namespace code_creation_kit
 
             try
             {
-                const typename CCommandLineParser<StringT>::ECommand command = parser.getCommand();
-                if ( CCommandLineParser<StringT>::eHelp == command )
+                const typename CommandLineParser<StringT>::ECommand command = parser.getCommand();
+                if ( CommandLineParser<StringT>::eHelp == command )
                 {
                     printVersionInfo();
                     parser.printDescription(std::cout);
                     generatorCommandProcessor.printDescription();
                 }
-                else if ( CCommandLineParser<StringT>::eExecuteCommand == command )
+                else if ( CommandLineParser<StringT>::eExecuteCommand == command )
                 {
                     std::vector<StringT> commands = parser.getCommands();
                     for (const StringT& generatorCommand : commands)
@@ -58,7 +58,7 @@ namespace code_creation_kit
                         generatorCommandProcessor.processCommand(generatorCommand, generator, StringT(), logFile);
                     }
                 }
-                else if (CCommandLineParser<StringT>::eProcessInstantTemplate == command)
+                else if (CommandLineParser<StringT>::eProcessInstantTemplate == command)
                 {
                     //check if wait and retry is switched on
                     if (prompt)
@@ -114,7 +114,7 @@ namespace code_creation_kit
                         }
                     }
                 }
-                else if ( CCommandLineParser<StringT>::eExecuteCommandFile == command )
+                else if ( CommandLineParser<StringT>::eExecuteCommandFile == command )
                 {
                     //check if wait and retry is switched on
                     if ( prompt )
@@ -153,7 +153,7 @@ namespace code_creation_kit
                         commandFile.checkEofReached();
                     }
                 }
-                else if ( CCommandLineParser<StringT>::eCommandFileDependencies == command )
+                else if ( CommandLineParser<StringT>::eCommandFileDependencies == command )
                 {
                     //check if wait and retry is switched on
                     if ( prompt )
@@ -200,17 +200,17 @@ namespace code_creation_kit
             catch( SourceFileExceptions<CommandFileT>::ExCannotOpenFile&)
             {
                 FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
-                throw CErrorPrinted(); //empty class provided externally
+                throw ErrorPrinted(); //empty class provided externally
             }
             catch( SourceFileExceptions<CommandFileT>::ExCannotReadFile&)
             {
                 FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
-                throw CErrorPrinted(); //empty class provided externally
+                throw ErrorPrinted(); //empty class provided externally
             }
             catch (ExInstantTemplateFileNotFound&)
             {
                 FileSystem::getCerr<CharT>() << "Failed to open instant template file: " << instantTemplateFileNameAbsolutePath << std::endl;
-                throw CErrorPrinted(); //empty class provided externally
+                throw ErrorPrinted(); //empty class provided externally
             }
 
         }

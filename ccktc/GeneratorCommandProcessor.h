@@ -20,9 +20,9 @@ namespace code_creation_kit
 
     ///processes user commands
     template <typename StringT>
-    class CGeneratorCommandProcessor
+    class GeneratorCommandProcessor
     {
-        typedef CCommandFileLineParser<StringT> ParserT;
+        typedef CommandFileLineParser<StringT> ParserT;
         typedef typename StringT::value_type CharT;
     public:
         class ExInvalidCommandOptions : public std::runtime_error 
@@ -154,7 +154,7 @@ namespace code_creation_kit
                     StringT delimiterCharsQuoted = STRING_LITERAL("\"") + delimiterChars + STRING_LITERAL("\"");
                     StringT result;
                     auto itBegin = delimiterCharsQuoted.cbegin();
-                    if (CCStyleParameterPolicy::parseParameterValue<ExInvalidCommandOptions, typename StringT::const_iterator, StringT>(itBegin, delimiterCharsQuoted.cend(), result, true))
+                    if (CStyleParameterPolicy::parseParameterValue<ExInvalidCommandOptions, typename StringT::const_iterator, StringT>(itBegin, delimiterCharsQuoted.cend(), result, true))
                     {
                         delimiterChars = result;
                     }

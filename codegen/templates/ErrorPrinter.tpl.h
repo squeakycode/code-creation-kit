@@ -38,11 +38,11 @@ catch( [ENTRY]["Scope"]::[ENTRY]["Exception Name"]& e)
 [OR][TRIM]
     [PART]["print error message", " ", 4]
 [END][TRIM]
-    throw CErrorPrinted();
+    throw ErrorPrinted();
 }[PART_END]
 namespace code_creation_kit
 {
-    class CErrorPrinted{};
+    class ErrorPrinted{};
 
 #ifdef _MSC_VER
 #pragma warning( push )
