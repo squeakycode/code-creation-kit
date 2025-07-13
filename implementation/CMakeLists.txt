@@ -121,7 +121,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CCommandFileLineParser.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CCommandFileLineParser.tccmd"
         MAIN_DEPENDENCY CCommandFileLineParser.tccmd
-        DEPENDS CCommandFileLineParser.csv ../templates/CommandLineParser.tpl.h
+        DEPENDS CCommandFileLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
         COMMENT "Generating CCommandFileLineParser.tccmd"
     )
 
@@ -130,7 +130,7 @@ if (CCK_TCCMD_EXECUTABLE_NEVER)
         OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/CCommandLineParser.gen.h"
         COMMAND ${CCK_TCCMD_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/CCommandLineParser.tccmd"
         MAIN_DEPENDENCY CCommandLineParser.tccmd
-        DEPENDS CCommandLineParser.csv ../templates/CommandLineParser.tpl.h
+        DEPENDS CCommandLineParser.csv ../codegen/templates/CommandLineParser.tpl.h
         COMMENT "Generating CCommandLineParser.tccmd"
     )
 

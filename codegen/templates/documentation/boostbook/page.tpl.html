@@ -1,0 +1,133 @@
+[COMMENT]  Copyright (c) 2011-2023, Andreas Gau
+[COMMENT]  All rights reserved.
+[COMMENT]
+[COMMENT]  Redistribution and use in source and binary forms, with or without
+[COMMENT]  modification, are permitted provided that the following conditions are met:
+[COMMENT]      * Redistributions of source code must retain the above copyright
+[COMMENT]        notice, this list of conditions and the following disclaimer.
+[COMMENT]      * Redistributions in binary form must reproduce the above copyright
+[COMMENT]        notice, this list of conditions and the following disclaimer in the
+[COMMENT]        documentation and/or other materials provided with the distribution.
+[COMMENT]      * Neither the name of the author nor the
+[COMMENT]        names of contributors may be used to endorse or promote products
+[COMMENT]        derived from this software without specific prior written permission.
+[COMMENT]
+[COMMENT]  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+[COMMENT]  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+[COMMENT]  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+[COMMENT]  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+[COMMENT]  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+[COMMENT]  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+[COMMENT]  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+[COMMENT]  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+[COMMENT]  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+[COMMENT]  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+[COMMENT]
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>[ENTRY]["title"][HTML_ESCAPE]</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+[COMMENT] <!-- insert logo, create empty file if no logo -->
+$INCLUDE$["logo.tpl.html"]$TRIM$
+    <hr>
+[INCLUDE]["navigation.tpl.html"][TRIM]
+
+[SET_RECURSION_LEVEL_LIMIT_OFF][TRIM]
+[COMMENT] <!-- insert heading? -->
+[MACRO_BEGIN][IF][ENTRY]["Item Type"][MATCHES_REGEX]['heading [1-9]'][TRIM]
+    [COMMENT] <!-- h1 to h6 are looked up as second step -->
+    <div class="titlepage"><div><div><[ENTRY.]["[ENTRY]["Item Type"]:"][READ_LEFT_TO_RIGHT.] class="title" style="clear: both"><a name="anchor[INDEX]"></a>[ENTRY]["Text"]</[ENTRY.]["[ENTRY]["Item Type"]:"][READ_LEFT_TO_RIGHT.]></div></div></div>
+[COMMENT] <!--insert table of content? -->
+[OR][IF][ENTRY]["Item Type"][EQUALS]["table_of_contents"][TRIM]
+    <div class="toc">
+[COMMENT] <!-- insert additional heading for table of content if text is provided -->
+    [BEGIN]<p><b>[ENTRY]["Text"][HTML_ESCAPE]</b></p>[OR][END]
+    <dl>
+[COMMENT]    
+[COMMENT] <!-- the following is done: list headings in table, look up <dd><dl> tags in matrix for indentation, look up filename -->
+[COMMENT]
+    [MACRO_BEGIN.][IF.][ENTRY.]["Item Type"][MATCHES_REGEX.]['heading [1-9]'][TRIM]
+[COMMENT]
+[COMMENT] <!-- look up <dd><dl> tags in matrix for indentation -->
+[COMMENT]
+    [BEGIN.][TRIM]
+    [IF.][FIRST_TIME.][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][ENTRY..]["[ENTRY.]["Item Type"]"]
+    [OR.][TRIM]
+[COMMENT] <!-- trailing entry of lower block -->
+    [ENTRY..]["[ENTRY.]["Item Type"]"][END..]
+    [END.][TRIM]
+[COMMENT]
+[COMMENT] <!-- headings in table, look up filename -->
+[COMMENT]
+    <dt><span class="section"><a href="[ENTRY..]["file"]#anchor[INDEX.]">[ENTRY.]["Text"][HTML_ESCAPE.]</a></span></dt>
+[COMMENT]
+[COMMENT] <!-- look up <dd><dl> tags in matrix for indentation -->
+[COMMENT]
+    [BEGIN.][TRIM]
+    [IF.][LAST_TIME.][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][ENTRY..]["heading 2"]
+    [OR.][TRIM]
+[COMMENT] <!-- completed by trailing entry of upper block -->
+    [BEGIN..][IF..][ENTRY..]["previous\\next"][READ_TOP_DOWN..][EQUALS..]["[ENTRY.]["Item Type"]"][TRIM]
+    [END.][TRIM]
+[COMMENT]
+[COMMENT] <!-- end of look up of headings in table  -->
+[COMMENT]
+    [MACRO_END.][TRIM]
+    </dl>
+    </div>
+[COMMENT] <!--insert image? -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["image"][TRIM]
+    <p>
+      <span class="inlinemediaobject"><img src="[ENTRY]["Text"]" alt="[ENTRY]["Text"]"></span>
+    </p>
+[COMMENT] <!--insert list start? -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["list_start"][TRIM]
+    <div class="itemizedlist"><ul type="disc">
+[COMMENT] <!--insert list item? -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["list_item"][TRIM]
+    <li>
+    [ENTRY]["Text"]
+    </li>
+[COMMENT] <!--insert list end? -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["list_end"][TRIM]
+    </ul></div>
+[COMMENT] <!--insert text paragraph? -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["paragraph"][TRIM]
+    <p>
+    [ENTRY]["Text"]
+    </p>
+[COMMENT] <!-- insert include for an html file, in a second generation step the include is executed -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["include"][IF][ENTRY]["Text"][MATCHES_REGEX]['.*\.html'][TRIM]
+$INCLUDE$["[ENTRY]["Text"]"]$TRIM$
+[COMMENT] <!-- insert include for an rtf file with accompanying html file, in a second generation step the include is executed -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["include"][IF][ENTRY]["Text"][MATCHES_REGEX]['.*\.rtf'][TRIM]
+    <pre class="synopsis">
+$INCLUDE$["[ENTRY]["Text"][REGEX_REPLACE]['(.*)\.rtf','$1\.html']"]$TRIM$
+    </pre>
+[COMMENT] <!-- insert include, in a second generation step the include is executed -->        
+[OR][IF][ENTRY]["Item Type"][EQUALS]["include"][TRIM]
+    <pre class="synopsis">
+$INCLUDE$["[ENTRY]["Text"]"]$TRIM$
+    </pre>
+[MACRO_END][TRIM]
+
+    <hr>
+[INCLUDE]["navigation.tpl.html"][TRIM]
+</body>
+</html>
