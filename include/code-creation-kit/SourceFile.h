@@ -9,9 +9,9 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CSourceFile(s) for template argument independent access
+    ///defines exceptions thrown by SourceFile(s) for template argument independent access
     template <typename SourceFileIdentifyingT>
-    class CSourceFileExceptions
+    class SourceFileExceptions
     {
     public:
         class ExCannotOpenFile : public std::runtime_error 
@@ -23,20 +23,20 @@ namespace code_creation_kit
 
     ///encapsulates often used input stream handling
     template <typename StringT, typename SourceFileIdentifyingT>
-    class CSourceFile : public CSourceFileExceptions<SourceFileIdentifyingT>
+    class SourceFile : public SourceFileExceptions<SourceFileIdentifyingT>
     {
     public:
         typedef typename StringT::value_type CharT;
         typedef std::basic_istream<CharT, std::char_traits<CharT> > InputStreamT;
         typedef std::basic_ifstream< CharT, std::char_traits<CharT> > InputFileStreamT;
-        typedef CSourceFile<StringT,SourceFileIdentifyingT> ThisT;
+        typedef SourceFile<StringT,SourceFileIdentifyingT> ThisT;
 
-        CSourceFile()
+        SourceFile()
             : m_useCin( false)
         {
         }
 
-        explicit CSourceFile( const StringT& filename, bool useCinInstead = false)
+        explicit SourceFile( const StringT& filename, bool useCinInstead = false)
             : m_useCin( useCinInstead)
         {
             if ( !m_useCin )

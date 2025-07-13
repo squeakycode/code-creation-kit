@@ -18,7 +18,7 @@ namespace code_creation_kit
         void nextColumn();
     */
     ///parses a csv file, csv data is fed into a table builder, position can be tracked
-    class CCsvParser
+    class CsvParser
     {
     public:
         class ExBadDelimiter : public std::invalid_argument

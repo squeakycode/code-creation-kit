@@ -14,21 +14,21 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CGenerator for template argument independent access
-    class CGeneratorStatisticExceptions
+    ///defines exceptions thrown by Generator for template argument independent access
+    class GeneratorStatisticExceptions
     {
     public:
     };
 
     ///serves generator stub and creating a statistic of the used files
     template <typename StringT>
-    class CGeneratorStatistic : public CGeneratorStatisticExceptions
+    class GeneratorStatistic : public GeneratorStatisticExceptions
     {
-        typedef CGeneratorStatistic<StringT> ThisT;
-        typedef CToken<Tokens, StringT> TokenT;
-        typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
-        typedef CTokenizer<TokenT, StringT, PreprocessorT, CNul> TokenizerT;
-        typedef CTemplateLoader<TokenizerT, StringT> TemplateLoaderT;
+        typedef GeneratorStatistic<StringT> ThisT;
+        typedef Token<Tokens, StringT> TokenT;
+        typedef TemplatePreprocessor<NullDevice, ThisT, ThisT, TokenT, StringT> PreprocessorT;
+        typedef Tokenizer<TokenT, StringT, PreprocessorT, NullDevice> TokenizerT;
+        typedef TemplateLoader<TokenizerT, StringT> TemplateLoaderT;
 
     public:
         typedef typename StringT::value_type CharT;
@@ -36,7 +36,7 @@ namespace code_creation_kit
         typedef typename TemplateLoaderT::FileData FileDataT;
         typedef std::set<StringT> FileSetT;
 
-        CGeneratorStatistic()
+        GeneratorStatistic()
             : m_csvDelimiterChars(STRING_LITERAL(";"))
             , m_csvCommentChars(STRING_LITERAL(""))
             , m_csvQuoteChars(STRING_LITERAL("\""))
@@ -56,8 +56,8 @@ namespace code_creation_kit
         }
 
         //noncopyable
-        CGeneratorStatistic(const CGeneratorStatistic&) = delete;
-        CGeneratorStatistic& operator=(const CGeneratorStatistic&) = delete;
+        GeneratorStatistic(const GeneratorStatistic&) = delete;
+        GeneratorStatistic& operator=(const GeneratorStatistic&) = delete;
 
         ///set delimiter for next csv table to load
         void setCsvDelimiterChars(const StringT& csvDelimiterChars)
@@ -130,7 +130,7 @@ namespace code_creation_kit
             bool , 
             const ParameterListT& ,
             bool ,
-            const CInlineTemplateParameters<StringT>& p
+            const InlineTemplateParameters<StringT>& p
             )
         {
             //setup tokenizer
@@ -240,7 +240,7 @@ namespace code_creation_kit
         TokenizerT m_tokenizer; ///<splits input lines into tokens
         PreprocessorT m_preprocessor; ///<does the preprocessing
         TemplateLoaderT m_templateLoader; ///<the loader
-        CNul m_nul; ///<dumps the data stream as no output is produced
+        NullDevice m_nul; ///<dumps the data stream as no output is produced
         CharT m_csvDelimiter; ///<delimiter used by csv files to load
         FileSetT m_tables; ///<list of tables loaded
         FileSetT m_generatedFiles; ///<list of files generated

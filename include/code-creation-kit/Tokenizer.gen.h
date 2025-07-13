@@ -19,8 +19,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CTokenizer for template argument independent access
-    class CTokenizerExceptions
+    ///defines exceptions thrown by Tokenizer for template argument independent access
+    class TokenizerExceptions
     {
     public:
         class ExInlinePrefixEmpty : public std::runtime_error //not in error printer table
@@ -42,11 +42,11 @@ namespace code_creation_kit
         , typename StringT
         , typename OutputStreamT
         , typename FinalOutputStreamT
-        , typename LogOutputStreamT = CNul >
-    class CTokenizer
+        , typename LogOutputStreamT = NullDevice >
+    class Tokenizer
     {
     public:
-        typedef CTokenizer<TokenT, StringT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
+        typedef Tokenizer<TokenT, StringT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
         typedef cppstringx::range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
@@ -74,7 +74,7 @@ namespace code_creation_kit
         };
     public:
 
-        CTokenizer()
+        Tokenizer()
             : m_pOutputStream(nullptr)
             , m_pFinalOutputStream(nullptr)
             , m_inlineTemplateMode(false)
@@ -121,19 +121,19 @@ namespace code_creation_kit
                 || generatedPostfix != cppstringx::trim_copy( generatedPostfix)
             )
             {
-                throw CTokenizerExceptions::ExInlineMarkupWhiteSpace();
+                throw TokenizerExceptions::ExInlineMarkupWhiteSpace();
             }
             if ( prefix.empty())
             {
-                throw CTokenizerExceptions::ExInlinePrefixEmpty();
+                throw TokenizerExceptions::ExInlinePrefixEmpty();
             }
             if ( generatedPostfix.empty())
             {
-                throw CTokenizerExceptions::ExInlineGeneratedPostfixEmpty();
+                throw TokenizerExceptions::ExInlineGeneratedPostfixEmpty();
             }
             if (cppstringx::ends_with( prefix+postfix, generatedPostfix))
             {
-                throw CTokenizerExceptions::ExBadInlineGeneratedPostfix();
+                throw TokenizerExceptions::ExBadInlineGeneratedPostfix();
             }
 
             m_inlinePrefix = prefix;

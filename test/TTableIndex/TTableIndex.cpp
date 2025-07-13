@@ -35,7 +35,7 @@ TEST_CASE( "TTableIndex", "[TTableIndex]")
     }
 
     //create
-    CTableIndex<TableT, std::exception> tableIndex;
+    TableIndex<TableT, std::exception> tableIndex;
     //connect test table
     tableIndex.connectTable( &table);
     tableIndex.readTable(1);

@@ -9,9 +9,9 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CTargetFile(s) for template argument independent access
+    ///defines exceptions thrown by TargetFile(s) for template argument independent access
     template <typename TargetFileIdentifyingT>
-    class CTargetFileExceptions
+    class TargetFileExceptions
     {
     public:
         class ExCannotOpenFile : public std::runtime_error 
@@ -23,20 +23,20 @@ namespace code_creation_kit
 
     ///encapsulates often used input stream handling
     template <typename StringT, typename TargetFileIdentifyingT>
-    class CTargetFile : public CTargetFileExceptions<TargetFileIdentifyingT>
+    class TargetFile : public TargetFileExceptions<TargetFileIdentifyingT>
     {
     public:
         typedef typename StringT::value_type CharT;
         typedef std::basic_ostream<CharT, std::char_traits<CharT> > OutputStreamT;
         typedef std::basic_ofstream< CharT, std::char_traits<CharT> > OutputFileStreamT;
-        typedef CTargetFile<StringT,TargetFileIdentifyingT> ThisT;
+        typedef TargetFile<StringT,TargetFileIdentifyingT> ThisT;
 
-        CTargetFile()
+        TargetFile()
             : m_useCout( false)
         {
         }
 
-        explicit CTargetFile( const StringT& filename, bool useCoutInstead = false, bool append = false)
+        explicit TargetFile( const StringT& filename, bool useCoutInstead = false, bool append = false)
             : m_useCout( useCoutInstead)
         {
             open( filename, useCoutInstead, append);
@@ -73,7 +73,7 @@ namespace code_creation_kit
         }
 
         ///write text to stream and check ok
-        CTargetFile<StringT,TargetFileIdentifyingT> operator << ( const StringT& text)
+        TargetFile<StringT,TargetFileIdentifyingT> operator << ( const StringT& text)
         {
             if ( !get() << text )
             {

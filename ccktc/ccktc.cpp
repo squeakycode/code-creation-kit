@@ -26,15 +26,15 @@ int process( int argc, char* argv[], bool& prompt, bool& logging)
     try
     {
         //create log file
-        CTargetFile<StringT, LogFileT> logFile;
+        TargetFile<StringT, LogFileT> logFile;
 
         //create generator
-        CGenerator<StringT, LogOutputStreamT> generatorImpl;
-        CErrorPrinter<StringT, CGenerator<StringT, LogOutputStreamT> > generator( generatorImpl);
+        Generator<StringT, LogOutputStreamT> generatorImpl;
+        ErrorPrinter<StringT, Generator<StringT, LogOutputStreamT> > generator( generatorImpl);
 
         //create generator statistic
-        CGeneratorStatistic<StringT> generatorStatisticImpl;
-        CErrorPrinter<StringT, CGeneratorStatistic<StringT> > generatorStatistic( generatorStatisticImpl);
+        GeneratorStatistic<StringT> generatorStatisticImpl;
+        ErrorPrinter<StringT, GeneratorStatistic<StringT> > generatorStatistic( generatorStatisticImpl);
 
         //execute command, which generator is used depends on the command
         CommandProcessor::processCommandLine( argc, argv, generator, generatorStatistic, logFile, &prompt, &logging);

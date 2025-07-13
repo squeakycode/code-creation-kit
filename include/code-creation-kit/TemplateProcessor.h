@@ -36,30 +36,30 @@ namespace code_creation_kit
     };
 
     ///sets up und operates the building blocks needed for processing a template to produce generated output
-    template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader, typename LogOutputStreamT = CNul >
-    class CTemplateProcessor
+    template <typename TableT, typename OutputStreamT, typename TemplateLoaderT = CNoTemplateLoader, typename LogOutputStreamT = NullDevice >
+    class TemplateProcessor
     {
-        typedef CTemplateProcessor<TableT, OutputStreamT, TemplateLoaderT, LogOutputStreamT> ThisT;
+        typedef TemplateProcessor<TableT, OutputStreamT, TemplateLoaderT, LogOutputStreamT> ThisT;
         typedef typename TableT::value_type::value_type StringT;
 
-        class BackEndTokenizer;
-        class ProcessingLevelControl;
-        typedef CLineCollector< StringT, BackEndTokenizer> LineCollectorT;
-        typedef CMacroProcessor<TableT, ProcessingLevelControl, LogOutputStreamT> ProcessorT;
-        typedef CToken<Tokens, StringT> TokenT;
-        typedef CTemplateProvidedTableLoader<StringT, LogOutputStreamT> TemplateProvidedTableLoaderT;
-        typedef CParser<ProcessorT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ParserT;
-        typedef CProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, ProcessorT, LineCollectorT, BackEndTokenizer, OutputStreamT, LogOutputStreamT> ProcessingLevelControlT;
-        typedef CTemplatePreprocessor<ProcessingLevelControl, ThisT, TemplateLoaderT, TokenT, StringT> PreprocessorT;
-        typedef CTokenizer<TokenT, StringT, PreprocessorT, OutputStreamT, LogOutputStreamT> TokenizerT;
-        typedef CBackEndTokenizer<TokenT, StringT, PreprocessorT, LogOutputStreamT> BackEndTokenizerT;
-        class BackEndTokenizer : public BackEndTokenizerT {};
-        class ProcessingLevelControl : public ProcessingLevelControlT {};
+        class BackEndTokenizerT;
+        class ProcessingLevelControlT;
+        typedef LineCollector< StringT, BackEndTokenizerT> LineCollectorT;
+        typedef MacroProcessor<TableT, ProcessingLevelControlT, LogOutputStreamT> ProcessorT;
+        typedef Token<Tokens, StringT> TokenT;
+        typedef TemplateProvidedTableLoader<StringT, LogOutputStreamT> TemplateProvidedTableLoaderT;
+        typedef Parser<ProcessorT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ParserT;
+        typedef ProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, ProcessorT, LineCollectorT, BackEndTokenizerT, OutputStreamT, LogOutputStreamT> ProcessingLevelControlIntermediateT;
+        typedef TemplatePreprocessor<ProcessingLevelControlT, ThisT, TemplateLoaderT, TokenT, StringT> PreprocessorT;
+        typedef Tokenizer<TokenT, StringT, PreprocessorT, OutputStreamT, LogOutputStreamT> TokenizerT;
+        typedef BackEndTokenizer<TokenT, StringT, PreprocessorT, LogOutputStreamT> BackEndTokenizerIntermediateT;
+        class BackEndTokenizerT : public BackEndTokenizerIntermediateT {};
+        class ProcessingLevelControlT : public ProcessingLevelControlIntermediateT {};
         typedef std::shared_ptr<const TableT> SharedConstTableT;
 
     public:
 
-        CTemplateProcessor()
+        TemplateProcessor()
         {
             //set default markup
             setDefaultMarkup();
@@ -147,7 +147,7 @@ namespace code_creation_kit
         }
 
         ///sets inline template processing parameters
-        void setInlineTemplateParameters( const CInlineTemplateParameters<StringT>& p)
+        void setInlineTemplateParameters( const InlineTemplateParameters<StringT>& p)
         {
             m_processingLevelControl.setInlineTemplateParameters( p.enabled, p.inlineGeneratedPostfix, p.inlinePad);
             m_tokenizer.setInlineTemplateMode( p.enabled);
@@ -188,7 +188,7 @@ namespace code_creation_kit
         ///return maximum number of recursion levels
         static int getMaxNumberOfRecursionLevels()
         {
-            return ProcessingLevelControl::getMaxNumberOfRecursionLevels();
+            return ProcessingLevelControlT::getMaxNumberOfRecursionLevels();
         }
 
         ///return maximum text size of macro
@@ -211,7 +211,7 @@ namespace code_creation_kit
         }
 
 
-        CPositionTracker getCsvPositionWithFailure()
+        PositionTracker getCsvPositionWithFailure()
         {
             return m_templateProvidedTableLoader.getCsvPositionWithFailure();
         }
@@ -225,8 +225,8 @@ namespace code_creation_kit
         }
 
         TokenizerT m_tokenizer; ///<splits input lines into tokens
-        BackEndTokenizer m_backEndTokenizer; ///<splits lines produced by a macro into tokens
-        ProcessingLevelControl m_processingLevelControl; ///<controls the level used for processing in spiral recursion
+        BackEndTokenizerT m_backEndTokenizer; ///<splits lines produced by a macro into tokens
+        ProcessingLevelControlT m_processingLevelControl; ///<controls the level used for processing in spiral recursion
         ProcessorT m_processor; ///<processes macro expressions
         PreprocessorT m_preprocessor; ///<preprocesses the input
         TemplateProvidedTableLoaderT m_templateProvidedTableLoader; ///<loader for tables provided by template keywords TABLE_BEGIN and TABLE_END

@@ -19,13 +19,13 @@ TEST_CASE( "TGeneratorStatistic", "[TGeneratorStatistic]")
     // standard
     {
         typedef std::string StringT;
-        CGeneratorStatistic<StringT> generator;
+        GeneratorStatistic<StringT> generator;
         double dummy = 0;
 
         generator.loadTable( "a", "LabelA", true, true, 1, 1, false);
         generator.loadTable( "a", "LabelB", true, true, 1, 1, false);
         generator.addIncludeDirectory("IncludeDirectory");
-        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>());
+        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, InlineTemplateParameters<StringT>());
 
         REQUIRE( generator.getTableFiles().size() == 1);
         REQUIRE( generator.getGeneratedFiles().size() == 1);
@@ -39,13 +39,13 @@ TEST_CASE( "TGeneratorStatistic", "[TGeneratorStatistic]")
     // inline
     {
         typedef std::string StringT;
-        CGeneratorStatistic<StringT> generator;
+        GeneratorStatistic<StringT> generator;
         double dummy = 0;
 
         generator.loadTable( "a", "LabelA", true, true, 1, 1, false);
         generator.loadTable( "a", "LabelB", true, true, 1, 1, false);
         generator.addIncludeDirectory("IncludeDirectory");
-        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, CInlineTemplateParameters<StringT>( true, "$$$", "", "&&&&", 0));
+        generator.generate( CCK_TEST_INPUT_FILE_PREFIX "test1Inline.tpl.txt", CCK_TEST_INPUT_FILE_PREFIX "out.txt", false, false, "dummy", false, dummy, false, InlineTemplateParameters<StringT>( true, "$$$", "", "&&&&", 0));
 
         REQUIRE( generator.getTableFiles().size() == 1);
         REQUIRE( generator.getGeneratedFiles().size() == 1);

@@ -7,12 +7,12 @@ namespace code_creation_kit
 {
     ///takes text snippets and produces linewise output
     template <typename StringT, typename OutputStreamT>
-    class CLineCollector
+    class LineCollector
     {
     public:
         typedef typename StringT::value_type CharT;
 
-        CLineCollector()
+        LineCollector()
             : m_outputStream(0)
         {
         }
@@ -31,7 +31,7 @@ namespace code_creation_kit
 
         ///collects text fragments and creates a linewise output from the fragments
         template <typename RangeT>
-        CLineCollector<StringT, OutputStreamT>& operator <<( const RangeT& text)
+        LineCollector<StringT, OutputStreamT>& operator <<( const RangeT& text)
         {
             for ( typename RangeT::const_iterator it = text.begin(); it != text.end(); ++it)
             {

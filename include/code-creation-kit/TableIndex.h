@@ -11,7 +11,7 @@ namespace code_creation_kit
 {
     ///creates an index of all columns with the same name
     template <typename TableT, typename IndexOutOfBoundsExceptionT>
-    class CTableIndex
+    class TableIndex
     {
     public:
         typedef typename TableT::value_type::value_type StringT;
@@ -19,7 +19,7 @@ namespace code_creation_kit
         typedef SizeT IndexT;
         typedef std::vector<IndexT> IndexVectorT;
 
-        CTableIndex()
+        TableIndex()
             : m_table(0)
             , m_headerIndex(0)
         {

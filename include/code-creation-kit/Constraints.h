@@ -288,7 +288,7 @@ namespace code_creation_kit
     };
 
     ///defines exceptions thrown by CRegexMatchesConstraint for template argument independent access
-    class CRegexMatchesConstraintExceptions
+    class RegexMatchesConstraintExceptions
     {
     public:
         class ExRegexSyntaxError : public std::runtime_error
@@ -296,7 +296,7 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CRegexMatchesConstraint : public CConstraintBase<StringT>, public CRegexMatchesConstraintExceptions
+    class CRegexMatchesConstraint : public CConstraintBase<StringT>, public RegexMatchesConstraintExceptions
     {
     public:
         typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;

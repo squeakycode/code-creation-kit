@@ -20,7 +20,7 @@ namespace code_creation_kit
     class CsvFileLoadedViaTemplateT;
 
     ///defines exceptions thrown by CTemplateProvidedTableMap for template argument independent access
-    class CTemplateProvidedTableLoaderExceptions
+    class TemplateProvidedTableLoaderExceptions
     {
     public:
         class ExUnexpectedTableProperty : public std::runtime_error
@@ -35,8 +35,8 @@ namespace code_creation_kit
     };
 
     ///stores table data provided by template keywords TABLE_BEGIN and TABLE_END
-    template <typename StringT, typename LogOutputStreamT = CNul >
-    class CTemplateProvidedTableLoader : public CTemplateProvidedTableLoaderExceptions
+    template <typename StringT, typename LogOutputStreamT = NullDevice >
+    class TemplateProvidedTableLoader : public TemplateProvidedTableLoaderExceptions
     {
     public:
         typedef typename StringT::value_type CharT;
@@ -71,14 +71,14 @@ namespace code_creation_kit
         };
         
 
-        CTemplateProvidedTableLoader()
+        TemplateProvidedTableLoader()
             : m_pLogOutputStream(nullptr)
             , m_lastRowNumberWithFailure(0)
         {
         }
 
 
-        ~CTemplateProvidedTableLoader() = default;
+        ~TemplateProvidedTableLoader() = default;
 
 
         ///connect log output stream
@@ -114,7 +114,7 @@ namespace code_creation_kit
             m_tableFileNameLoading = tableFileName;
 
             //open table file
-            CSourceFile<StringT, CsvFileLoadedViaTemplateT> file(tableFileName, false);
+            SourceFile<StringT, CsvFileLoadedViaTemplateT> file(tableFileName, false);
 
             //load the table
             TableData tableData = loadTableImpl(
@@ -223,7 +223,7 @@ namespace code_creation_kit
             }
 
             //check input data
-            CCsvParser::checkCharsUsedForCsvParsing<StringT>(CCsvParser::UsedCsvCharsCheck_All, csvDelimiterChars, csvQuoteChars, csvCommentChars);
+            CsvParser::checkCharsUsedForCsvParsing<StringT>(CsvParser::UsedCsvCharsCheck_All, csvDelimiterChars, csvQuoteChars, csvCommentChars);
 
             try
             {
@@ -231,11 +231,11 @@ namespace code_creation_kit
 
                 //create table and table builder
                 tableData.ptrTable = std::make_shared<TableT>();
-                typedef CVerticalTableBuilder<TableT> TableBuilderT;
+                typedef VerticalTableBuilder<TableT> TableBuilderT;
                 TableBuilderT tableBuidler(*tableData.ptrTable, padRows);
 
                 //parse the table file
-                CCsvParser::parse(inputStream, tableBuidler, csvDelimiterChars, csvQuoteChars, csvCommentChars, m_positionTracker);
+                CsvParser::parse(inputStream, tableBuidler, csvDelimiterChars, csvQuoteChars, csvCommentChars, m_positionTracker);
             }
             catch (...)
             {
@@ -269,7 +269,7 @@ namespace code_creation_kit
         }
 
 
-        [[nodiscard]] CPositionTracker getCsvPositionWithFailure() const
+        [[nodiscard]] PositionTracker getCsvPositionWithFailure() const
         {
             return m_positionTracker;
         }
@@ -277,7 +277,7 @@ namespace code_creation_kit
     private:
         LogOutputStreamT* m_pLogOutputStream; ///< used for logging purposes; NULL if not logging
         size_t m_lastRowNumberWithFailure;
-        CPositionTracker m_positionTracker; ///<used by csv parser
+        PositionTracker m_positionTracker; ///<used by csv parser
         StringT m_tableFileNameLoading;
     };
 }

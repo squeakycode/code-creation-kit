@@ -12,8 +12,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CVerticalTableBuilder for template argument independent access
-    class CVerticalTableBuilderExceptions
+    ///defines exceptions thrown by VerticalTableBuilder for template argument independent access
+    class VerticalTableBuilderExceptions
     {
     public:
         class ExOverflow : public std::overflow_error 
@@ -25,13 +25,13 @@ namespace code_creation_kit
 
     ///Supports adding table items to a container and checks for over- and underflows
     template <typename VerticalContainerT>
-    class CVerticalTableBuilder : public CVerticalTableBuilderExceptions
+    class VerticalTableBuilder : public VerticalTableBuilderExceptions
     {
     public:
         typedef typename VerticalContainerT::value_type::value_type StringT;
         typedef typename VerticalContainerT::value_type ColumnT;
 
-        CVerticalTableBuilder( VerticalContainerT& container, bool pad = false) 
+        VerticalTableBuilder( VerticalContainerT& container, bool pad = false) 
             : m_container( container)
             , m_pad(pad)
             , m_currentRowIndex(0)

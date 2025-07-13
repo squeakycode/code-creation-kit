@@ -67,7 +67,7 @@ public:
         bool append,
         const ParameterListT& parameters,
         bool canChangeTableList,
-        const CInlineTemplateParameters<StringT>& inlineTemplateParameters
+        const InlineTemplateParameters<StringT>& inlineTemplateParameters
         )
     {
         CHECK( m_generate);
@@ -160,7 +160,7 @@ public:
     unsigned int m_columnHeaderIndex;
     bool m_padRows;
 
-    CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
+    InlineTemplateParameters<StringT> m_inlineTemplateParameters;
 
     bool m_append;
     bool m_logStream;
@@ -267,7 +267,7 @@ private:
 template <typename StringT, typename ContainerT, typename GeneratorT> 
 void process( ContainerT& container, GeneratorT& generator)
 {
-    CTargetFile<StringT, LogFileT> logFile;
+    TargetFile<StringT, LogFileT> logFile;
 
     std::list<StringT> argsString;
     std::vector<typename StringT::value_type*> args;
@@ -473,7 +473,7 @@ void runTest()
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
         generator.m_recycle = true;
-        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
+        generator.m_inlineTemplateParameters = InlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args = { "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y" };
         process<StringT>( args, generator);
     }

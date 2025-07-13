@@ -6,7 +6,7 @@
 namespace code_creation_kit
 {
     ///tracks the current position in a text file
-    class CPositionTracker
+    class PositionTracker
     {
     public:
         unsigned int getColumn() const

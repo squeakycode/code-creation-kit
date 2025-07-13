@@ -6,10 +6,10 @@
 namespace code_creation_kit
 {
     ///Null device.
-    class CNul
+    class NullDevice
     {
     public:
         template <typename T>
-        CNul& operator<<( const T&) { return *this; }
+        NullDevice& operator<<( const T&) { return *this; }
     };
 }

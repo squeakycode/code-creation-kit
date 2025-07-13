@@ -10,14 +10,14 @@ namespace code_creation_kit
 {
     ///represents the macro tree structure
     template <typename StringT>
-    class CMacroExpression
+    class MacroExpression
     {
     public:
         typedef std::size_t SizeT;
         typedef SizeT IndexT;
-        typedef std::list<CMacroExpression> SubExpressionListT;
+        typedef std::list<MacroExpression> SubExpressionListT;
 
-        CMacroExpression() 
+        MacroExpression() 
             : m_ored(false)
             , m_substitution(false)
             , m_index(0)
@@ -54,7 +54,7 @@ namespace code_creation_kit
         template <typename IteratorT>
         void add( IteratorT start, IteratorT end)
         {
-            CMacroExpression<StringT> temp;
+            MacroExpression<StringT> temp;
             temp.m_macroExpression = StringT( start, end);
             attach( temp);
         }
@@ -62,14 +62,14 @@ namespace code_creation_kit
         ///adds a substitution to the tree
         void add( IndexT index) 
         {
-            CMacroExpression<StringT> temp;
+            MacroExpression<StringT> temp;
             temp.m_index = index;
             temp.m_substitution = true;
             attach( temp);
         }
 
         ///adds a node to the tree, may use swap thus returning an empty node
-        void attach( CMacroExpression<StringT>& subExpression)
+        void attach( MacroExpression<StringT>& subExpression)
         {   
             //do not add empty nodes as they have no effect
             if ( subExpression.isEmpty())
@@ -108,7 +108,7 @@ namespace code_creation_kit
                 {
                     //turn into list node
                     pushThisALevelDown(); 
-                    m_subExpressions.push_back( CMacroExpression<StringT>());
+                    m_subExpressions.push_back( MacroExpression<StringT>());
                 }
                 return;
             }
@@ -119,7 +119,7 @@ namespace code_creation_kit
                 pushThisALevelDown();
             }
 
-            m_subExpressions.push_back( CMacroExpression<StringT>());
+            m_subExpressions.push_back( MacroExpression<StringT>());
             m_subExpressions.back().swap( subExpression);
         }
 
@@ -132,11 +132,11 @@ namespace code_creation_kit
                 m_ored = true;
             }
             //add expression for adding following expressions
-            m_subExpressions.push_back( CMacroExpression<StringT>());
+            m_subExpressions.push_back( MacroExpression<StringT>());
         }
 
         ///swap implementation
-        void swap( CMacroExpression<StringT>& rhs)
+        void swap( MacroExpression<StringT>& rhs)
         {
             m_subExpressions.swap( rhs.m_subExpressions);
             m_macroExpression.swap( rhs.m_macroExpression);
@@ -149,9 +149,9 @@ namespace code_creation_kit
         ///creates a new parent node containing this as child by using swap 
         void pushThisALevelDown()
         {
-            CMacroExpression<StringT> temp;
+            MacroExpression<StringT> temp;
             temp.swap( *this);
-            m_subExpressions.push_back( CMacroExpression<StringT>());
+            m_subExpressions.push_back( MacroExpression<StringT>());
             m_subExpressions.back().swap( temp);
         }
 

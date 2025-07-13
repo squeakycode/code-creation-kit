@@ -7,15 +7,15 @@ namespace code_creation_kit
 {
     /// paramters for inline template processing
     template <typename StringT>
-    struct CInlineTemplateParameters
+    struct InlineTemplateParameters
     {
-        CInlineTemplateParameters()
+        InlineTemplateParameters()
             : enabled(false)
             , inlinePad( 0)
         {
         }
 
-        CInlineTemplateParameters( bool enable, StringT prefix, StringT postfix, StringT generatedPostfix, size_t numInlinePad)
+        InlineTemplateParameters( bool enable, StringT prefix, StringT postfix, StringT generatedPostfix, size_t numInlinePad)
             : enabled( enable)
             , inlinePrefix( prefix)
             , inlinePostfix( postfix)
@@ -24,7 +24,7 @@ namespace code_creation_kit
         {
         }
 
-        bool operator== ( const CInlineTemplateParameters<StringT>& rhs)
+        bool operator== ( const InlineTemplateParameters<StringT>& rhs)
         {
             if ( enabled != rhs.enabled) return false;
             if ( inlinePrefix != rhs.inlinePrefix) return false;

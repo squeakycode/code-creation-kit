@@ -31,13 +31,13 @@ namespace code_creation_kit
 #endif
 
     template <typename StringT, typename GeneratorT>
-    class CErrorPrinter
+    class ErrorPrinter
     {
     public:
-        typedef CSimpleFormat<StringT> FormatT;
+        typedef SimpleFormat<StringT> FormatT;
         typedef typename StringT::value_type CharT; 
 
-        CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
+        ErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
         template <typename ParameterListT>
         void generate(
@@ -49,7 +49,7 @@ namespace code_creation_kit
             bool append,
             const ParameterListT& parameters,
             bool canChangeTableList = false,
-            const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+            const InlineTemplateParameters<StringT>& inlineTemplateParameters = InlineTemplateParameters<StringT>()
         )
         {
             try
@@ -65,7 +65,7 @@ namespace code_creation_kit
                     canChangeTableList,
                     inlineTemplateParameters);
             }
-            catch( CSourceFileExceptions<TemplateFileT>::ExCannotOpenFile& e)
+            catch( SourceFileExceptions<TemplateFileT>::ExCannotOpenFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1060: Cannot open template file: %1%\n"));
@@ -73,7 +73,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CSourceFileExceptions<TemplateFileT>::ExCannotReadFile& e)
+            catch( SourceFileExceptions<TemplateFileT>::ExCannotReadFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1061: An error occured reading template file: %1%\n"));
@@ -81,7 +81,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTargetFileExceptions<GeneratedFileT>::ExCannotOpenFile& e)
+            catch( TargetFileExceptions<GeneratedFileT>::ExCannotOpenFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1070: Cannot open target file: %1%\n"));
@@ -89,7 +89,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTargetFileExceptions<GeneratedFileT>::ExCannotWriteToFile& e)
+            catch( TargetFileExceptions<GeneratedFileT>::ExCannotWriteToFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1071: An error occured writing to target file: %1%\n"));
@@ -97,7 +97,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTargetFileExceptions<IntermediateFileT>::ExCannotOpenFile& e)
+            catch( TargetFileExceptions<IntermediateFileT>::ExCannotOpenFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1080: Cannot open intermediate file: %1%\n"));
@@ -105,7 +105,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTargetFileExceptions<IntermediateFileT>::ExCannotWriteToFile& e)
+            catch( TargetFileExceptions<IntermediateFileT>::ExCannotWriteToFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1081: An error occured writing to intermediate file: %1%\n"));
@@ -121,7 +121,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CGeneratorExceptions::ExFailedToDeleteTempFile& e)
+            catch( GeneratorExceptions::ExFailedToDeleteTempFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1100: Failed to delete intermediate output file: %1%\n"));
@@ -129,7 +129,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CGeneratorExceptions::ExFailedToDeleteOldTargetFile& e)
+            catch( GeneratorExceptions::ExFailedToDeleteOldTargetFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1101: Failed to delete old version of target file '%1%' for replacement with intermediate file.\n"));
@@ -137,7 +137,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CGeneratorExceptions::ExCannotMoveIntermediateFile& e)
+            catch( GeneratorExceptions::ExCannotMoveIntermediateFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1102: Failed to move intermediate file '%1%' to target file '%2%'\n"));
@@ -185,7 +185,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CProcessingLevelControlExceptions::ExPossibleInfiniteLoop& e)
+            catch( ProcessingLevelControlExceptions::ExPossibleInfiniteLoop& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1250: Recursion exceeded the maximum of %3% levels while expanding macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -193,7 +193,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit& e)
+            catch( ProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1251: The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -201,7 +201,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplateLoaderExceptions::ExCyclicInclusion& e)
+            catch( TemplateLoaderExceptions::ExCyclicInclusion& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1300: Cyclic inclusion detected.\n"));
@@ -217,7 +217,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CRegexMatchesConstraintExceptions::ExRegexSyntaxError& e)
+            catch( RegexMatchesConstraintExceptions::ExRegexSyntaxError& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -225,7 +225,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CRegexReplaceConversionExceptions::ExRegexSyntaxError& e)
+            catch( RegexReplaceConversionExceptions::ExRegexSyntaxError& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1500: Syntax error in regular expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -233,7 +233,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCalcConversionExceptions::ExDivisionByZero& e)
+            catch( CalcConversionExceptions::ExDivisionByZero& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1510: Division by zero. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -241,7 +241,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCalcConversionExceptions::ExArithmeticExpressionSyntaxError& e)
+            catch( CalcConversionExceptions::ExArithmeticExpressionSyntaxError& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1511: Syntax error in arithmetic expression. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -249,7 +249,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplatePreprocessorExceptions::ExPrefixLeadingWhiteSpace& e)
+            catch( TemplatePreprocessorExceptions::ExPrefixLeadingWhiteSpace& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1602: Leading white space for markup prefix is not allowed.\n"));
@@ -257,7 +257,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplatePreprocessorExceptions::ExPostfixTrailingWhiteSpace& e)
+            catch( TemplatePreprocessorExceptions::ExPostfixTrailingWhiteSpace& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1603: Trailing white space for markup postfix is not allowed.\n"));
@@ -265,7 +265,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplatePreprocessorExceptions::ExBadlyPlacedTrim& e)
+            catch( TemplatePreprocessorExceptions::ExBadlyPlacedTrim& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1604: Trim directives are expected at the end of a line. Trailing whitespace is allowed.\n"));
@@ -273,7 +273,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplatePreprocessorExceptions::ExBadlyPlacedComment& e)
+            catch( TemplatePreprocessorExceptions::ExBadlyPlacedComment& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1605: COMMENT is expected at the beginning of a line. Leading whitespace is allowed.\n"));
@@ -281,7 +281,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingBlockBegin& e)
+            catch( ParserExceptions::ExMissingBlockBegin& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1801: Missing begin block marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -289,7 +289,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingMacroBegin& e)
+            catch( ParserExceptions::ExMissingMacroBegin& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1802: Missing begin macro marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -297,7 +297,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingBlockEnd& e)
+            catch( ParserExceptions::ExMissingBlockEnd& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1803: Missing block end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -305,7 +305,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingMacroEnd& e)
+            catch( ParserExceptions::ExMissingMacroEnd& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1804: Missing macro end marker. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -313,7 +313,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExUnexpectedKeyword& e)
+            catch( ParserExceptions::ExUnexpectedKeyword& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1810: Syntax error. Unexpected keyword found. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -321,7 +321,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExUnexpectedEndOfMacro& e)
+            catch( ParserExceptions::ExUnexpectedEndOfMacro& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1805: Unexpected end of macro. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -329,7 +329,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExDirectiveAlreadyApplied& e)
+            catch( ParserExceptions::ExDirectiveAlreadyApplied& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1820: Directive has been applied already. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -337,7 +337,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExConstraintExpectedAfterNot& e)
+            catch( ParserExceptions::ExConstraintExpectedAfterNot& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1821: Constraint following not expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -345,7 +345,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExSubstitutionExpectedAfterIf& e)
+            catch( ParserExceptions::ExSubstitutionExpectedAfterIf& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1822: Substitution following if expected. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -353,7 +353,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExCannotApplyDirectiveToSubstitution& e)
+            catch( ParserExceptions::ExCannotApplyDirectiveToSubstitution& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1823: Directive cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -361,7 +361,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExCannotApplyDirectiveToConstraint& e)
+            catch( ParserExceptions::ExCannotApplyDirectiveToConstraint& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1824: Directive cannot be applied to this constraint. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -369,7 +369,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExCannotApplyDirectiveToConversion& e)
+            catch( ParserExceptions::ExCannotApplyDirectiveToConversion& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1825: Directive cannot be applied to this conversion. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -377,7 +377,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExCannotApplyConstraintToSubstitution& e)
+            catch( ParserExceptions::ExCannotApplyConstraintToSubstitution& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1826: Constraint cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -385,7 +385,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExCannotApplyConversionToSubstitution& e)
+            catch( ParserExceptions::ExCannotApplyConversionToSubstitution& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1827: Conversion cannot be applied to this substitution. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -393,7 +393,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExSubstitutionParsingBadOrder& e)
+            catch( ParserExceptions::ExSubstitutionParsingBadOrder& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1828: Extensions fo a substitution are expected in the order directives, constraints, conversions. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -401,7 +401,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExSubstitutionRequiresIf& e)
+            catch( ParserExceptions::ExSubstitutionRequiresIf& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1829: Substitution requires if. The line number shown corresponds to the last read line. This may not be the line causing the error for multi line macros.\n"));
@@ -409,7 +409,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMacroTooLarge& e)
+            catch( ParserExceptions::ExMacroTooLarge& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1830: The macro exceeds the maximum allowed size of %3% kb. This error can be caused by a too large text line or by a missing macro end marker. The text compiler is not designed to handle very large text lines efficiently.\n"));
@@ -417,7 +417,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExPartBlocksCannotBeNested& e)
+            catch( ParserExceptions::ExPartBlocksCannotBeNested& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1840: Part blocks cannot be nested.\n"));
@@ -425,7 +425,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingPartBegin& e)
+            catch( ParserExceptions::ExMissingPartBegin& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1841: Missing begin part marker.\n"));
@@ -433,7 +433,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingPartEnd& e)
+            catch( ParserExceptions::ExMissingPartEnd& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1842: Missing part end marker.\n"));
@@ -441,7 +441,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExPartAlreadyDefined& e)
+            catch( ParserExceptions::ExPartAlreadyDefined& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1843: Part already defined. Cannot add a second part with the same label.\n"));
@@ -449,7 +449,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExPartNotDefined& e)
+            catch( ParserExceptions::ExPartNotDefined& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1844: Part not defined. Cannot expand part.\n"));
@@ -457,7 +457,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExPossibleInfiniteLoop& e)
+            catch( ParserExceptions::ExPossibleInfiniteLoop& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1845: Recursion exceeded the maximum of allowed levels while expanding part.\n"));
@@ -465,7 +465,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty& e)
+            catch( TemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1860: Unexpected table property found for template-provided table.\n"));
@@ -473,7 +473,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingTableBegin& e)
+            catch( ParserExceptions::ExMissingTableBegin& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1861: Missing begin table marker.\n"));
@@ -481,7 +481,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExMissingTableEnd& e)
+            catch( ParserExceptions::ExMissingTableEnd& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1862: Missing table end marker.\n"));
@@ -489,7 +489,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroProcessorExceptions::ExCannotChangeTableList& e)
+            catch( MacroProcessorExceptions::ExCannotChangeTableList& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1863: Changing the table list permanently is disabled. Only temporary tables can be added or removed.\n"));
@@ -497,7 +497,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CTemplateProvidedTableLoaderExceptions::ExTableLoadFileNameMustNotBeEmpty& e)
+            catch( TemplateProvidedTableLoaderExceptions::ExTableLoadFileNameMustNotBeEmpty& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1864: Table filename must not be empty.\n"));
@@ -505,7 +505,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CParserExceptions::ExUnexpectedPartPadding& e)
+            catch( ParserExceptions::ExUnexpectedPartPadding& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1865: The part padding directives can only be used inside a part block.\n"));
@@ -513,7 +513,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CToSizeConversionExceptions::ExUnexpectedToSizeProperty& e)
+            catch( ToSizeConversionExceptions::ExUnexpectedToSizeProperty& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1880: Unexpected property found for to size conversion.\n"));
@@ -521,7 +521,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExBadDelimiter& e)
+            catch( CsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1001: Provided character cannot be used as delimiting character. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
@@ -529,7 +529,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExRequireDelimitingChar& e)
+            catch( CsvParser::ExRequireDelimitingChar& e)
             {
                 (void) e; //unused
                 if (!getTableLoadFileNameWithFailure().empty())
@@ -546,7 +546,7 @@ namespace code_creation_kit
                 }
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExUnexpectedQuote& e)
+            catch( CsvParser::ExUnexpectedQuote& e)
             {
                 (void) e; //unused
                 if (!getTableLoadFileNameWithFailure().empty())
@@ -563,7 +563,7 @@ namespace code_creation_kit
                 }
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExStreamBad& e)
+            catch( CsvParser::ExStreamBad& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1004: An error occured reading table.\n"));
@@ -571,7 +571,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CSourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotOpenFile& e)
+            catch( SourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotOpenFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1010: Cannot open table file: %1%\n"));
@@ -579,7 +579,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CSourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotReadFile& e)
+            catch( SourceFileExceptions<CsvFileLoadedViaTemplateT>::ExCannotReadFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1011: An error occured reading table file: %1%\n"));
@@ -587,7 +587,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CVerticalTableBuilderExceptions::ExUnderflow& e)
+            catch( VerticalTableBuilderExceptions::ExUnderflow& e)
             {
                 (void) e; //unused
                 if (!getTableLoadFileNameWithFailure().empty())
@@ -604,7 +604,7 @@ namespace code_creation_kit
                 }
                 throw CErrorPrinted();
             }
-            catch( CVerticalTableBuilderExceptions::ExOverflow& e)
+            catch( VerticalTableBuilderExceptions::ExOverflow& e)
             {
                 (void) e; //unused
                 if (!getTableLoadFileNameWithFailure().empty())
@@ -621,7 +621,7 @@ namespace code_creation_kit
                 }
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExBadCommentChars& e)
+            catch( CsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1030: The CSV comment char list contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
@@ -629,7 +629,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExBadQuoteChars& e)
+            catch( CsvParser::ExBadQuoteChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1031: The CSV quote char list contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters. The line number shown corresponds to the last read line. This may not be the line causing the error.\n"));
@@ -637,7 +637,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
+            catch( MacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1053: Table label already defined. Cannot add a second table with the same label.\n"));
@@ -645,7 +645,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
+            catch( MacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1900: Error tag triggered: %3%\n"));
@@ -667,7 +667,7 @@ namespace code_creation_kit
             {
                 m_generator.setCsvDelimiterChars(csvDelimiterChars);
             }
-            catch( CCsvParser::ExBadDelimiter& e)
+            catch( CsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
@@ -684,7 +684,7 @@ namespace code_creation_kit
             {
                 m_generator.setCsvCommentChars( csvCommentChars);
             }
-            catch( CCsvParser::ExBadCommentChars& e)
+            catch( CsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
@@ -700,7 +700,7 @@ namespace code_creation_kit
             {
                 m_generator.setCsvQuoteChars(csvQuoteChars);
             }
-                 catch( CCsvParser::ExBadQuoteChars& e)
+                 catch( CsvParser::ExBadQuoteChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
@@ -716,7 +716,7 @@ namespace code_creation_kit
             {
                 m_generator.loadTable( tableFileName, label, topDown, leftToRight, rowHeaderIndex, columnHeaderIndex, padRows);
             }
-            catch( CCsvParser::ExBadDelimiter& e)
+            catch( CsvParser::ExBadDelimiter& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1001: '%1%' cannot be used as delimiting characters.\n"));
@@ -724,7 +724,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExRequireDelimitingChar& e)
+            catch( CsvParser::ExRequireDelimitingChar& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1002: New line or delimiter at the end of item in quotes is expected.\n"));
@@ -732,7 +732,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExUnexpectedQuote& e)
+            catch( CsvParser::ExUnexpectedQuote& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1003: Unexpected quote.\n"));
@@ -740,7 +740,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExStreamBad& e)
+            catch( CsvParser::ExStreamBad& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1004: An error occured reading table file: %1%\n"));
@@ -748,7 +748,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CSourceFileExceptions<CsvFileT>::ExCannotOpenFile& e)
+            catch( SourceFileExceptions<CsvFileT>::ExCannotOpenFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1010: Cannot open table file: %1%\n"));
@@ -756,7 +756,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CSourceFileExceptions<CsvFileT>::ExCannotReadFile& e)
+            catch( SourceFileExceptions<CsvFileT>::ExCannotReadFile& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1011: An error occured reading table file: %1%\n"));
@@ -764,7 +764,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CVerticalTableBuilderExceptions::ExUnderflow& e)
+            catch( VerticalTableBuilderExceptions::ExUnderflow& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1020: Table row %4% contains less items than first row.\n"));
@@ -772,7 +772,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CVerticalTableBuilderExceptions::ExOverflow& e)
+            catch( VerticalTableBuilderExceptions::ExOverflow& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL("%1%(%2%,%3%) : " CODE_CREATION_KIT_ERROR_TAG1 " TC1021: Table row %4% contains more items than first row.\n"));
@@ -780,7 +780,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExBadCommentChars& e)
+            catch( CsvParser::ExBadCommentChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1030: The CSV comment char list '%1%' contains characters that cannot be used for commenting lines, e.g. quote or the delimiter characters.\n"));
@@ -788,7 +788,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CCsvParser::ExBadQuoteChars& e)
+            catch( CsvParser::ExBadQuoteChars& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1031: The CSV quote char list '%1%' contains characters that cannot be used for putting text items in quotes, e.g. comment or the delimiter characters.\n"));
@@ -796,7 +796,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds& e)
+            catch( MacroProcessorExceptions::ExRowHeaderIndexOutOfBounds& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1051: Row header index %1% exceeds the bounds of the table.\n"));
@@ -804,7 +804,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds& e)
+            catch( MacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1052: Column header index  %1% exceeds the bounds of the table.\n"));
@@ -812,7 +812,7 @@ namespace code_creation_kit
                 toErrorStream( formatter.str());
                 throw CErrorPrinted();
             }
-            catch( CMacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
+            catch( MacroProcessorExceptions::ExTableLabelAlreadyDefined& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1053: Table label '%1%' already defined. Cannot add a second table with the same label.\n"));
@@ -828,7 +828,7 @@ namespace code_creation_kit
             {
                 m_generator.unloadTable( label);
             }
-            catch( CMacroProcessorExceptions::ExTableNotFound& e)
+            catch( MacroProcessorExceptions::ExTableNotFound& e)
             {
                 (void) e; //unused
                 FormatT formatter(STRING_LITERAL(" " CODE_CREATION_KIT_ERROR_TAG2 " TC1701: A table entry with the provided label '%1%' does not exist.\n"));

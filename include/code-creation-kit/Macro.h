@@ -11,11 +11,11 @@ namespace code_creation_kit
 {
     ///data structure representing a macro, created from parsed macro
     template <typename StringT>
-    class CMacro
+    class Macro
     {
     public:
-        typedef CMacroExpression<StringT> MacroExpressionT;
-        typedef CSubstitution<StringT> SubstitutionT;
+        typedef MacroExpression<StringT> MacroExpressionT;
+        typedef Substitution<StringT> SubstitutionT;
         typedef std::vector<SubstitutionT> SubstitutionVectorT;
         typedef std::size_t SizeT;
         typedef SizeT IndexT;

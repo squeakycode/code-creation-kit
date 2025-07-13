@@ -7,8 +7,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CProcessingLevelControlExceptions for template argument independent access
-    class CProcessingLevelControlExceptions
+    ///defines exceptions thrown by ProcessingLevelControlExceptions for template argument independent access
+    class ProcessingLevelControlExceptions
     {
     public:
         class ExPossibleInfiniteLoop : public std::runtime_error
@@ -19,8 +19,8 @@ namespace code_creation_kit
     };
 
 
-    template <typename ParserT, typename TemplateProvidedTableLoaderT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = CNul >
-    class CProcessingLevelControl : public CProcessingLevelControlExceptions
+    template <typename ParserT, typename TemplateProvidedTableLoaderT, typename MacroProcessorT, typename LineCollectorT, typename OutputStreamT, typename FinalOutputStreamT, typename LogOutputStreamT = NullDevice >
+    class ProcessingLevelControl : public ProcessingLevelControlExceptions
     {
         ///represents a processing stage in the processing spiral
         ///holds the processing blocks having a state
@@ -46,12 +46,12 @@ namespace code_creation_kit
         };
 
     public:
-        typedef CProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
+        typedef ProcessingLevelControl<ParserT, TemplateProvidedTableLoaderT, MacroProcessorT, LineCollectorT, OutputStreamT, FinalOutputStreamT, LogOutputStreamT> ThisT;
         typedef typename ParserT::ParserTokenT TokenT;
         typedef typename ParserT::ParserStringT StringT;
         typedef typename StringT::value_type CharT;
 
-        CProcessingLevelControl()
+        ProcessingLevelControl()
             : m_level( m_levelBlocks)
             , m_levelLimit( m_levelBlocks + m_cMaxNumLevel)
             , m_finalOutputStream(0)

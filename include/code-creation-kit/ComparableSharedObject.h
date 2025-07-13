@@ -9,24 +9,24 @@ namespace code_creation_kit
 {
     ///allows to compare objects held by shared_ptr
     template <typename T>
-    class CComparableSharedObject
+    class ComparableSharedObject
     {
     public:
-        CComparableSharedObject()
+        ComparableSharedObject()
         {
         }
 
-        CComparableSharedObject( T* ptr)
+        ComparableSharedObject( T* ptr)
             : m_ptr( ptr)
         {
         }
 
-        CComparableSharedObject( std::shared_ptr<T> ptr)
+        ComparableSharedObject( std::shared_ptr<T> ptr)
             : m_ptr( ptr)
         {
         }
 
-        bool operator == ( const CComparableSharedObject<T>& rhs) const
+        bool operator == ( const ComparableSharedObject<T>& rhs) const
         {
             if ( (bool) m_ptr == (bool) rhs.m_ptr)
             {
@@ -40,7 +40,7 @@ namespace code_creation_kit
             return false;
         }
 
-        bool operator != ( const CComparableSharedObject<T>& rhs) const
+        bool operator != ( const ComparableSharedObject<T>& rhs) const
         {
             return !(*this == rhs);
         }

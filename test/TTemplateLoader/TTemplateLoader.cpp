@@ -20,14 +20,14 @@ using namespace code_creation_kit;
 class TestHelper
 {
 public:
-    TestHelper( CTemplateLoader<TestHelper, std::string>& loader): m_loader( loader) {}
+    TestHelper( TemplateLoader<TestHelper, std::string>& loader): m_loader( loader) {}
     template <typename T>
     void operator << (const T& text)
     {
         m_loader.loadTemplateFile( text);
     }
 
-    CTemplateLoader<TestHelper, std::string>& m_loader;
+    TemplateLoader<TestHelper, std::string>& m_loader;
 };
 
 #ifdef _MSC_VER
@@ -41,7 +41,7 @@ TEST_CASE( "TTemplateLoader", "[TTemplateLoader]")
 
     typedef std::string StringT;
     {
-        CTemplateLoader<std::stringstream, StringT> loader;
+        TemplateLoader<std::stringstream, StringT> loader;
 
         //check result of loading last line with new line
         {
@@ -77,11 +77,11 @@ TEST_CASE( "TTemplateLoader", "[TTemplateLoader]")
 
     //check trigger loading another file by output processing, ends in cyclic inclusion error
     {
-        typedef CTemplateLoader<TestHelper, StringT> LoaderT;
-        CTemplateLoader<TestHelper, StringT> loader;
+        typedef TemplateLoader<TestHelper, StringT> LoaderT;
+        TemplateLoader<TestHelper, StringT> loader;
         TestHelper helper( loader);
         loader.connectOutputStream( &helper);
-        CHECK_THROWS_AS( loader.loadTemplateFile( CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);
+        CHECK_THROWS_AS( loader.loadTemplateFile( CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt"), TemplateLoaderExceptions::ExCyclicInclusion);
         REQUIRE( loader.getInclusionHierarchy().size() == 3 );
         std::string expected[] = {CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest4.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest5.txt"};
 

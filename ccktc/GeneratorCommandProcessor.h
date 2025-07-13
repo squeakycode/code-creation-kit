@@ -68,7 +68,7 @@ namespace code_creation_kit
                 || command == ParserT::eGenerateUsingIntermediateFile
                 || command == ParserT::eProcessInlineTemplateFile)
             {
-                CInlineTemplateParameters<StringT> inlineTemplateParameters;
+                InlineTemplateParameters<StringT> inlineTemplateParameters;
                 StringT outputFileName( m_parser.getOutputFile());
                 bool useIntermediateFile = m_parser.getUseIntermediateOutputFile();
 

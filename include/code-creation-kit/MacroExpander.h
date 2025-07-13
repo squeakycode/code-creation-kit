@@ -13,8 +13,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CMacroExpander for template argument independent access
-    class CMacroExpanderExceptions
+    ///defines exceptions thrown by MacroExpander for template argument independent access
+    class MacroExpanderExceptions
     {
     public:
         template <typename StringT>
@@ -37,10 +37,10 @@ namespace code_creation_kit
 
     ///uses the macro data structure, a table index and a table index to create the expanded macro
     template <typename MacroT, typename TableIndexT, typename TableT>
-    class CMacroExpander : public CMacroExpanderExceptions
+    class MacroExpander : public MacroExpanderExceptions
     {
     public:
-        typedef CMacroExpander<MacroT,TableIndexT,TableT> MacroExpanderT;
+        typedef MacroExpander<MacroT,TableIndexT,TableT> MacroExpanderT;
         typedef typename TableT::value_type::value_type StringT;
         typedef typename MacroT::IndexT IndexT;
         typedef typename MacroT::MacroExpressionT MacroExpressionT;
@@ -49,7 +49,7 @@ namespace code_creation_kit
         typedef void (*ConversionFunctionT) ( typename MacroT::SubstitutionT&, const StringT&, StringT&);
 
 
-        CMacroExpander( const MacroT& macro, const TableT& dummy)
+        MacroExpander( const MacroT& macro, const TableT& dummy)
             : m_macro(macro)
             , m_table(dummy) //will not be touched as the list of indices is empty
         {
@@ -58,7 +58,7 @@ namespace code_creation_kit
             m_substitutions.resize( macro.getSubstitutions().size());
         }
 
-        CMacroExpander( const TableIndexT& tableIndex, const MacroT& macro, const TableT& table, bool topDown)
+        MacroExpander( const TableIndexT& tableIndex, const MacroT& macro, const TableT& table, bool topDown)
             : m_macro(macro)
             , m_table(table)
         {

@@ -11,8 +11,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CParser for template argument independent access
-    class CParserExceptions
+    ///defines exceptions thrown by Parser for template argument independent access
+    class ParserExceptions
     {
     public:
         class ExMissingBlockBegin : public std::runtime_error
@@ -151,12 +151,12 @@ namespace code_creation_kit
 
 namespace code_creation_kit
 {
-    template <typename OutputStreamT, typename TemplateProvidedTableLoaderT, typename TokenT, typename StringT, typename LogOutputStreamT = CNul >
-    class CParser : public CParserExceptions
+    template <typename OutputStreamT, typename TemplateProvidedTableLoaderT, typename TokenT, typename StringT, typename LogOutputStreamT = NullDevice >
+    class Parser : public ParserExceptions
     {
     public:
-        typedef CParser<OutputStreamT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ThisT;
-        typedef CMacro<StringT> MacroT;
+        typedef Parser<OutputStreamT, TemplateProvidedTableLoaderT, TokenT, StringT, LogOutputStreamT> ThisT;
+        typedef Macro<StringT> MacroT;
         typedef std::vector<TokenT> StackT;
         typedef typename StackT::const_iterator PosT;
         typedef typename MacroT::MacroExpressionT MacroExpressionT;
@@ -168,7 +168,7 @@ namespace code_creation_kit
         typedef std::map<StringT, SharedStackT> PartMapT;
 
 
-        CParser()
+        Parser()
             : m_pOutputStream(nullptr)
             , m_currentMacroTextSize(0)
             , m_level(0)

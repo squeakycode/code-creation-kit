@@ -18,8 +18,8 @@ TEST_CASE( "TErrorPrinter", "[TErrorPrinter]")
     typedef std::string StringT;
     typedef std::vector<StringT> ParameterListT;
 
-    CGenerator<StringT> generatorImpl;
-    CErrorPrinter<StringT, CGenerator<StringT> > generator( generatorImpl);
+    Generator<StringT> generatorImpl;
+    ErrorPrinter<StringT, Generator<StringT> > generator( generatorImpl);
 
     //bad comment chars
     CHECK_THROWS_AS( generator.setCsvCommentChars( "\""), CErrorPrinted);

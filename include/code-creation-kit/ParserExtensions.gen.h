@@ -308,7 +308,7 @@ namespace code_creation_kit
         {
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::ExCannotApplyDirectiveToConstraint();
+                throw ParserExceptions::ExCannotApplyDirectiveToConstraint();
             }
 
             success = true;
@@ -318,7 +318,7 @@ namespace code_creation_kit
                 {
                     if ( item.flush())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -332,7 +332,7 @@ namespace code_creation_kit
                 {
                     if ( item.forAll())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -346,7 +346,7 @@ namespace code_creation_kit
                 {
                     if ( item.ignoreCase())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -382,7 +382,7 @@ namespace code_creation_kit
         {
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::ExCannotApplyConstraintToSubstitution();
+                throw ParserExceptions::ExCannotApplyConstraintToSubstitution();
             }
 
             success = true;
@@ -479,7 +479,7 @@ namespace code_creation_kit
 
         if ( not_)
         {
-            throw CParserExceptions::ExConstraintExpectedAfterNot();
+            throw ParserExceptions::ExConstraintExpectedAfterNot();
         }
 
         return success;
@@ -496,7 +496,7 @@ namespace code_creation_kit
         {
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::ExCannotApplyDirectiveToConversion();
+                throw ParserExceptions::ExCannotApplyDirectiveToConversion();
             }
 
             success = true;
@@ -506,7 +506,7 @@ namespace code_creation_kit
                 {
                     if ( item.ignoreCase())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -535,7 +535,7 @@ namespace code_creation_kit
         {
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::ExCannotApplyConversionToSubstitution();
+                throw ParserExceptions::ExCannotApplyConversionToSubstitution();
             }
 
             success = true;
@@ -729,7 +729,7 @@ namespace code_creation_kit
         {
             if ( !isValidCombination<TokenT>( parentItem, pos->getToken()))
             {
-                throw CParserExceptions::ExCannotApplyDirectiveToSubstitution();
+                throw ParserExceptions::ExCannotApplyDirectiveToSubstitution();
             }
 
             success = true;
@@ -739,7 +739,7 @@ namespace code_creation_kit
                 {
                     if ( item.volatil())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -753,7 +753,7 @@ namespace code_creation_kit
                 {
                     if ( item.leftToRight())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -767,7 +767,7 @@ namespace code_creation_kit
                 {
                     if ( item.topDown())
                     {
-                        throw CParserExceptions::ExDirectiveAlreadyApplied();
+                        throw ParserExceptions::ExDirectiveAlreadyApplied();
                     }
                     else
                     {
@@ -908,7 +908,7 @@ namespace code_creation_kit
 
         if ( if_)
         {
-            throw CParserExceptions::ExSubstitutionExpectedAfterIf();
+            throw ParserExceptions::ExSubstitutionExpectedAfterIf();
         }
 
         return success;

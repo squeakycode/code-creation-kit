@@ -15,16 +15,16 @@ namespace code_creation_kit
 {
     ///holds the data representing a substitution, e.g. for an entry
     template <typename StringT>
-    class CSubstitution : public Substitutions
+    class Substitution : public Substitutions
     {
     public:
         typedef const std::vector<StringT> ConstStringListT;
         typedef std::shared_ptr<ConstStringListT> ConstSharedStringListT;
 
-        typedef std::list<CComparableSharedObject<IConversion<StringT> > > ConversionListT;
-        typedef std::list<CComparableSharedObject<IConstraint<StringT> > > ConstraintListT;
+        typedef std::list<ComparableSharedObject<IConversion<StringT> > > ConversionListT;
+        typedef std::list<ComparableSharedObject<IConstraint<StringT> > > ConstraintListT;
 
-        CSubstitution()
+        Substitution()
             : m_type( eInvalid)
             , m_if_(false)
             , m_not_(false)
@@ -35,7 +35,7 @@ namespace code_creation_kit
         {
         }
 
-        CSubstitution( ESubstitutions type)
+        Substitution( ESubstitutions type)
             : m_type( type)
             , m_if_(false)
             , m_not_(false)
@@ -46,7 +46,7 @@ namespace code_creation_kit
         {
         }
 
-        CSubstitution( ESubstitutions type, ConstSharedStringListT parameters)
+        Substitution( ESubstitutions type, ConstSharedStringListT parameters)
             : m_type( type)
             , m_if_(false)
             , m_not_(false)
@@ -59,13 +59,13 @@ namespace code_creation_kit
         }
 
         ///returns true if not equal, used for optimizations
-        bool operator != ( const CSubstitution<StringT>& rhs) const
+        bool operator != ( const Substitution<StringT>& rhs) const
         {
             return !(*this == rhs);
         }
 
         ///returns true if equal, used for optimizations
-        bool operator == ( const CSubstitution<StringT>& rhs) const
+        bool operator == ( const Substitution<StringT>& rhs) const
         {
             if(
                 m_type != rhs.m_type
@@ -201,7 +201,7 @@ namespace code_creation_kit
         StringT m_separatorText;
         //end possible modifiers
 
-        CComparableSharedObject<ConstStringListT> m_parameters; ///<the parameters of the substitution
+        ComparableSharedObject<ConstStringListT> m_parameters; ///<the parameters of the substitution
         ConversionListT m_conversionList; ///<conversions to apply
         ConstraintListT m_constraintList; ///<constraints to apply
     };

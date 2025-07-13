@@ -31,7 +31,7 @@ void run_test()
     CHECK_NOTHROW(CreateTSourceFileFiles());
 
     typedef TStreamHelper<StringT> SinkT;
-    typedef CSourceFile<StringT,TestFile> SourceFileT;
+    typedef SourceFile<StringT,TestFile> SourceFileT;
 
     {
         SinkT result;

@@ -94,7 +94,7 @@ struct TCsvParserTableBuilder
     unsigned int row;
     unsigned int col;
     unsigned int items;
-    CPositionTracker positionTracker;
+    PositionTracker positionTracker;
     int finishedCount;
 
     typedef std::string StringT;
@@ -200,7 +200,7 @@ a5;b5;c5;d5;"e5"
     TCsvParserTableBuilder helper;
 
     //parse the file
-    CCsvParser::parse( file, helper, ";", "\"", "#'", helper.positionTracker);
+    CsvParser::parse( file, helper, ";", "\"", "#'", helper.positionTracker);
 
     //check parsing ok
     CHECK( helper.row == test_data::rows );
@@ -211,28 +211,28 @@ a5;b5;c5;d5;"e5"
     {
         std::stringstream s;
         s << "a\"a"; //a"a
-        CHECK_THROWS_AS( CCsvParser::parse( s, helper, ";", "\"", ""), CCsvParser::ExUnexpectedQuote);
+        CHECK_THROWS_AS( CsvParser::parse( s, helper, ";", "\"", ""), CsvParser::ExUnexpectedQuote);
     }
     {
         std::stringstream s;
         s << "\"a\"a"; //"a"a
-        CHECK_THROWS_AS( CCsvParser::parse( s, helper, ";", "\"", ""), CCsvParser::ExRequireDelimitingChar);
+        CHECK_THROWS_AS( CsvParser::parse( s, helper, ";", "\"", ""), CsvParser::ExRequireDelimitingChar);
     }
     {
         std::stringstream s;
-        CHECK_THROWS_AS(CCsvParser::parse( s, helper, ";", "\"", "\n"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::parse( s, helper, ";", "\"", "\n"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CsvParser::ExBadQuoteChars);
     }
 
     //check ignore double quotes
@@ -240,7 +240,7 @@ a5;b5;c5;d5;"e5"
         TCsvParserTableBuilderDoubleQuote helperDoubleQuote;
         std::stringstream s;
         s << "\"a1;b\"1;c1\"\n\"x;y\";z";
-        CCsvParser::parse( s, helperDoubleQuote, ";", "", "");
+        CsvParser::parse( s, helperDoubleQuote, ";", "", "");
 
         //check parsing ok
         CHECK( helperDoubleQuote.row == 1 );
@@ -253,7 +253,7 @@ a5;b5;c5;d5;"e5"
         TCsvParserTableBuilderEmptyLastItemOnEof helperEmptyLastItemOnEof;
         std::stringstream s;
         s << "a1;b1\nx;";
-        CCsvParser::parse(s, helperEmptyLastItemOnEof, ";", "", "");
+        CsvParser::parse(s, helperEmptyLastItemOnEof, ";", "", "");
 
         //check parsing ok
         CHECK(helperEmptyLastItemOnEof.row == 1);

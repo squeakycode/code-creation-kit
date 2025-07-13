@@ -50,13 +50,13 @@ namespace code_creation_kit
 #endif
 
     template <typename StringT, typename GeneratorT>
-    class CErrorPrinter
+    class ErrorPrinter
     {
     public:
-        typedef CSimpleFormat<StringT> FormatT;
+        typedef SimpleFormat<StringT> FormatT;
         typedef typename StringT::value_type CharT; 
 
-        CErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
+        ErrorPrinter( GeneratorT& generator) : m_generator( generator) {}
 
         template <typename ParameterListT>
         void generate(
@@ -68,7 +68,7 @@ namespace code_creation_kit
             bool append,
             const ParameterListT& parameters,
             bool canChangeTableList = false,
-            const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+            const InlineTemplateParameters<StringT>& inlineTemplateParameters = InlineTemplateParameters<StringT>()
         )
         {
             try

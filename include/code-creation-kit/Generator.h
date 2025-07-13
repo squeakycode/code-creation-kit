@@ -25,8 +25,8 @@ namespace code_creation_kit
     class GeneratedFileT;
     class IntermediateFileT;
 
-    ///defines exceptions thrown by CGenerator for template argument independent access
-    class CGeneratorExceptions
+    ///defines exceptions thrown by Generator for template argument independent access
+    class GeneratorExceptions
     {
     public:
         class ExFailedToDeleteTempFile : public std::runtime_error 
@@ -44,30 +44,30 @@ namespace code_creation_kit
 
 
     ///sets up and operates all building blocks needed for generating
-    template <typename StringT, typename LogOutputStreamT = CNul >
-    class CGenerator : public CGeneratorExceptions
+    template <typename StringT, typename LogOutputStreamT = NullDevice >
+    class Generator : public GeneratorExceptions
     {
-        class TemplateLoader;
+        class TemplateLoaderT;
         typedef typename StringT::value_type CharT;
-        typedef CTargetFile< StringT, GeneratedFileT> TargetFileT;
-        typedef CTargetFile< StringT, IntermediateFileT> IntermediateTargetFileT;
+        typedef TargetFile< StringT, GeneratedFileT> TargetFileT;
+        typedef TargetFile< StringT, IntermediateFileT> IntermediateTargetFileT;
         typedef std::vector<std::vector<StringT> > TableT;
         typedef std::shared_ptr<TableT> SharedTableT;
         typedef std::shared_ptr<const TableT> SharedConstTableT;
         typedef typename TableT::size_type SizeT;
-        typedef CTemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoader, LogOutputStreamT> TemplateProcessorT;
-        typedef CTemplateLoader<TemplateProcessorT, StringT, LogOutputStreamT> TemplateLoaderT;
+        typedef TemplateProcessor<TableT, typename TargetFileT::OutputStreamT, TemplateLoaderT, LogOutputStreamT> TemplateProcessorT;
+        typedef TemplateLoader<TemplateProcessorT, StringT, LogOutputStreamT> TemplateLoaderIntermediateT;
 
         typedef typename TargetFileT::OutputStreamT OutputStreamT;
         typedef typename TemplateLoaderT::InputStreamT InputStreamT;
 
-        class TemplateLoader: public TemplateLoaderT {};
+        class TemplateLoaderT: public TemplateLoaderIntermediateT {};
 
     public:
         typedef typename TemplateLoaderT::FileDataListT FileDataListT;
         typedef typename TemplateLoaderT::FileData FileDataT;
 
-        CGenerator()
+        Generator()
             : m_lastRowNumberWithFailure(1)
             , m_indexOfLastProcessedParameter(0)
             , m_csvDelimiterChars(STRING_LITERAL(";"))
@@ -78,8 +78,8 @@ namespace code_creation_kit
         }
 
         //noncopyable
-        CGenerator(const CGenerator&) = delete;
-        CGenerator& operator=(const CGenerator&) = delete;
+        Generator(const Generator&) = delete;
+        Generator& operator=(const Generator&) = delete;
 
         ///set delimiter for next csv table to load
         void setCsvDelimiterChars(const StringT& csvDelimiterChars)
@@ -92,7 +92,7 @@ namespace code_creation_kit
             }
 
             //check the delimiter
-            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars);
+            CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars);
             m_csvDelimiterChars = csvDelimiterChars;
         }
 
@@ -113,7 +113,7 @@ namespace code_creation_kit
             }
 
             //check the characters
-            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, m_csvDelimiterChars, csvQuoteChars, m_csvQuoteChars);
+            CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, m_csvDelimiterChars, csvQuoteChars, m_csvQuoteChars);
             //set the characters
             m_csvQuoteChars = csvQuoteChars;
         }
@@ -135,7 +135,7 @@ namespace code_creation_kit
             }
 
             //check the characters
-            CCsvParser::checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, m_csvDelimiterChars, m_csvQuoteChars, csvCommentChars);
+            CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, m_csvDelimiterChars, m_csvQuoteChars, csvCommentChars);
             //set the characters
             m_csvCommentChars = csvCommentChars;
         }
@@ -166,15 +166,15 @@ namespace code_creation_kit
             m_lastRowNumberWithFailure = 0;
 
             //create table and table builder
-            typedef CVerticalTableBuilder<TableT> TableBuilderT;
+            typedef VerticalTableBuilder<TableT> TableBuilderT;
             SharedTableT ptrTableToLoad = std::make_shared<TableT>();
             TableBuilderT tableBuidler( *ptrTableToLoad, padRows);
             try
             {
                 //open table file
-                CSourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
+                SourceFile<StringT, CsvFileT> file( tableFileName, tableFileName == STRING_LITERAL("-"));
                 //parse the table file
-                CCsvParser::parse( file.get(), tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
+                CsvParser::parse( file.get(), tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
@@ -203,14 +203,14 @@ namespace code_creation_kit
             m_lastRowNumberWithFailure = 0;
 
             //create table and table builder
-            typedef CVerticalTableBuilder<TableT> TableBuilderT;
+            typedef VerticalTableBuilder<TableT> TableBuilderT;
             SharedTableT ptrTableToLoad = std::make_shared<TableT>();
             TableBuilderT tableBuidler( *ptrTableToLoad, padRows);
 
             try
             {
                 //parse the table file
-                CCsvParser::parse( inputStream, tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
+                CsvParser::parse( inputStream, tableBuidler, m_csvDelimiterChars, m_csvQuoteChars, m_csvCommentChars, m_positionTracker);
                 //connect table to processor and keep reference in list
                 m_templateProcessor.connectTable(ptrTableToLoad, label, topDown, leftRight, rowHeaderIndex, columnHeaderIndex, false);
             }
@@ -262,7 +262,7 @@ namespace code_creation_kit
             bool append,
             const ParameterListT& parameters,
             bool canChangeTableList,
-            const CInlineTemplateParameters<StringT>& inlineTemplateParameters = CInlineTemplateParameters<StringT>()
+            const InlineTemplateParameters<StringT>& inlineTemplateParameters = InlineTemplateParameters<StringT>()
             )
         {
             //log
@@ -591,8 +591,8 @@ namespace code_creation_kit
 
     private:
         TemplateProcessorT m_templateProcessor; ///<does the work
-        TemplateLoader m_templateLoader; ///<the loader
-        CPositionTracker m_positionTracker; ///<used by csv parser
+        TemplateLoaderT m_templateLoader; ///<the loader
+        PositionTracker m_positionTracker; ///<used by csv parser
         SizeT m_lastRowNumberWithFailure; ///<for error output
         SizeT m_indexOfLastProcessedParameter; ///<for error output
         StringT m_csvDelimiterChars; ///<delimiter used by csv files to load

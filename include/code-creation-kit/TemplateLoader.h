@@ -15,8 +15,8 @@ namespace code_creation_kit
 {
     class TemplateFileT;
 
-    ///Holds exceptions thrown by CTemplateLoader for template argument independent access
-    class CTemplateLoaderExceptions
+    ///Holds exceptions thrown by TemplateLoader for template argument independent access
+    class TemplateLoaderExceptions
     {
     public:
         class ExCyclicInclusion : public std::runtime_error 
@@ -24,13 +24,13 @@ namespace code_creation_kit
     };
 
     ///handles the line based loading of template files and the inclusion of other files
-    template <typename OutputStreamT, typename StringT, typename LogOutputStreamT = CNul >
-    class CTemplateLoader : public CTemplateLoaderExceptions
+    template <typename OutputStreamT, typename StringT, typename LogOutputStreamT = NullDevice >
+    class TemplateLoader : public TemplateLoaderExceptions
     {
         typedef typename StringT::value_type CharT;
         typedef std::list<StringT> IncludeDirectoryListT;
     public:
-        typedef CSourceFile<StringT,TemplateFileT> InputFileT;
+        typedef SourceFile<StringT,TemplateFileT> InputFileT;
         typedef typename InputFileT::InputStreamT InputStreamT;
 
         ///holds the data of currently processed file
@@ -59,7 +59,7 @@ namespace code_creation_kit
 
         typedef std::list<FileData> FileDataListT;
 
-        CTemplateLoader()
+        TemplateLoader()
             : m_outputStream(0)
             , m_logOutputStream(0)
         {

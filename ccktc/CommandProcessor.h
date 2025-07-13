@@ -148,7 +148,7 @@ namespace code_creation_kit
                         //process the command file
                         bool useCin = commandFileName == STRING_LITERAL("-");
                         commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
-                        CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
+                        SourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
                         generatorCommandProcessor.processCommandStream( commandFile.get(), generator, commandFileAbsolutePath, logFile);
                         commandFile.checkEofReached();
                     }
@@ -174,7 +174,7 @@ namespace code_creation_kit
                         //process the command file
                         bool useCin = commandFileName == STRING_LITERAL("-");
                         commandFileAbsolutePath = useCin ? commandFileName : FileSystem::determineDependentLocation( commandFileName);
-                        CSourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
+                        SourceFile<StringT,CommandFileT> commandFile( commandFileAbsolutePath, useCin);
                         generatorCommandProcessor.processCommandStream( commandFile.get(), generatorStatistic, commandFileAbsolutePath, logFile, true);
                         commandFile.checkEofReached();
 
@@ -197,12 +197,12 @@ namespace code_creation_kit
                     throw ExInvalidCommandLineOptions();
                 }
             }
-            catch( CSourceFileExceptions<CommandFileT>::ExCannotOpenFile&)
+            catch( SourceFileExceptions<CommandFileT>::ExCannotOpenFile&)
             {
                 FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
                 throw CErrorPrinted(); //empty class provided externally
             }
-            catch( CSourceFileExceptions<CommandFileT>::ExCannotReadFile&)
+            catch( SourceFileExceptions<CommandFileT>::ExCannotReadFile&)
             {
                 FileSystem::getCerr<CharT>() << "Failed to open command file: " << commandFileAbsolutePath << std::endl;
                 throw CErrorPrinted(); //empty class provided externally

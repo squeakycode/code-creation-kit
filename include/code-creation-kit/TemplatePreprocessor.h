@@ -8,8 +8,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CTemplatePreprocessor for template argument independent access
-    class CTemplatePreprocessorExceptions
+    ///defines exceptions thrown by TemplatePreprocessor for template argument independent access
+    class TemplatePreprocessorExceptions
     {
     public:
         class ExFileInclusionNotSupported : public std::runtime_error 
@@ -35,10 +35,10 @@ namespace code_creation_kit
 
     ///performs preprocessing operations
     template <typename PreprocessedStreamT, typename MarkupObserverT, typename TemplateLoaderT, typename TokenT, typename StringT>
-    class CTemplatePreprocessor : public CTemplatePreprocessorExceptions
+    class TemplatePreprocessor : public TemplatePreprocessorExceptions
     {
     public:
-        CTemplatePreprocessor()
+        TemplatePreprocessor()
             : m_preprocessedStream(nullptr)
             , m_markupObserver(nullptr)
             , m_templateLoader(nullptr)
@@ -46,7 +46,7 @@ namespace code_creation_kit
         }
 
         ///perform preprocessing operations
-        CTemplatePreprocessor<PreprocessedStreamT, MarkupObserverT, TemplateLoaderT, TokenT, StringT>& operator<<( const TokenT& token)
+        TemplatePreprocessor<PreprocessedStreamT, MarkupObserverT, TemplateLoaderT, TokenT, StringT>& operator<<( const TokenT& token)
         {
             if ( token == TokenT::eMarkup )
             {

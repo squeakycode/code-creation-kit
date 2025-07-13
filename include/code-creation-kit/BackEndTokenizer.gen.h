@@ -25,11 +25,11 @@ namespace code_creation_kit
           typename TokenT
         , typename StringT
         , typename OutputStreamT
-        , typename LogOutputStreamT = CNul >
-    class CBackEndTokenizer
+        , typename LogOutputStreamT = NullDevice >
+    class BackEndTokenizer
     {
     public:
-        typedef CBackEndTokenizer<TokenT, StringT, OutputStreamT, LogOutputStreamT> ThisT;
+        typedef BackEndTokenizer<TokenT, StringT, OutputStreamT, LogOutputStreamT> ThisT;
         typedef std::vector<StringT> KeywordListT;
         typedef cppstringx::range<typename StringT::const_iterator> RangeT;
         typedef typename StringT::value_type CharT;
@@ -57,7 +57,7 @@ namespace code_creation_kit
         };
     public:
 
-        CBackEndTokenizer()
+        BackEndTokenizer()
             : m_pOutputStream(nullptr)
             , m_closing(false)
             , m_bypassMode(false)

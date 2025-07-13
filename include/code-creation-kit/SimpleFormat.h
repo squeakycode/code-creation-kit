@@ -13,7 +13,7 @@ namespace code_creation_kit
 {
     // A simple formatter that works for tags %1% through %9%
     template <typename StringT>
-    class CSimpleFormat
+    class SimpleFormat
     {
         typedef typename StringT::value_type CharT;
         typedef std::basic_stringstream<CharT> StringStreamT;
@@ -34,13 +34,13 @@ namespace code_creation_kit
             }
         };
     public:
-        CSimpleFormat(const CharT* formatText)
+        SimpleFormat(const CharT* formatText)
             : m_formatText(formatText)
         {
         }
 
         template <typename T>
-        CSimpleFormat& operator %(const T& arg)
+        SimpleFormat& operator %(const T& arg)
         {
             StringStreamT stringsstream;
             stringsstream << arg;

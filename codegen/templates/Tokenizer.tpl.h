@@ -16,13 +16,13 @@
 #include "StringLiteral.h"
 #include "NullDevice.h"
 
-[PART_BEGIN]["if front end"][IF][ENTRY]["Tokenizer"][EQUALS]["CTokenizer"][PART_END][TRIM]
-[PART_BEGIN]["if back end"][IF][ENTRY]["Tokenizer"][EQUALS]["CBackEndTokenizer"][PART_END][TRIM]
+[PART_BEGIN]["if front end"][IF][ENTRY]["Tokenizer"][EQUALS]["Tokenizer"][PART_END][TRIM]
+[PART_BEGIN]["if back end"][IF][ENTRY]["Tokenizer"][EQUALS]["BackEndTokenizer"][PART_END][TRIM]
 
 namespace code_creation_kit
 {
     [MACRO_BEGIN][PART]["if front end"][TRIM]
-    ///defines exceptions thrown by CTokenizer for template argument independent access
+    ///defines exceptions thrown by Tokenizer for template argument independent access
     class CTokenizerExceptions
     {
     public:
@@ -46,7 +46,7 @@ namespace code_creation_kit
         , typename StringT
         , typename OutputStreamT
         , typename FinalOutputStreamT[PART]["if front end"]
-        , typename LogOutputStreamT = CNul >
+        , typename LogOutputStreamT = NullDevice >
     class [ENTRY]["Tokenizer"]
     {
     public:

@@ -10,7 +10,7 @@
 namespace code_creation_kit
 {
     template <typename ETokenHolderT, typename StringT>
-    class CToken : public ETokenHolderT
+    class Token : public ETokenHolderT
     {
     public:
         typedef typename StringT::value_type CharT;
@@ -19,44 +19,44 @@ namespace code_creation_kit
         typedef std::shared_ptr<StringListT> SharedStringListT;
         typedef std::shared_ptr<const StringListT> ConstSharedStringListT;
 
-        CToken()
+        Token()
             : m_token(static_cast<ETokenT>(0))
         {
         }
 
-        explicit CToken( ETokenT token)
+        explicit Token( ETokenT token)
             : m_token( token)
         {
         }
 
-        CToken( ETokenT token, SharedStringListT stringList)
+        Token( ETokenT token, SharedStringListT stringList)
             : m_token( token)
             , m_stringList( stringList)
         {
         }
 
-        CToken( ETokenT token, SharedStringListT stringList, SharedStringListT sourceText)
+        Token( ETokenT token, SharedStringListT stringList, SharedStringListT sourceText)
             : m_token( token)
             , m_stringList( stringList)
             , m_sourceText( sourceText)
         {
         }
 
-        CToken( ETokenT token, const StringT& textA)
+        Token( ETokenT token, const StringT& textA)
             : m_token( token)
             , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->front() = textA;
         }
 
-        CToken( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
+        Token( ETokenT token,  const typename StringT::const_iterator& start,  const typename StringT::const_iterator& end)
             : m_token( token)
             , m_stringList(std::make_shared<StringListT>(1))
         {
             m_stringList->back().assign( start, end);
         }
 
-        CToken( ETokenT token, const StringT& textA, const StringT& textB)
+        Token( ETokenT token, const StringT& textA, const StringT& textB)
             : m_token( token)
             , m_stringList(std::make_shared<StringListT>(2))
         {
@@ -64,7 +64,7 @@ namespace code_creation_kit
             m_stringList->back() = textB;
         }
 
-        CToken( ETokenT token, const CharT* textA, const CharT* textB)
+        Token( ETokenT token, const CharT* textA, const CharT* textB)
                 : m_token( token)
                 , m_stringList(std::make_shared<StringListT>(2))
         {
@@ -72,14 +72,14 @@ namespace code_creation_kit
             m_stringList->back() = textB;
         }
 
-        CToken( const CToken<ETokenHolderT, StringT>& rhs)
+        Token( const Token<ETokenHolderT, StringT>& rhs)
             : m_token( rhs.m_token)
             , m_stringList( rhs.m_stringList)
             , m_sourceText( rhs.m_sourceText)
         {
         }
 
-        CToken<ETokenHolderT, StringT>& operator = ( const CToken<ETokenHolderT, StringT>& rhs)
+        Token<ETokenHolderT, StringT>& operator = ( const Token<ETokenHolderT, StringT>& rhs)
         {
             m_token = rhs.m_token;
             m_stringList = rhs.m_stringList;
@@ -87,9 +87,9 @@ namespace code_creation_kit
             return *this;
         }
 
-        CToken<ETokenHolderT, StringT> cloneChangingParameter(StringT parameter0) const
+        Token<ETokenHolderT, StringT> cloneChangingParameter(StringT parameter0) const
         {
-            CToken<ETokenHolderT, StringT> clone;
+            Token<ETokenHolderT, StringT> clone;
             clone.m_token = m_token;
             clone.m_stringList = std::make_shared<StringListT>(*m_stringList);
             clone.m_sourceText = m_sourceText;
@@ -114,7 +114,7 @@ namespace code_creation_kit
             return m_token != token;
         }
 
-        bool operator == ( const CToken<ETokenHolderT, StringT>& rhs) const
+        bool operator == ( const Token<ETokenHolderT, StringT>& rhs) const
         {
             if (   m_token != rhs.m_token
                 || m_stringList != rhs.m_stringList
@@ -186,7 +186,7 @@ namespace code_creation_kit
 
     private:
         ETokenT m_token;
-        CComparableSharedObject<StringListT> m_stringList;
-        CComparableSharedObject<StringListT> m_sourceText;
+        ComparableSharedObject<StringListT> m_stringList;
+        ComparableSharedObject<StringListT> m_sourceText;
     };
 }

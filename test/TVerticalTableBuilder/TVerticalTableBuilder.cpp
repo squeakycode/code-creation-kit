@@ -15,7 +15,7 @@ void testBuilder( T& itemTable, const unsigned int rows, const unsigned int colu
     //create builder and container
     typedef std::vector<std::vector<std::string> >  TableT;
     TableT table;
-    CVerticalTableBuilder<TableT> tableBuilder(table, pad);
+    VerticalTableBuilder<TableT> tableBuilder(table, pad);
 
     //fill in the test data
     for ( unsigned int row = 0; row < rows; ++row)
@@ -91,7 +91,7 @@ TEST_CASE("TVerticalTableBuilder", "[TVerticalTableBuilder]")
             {"a5","b5"}
         };
         testBuilder( itemTable, rows, columns, true);
-        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), VerticalTableBuilderExceptions::ExUnderflow);
     }
 
     {
@@ -105,7 +105,7 @@ TEST_CASE("TVerticalTableBuilder", "[TVerticalTableBuilder]")
             {"a5","b5",NULL}
         };
         testBuilder( itemTable, rows, columns, true);
-        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExOverflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), VerticalTableBuilderExceptions::ExOverflow);
     }
 
     {
@@ -118,7 +118,7 @@ TEST_CASE("TVerticalTableBuilder", "[TVerticalTableBuilder]")
             {"c",NULL},
         };
         testBuilder( itemTable, rows, columns, true);
-        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), CVerticalTableBuilderExceptions::ExUnderflow);
+        CHECK_THROWS_AS( testBuilder( itemTable, rows, columns, false), VerticalTableBuilderExceptions::ExUnderflow);
     }
 
 }

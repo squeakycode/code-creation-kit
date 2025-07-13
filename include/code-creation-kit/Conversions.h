@@ -78,7 +78,7 @@ namespace code_creation_kit
     };
 
     ///defines exceptions thrown by CRegexReplaceConversion for template argument independent access
-    class CRegexReplaceConversionExceptions
+    class RegexReplaceConversionExceptions
     {
     public:
         class ExRegexSyntaxError : public std::runtime_error
@@ -86,7 +86,7 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CRegexReplaceConversion : public ConversionDirectives<StringT>, public CRegexReplaceConversionExceptions
+    class CRegexReplaceConversion : public ConversionDirectives<StringT>, public RegexReplaceConversionExceptions
     {
     public:
         typedef std::basic_regex<typename StringT::value_type, std::regex_traits<typename StringT::value_type> > RegexT;
@@ -878,7 +878,7 @@ namespace code_creation_kit
     };
 
     ///defines exceptions thrown by CCaclulationConversion for template argument independent access
-    class CCalcConversionExceptions
+    class CalcConversionExceptions
     {
     public:
         class ExArithmeticExpressionSyntaxError : public std::runtime_error
@@ -897,7 +897,7 @@ namespace code_creation_kit
     };
 
     template <typename StringT>
-    class CCalcConversion : public ConversionDirectives<StringT>, public CCalcConversionExceptions
+    class CCalcConversion : public ConversionDirectives<StringT>, public CalcConversionExceptions
     {
         typedef typename StringT::value_type CharT;
         typedef typename StringT::const_iterator IteratorT;
@@ -1548,7 +1548,7 @@ namespace code_creation_kit
 
 
     ///defines exceptions thrown by CToSizeConversion for template argument independent access
-    class CToSizeConversionExceptions
+    class ToSizeConversionExceptions
     {
     public:
         class ExUnexpectedToSizeProperty : public std::runtime_error
@@ -1559,7 +1559,7 @@ namespace code_creation_kit
 
 
     template <typename StringT>
-    class CToSizeConversion : public ConversionDirectives<StringT>, public CToSizeConversionExceptions
+    class CToSizeConversion : public ConversionDirectives<StringT>, public ToSizeConversionExceptions
     {
         typedef typename StringT::value_type CharT;
 

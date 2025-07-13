@@ -230,18 +230,18 @@ void testCalculation(const std::string& in, const std::string& out, const std::s
 template <typename StringT>
 void testCalculation()
 {
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a#+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("a1", "3", "a+1"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b*"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b**"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "*b"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a#+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+2#"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b+2#"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("a1", "3", "a+1"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b*"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b**"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "*b"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
 
     testCalculation<StringT>("1", "3", "a+2");
     testCalculation<StringT>("1", "304", "a+2+300+1");

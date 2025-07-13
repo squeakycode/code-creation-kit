@@ -7,14 +7,14 @@ namespace code_creation_kit
 {
     ///adapter for processing a table from left to right
     template <typename TableT>
-    class CVerticalTableRotator
+    class VerticalTableRotator
     {
         typedef std::size_t SizeT;
         typedef SizeT IndexT;
     public:
         typedef typename TableT::value_type::value_type StringT;
 
-        explicit CVerticalTableRotator( const TableT* table)
+        explicit VerticalTableRotator( const TableT* table)
             : m_table(table)
         {
         }

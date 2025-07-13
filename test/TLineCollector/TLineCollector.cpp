@@ -26,7 +26,7 @@ TEST_CASE( "TLineCollector", "[TLineCollector]")
     //types in test
     typedef std::string StringT;
     typedef THelper<StringT> OutputStreamT;
-    typedef CLineCollector<StringT,OutputStreamT> CollectorT;
+    typedef LineCollector<StringT,OutputStreamT> CollectorT;
 
     //create objects
     OutputStreamT lines;

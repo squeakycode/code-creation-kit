@@ -12,8 +12,8 @@
 
 namespace code_creation_kit
 {
-    ///defines exceptions thrown by CMacroProcessor for template argument independent access
-    class CMacroProcessorExceptions
+    ///defines exceptions thrown by MacroProcessor for template argument independent access
+    class MacroProcessorExceptions
     {
     public:
         class ExTableNotFound : public std::runtime_error 
@@ -37,17 +37,17 @@ namespace code_creation_kit
     };
 
     ///processes macro expression text and ouputs expansion result
-    template <typename TableT, typename OutputStreamT, typename LogOutputStreamT = CNul >
-    class CMacroProcessor : public CMacroProcessorExceptions
+    template <typename TableT, typename OutputStreamT, typename LogOutputStreamT = NullDevice >
+    class MacroProcessor : public MacroProcessorExceptions
     {
         //types used:
         typedef typename TableT::value_type::value_type StringT;
         typedef std::size_t SizeT;
         typedef SizeT IndexT;
 
-        typedef CVerticalTableRotator<TableT> TableRotatorT;
-        typedef CTableIndex<TableT, ExColumnHeaderIndexOutOfBounds> TableIndexT;
-        typedef CTableIndex<TableRotatorT, ExRowHeaderIndexOutOfBounds> RotatedTableIndexT;
+        typedef VerticalTableRotator<TableT> TableRotatorT;
+        typedef TableIndex<TableT, ExColumnHeaderIndexOutOfBounds> TableIndexT;
+        typedef TableIndex<TableRotatorT, ExRowHeaderIndexOutOfBounds> RotatedTableIndexT;
         typedef std::shared_ptr<const TableT> SharedConstTableT;
         typedef std::shared_ptr<TableRotatorT> SharedTableRotatorT;
 
@@ -120,18 +120,18 @@ namespace code_creation_kit
 
         //types used:
         typedef std::list<TableData> TableListT; ///<tables are processed in the order they are connected
-        typedef CMacro<StringT> MacroT;
+        typedef Macro<StringT> MacroT;
 
     public:
-        CMacroProcessor()
+        MacroProcessor()
             : m_outputStream(nullptr)
             , m_pLogOutputStream(nullptr)
             , m_canChangeNonTemporaryTableList(true)
         {
         }
 
-        CMacroProcessor(CMacroProcessor& rhs) = delete;
-        CMacroProcessor& operator=(CMacroProcessor& rhs) = delete;
+        MacroProcessor(MacroProcessor& rhs) = delete;
+        MacroProcessor& operator=(MacroProcessor& rhs) = delete;
 
         ///this allows controlling the changes made by a template
         void setCanChangeNonTemporaryTableList(bool canChangeNonTemporaryTableList)
@@ -248,14 +248,14 @@ namespace code_creation_kit
         }
 
         ///forward text of a line surrounding a macro, see definition of macro
-        CMacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const StringT& text)
+        MacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const StringT& text)
         {
             *m_outputStream << text;
             return *this;
         }
 
         ///process macro and ouput expansion result
-        CMacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const MacroT& macro)
+        MacroProcessor<TableT, OutputStreamT, LogOutputStreamT>& operator <<( const MacroT& macro)
         {
             SizeT count = 0;
             StringT expandedMacro;
@@ -313,7 +313,7 @@ namespace code_creation_kit
             else
             {
                 //try to expand to maybe text only alternative
-                typedef CMacroExpander< MacroT, TableIndexT, TableT> ExpanderT;
+                typedef MacroExpander< MacroT, TableIndexT, TableT> ExpanderT;
                 if ( ExpanderT( macro, TableT()).expand( 0, expandedMacro, count, true))
                 {
                     if ( !expandedMacro.empty()) //macro expanded
@@ -359,7 +359,7 @@ namespace code_creation_kit
             bool& lastTimeExpanded
             )
         {
-            typedef CMacroExpander< MacroT, LocalTableIndexT, LocalTableT> ExpanderT;
+            typedef MacroExpander< MacroT, LocalTableIndexT, LocalTableT> ExpanderT;
             ExpanderT expander( tableIndex, macro, table, topDown);
 
             if ( expander.canExpand())
