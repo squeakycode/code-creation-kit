@@ -1,6 +1,6 @@
 # Copyright (c) 2011-2025 Andreas Gau
 # SPDX-License-Identifier: BSD-3-Clause
 
-"../requirements/Tag Specification.CombiParsers.csv"
+datamodels/TagSpecification.CombiParsers.csv
 
--s CombiKeywordParameterParser.tpl.h -o ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
+-s templates/CombiKeywordParameterParser.tpl.h -o ../include/code-creation-kit/CombiKeywordParameterParser.gen.h

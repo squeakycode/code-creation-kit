@@ -260,6 +260,7 @@ namespace code_creation_kit
 #endif
         }
 
+        /// recycle a file
         bool recycleFile( const std::wstring& location)
         {
 #ifdef WIN32
