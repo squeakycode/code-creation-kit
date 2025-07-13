@@ -2,4 +2,4 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 datamodels/Exceptions.csv
--s templates/ErrorPrinter.tpl.h -o ../ccktc/ErrorPrinter.gen.h
+-s templates/ErrorPrinter.tpl.h -o ../include/code-creation-kit/ErrorPrinter.gen.h
