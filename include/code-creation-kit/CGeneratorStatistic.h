@@ -1,0 +1,252 @@
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
+
+#pragma once
+
+#include <set>
+#include "CTemplateLoader.h"
+#include "ETokens.gen.h"
+#include "CToken.h"
+#include "CTokenizer.gen.h"
+#include "CTemplatePreprocessor.h"
+#include "StringLiteral.h"
+#include "CInlineTemplateParameters.h"
+
+namespace code_creation_kit
+{
+    ///defines exceptions thrown by CGenerator for template argument independent access
+    class CGeneratorStatisticExceptions
+    {
+    public:
+    };
+
+    ///serves generator stub and creating a statistic of the used files
+    template <typename StringT>
+    class CGeneratorStatistic : public CGeneratorStatisticExceptions
+    {
+        typedef CGeneratorStatistic<StringT> ThisT;
+        typedef CToken<Tokens, StringT> TokenT;
+        typedef CTemplatePreprocessor<CNul, ThisT, ThisT, TokenT, StringT> PreprocessorT;
+        typedef CTokenizer<TokenT, StringT, PreprocessorT, CNul> TokenizerT;
+        typedef CTemplateLoader<TokenizerT, StringT> TemplateLoaderT;
+
+    public:
+        typedef typename StringT::value_type CharT;
+        typedef typename TemplateLoaderT::FileDataListT FileDataListT;
+        typedef typename TemplateLoaderT::FileData FileDataT;
+        typedef std::set<StringT> FileSetT;
+
+        CGeneratorStatistic()
+            : m_csvDelimiterChars(STRING_LITERAL(";"))
+            , m_csvCommentChars(STRING_LITERAL(""))
+            , m_csvQuoteChars(STRING_LITERAL("\""))
+
+        {
+            //set default markup
+            setDefaultMarkup();
+
+            //setup tokenizer
+            m_tokenizer.connectOutputStream( &m_preprocessor);
+
+            //setup prepocessor
+            m_preprocessor.connectPreprocessedStream( &m_nul);
+            m_preprocessor.connectMarkupObserver( this);
+            m_preprocessor.connectTemplateLoader( this);
+            m_templateLoader.connectOutputStream( &m_tokenizer);
+        }
+
+        //noncopyable
+        CGeneratorStatistic(const CGeneratorStatistic&) = delete;
+        CGeneratorStatistic& operator=(const CGeneratorStatistic&) = delete;
+
+        ///set delimiter for next csv table to load
+        void setCsvDelimiterChars(const StringT& csvDelimiterChars)
+        {
+            m_csvDelimiterChars = csvDelimiterChars;
+        }
+
+        ///get delimiter for next csv table to load
+        StringT getCsvDelimiterChars() const
+        {
+            return m_csvDelimiterChars;
+        }
+
+        ///set list of characters as string used for quoting text item for next csv table to load
+        void setCsvQuoteChars(const StringT& csvQuoteChars)
+        {
+            m_csvQuoteChars = csvQuoteChars;
+        }
+
+        ///get list of characters as string used for quoting text item for next csv table to load
+        const StringT& getCsvQuoteChars() const
+        {
+            return m_csvQuoteChars;
+        }
+
+        ///set list of characters as string that mark commented lines for next csv table to load
+        void setCsvCommentChars(const StringT& csvCommentChars)
+        {
+            m_csvCommentChars = csvCommentChars;
+        }
+
+        ///get list of characters as string that mark commented lines for next csv table to load
+        const StringT& getCsvCommentChars() const
+        {
+            return m_csvCommentChars;
+        }
+
+        ///load another table for generation, see also unloadTable
+        void loadTable( const StringT& tableFileName, const StringT&, bool, bool, unsigned int, unsigned int, bool)
+        {
+            m_tables.insert( tableFileName);
+        }
+
+        ///load template file and keep stats
+        void loadTemplateFile( const StringT& filename, bool useCinInstead = false)
+        {
+            if ( !useCinInstead )
+            {
+                m_templateFiles.insert( m_templateLoader.resolveFileName( filename));
+            }
+            m_templateLoader.loadTemplateFile( filename, useCinInstead);
+        }
+
+        ///used when a CSV table is loaded using TABLE_LOAD
+        StringT resolveFileNameForTableToLoad(const StringT& filename)
+        {
+            StringT resolvedFileName = m_templateLoader.resolveFileName(filename);
+            m_tables.insert(resolvedFileName);
+            return resolvedFileName;
+        }
+
+        ///generates output by processing a template file
+        template <typename ParameterListT>
+        void generate( 
+            const StringT& templateFileName, 
+            const StringT& targetFileName, 
+            bool , 
+            bool , 
+            const StringT& , 
+            bool , 
+            const ParameterListT& ,
+            bool ,
+            const CInlineTemplateParameters<StringT>& p
+            )
+        {
+            //setup tokenizer
+            m_tokenizer.reset();
+            m_tokenizer.setInlineTemplateMode( p.enabled);
+            if ( p.enabled)
+            {
+                m_tokenizer.setInlineTemplateMarkup(
+                    p.inlinePrefix,
+                    p.inlinePostfix,
+                    p.inlineGeneratedPostfix);
+            }
+
+            //reset
+            m_templateLoader.resetInclusionHierarchy();
+
+            //add to statistic
+            if ( targetFileName != STRING_LITERAL("-")) //if not use cout
+            {
+                m_generatedFiles.insert( targetFileName);
+            }
+
+            //start processing the template file
+            loadTemplateFile( templateFileName, templateFileName == STRING_LITERAL("-"));
+        }
+
+        //resets the generator building blocks
+        void reset()
+        {
+            m_templateLoader.reset();
+            m_tokenizer.reset();
+            m_tables.clear();
+            m_generatedFiles.clear();
+            m_templateFiles.clear();
+            m_csvDelimiter = STRING_LITERAL(';');
+            setDefaultMarkup();
+        }
+
+
+        ///sets new tag markup
+        void setMarkup( const StringT& prefix, const StringT& postfix)
+        {
+            m_preprocessor.setPrefix( prefix);
+            m_preprocessor.setPostfix( postfix);
+            m_tokenizer.setMarkup( prefix, postfix);
+        }
+
+        ///adds an include directory to the list
+        void addIncludeDirectory( const StringT& directory)
+        {
+            m_templateLoader.addIncludeDirectory( directory);
+        }
+
+        ///returns stack of files currently opened
+        const FileDataListT& getInclusionHierarchy()
+        {
+            return m_templateLoader.getInclusionHierarchy();
+        }
+
+        ///can be used for error reporting
+        const FileDataT& getLastTemplateFileProcessed() const
+        {
+            return m_templateLoader.getLastFileProcessed();
+        }
+
+        ///get list of loaded tables
+        const FileSetT& getTableFiles() const
+        {
+            return m_tables;
+        }
+
+        ///get list of generated files
+        const FileSetT& getGeneratedFiles() const
+        {
+            return m_generatedFiles;
+        }
+
+        ///get list of template files
+        const FileSetT& getTemplateFiles() const
+        {
+            return m_templateFiles;
+        }
+
+        StringT getTableLoadFileNameWithFailure()
+        {
+            return StringT();
+        }
+
+        ///dummy only:
+        void unloadTable( const StringT&){}
+        unsigned int getLastRowNumberWithFailure() { return 1; }
+        unsigned int getIndexOfLastProcessedParameter() { return 0; }
+        unsigned int getLastColumnWithFailure() { return 1;}
+        unsigned int getLastLineWithFailure() { return 1;}
+        static int getMaxNumberOfRecursionLevels() { return 1; }
+        static int getMaxMacroTextSizeBytes() { return 1; }
+        template <typename LogOutputStreamT>
+        void connectLogOutputStream( LogOutputStreamT*){}
+
+    private:
+        ///set default markup
+        void setDefaultMarkup()
+        {
+            setMarkup( STRING_LITERAL("["), STRING_LITERAL("]"));
+        }
+
+        TokenizerT m_tokenizer; ///<splits input lines into tokens
+        PreprocessorT m_preprocessor; ///<does the preprocessing
+        TemplateLoaderT m_templateLoader; ///<the loader
+        CNul m_nul; ///<dumps the data stream as no output is produced
+        CharT m_csvDelimiter; ///<delimiter used by csv files to load
+        FileSetT m_tables; ///<list of tables loaded
+        FileSetT m_generatedFiles; ///<list of files generated
+        FileSetT m_templateFiles; ///<list of template files loaded
+        StringT m_csvDelimiterChars; ///<delimiter used by csv files to load
+        StringT m_csvCommentChars; ///<list of characters as string that mark commented lines in CSV-files
+        StringT m_csvQuoteChars; ///< Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.
+    };
+}

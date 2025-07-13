@@ -2,4 +2,4 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 CCommandFileLineParser.csv
--s ../templates/CommandLineParser.tpl.h -o CCommandFileLineParser.gen.h -p "Parser Name=CCommandFileLineParser" "Heading=Command Options"
+-s templates/CommandLineParser.tpl.h -o CCommandFileLineParser.gen.h -p "Parser Name=CCommandFileLineParser" "Heading=Command Options"

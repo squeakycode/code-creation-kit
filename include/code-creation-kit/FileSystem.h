@@ -3,20 +3,15 @@
 
 #pragma once
 
-// #ifdef _MSC_VER
-// #pragma warning( push )
-// #pragma warning( disable : 4127 )
-// #endif
-// #include "3rdparty/ghc/filesystem.hpp"
-// #ifdef _MSC_VER
-// #pragma warning( pop )
-// #endif
-
-#include "StringLiteral.h"
-#include "cppstringx.hpp"
+#ifdef WIN32
+#include <windows.h>
+#include <Shellapi.h>
+#endif
 
 #include <iostream>
 #include <filesystem>
+
+#include "cppstringx.hpp"
 
 namespace filesystem_namespace = std;
 
@@ -246,8 +241,43 @@ namespace code_creation_kit
         }
 
         /// recycle a file
-        bool recycleFile( const std::string& location);
-        bool recycleFile( const std::wstring& location);
+        bool recycleFile( const std::string& location)
+        {
+#ifdef WIN32
+            std::vector<std::string::value_type> temp( location.size() + 2, 0);
+            memcpy( &temp[0], location.c_str(), location.size());
+            SHFILEOPSTRUCTA fileOps;
+            ::ZeroMemory(&fileOps, sizeof(fileOps));
+            fileOps.wFunc = FO_DELETE;
+            fileOps.pFrom = &temp[0];
+            fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+
+            HRESULT res = SHFileOperationA( &fileOps);
+            return SUCCEEDED( res);
+#else
+            (void) location;
+            return false;
+#endif
+        }
+
+        bool recycleFile( const std::wstring& location)
+        {
+#ifdef WIN32
+            std::vector<std::wstring::value_type> temp( location.size() + 2, 0);
+            memcpy( &temp[0], location.c_str(), location.size());
+            SHFILEOPSTRUCTW fileOps;
+            ::ZeroMemory(&fileOps, sizeof(fileOps));
+            fileOps.wFunc = FO_DELETE;
+            fileOps.pFrom = &temp[0];
+            fileOps.fFlags = FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+
+            HRESULT res = SHFileOperationW( &fileOps);
+            return SUCCEEDED( res);
+#else
+            (void) location;
+            return false;
+#endif
+        }
 
         ///helper function for getting the right output stream
         template <typename CharT> 
