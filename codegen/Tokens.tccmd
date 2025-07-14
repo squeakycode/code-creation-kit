@@ -8,5 +8,4 @@ datamodels/TagSpecification.csv
 -s templates/Tokenizer.tpl.h -o ../include/code-creation-kit/BackEndTokenizer.gen.h -p Tokenizer=BackEndTokenizer
 -s ../test/TTokenizer/TokenizerTest.tpl.h -o ../test/TTokenizer/TokenizerTest.gen.h
 
--s templates/commands.tpl.csv -o ../examples/create_syntax_highlighter/commands.csv
--s templates/tags.tpl.csv -o ../examples/create_syntax_highlighter/tags.csv
+-s templates/tags.tpl.csv -o ../samples/create_syntax_highlighter/tags.csv

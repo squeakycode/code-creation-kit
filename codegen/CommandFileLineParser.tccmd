@@ -3,4 +3,4 @@
 
 datamodels/CommandFileLineParser.csv
 -s templates/CommandLineParser.tpl.h -o ../ccktc/CommandFileLineParser.gen.h -p "Parser Name=CommandFileLineParser" "Heading=Command Options"
--s templates/commands.tpl.csv -o ../examples/create_syntax_highlighter/commands.csv
+-s templates/commands.tpl.csv -o ../samples/create_syntax_highlighter/commands.csv

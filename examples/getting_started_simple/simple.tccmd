@@ -1,2 +1,0 @@
---load-table simple.csv
---template-source-file CDataClass.tpl.h --output-file CDataClass.gen.h

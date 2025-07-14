@@ -1,9 +1,0 @@
---load-table simple_extended.csv --top-down
---load-table simple_extended.map_cpp.csv --top-down
-
--s CDataClass.tpl.h -o CMyData.gen.h -p "Class Name=CMyData"
-
---unload-table simple_extended.map_cpp.csv
---load-table simple_extended.map_vbnet.csv --top-down
-
--s CDataClass.tpl.vb -o MyData.gen.vb -p "Class Name=MyData"

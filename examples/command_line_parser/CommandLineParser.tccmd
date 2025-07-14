@@ -1,3 +1,0 @@
---load-table CommandLineParser.csv
---template-source-file CommandLineParser.tpl.h --output-file CommandLineParser.gen.h
---template-source-file CommandLineParserMain.tpl.h --output-file CommandLineParserMain.gen.cpp
