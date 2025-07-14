@@ -250,7 +250,7 @@ namespace code_creation_kit
 
 
         template <typename ConstraintListT, typename IndexVectorT, typename OutputT>
-        bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT row, bool suppressOutput) const
+        bool expandSubstitution( const ConstraintListT& constraintList, const IndexVectorT& indexVector, OutputT& output, const IndexT rowIndex, bool suppressOutput) const
         {
             typedef const typename ConstraintListT::value_type ConstraintT;
 
@@ -258,9 +258,10 @@ namespace code_creation_kit
             {
                 //default no constraints, output non empty entries
                 output.reserve( indexVector.size());
-                for (IndexT column : indexVector)
+                for (IndexT columnIndex : indexVector)
                 {
-                    const StringT& entry = m_table[ column ][ row ];
+                    const auto& column = m_table[ columnIndex ];
+                    const StringT& entry = column[ rowIndex ];
                     if ( !entry.empty())
                     {
                         if ( suppressOutput)
@@ -280,9 +281,9 @@ namespace code_creation_kit
                 {
                     if ( constraint->flush() && !constraint->forAll())
                     {
-                        for (IndexT column : indexVector)
+                        for (IndexT columnIndex : indexVector)
                         {
-                            if ( constraint->matchesConstraint( m_table[ column ][ row ]))
+                            if ( constraint->matchesConstraint( m_table[ columnIndex ][ rowIndex ]))
                             {
                                 flush = true;
                                 break;
@@ -303,9 +304,9 @@ namespace code_creation_kit
                         if ( constraint->forAll())
                         {
                             flush = true;
-                            for (IndexT column : indexVector)
+                            for (IndexT columnIndex : indexVector)
                             {
-                                if ( !constraint->matchesConstraint( m_table[ column ][ row ]))
+                                if ( !constraint->matchesConstraint( m_table[ columnIndex ][ rowIndex ]))
                                 {
                                     flush = false;
                                     break;
@@ -323,9 +324,10 @@ namespace code_creation_kit
                 if ( !flush)
                 {
                     //try to find a matching constraint for every entry
-                    for (IndexT column : indexVector)
+                    for (IndexT columnIndex : indexVector)
                     {
-                        const StringT& entry = m_table[ column ][ row ];
+                        const auto& column = m_table[ columnIndex ];
+                        const StringT& entry = column[ rowIndex ];
                         for (ConstraintT& constraint : constraintList)
                         {
                             if (   !constraint->forAll()
@@ -352,9 +354,9 @@ namespace code_creation_kit
 
                     //flush every entry to the output
                     output.reserve( indexVector.size());
-                    for (IndexT column : indexVector)
+                    for (IndexT columnIndex : indexVector)
                     {
-                        output.push_back( m_table[ column ][ row ]);
+                        output.push_back( m_table[ columnIndex ][ rowIndex ]);
                     }
                 }
             }
