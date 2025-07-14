@@ -12,7 +12,7 @@ add_executable(ccktc
     ../include/code-creation-kit/MacroExpander.h
     ../include/code-creation-kit/MacroExpression.h
     ../include/code-creation-kit/MacroProcessor.h
-    ../include/code-creation-kit/Nul.h
+    ../include/code-creation-kit/NullDevice.h
     ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
     ../include/code-creation-kit/ConstraintDirectives.gen.h
     ../include/code-creation-kit/Constraints.h

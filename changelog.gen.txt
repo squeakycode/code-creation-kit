@@ -7,6 +7,19 @@ This is a development snapshot.
 
 Change      Tracker ID Description
 ----------- ---------- ---------------------------------------------------
+New Feature            Excel CSV-saver add-in has been extended by the
+                       method SaveActiveWorkbookToCsvFilesUtf8 that
+                       allows to save tables with UTF-8 encoding.
+
+Bugfix                 Excel CSV-saver add-in now saves the line endings
+                       correctly when cells contain line breaks.
+
+Improvement            The CSV parser now skips over byte order marks
+                       (BOM). BOMs have otherwise the effect that first
+                       column or row is not found when generating. This
+                       condition is hard to identify, because BOMs are
+                       usually not visible.
+
 Bugfix                 Fixed an issue where a CSV-file failed to load
                        when then last cell was empty and not terminated
                        by a new line character.

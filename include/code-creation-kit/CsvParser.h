@@ -106,6 +106,44 @@ namespace code_creation_kit
             typedef typename TableBuilderT::StringT::value_type CharT;
             typedef typename TableBuilderT::StringT StringT;
 
+            // detect and ignore BOMs
+            stream.peek();
+            if (stream)
+            {
+                auto initialPosition = stream.tellg();
+                if constexpr (sizeof(CharT) == 1)
+                {
+                    unsigned char bom[3] = {0};
+                    stream.read(reinterpret_cast<char*>(&bom), 3);
+                    if (!(bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF))
+                    {
+                        // no UTF-8 BOM, reset
+                        stream.clear(); // reset the stream state to good
+                        stream.seekg(initialPosition);
+                    }
+                }
+                else if constexpr (sizeof(CharT) == 2)
+                {
+                    CharT bom[1] = {0};
+                    stream.read(reinterpret_cast<CharT*>(&bom), sizeof(CharT));
+                    if (!(bom[0] == 0xFEFF))
+                    {
+                        stream.clear();
+                        stream.seekg(initialPosition);
+                    }
+                }
+                else if constexpr (sizeof(CharT) == 4)
+                {
+                    CharT bom[1] = {0};
+                    stream.read(reinterpret_cast<CharT*>(&bom), sizeof(CharT));
+                    if (!(bom[0] == 0x0000FEFF))
+                    {
+                        stream.clear();
+                        stream.seekg(initialPosition);
+                    }
+                }
+            }
+
             auto isDelimiter = [&delimiterChars](CharT c) -> bool
             {
                 for (auto x : delimiterChars)

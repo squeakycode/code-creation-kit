@@ -261,3 +261,33 @@ a5;b5;c5;d5;"e5"
         CHECK(helperEmptyLastItemOnEof.finishedCount == 1);
     }
 }
+
+TEST_CASE( "TCsvParser with UTF-8 BOM", "[TCsvParser]")
+{
+    const char* fileData = "\xEF\xBB\xBF"
+R"('comment
+a1;b1;c1;d1;e1
+;;;;
+""";";"b2;
+b2";"""b3;
+b3""";"""b3""
+b3""";";"
+;;;;
+#comment
+a5;b5;c5;d5;"e5"
+)";
+
+    //open test file
+    std::istringstream file(fileData);
+
+    //create parser
+    TCsvParserTableBuilder helper;
+
+    //parse the file
+    CsvParser::parse( file, helper, ";", "\"", "#'", helper.positionTracker);
+
+    //check parsing ok
+    CHECK( helper.row == test_data::rows );
+    CHECK( helper.items == test_data::columns * test_data::rows );
+    CHECK( helper.finishedCount == 1);
+}

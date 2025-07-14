@@ -38,11 +38,11 @@
         <dt><span class="section"><a href="change_log.gen.html#anchor">Change Log</a></span></dt>
         <dd><dl>
         <dt><span class="section"><a href="change_log.gen.html#anchor3">Development Snapshot</a></span></dt>
-        <dt><span class="section"><a href="change_log.gen.html#anchor12">Release 0.5</a></span></dt>
-        <dt><span class="section"><a href="change_log.gen.html#anchor21">Release 0.4</a></span></dt>
-        <dt><span class="section"><a href="change_log.gen.html#anchor30">Release 0.3.0.96</a></span></dt>
-        <dt><span class="section"><a href="change_log.gen.html#anchor39">Release 0.2.0.67</a></span></dt>
-        <dt><span class="section"><a href="change_log.gen.html#anchor52">Release 0.1.0.40</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor15">Release 0.5</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor24">Release 0.4</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor33">Release 0.3.0.96</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor42">Release 0.2.0.67</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor55">Release 0.1.0.40</a></span></dt>
         </dl></dd>
         </dl>
      </div>
@@ -59,6 +59,21 @@
                 <th>Description</th>
             </tr>
 
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Excel CSV-saver add-in has been extended by the method SaveActiveWorkbookToCsvFilesUtf8 that allows to save tables with UTF-8 encoding.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Excel CSV-saver add-in now saves the line endings correctly when cells contain line breaks.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>The CSV parser now skips over byte order marks &#40;BOM&#41;. BOMs have otherwise the effect that first column or row is not found when generating. This condition is hard to identify, because BOMs are usually not visible.</td>
+            </tr>
             <tr>
                 <td>Bugfix</td>
                 <td> </td>
@@ -108,7 +123,7 @@
         </tbody>
     </table>
     </div>
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor12"></a>Release 0.5 (2019-12-07)</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor15"></a>Release 0.5 (2019-12-07)</h3></div></div></div>
     <p>
     Adds TABLE and PART tags. Minor fixes.
     </p>
@@ -165,7 +180,7 @@
         </tbody>
     </table>
     </div>
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor21"></a>Release 0.4 (2015-11-08)</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor24"></a>Release 0.4 (2015-11-08)</h3></div></div></div>
     <p>
     This release adds a few tags and fixes a few bugs. The code-creation-kit can now be build under linux.</p><p></p><p>The code-creation-kit has proven itself to be a very helpful and stable tool for a class of programming tasks that involve a lot repetition. Furthermore it allows to solve programming problems that could otherwise not be solved without introducing a lot of maintenance overhead.
     </p>
@@ -222,7 +237,7 @@
         </tbody>
     </table>
     </div>
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor30"></a>Release 0.3.0.96 (2012-10-30)</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor33"></a>Release 0.3.0.96 (2012-10-30)</h3></div></div></div>
     <p>
     This release adds in-place generation using inline templates, logging for debugging support, and more CSV-file handling features.</p><p></p><p>Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
     </p>
@@ -279,7 +294,7 @@
         </tbody>
     </table>
     </div>
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor39"></a>Release 0.2.0.67 (2011-06-19)</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor42"></a>Release 0.2.0.67 (2011-06-19)</h3></div></div></div>
     <p>
     The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.</p><p></p><p>Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
     </p>
@@ -356,7 +371,7 @@
         </tbody>
     </table>
     </div>
-    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor52"></a>Release 0.1.0.40 (2011-03-06)</h3></div></div></div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor55"></a>Release 0.1.0.40 (2011-03-06)</h3></div></div></div>
     <p>
     This is the first release of the code-creation-kit. The main purpose of the kit is to be used as code generator.</p><p>Please note that it is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
     </p>
