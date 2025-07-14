@@ -1,34 +1,12 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "CTokenizer.gen.h"
-#include "CBackEndTokenizer.gen.h"
+#include "Tokenizer.gen.h"
+#include "BackEndTokenizer.gen.h"
 #include "ETokens.gen.h"
-#include "CToken.h"
+#include "Token.h"
 #include "TokenizerTest.gen.h"
 #include <string>
 #include <vector>
@@ -225,14 +203,14 @@ void testInlineTemplateProcessing()
     TokenizerT tokenizer;
     setKeywords<TokenizerT, StringT>( tokenizer);
 
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ * "), STRING_LITERAL("* /"), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* / "), STRING_LITERAL("// $")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* /"), STRING_LITERAL("// $ ")), CTokenizerExceptions::ExInlineMarkupWhiteSpace);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL(""), STRING_LITERAL("*/"), STRING_LITERAL("//$")), CTokenizerExceptions::ExInlinePrefixEmpty);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("")), CTokenizerExceptions::ExInlineGeneratedPostfixEmpty);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("**/"), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("**/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
-    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*/"), STRING_LITERAL(""), STRING_LITERAL("*/")), CTokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ * "), STRING_LITERAL("* /"), STRING_LITERAL("// $")), TokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* / "), STRING_LITERAL("// $")), TokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/ *"), STRING_LITERAL("* /"), STRING_LITERAL("// $ ")), TokenizerExceptions::ExInlineMarkupWhiteSpace);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL(""), STRING_LITERAL("*/"), STRING_LITERAL("//$")), TokenizerExceptions::ExInlinePrefixEmpty);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("")), TokenizerExceptions::ExInlineGeneratedPostfixEmpty);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("**/"), STRING_LITERAL("*/")), TokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*"), STRING_LITERAL("*/"), STRING_LITERAL("**/")), TokenizerExceptions::ExBadInlineGeneratedPostfix);
+    CHECK_THROWS_AS( tokenizer.setInlineTemplateMarkup( STRING_LITERAL("/*/"), STRING_LITERAL(""), STRING_LITERAL("*/")), TokenizerExceptions::ExBadInlineGeneratedPostfix);
 
     OutputT helper;
     tokenizer.connectOutputStream( &helper); 
@@ -290,9 +268,9 @@ TEST_CASE("TTokenizer", "[TTokenizer]")
 {
     {
         typedef std::string StringT;
-        typedef CToken<Tokens, StringT> TokenT;    
+        typedef Token<Tokens, StringT> TokenT;    
         typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
-        typedef CTokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
+        typedef Tokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
         testInlineTemplateProcessing<TokenizerT, OutputT, TokenT, StringT>();
@@ -300,9 +278,9 @@ TEST_CASE("TTokenizer", "[TTokenizer]")
 
     {
         typedef std::string StringT;
-        typedef CToken<Tokens, StringT> TokenT;    
+        typedef Token<Tokens, StringT> TokenT;    
         typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
-        typedef CBackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
+        typedef BackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
         testBackEndFeatures<TokenizerT, OutputT, TokenT, StringT>();
@@ -310,9 +288,9 @@ TEST_CASE("TTokenizer", "[TTokenizer]")
 
     {
         typedef std::wstring StringT;
-        typedef CToken<Tokens, StringT> TokenT;    
+        typedef Token<Tokens, StringT> TokenT;    
         typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
-        typedef CTokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
+        typedef Tokenizer<TokenT, StringT, OutputT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
         testInlineTemplateProcessing<TokenizerT, OutputT, TokenT, StringT>();
@@ -320,9 +298,9 @@ TEST_CASE("TTokenizer", "[TTokenizer]")
 
     {
         typedef std::wstring StringT;
-        typedef CToken<Tokens, StringT> TokenT;    
+        typedef Token<Tokens, StringT> TokenT;    
         typedef CTokenizerTestHelper<TokenT, StringT> OutputT;
-        typedef CBackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
+        typedef BackEndTokenizer<TokenT, StringT, OutputT> TokenizerT;
 
         test<TokenizerT, OutputT, TokenT, StringT>();
         testBackEndFeatures<TokenizerT, OutputT, TokenT, StringT>();

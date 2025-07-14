@@ -1,0 +1,12 @@
+Actions\States;Action Name;Action Description;State 1;State 2;State 3;State 4;State 6
+State Name;;;Stopped;Playing;Paused;Open;Forwarding
+State Description;;;The player is stopped.;The player is playing.;The player is paused.;The player is open. The media can be exchanged.;The player is fast forwarding.
+Initial State;;;yes;;;;
+Action 1;Play;The user pressed the play button.;Playing;;Playing;;
+Action 2;Stop;The user pressed the stop button.;;Stopped;Stopped;;
+Action 3;Pause;The user pressed the pause button.;;Paused;;;
+Action 4;Open;The user opened the player.;Open;Open;Open;;Open
+Action 5;Close;The user closed the player.;;;;Stopped;
+Action 6;PressForward;The user presses the forward button.;;Forwarding;;;
+Action 7;ReleaseForward;The user released the forward button.;;;;;Playing
+Action 8;EndOfMediaReached;The playing logic detected that the end of the cd is reached.;;Stopped;;;Stopped

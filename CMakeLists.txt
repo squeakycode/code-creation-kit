@@ -1,60 +1,32 @@
-#  Copyright (c) 2011-2023 Andreas Gau
-#  All rights reserved.
-#
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions are met:
-#      * Redistributions of source code must retain the above copyright
-#        notice, this list of conditions and the following disclaimer.
-#      * Redistributions in binary form must reproduce the above copyright
-#        notice, this list of conditions and the following disclaimer in the
-#        documentation and/or other materials provided with the distribution.
-#      * Neither the name of the copyright holder nor the
-#        names of contributors may be used to endorse or promote products
-#        derived from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0092 NEW) # no default /W3 flag for MSVC
 
 #we only need debug and release configurations
 set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
-set(CCK_WITH_TESTS ON CACHE BOOL "Generate code-creation-kit test projects.")
-set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
-set(CCK_WITH_WIN32_STATIC_RUNTIME ON CACHE BOOL "Generate code-creation-kit with static runtime under Windows.")
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 
 #we are building code creation kit
 project(cck CXX)
 
-if(MSVC)
-    cmake_policy(SET CMP0074 NEW) #The NEW behavior for this policy is to use <PackageName>_ROOT variables.
-endif()
+#set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
 
 #if the code creation kit is installed use it for building, otherwise use pre generated files, that are checked in
-if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
-    if(WIN32) # Windows
-        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc.exe")
-            message(STATUS "Found installed ccktc executable. It will be used for building.")
-            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc.exe")
-        endif()
-    else()
-        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc")
-            message(STATUS "Found installed ccktc executable. It will be used for building.")
-            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc")
-        endif()
-    endif()
-endif()
+#if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
+#    if(WIN32) # Windows
+#        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc.exe")
+#            message(STATUS "Found installed ccktc executable. It will be used for building.")
+#            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc.exe")
+#        endif()
+#    else()
+#        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc")
+#            message(STATUS "Found installed ccktc executable. It will be used for building.")
+#            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc")
+#        endif()
+#    endif()
+#endif()
 
 #use highest warning levels
 macro(custom_target_use_highest_warning_level TargetName)
@@ -65,27 +37,7 @@ else()
 endif()
 endmacro(custom_target_use_highest_warning_level)
 
-
-#static linking of c runtime for windows
-if(MSVC)
-    if (CCK_WITH_WIN32_STATIC_RUNTIME)
-        #compile with std runtime linked statically
-        set(CompilerFlags
-                CMAKE_CXX_FLAGS
-                CMAKE_CXX_FLAGS_DEBUG
-                CMAKE_CXX_FLAGS_RELEASE
-                CMAKE_C_FLAGS
-                CMAKE_C_FLAGS_DEBUG
-                CMAKE_C_FLAGS_RELEASE
-                )
-        foreach(CompilerFlag ${CompilerFlags})
-          string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-        endforeach()  
-    endif()
-endif()
-
 #add the sub directories to build
-add_subdirectory(implementation)
 add_subdirectory(ccktc)
 
 option(CCK_BUILD_TESTS "Determines whether to build tests." ON)
@@ -106,7 +58,6 @@ if(CCK_BUILD_TESTS)
     add_subdirectory(test/TLineCollector)
     add_subdirectory(test/TParameterParser)
     add_subdirectory(test/TSourceFile)
-    add_subdirectory(test/TSpecialRegexCharacterPrefixer)
     add_subdirectory(test/TSystem)
     add_subdirectory(test/TTableIndex)
     add_subdirectory(test/TTemplateLoader)
@@ -114,3 +65,35 @@ if(CCK_BUILD_TESTS)
     add_subdirectory(test/TTokenizer)
     add_subdirectory(test/TVerticalTableBuilder)
 endif()
+
+# Packaging support
+set(CPACK_PACKAGE_VENDOR "squeakycode")
+#<>[COMMENT] The version information is injected here from codegen/Version.tccmd
+#<>[MACRO_BEGIN][TRIM]
+#<>set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "[ENTRY]["cck-product name"] a powerful and versatile toolset designed to streamline code generation.")
+#<>set(CPACK_PACKAGE_NAME "[ENTRY]["cck-product name"]")
+#<>set(CPACK_PACKAGE_VERSION "[ENTRY]["cck-major"].[ENTRY]["cck-minor"].[ENTRY]["cck-patch"]")
+#<>set(CPACK_PACKAGE_VERSION_MAJOR "[ENTRY]["cck-major"]")
+#<>set(CPACK_PACKAGE_VERSION_MINOR "[ENTRY]["cck-minor"]")
+#<>set(CPACK_PACKAGE_VERSION_PATCH "[ENTRY]["cck-patch"]")
+#<>[MACRO_END][TRIM]
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "code-creation-kit a powerful and versatile toolset designed to streamline code generation.")#< inline generated
+set(CPACK_PACKAGE_NAME "code-creation-kit")                                               #< inline generated
+set(CPACK_PACKAGE_VERSION "0.7.0")                                                        #< inline generated
+set(CPACK_PACKAGE_VERSION_MAJOR "0")                                                      #< inline generated
+set(CPACK_PACKAGE_VERSION_MINOR "7")                                                      #< inline generated
+set(CPACK_PACKAGE_VERSION_PATCH "0")                                                      #< inline generated
+set(CPACK_PACKAGE_CONTACT "andreas.gau@gmx.org")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+
+# Set package type defaults
+if(APPLE)
+    set(CPACK_GENERATOR "ZIP")
+elseif(UNIX)
+    set(CPACK_GENERATOR "TGZ")
+elseif(WIN32)
+    set(CPACK_GENERATOR "ZIP")
+endif()
+
+include(CPack)

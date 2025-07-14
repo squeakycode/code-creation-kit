@@ -1,37 +1,14 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <string>
-#include <fstream>
 #include <sstream>
-#include "CCsvParser.h"
-#include "CPositionTracker.h"
-#include "TCsvParserTestFiles.h"
+
+#include "CsvParser.h"
+#include "PositionTracker.h"
 
 using namespace code_creation_kit;
 
@@ -117,7 +94,7 @@ struct TCsvParserTableBuilder
     unsigned int row;
     unsigned int col;
     unsigned int items;
-    CPositionTracker positionTracker;
+    PositionTracker positionTracker;
     int finishedCount;
 
     typedef std::string StringT;
@@ -203,19 +180,27 @@ struct TCsvParserTableBuilderEmptyLastItemOnEof
 
 TEST_CASE( "TCsvParser", "[TCsvParser]")
 {
-    CHECK_NOTHROW(CreateTCsvParserFiles());
+    const char* fileData =
+R"('comment
+a1;b1;c1;d1;e1
+;;;;
+""";";"b2;
+b2";"""b3;
+b3""";"""b3""
+b3""";";"
+;;;;
+#comment
+a5;b5;c5;d5;"e5"
+)";
 
     //open test file
-    std::ifstream file( CCK_TEST_INPUT_FILE_PREFIX "TCsvParser.csv");
-    CHECK( file.good() );
+    std::istringstream file(fileData);
 
     //create parser
-    CCsvParser parser;
     TCsvParserTableBuilder helper;
-    (void) parser;
 
     //parse the file
-    parser.parse( file, helper, ";", "\"", "#'", helper.positionTracker);
+    CsvParser::parse( file, helper, ";", "\"", "#'", helper.positionTracker);
 
     //check parsing ok
     CHECK( helper.row == test_data::rows );
@@ -226,28 +211,28 @@ TEST_CASE( "TCsvParser", "[TCsvParser]")
     {
         std::stringstream s;
         s << "a\"a"; //a"a
-        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExUnexpectedQuote);
+        CHECK_THROWS_AS( CsvParser::parse( s, helper, ";", "\"", ""), CsvParser::ExUnexpectedQuote);
     }
     {
         std::stringstream s;
         s << "\"a\"a"; //"a"a
-        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", ""), CCsvParser::ExRequireDelimitingChar);
+        CHECK_THROWS_AS( CsvParser::parse( s, helper, ";", "\"", ""), CsvParser::ExRequireDelimitingChar);
     }
     {
         std::stringstream s;
-        CHECK_THROWS_AS( parser.parse( s, helper, ";", "\"", "\n"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS( parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CCsvParser::ExBadCommentChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CCsvParser::ExBadDelimiter);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CCsvParser::ExBadQuoteChars);
-        CHECK_THROWS_AS(parser.checkCharsUsedForCsvParsing<std::string>(CCsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CCsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::parse( s, helper, ";", "\"", "\n"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b;", "c;"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a;", "b", "c;"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\n"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Commenting, "a", "b", "\r"), CsvParser::ExBadCommentChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b;", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "a;", "b", "c;"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "\n", "b", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Delimiter, "\r", "b", "c"), CsvParser::ExBadDelimiter);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "b;", "c;"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a;", "b;", "c"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "\n", "c"), CsvParser::ExBadQuoteChars);
+        CHECK_THROWS_AS(CsvParser::checkCharsUsedForCsvParsing<std::string>(CsvParser::UsedCsvCharsCheck_Quote, "a", "\r", "c"), CsvParser::ExBadQuoteChars);
     }
 
     //check ignore double quotes
@@ -255,7 +240,7 @@ TEST_CASE( "TCsvParser", "[TCsvParser]")
         TCsvParserTableBuilderDoubleQuote helperDoubleQuote;
         std::stringstream s;
         s << "\"a1;b\"1;c1\"\n\"x;y\";z";
-        parser.parse( s, helperDoubleQuote, ";", "", "");
+        CsvParser::parse( s, helperDoubleQuote, ";", "", "");
 
         //check parsing ok
         CHECK( helperDoubleQuote.row == 1 );
@@ -268,11 +253,41 @@ TEST_CASE( "TCsvParser", "[TCsvParser]")
         TCsvParserTableBuilderEmptyLastItemOnEof helperEmptyLastItemOnEof;
         std::stringstream s;
         s << "a1;b1\nx;";
-        parser.parse(s, helperEmptyLastItemOnEof, ";", "", "");
+        CsvParser::parse(s, helperEmptyLastItemOnEof, ";", "", "");
 
         //check parsing ok
         CHECK(helperEmptyLastItemOnEof.row == 1);
         CHECK(helperEmptyLastItemOnEof.items == 4);
         CHECK(helperEmptyLastItemOnEof.finishedCount == 1);
     }
+}
+
+TEST_CASE( "TCsvParser with UTF-8 BOM", "[TCsvParser]")
+{
+    const char* fileData = "\xEF\xBB\xBF"
+R"('comment
+a1;b1;c1;d1;e1
+;;;;
+""";";"b2;
+b2";"""b3;
+b3""";"""b3""
+b3""";";"
+;;;;
+#comment
+a5;b5;c5;d5;"e5"
+)";
+
+    //open test file
+    std::istringstream file(fileData);
+
+    //create parser
+    TCsvParserTableBuilder helper;
+
+    //parse the file
+    CsvParser::parse( file, helper, ";", "\"", "#'", helper.positionTracker);
+
+    //check parsing ok
+    CHECK( helper.row == test_data::rows );
+    CHECK( helper.items == test_data::columns * test_data::rows );
+    CHECK( helper.finishedCount == 1);
 }

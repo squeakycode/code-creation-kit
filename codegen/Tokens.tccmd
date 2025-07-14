@@ -1,0 +1,11 @@
+# Copyright (c) 2011-2025 Andreas Gau
+# SPDX-License-Identifier: BSD-3-Clause
+
+datamodels/TagSpecification.csv
+
+-s templates/ETokens.tpl.h -o ../include/code-creation-kit/ETokens.gen.h
+-s templates/Tokenizer.tpl.h -o ../include/code-creation-kit/Tokenizer.gen.h -p Tokenizer=Tokenizer
+-s templates/Tokenizer.tpl.h -o ../include/code-creation-kit/BackEndTokenizer.gen.h -p Tokenizer=BackEndTokenizer
+-s ../test/TTokenizer/TokenizerTest.tpl.h -o ../test/TTokenizer/TokenizerTest.gen.h
+
+-s templates/tags.tpl.csv -o ../samples/create_syntax_highlighter/tags.csv

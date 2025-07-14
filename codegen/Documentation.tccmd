@@ -1,0 +1,13 @@
+datamodels/ChangeLog.csv
+-s templates/documentation/change_log_content.tpl.html -o ../doc/change_log.gen.html -p "file=change_log.gen.html" "heading=Change Log"
+-s templates/documentation/change_log.tpl.txt -o ../changelog.gen.txt
+-r
+datamodels/CommandLineParser.csv
+-s templates/documentation/command_line_reference.tpl.html -o ../doc/command_line_reference.gen.html
+-r
+datamodels/CommandFileLineParser.csv"
+-s templates/documentation/command_file_reference.tpl.html -o ../doc/command_file_reference.gen.html
+-r
+datamodels/TagSpecification.csv
+-s templates/documentation/full_tag_reference.tpl.html -o ../doc/full_tag_reference.gen.html
+

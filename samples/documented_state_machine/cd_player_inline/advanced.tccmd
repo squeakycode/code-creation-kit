@@ -1,0 +1,5 @@
+--load-table advanced.csv
+# The recycle option tries put the processed file into the recycle bin
+# of the system each time the processing replaces it to prevent data loss. 
+-s CDPlayerStatemachine.h --inlined -b //<> -d //$ --inline-pad 90 --recycle
+-s main.cpp --inlined -b //<> -d //$ --inline-pad 90 --recycle

@@ -1,34 +1,12 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <string>
 #include <sstream>
-#include "CGenerator.h"
+#include "Generator.h"
 #include "TGeneratorTestFiles.h"
 
 using namespace code_creation_kit;
@@ -40,7 +18,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
     CHECK_NOTHROW(CreateTGeneratorFiles());
 
     {
-        CGenerator<std::string> generator;
+        Generator<std::string> generator;
 
         generator.setCsvCommentChars("#");
 
@@ -71,7 +49,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
     //data flow test
     {
-        CGenerator<std::string, std::ostream> generator;
+        Generator<std::string, std::ostream> generator;
 
         //load a table
         generator.loadTable( CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelA", true, true, 1, 1, false);
@@ -85,7 +63,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
     //test append
     {
-        CGenerator<std::string> generator;
+        Generator<std::string> generator;
         //load a table
         generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TDataflow.csv", "LabelA", true, true, 1, 1, false);
 
@@ -116,7 +94,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
         in << "[ENTRY][\"a\"][ENTRY][\"b\"]" << std::endl;
         in << "end";
 
-        CGenerator<std::string> generator;
+        Generator<std::string> generator;
 
         //load a table
         generator.loadTable( csv, "LabelA", true, true, 1, 1, false);
@@ -136,9 +114,9 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
     //test inline
     {
-        CGenerator<std::string> generator;
+        Generator<std::string> generator;
         std::vector<std::string> parameterList;
-        CInlineTemplateParameters<std::string> itp( true, "//<>", "//>", "//$", 3);
+        InlineTemplateParameters<std::string> itp( true, "//<>", "//>", "//$", 3);
 
         generator.setCsvCommentChars("#");
 
@@ -181,7 +159,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
     //table with padding test
     {
-        CGenerator<std::string> generator;
+        Generator<std::string> generator;
         //load a table
         generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "NeedsPadding.csv", "LabelA", true, true, 0, 0, true);
 
@@ -194,8 +172,8 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
     //log test
     {
-        CGenerator<std::string, std::ostream> generator;
-        CTargetFile<std::string, LogFileT> logFile(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", false);
+        Generator<std::string, std::ostream> generator;
+        TargetFile<std::string, LogFileT> logFile(CCK_TEST_INPUT_FILE_PREFIX "LogOutput.txt", false);
 
         //connecting log stream
         generator.connectLogOutputStream( &logFile.get());
@@ -233,7 +211,7 @@ TEST_CASE( "TGenerator", "[TGenerator]")
 
         //check extended error output
         CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest1.gen.txt"), std::exception);
-        CInlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
+        InlineTemplateParameters<std::string> itp( true, "$", "%", "&", 3);
         CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest2.tpl", true, false, "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest2.tpl.intermediate", false, std::vector<std::string>(), false, itp), std::exception);
         CHECK_THROWS_AS( generator.generate( "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX "LogTest3.tpl", "../TGenerator/" CCK_TEST_INPUT_FILE_PREFIX  "LogTest1.gen.txt"), std::exception);
 

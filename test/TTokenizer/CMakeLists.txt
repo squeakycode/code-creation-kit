@@ -6,11 +6,9 @@ add_executable(Test_TokenizerRunner
 
 target_include_directories(Test_TokenizerRunner
 PRIVATE
-${PROJECT_SOURCE_DIR}/test/include
-$<TARGET_PROPERTY:cck_implementation,INTERFACE_INCLUDE_DIRECTORIES>
+    ${PROJECT_SOURCE_DIR}/test/include
+    ${PROJECT_SOURCE_DIR}/include/code-creation-kit
 )
-
-add_dependencies(Test_TokenizerRunner cck_implementation)
 
 custom_target_use_highest_warning_level(Test_TokenizerRunner)
 

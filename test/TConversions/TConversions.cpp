@@ -1,27 +1,5 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -156,37 +134,37 @@ template <typename StringT>
 void testPad()
 {
     typedef typename StringT::value_type CharT;
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n       6\n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("abc123456"), STRING_LITERAL("abc "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("abc   123456"), STRING_LITERAL("abc "), STRING_LITERAL("12"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc12345\nabc    6\nabc     "), STRING_LITERAL("abc "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abb12345\na6\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("ab12345\nab6\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc     12345\nabc6\nabc"), STRING_LITERAL("abc "), STRING_LITERAL("+8"), STRING_LITERAL("+2"));
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc "), STRING_LITERAL("0"), STRING_LITERAL("+0"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("  123456"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n       6\n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("   12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n 6\n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("abc123456"), STRING_LITERAL("abc "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("abc   123456"), STRING_LITERAL("abc "), STRING_LITERAL("12"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc12345\nabc    6\nabc     "), STRING_LITERAL("abc "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abb12345\na6\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("ab12345\nab6\nab"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc     12345\nabc6\nabc"), STRING_LITERAL("abc "), STRING_LITERAL("+8"), STRING_LITERAL("+2"));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6\n"), STRING_LITERAL("abc "), STRING_LITERAL("0"), STRING_LITERAL("+0"));
 
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6       \n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456   abc"), STRING_LITERAL(" abc"), STRING_LITERAL("12"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345abc\n6    abc\n     abc"), STRING_LITERAL(" abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345aab\n6b\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345bc\n6bc\nbc"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345     abc\n6abc\nabc"), STRING_LITERAL(" abc"), STRING_LITERAL("+8"), STRING_LITERAL("+2"));
-    testPad<StringT, CPadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6\n"), STRING_LITERAL(" abc"), STRING_LITERAL("0"), STRING_LITERAL("+0"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6       \n        "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345   \n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6 \n  "), STRING_LITERAL(" "), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("123456"), STRING_LITERAL("123456   abc"), STRING_LITERAL(" abc"), STRING_LITERAL("12"), STRING_LITERAL(""));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345abc\n6    abc\n     abc"), STRING_LITERAL(" abc"), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345aab\n6b\nab"), STRING_LITERAL("ab"), STRING_LITERAL("8"), STRING_LITERAL("2"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345bc\n6bc\nbc"), STRING_LITERAL("abc"), STRING_LITERAL("4"), STRING_LITERAL("2"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345     abc\n6abc\nabc"), STRING_LITERAL(" abc"), STRING_LITERAL("+8"), STRING_LITERAL("+2"));
+    testPad<StringT, PadRightConversion<StringT> >(STRING_LITERAL("12345\n6\n"), STRING_LITERAL("12345\n6\n"), STRING_LITERAL(" abc"), STRING_LITERAL("0"), STRING_LITERAL("+0"));
 
-    testPad<StringT, CPadLeftConversion<StringT> >(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
+    testPad<StringT, PadLeftConversion<StringT> >(STRING_LITERAL("1\t6"), STRING_LITERAL("  1\t6"), STRING_LITERAL(" "), STRING_LITERAL("8"), STRING_LITERAL(""));
 }
 
 template <typename StringT>
 void testBlockFormat(const StringT& in, const StringT& out, const StringT& blockWidth)
 {
     {
-        CBlockFormatConversion<StringT> bf(blockWidth);
+        BlockFormatConversion<StringT> bf(blockWidth);
 
         std::vector<StringT> v;
         v.push_back(in);
@@ -230,7 +208,7 @@ void testCalculation(const std::string& in, const std::string& out, const std::s
 {
     typedef typename StringT::value_type CharT;
     {
-        CCalcConversion<StringT> calc(StringConvert<StringT>(expression));
+        CalcConversion<StringT> calc(StringConvert<StringT>(expression));
 
         std::vector<StringT> v;
         v.push_back(StringConvert<StringT>(in));
@@ -252,18 +230,18 @@ void testCalculation(const std::string& in, const std::string& out, const std::s
 template <typename StringT>
 void testCalculation()
 {
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CCalcConversionExceptions::ExDivisionByZero);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CCalcConversionExceptions::ExDivisionByZero);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a#+2"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b+2#"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("a1", "3", "a+1"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b*"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b**"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "*b"), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a/0"), CalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a%0"), CalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+02"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "#a+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a#+2"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "a+2#"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b+2#"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("a1", "3", "a+1"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b*"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "b**"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(testCalculation<StringT>("1", "3", "*b"), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
 
     testCalculation<StringT>("1", "3", "a+2");
     testCalculation<StringT>("1", "304", "a+2+300+1");
@@ -299,12 +277,12 @@ void testToCsv(const StringT& in, const StringT& out, const StringT& csvDelimite
     {
         if (single)
         {
-            CToCsvConversion<StringT> toCsv(csvDelimiterChars);
+            ToCsvConversion<StringT> toCsv(csvDelimiterChars);
             toCsv.modify(v);
         }
         else
         {
-            CToCsvConversion<StringT> toCsv(csvDelimiterChars, csvQuoteChars);
+            ToCsvConversion<StringT> toCsv(csvDelimiterChars, csvQuoteChars);
             toCsv.modify(v);
         }
 
@@ -344,16 +322,16 @@ void testToCsv()
 
 TEST_CASE( "TConversions", "[TConversions]")
 {
-    testReplace<std::string, CReplaceConversion<std::string> >();
-    testReplace<std::string, CRegexReplaceConversion<std::string> >();
+    testReplace<std::string, ReplaceConversion<std::string> >();
+    testReplace<std::string, RegexReplaceConversion<std::string> >();
 
-    testMerge<std::string, CMergeConversion<std::string> >();
+    testMerge<std::string, MergeConversion<std::string> >();
 
-    testToCString<std::string, CToCStringConversion<std::string> >();
-    testToCString<std::wstring, CToCStringConversion<std::wstring> >();
+    testToCString<std::string, ToCStringConversion<std::string> >();
+    testToCString<std::wstring, ToCStringConversion<std::wstring> >();
 
-    testHtmlEscape<std::string, CHtmlEscapeConversion<std::string> >();
-    testHtmlEscape<std::wstring, CHtmlEscapeConversion<std::wstring> >();
+    testHtmlEscape<std::string, HtmlEscapeConversion<std::string> >();
+    testHtmlEscape<std::wstring, HtmlEscapeConversion<std::wstring> >();
 
     testPad<std::string>();
     testPad<std::wstring>();

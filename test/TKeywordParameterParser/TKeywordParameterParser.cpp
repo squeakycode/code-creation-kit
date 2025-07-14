@@ -1,27 +1,5 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -71,40 +49,40 @@ TEST_CASE( "TKeywordParameterParser", "[TKeywordParameterParser]")
     { // one
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "test");
-        test<CPlainParameterPolicy>( "[ \"test\" ]-", expectedParameters, 1);
+        test<PlainParameterPolicy>( "[ \"test\" ]-", expectedParameters, 1);
     }
 
     { // two
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "testa");
         expectedParameters.push_back( "testb");
-        test<CPlainParameterPolicy>( "[\"testa\" , \"testb\"]-", expectedParameters, 2);
+        test<PlainParameterPolicy>( "[\"testa\" , \"testb\"]-", expectedParameters, 2);
     }
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
-        CHECK_THROWS_AS( test<CPlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "x", expectedParameters, 1), KeywordParameterParser::ExParameterStartExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[\"test\"]-", expectedParameters, 2), KeywordParameterParser::ExParameterSeparatorExpected);
+        CHECK_THROWS_AS( test<PlainParameterPolicy>( "[\"test\",\"test\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterEndExpected);
     }
 
     { // one + special chars
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "\n\t\"\\test");
-        test<CCStyleParameterPolicy>( "[\"\\n\\t\\\"\\\\test\"]-", expectedParameters, 1);
+        test<CStyleParameterPolicy>( "[\"\\n\\t\\\"\\\\test\"]-", expectedParameters, 1);
     }
 
 
     { //exceptions
         std::vector<std::string> expectedParameters;
-        CHECK_THROWS_AS( test<CCStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
+        CHECK_THROWS_AS( test<CStyleParameterPolicy>( "[\"a\\s\"]-", expectedParameters, 1), KeywordParameterParser::ExParameterValueExpected);
     }
 
     { // one + special chars
         std::vector<std::string> expectedParameters;
         expectedParameters.push_back( "a'b");
-        test<CRegexParameterPolicy>( "['a''b']-", expectedParameters, 1);
+        test<RegexParameterPolicy>( "['a''b']-", expectedParameters, 1);
     }
 
     { // getParametersCombiCStyleUIntUIntRepeat

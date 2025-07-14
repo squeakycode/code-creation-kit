@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Data Table Creation | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="getting_started.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="template_creation.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h1 class="title" style="clear: both"><a name="anchor2"></a>Data Table Creation </h1></div></div></div>
+    <div class="toc">
+    
+    <dl>
+    <dt><span class="section"><a href="table_creation.html#anchor2">Data Table Creation </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="table_creation.html#anchor5">The CSV-File Format </a></span></dt>
+    <dt><span class="section"><a href="table_creation.html#anchor8">Using Spreadsheet Applications </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="table_creation.html#anchor10">Using Microsoft Excel with the Provided Add-In </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="table_creation.html#anchor20">Store Workbook additionally to CSV-Files using the Toolbar Button </a></span></dt>
+    <dt><span class="section"><a href="table_creation.html#anchor22">Store Workbook additionally to CSV-Files on Save </a></span></dt>
+    </dl></dd>
+    <dt><span class="section"><a href="table_creation.html#anchor26">Using the CSV format directly </a></span></dt>
+    </dl></dd></dl></dd>
+    </dl>
+    </div>
+    <p>
+    The code-creation-kit text compiler loads table data provided in the CSV-file format. This table format is very common and it is provided by many applications. It can simply be produced using a text editor. But the recommended way for creating such tables is using a spreadsheet application. Ideally you create a table to model a problem, e.g. a list of parameters, as you normally would without generating code. No special rules for column or row naming need to be applied. The default position for column headings is the first row and the first column for row headings. This can be changed using additional options in the command file. When multiple columns or rows with the same name are contained in a table their content is concatenated in the order it appears during the macro expansion. This behavior can be changed using additional tags. 
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor5"></a>The CSV-File Format </h2></div></div></div>
+    <p>
+    A comma-separated-values file uses a single character as delimiter to separate the items of a table. Common delimiters are semi-colon, tab, or comma. One line in the file stores one row of the table except when an item of the row contains a new line character. In this case or when the delimiter or a double quote is contained in the item text then the item is put into double quotes. Double quotes in the item text are doubled. 
+    </p>
+    <p>
+    Since the CSV-file format is stored as plain text, it is easy to track changes in a version control system using a text differencing tool. 
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor8"></a>Using Spreadsheet Applications </h2></div></div></div>
+    <p>
+    Using a spreadsheet application to create a data table is very convenient and all the powerful functionality of for instance Microsoft Excel or Open Office Calc can be used. 
+    </p>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor10"></a>Using Microsoft Excel with the Provided Add-In </h3></div></div></div>
+    <p>
+    The code-creation-kit setup comes with an Excel add-in named ‘Code-Creation-Kit_CSV-Saver.xla’. It is needed because Excel provides no possibility to export the content of a standard workbook to a CSV-file. When using the Save-As option the type of the workbook changes and only the content of the first sheet is saved changing the type of the workbook to CSV. The add-in provides a convenient way to store all sheets of a workbook to CSV-files. This allows keeping the master workbook utilizing all Excel functionality. The following is rules apply. 
+    </p>
+    <div class="itemizedlist"><ul type="disc">
+    <li>
+    Each sheet is saved to a separate CSV-file 
+    </li>
+    <li>
+    The CSV-files are saved in the folder where the workbook is located 
+    </li>
+    <li>
+    Naming for the first CSV-file/sheet: [workbook name].csv 
+    </li>
+    <li>
+    Naming for the next CSV-files/sheets: [workbook name].[sheet name].csv 
+    </li>
+    <li>
+    If the sheet name contains special characters they are replaced with '_' 
+    </li>
+    <li>
+    WARNING: files with the name of the produced CSV-files in the workbooks folder are overwritten without notice! 
+    </li>
+    </ul></div>
+    <div class="titlepage"><div><div><h4 class="title" style="clear: both"><a name="anchor20"></a>Store Workbook additionally to CSV-Files using the Toolbar Button </h4></div></div></div>
+    <p>
+    When the add-in is installed it automatically creates a toolbar with a button used to store the sheets of the active workbook. 
+    </p>
+    <div class="titlepage"><div><div><h4 class="title" style="clear: both"><a name="anchor22"></a>Store Workbook additionally to CSV-Files on Save </h4></div></div></div>
+    <p>
+    The workbook can be saved to CSV-files automatically when saving the workbook by adding the following before save event handler to the workbook. 
+    </p>
+    <pre class="synopsis">
+<span style="color:#0000ff">Private Sub</span> <span style="color:#000000">Workbook_BeforeSave</span><span style="color:#000000">(</span><span style="color:#0000ff">ByVal</span> SaveAsUI <span style="color:#0000ff">As</span> <span style="color:#0000ff">Boolean</span><span style="color:#000000">,</span> Cancel <span style="color:#0000ff">As</span> <span style="color:#0000ff">Boolean</span><span style="color:#000000">)</span>
+    SaveWorkbookToCsvFiles ThisWorkbook
+<span style="color:#0000ff">End Sub</span>
+    </pre>
+    <p>
+     
+    </p>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor26"></a>Using the CSV format directly </h3></div></div></div>
+    <p>
+    A spreadsheet application can also be used to create and modify a CSV-file directly.  
+    </p>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="getting_started.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="template_creation.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+</body>
+</html>

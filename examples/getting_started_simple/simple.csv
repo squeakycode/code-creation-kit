@@ -1,6 +1,0 @@
-Type;Name;Default;Description
-int;i;10;Description for i
-double;d;23.4;
-std::string;s;"""x34""";Description for s
-int;;6;This is an incomplete entry
-bool;b;true;Description for b

@@ -1,27 +1,5 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -33,10 +11,10 @@
 #include "TCommandProcessorTestFiles.h"
 
 ///externally provided exception class showing that an error has been printed
-class CErrorPrinted{};
+class ErrorPrinted{};
 
 #include "CommandProcessor.h"
-#include "CTargetFile.h"
+#include "TargetFile.h"
 #include "StringConvert.h"
 using namespace code_creation_kit;
 
@@ -89,7 +67,7 @@ public:
         bool append,
         const ParameterListT& parameters,
         bool canChangeTableList,
-        const CInlineTemplateParameters<StringT>& inlineTemplateParameters
+        const InlineTemplateParameters<StringT>& inlineTemplateParameters
         )
     {
         CHECK( m_generate);
@@ -182,7 +160,7 @@ public:
     unsigned int m_columnHeaderIndex;
     bool m_padRows;
 
-    CInlineTemplateParameters<StringT> m_inlineTemplateParameters;
+    InlineTemplateParameters<StringT> m_inlineTemplateParameters;
 
     bool m_append;
     bool m_logStream;
@@ -289,7 +267,7 @@ private:
 template <typename StringT, typename ContainerT, typename GeneratorT> 
 void process( ContainerT& container, GeneratorT& generator)
 {
-    CTargetFile<StringT, LogFileT> logFile;
+    TargetFile<StringT, LogFileT> logFile;
 
     std::list<StringT> argsString;
     std::vector<typename StringT::value_type*> args;
@@ -495,7 +473,7 @@ void runTest()
         generator.setIntermediateFileName( "a.txt.intermediate");
         generator.m_generate = true;
         generator.m_recycle = true;
-        generator.m_inlineTemplateParameters = CInlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
+        generator.m_inlineTemplateParameters = InlineTemplateParameters<StringT>( true, STRING_LITERAL("+++"), STRING_LITERAL(">>>"), STRING_LITERAL("<<<"), 56);
         std::vector<std::string> args = { "-c", "-s a.txt --inlined -b +++ -c >>> -d <<< --inline-pad 56 -y" };
         process<StringT>( args, generator);
     }
@@ -602,7 +580,7 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.h.itpl" };
         generator.m_reset = true;
-        CHECK_THROWS_AS(process<StringT>(args, generator), CErrorPrinted);
+        CHECK_THROWS_AS(process<StringT>(args, generator), ErrorPrinted);
     }
     
     {
@@ -610,7 +588,7 @@ void runTest()
         GeneratorT generator;
         std::vector<std::string> args = { "NotThere.tccmd" };
         generator.m_reset = true;
-        CHECK_THROWS_AS( process<StringT>( args, generator), CErrorPrinted);
+        CHECK_THROWS_AS( process<StringT>( args, generator), ErrorPrinted);
     }
 }
 
@@ -620,6 +598,82 @@ TEST_CASE( "TCommandProcessor", "[TCommandProcessor]")
 
     runTest<std::string>();
 #ifdef _MSC_VER
-    //runTest<std::wstring>();
+    runTest<std::wstring>();
 #endif
+}
+
+template <typename StringT>
+std::vector<StringT> splitCommandLine(const StringT& input)
+{
+    typedef typename StringT::value_type CharT;
+    std::vector<StringT> arguments;
+    StringT currentArgument;
+    bool inQuotes = false;
+    bool seenQuotes = false;
+
+    for (auto it = input.cbegin() ; it != input.cend(); ++it)
+    {
+        const CharT c = *it;
+
+        if (c == '\\')
+        {
+            // escaping is only relevant inside of quotes
+            if (inQuotes && (it + 1) != input.cend())
+            {
+                const CharT nextC = *(it + 1);
+                if (nextC == '"' || nextC == '\\')
+                {
+                    currentArgument += nextC;
+                    ++it;
+                }
+                else
+                {
+                    currentArgument += c;
+                }
+            }
+            else
+            {
+                currentArgument += c;
+            }
+        }
+        else if (c == '"')
+        {
+            inQuotes = !inQuotes;
+            seenQuotes = true;
+        }
+        else if ((c == ' ' || c == '\t') && !inQuotes)
+        {
+            if (!currentArgument.empty() || seenQuotes)
+            {
+                arguments.push_back(currentArgument);
+                currentArgument.clear();
+                seenQuotes = false;
+            }
+        }
+        else
+        {
+            currentArgument += c;
+        }
+    }
+    if (!currentArgument.empty())
+    {
+        arguments.push_back(currentArgument);
+    }
+    return arguments;
+}
+
+TEST_CASE( "TSplitCommandLine", "[TCommandProcessor]")
+{
+    auto result = splitCommandLine<std::string>(R"(  arg1\path\path\path " arg2 " "" "\\\"" \\      last   )");
+    REQUIRE(result.size() == 6);
+    CHECK(result[0] == "arg1\\path\\path\\path");
+    CHECK(result[1] == " arg2 ");
+    CHECK(result[2] == "");
+    CHECK(result[3] == "\\\"");
+    CHECK(result[4] == "\\\\");
+    CHECK(result[5] == "last");
+    auto result2 = splitCommandLine<std::wstring>(L"a\tb");
+    REQUIRE(result2.size() == 2);
+    CHECK(result2[0] == L"a");
+    CHECK(result2[1] == L"b");
 }

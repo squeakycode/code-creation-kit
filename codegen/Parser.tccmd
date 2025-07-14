@@ -1,0 +1,9 @@
+# Copyright (c) 2011-2025 Andreas Gau
+# SPDX-License-Identifier: BSD-3-Clause
+
+datamodels/TagSpecification.csv
+datamodels/ParserExtensions.csv
+
+-s templates/ConstraintDirectives.tpl.h -o ../include/code-creation-kit/ConstraintDirectives.gen.h
+-s templates/ConversionDirectives.tpl.h -o ../include/code-creation-kit/ConversionDirectives.gen.h
+-s templates/ParserExtensions.tpl.h -o ../include/code-creation-kit/ParserExtensions.gen.h

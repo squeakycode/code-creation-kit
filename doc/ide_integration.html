@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>IDE Integration | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="command_file_reference.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="index.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h1 class="title" style="clear: both"><a name="anchor2"></a>IDE Integration </h1></div></div></div>
+    <p>
+     
+    </p>
+    <div class="toc">
+    
+    <dl>
+    <dt><span class="section"><a href="ide_integration.html#anchor2">IDE Integration </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="ide_integration.html#anchor5">Command File Dependency Output </a></span></dt>
+    <dt><span class="section"><a href="ide_integration.html#anchor7">Microsoft Visual Studio </a></span></dt>
+    <dt><span class="section"><a href="ide_integration.html#anchor18">MPC - The Makefile, Project and Workspace Creator </a></span></dt>
+    </dl></dd>
+    </dl>
+    </div>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor5"></a>Command File Dependency Output </h2></div></div></div>
+    <p>
+    The text compiler provides information on the dependencies to the files associated with a command file. This information can be used to integrate the text compiler into different development environments. The command line section shows the required options to do this. 
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor7"></a>Microsoft Visual Studio </h2></div></div></div>
+    <p>
+    To integrate the text compiler into Microsoft Visual Studio as custom build step the following steps are required: 
+    </p>
+    <div class="itemizedlist"><ul type="disc">
+    <li>
+    Add the command file to your project 
+    </li>
+    <li>
+    Add the template files to your project 
+    </li>
+    <li>
+    Add the output files to your project 
+    </li>
+    <li>
+    Open the properties of the command file 
+    </li>
+    <li>
+    In a Windows-Explorer right click on the command file and select ‘Dependencies’ 
+    </li>
+    <li>
+    Enter the displayed settings in the Visual Studio property dialog of the command file 
+    </li>
+    </ul></div>
+    <p>
+    The example solution shows command files integrated as custom build steps. 
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor18"></a>MPC - The Makefile, Project and Workspace Creator </h2></div></div></div>
+    <p>
+     
+    </p>
+    <p>
+    The installed mpc folder contains the base file tccmd.mpb with the required settings for text compiler command files. Together with the dependency output using MPC style it can be used to create project files containing command files. 
+    </p>
+    <p>
+    The MPC integration example shows how to integrate the text compiler into MPC files for creating projects containing text compiler command files. It consists of a batch script that creates the MPC files for the examples. Furthermore it runs the MPC workspace creator to create the example solution and projects. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+     
+    </p>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="command_file_reference.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="index.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+</body>
+</html>

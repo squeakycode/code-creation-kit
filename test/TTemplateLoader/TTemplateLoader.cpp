@@ -1,32 +1,10 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "CTemplateLoader.h"
+#include "TemplateLoader.h"
 #include <string>
 #include <sstream>
 #include "TTemplateLoaderTestFiles.h"
@@ -42,14 +20,14 @@ using namespace code_creation_kit;
 class TestHelper
 {
 public:
-    TestHelper( CTemplateLoader<TestHelper, std::string>& loader): m_loader( loader) {}
+    TestHelper( TemplateLoader<TestHelper, std::string>& loader): m_loader( loader) {}
     template <typename T>
     void operator << (const T& text)
     {
         m_loader.loadTemplateFile( text);
     }
 
-    CTemplateLoader<TestHelper, std::string>& m_loader;
+    TemplateLoader<TestHelper, std::string>& m_loader;
 };
 
 #ifdef _MSC_VER
@@ -63,7 +41,7 @@ TEST_CASE( "TTemplateLoader", "[TTemplateLoader]")
 
     typedef std::string StringT;
     {
-        CTemplateLoader<std::stringstream, StringT> loader;
+        TemplateLoader<std::stringstream, StringT> loader;
 
         //check result of loading last line with new line
         {
@@ -99,11 +77,11 @@ TEST_CASE( "TTemplateLoader", "[TTemplateLoader]")
 
     //check trigger loading another file by output processing, ends in cyclic inclusion error
     {
-        typedef CTemplateLoader<TestHelper, StringT> LoaderT;
-        CTemplateLoader<TestHelper, StringT> loader;
+        typedef TemplateLoader<TestHelper, StringT> LoaderT;
+        TemplateLoader<TestHelper, StringT> loader;
         TestHelper helper( loader);
         loader.connectOutputStream( &helper);
-        CHECK_THROWS_AS( loader.loadTemplateFile( CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt"), CTemplateLoaderExceptions::ExCyclicInclusion);
+        CHECK_THROWS_AS( loader.loadTemplateFile( CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt"), TemplateLoaderExceptions::ExCyclicInclusion);
         REQUIRE( loader.getInclusionHierarchy().size() == 3 );
         std::string expected[] = {CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest3.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest4.txt", "InclusionTest/" CCK_TEST_INPUT_FILE_PREFIX "TemplateLoaderTest5.txt"};
 

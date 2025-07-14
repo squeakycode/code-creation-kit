@@ -1,3 +1,0 @@
---load-table advanced.extended.csv
--s ../DocumentedStatemachine.tpl.h -o CDPlayerStatemachineEx.gen.h -p "Machine Name=CDPlayerStateMachineEx"
--s ../DocumentedStatemachineTestMain.tpl.h -o CDPlayerExTestMain.gen.cpp -p "Machine Name=CDPlayerStateMachineEx"

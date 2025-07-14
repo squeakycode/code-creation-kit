@@ -1,34 +1,71 @@
-#  Copyright (c) 2011-2023 Andreas Gau
-#  All rights reserved.
-#
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions are met:
-#      * Redistributions of source code must retain the above copyright
-#        notice, this list of conditions and the following disclaimer.
-#      * Redistributions in binary form must reproduce the above copyright
-#        notice, this list of conditions and the following disclaimer in the
-#        documentation and/or other materials provided with the distribution.
-#      * Neither the name of the copyright holder nor the
-#        names of contributors may be used to endorse or promote products
-#        derived from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+add_executable(ccktc
+    ../include/code-creation-kit/BackEndTokenizer.gen.h
+    ../include/code-creation-kit/ComparableSharedObject.h
+    ../include/code-creation-kit/CsvParser.h
+    ../include/code-creation-kit/ErrorPrinter.gen.h
+    ../include/code-creation-kit/FilesBinaryEqual.h
+    ../include/code-creation-kit/Generator.h
+    ../include/code-creation-kit/GeneratorStatistic.h
+    ../include/code-creation-kit/InlineTemplateParameters.h
+    ../include/code-creation-kit/LineCollector.h
+    ../include/code-creation-kit/Macro.h
+    ../include/code-creation-kit/MacroExpander.h
+    ../include/code-creation-kit/MacroExpression.h
+    ../include/code-creation-kit/MacroProcessor.h
+    ../include/code-creation-kit/NullDevice.h
+    ../include/code-creation-kit/CombiKeywordParameterParser.gen.h
+    ../include/code-creation-kit/ConstraintDirectives.gen.h
+    ../include/code-creation-kit/Constraints.h
+    ../include/code-creation-kit/ConversionDirectives.gen.h
+    ../include/code-creation-kit/Conversions.h
+    ../include/code-creation-kit/Parser.h
+    ../include/code-creation-kit/PositionTracker.h
+    ../include/code-creation-kit/cppstringx.hpp
+    ../include/code-creation-kit/cpptokenfinder.hpp
+    ../include/code-creation-kit/ProcessingLevelControl.h
+    ../include/code-creation-kit/SimpleFormat.h
+    ../include/code-creation-kit/SourceFile.h
+    ../include/code-creation-kit/Substitution.h
+    ../include/code-creation-kit/TableIndex.h
+    ../include/code-creation-kit/TargetFile.h
+    ../include/code-creation-kit/TemplateLoader.h
+    ../include/code-creation-kit/TemplatePreprocessor.h
+    ../include/code-creation-kit/TemplateProcessor.h
+    ../include/code-creation-kit/TemplateProvidedTableLoader.h
+    ../include/code-creation-kit/Token.h
+    ../include/code-creation-kit/Tokenizer.gen.h
+    ../include/code-creation-kit/VerticalTableBuilder.h
+    ../include/code-creation-kit/VerticalTableRotator.h
+    ../include/code-creation-kit/DependencyPrinter.h
+    ../include/code-creation-kit/ESubstitutions.gen.h
+    ../include/code-creation-kit/ETokens.gen.h
+    ../include/code-creation-kit/FileSystem.h
+    ../include/code-creation-kit/IConstraint.h
+    ../include/code-creation-kit/IConversion.h
+    ../include/code-creation-kit/KeywordParameterCheckFunctions.h
+    ../include/code-creation-kit/KeywordParameterParser.h
+    ../include/code-creation-kit/ParserExtensions.gen.h
+    ../include/code-creation-kit/StringConvert.h
+    ../include/code-creation-kit/StringLiteral.h
+    ../include/code-creation-kit/System.h
+    version.gen.h
+    ccktc.cpp
+)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/output/bin)
-
-add_executable(ccktc ccktc.cpp)
-target_link_libraries(ccktc
+target_include_directories(ccktc
     PRIVATE
-    cck_implementation 
+    ../include/code-creation-kit
 )
 
 custom_target_use_highest_warning_level(ccktc)
+
+install(TARGETS ccktc
+        RUNTIME DESTINATION bin
+)
+
+# ccktc executable is linked with static runtime for Windows and Release build
+if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_target_properties(ccktc PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+    )
+endif()

@@ -1,6 +1,0 @@
-Type;Name;Default;Min;Max;Description
-integer;i;10;2;100;Description for i
-double;d;23.4;-234.5;300;
-string;s;"""x34""";;;Description for s
-integer;;6;;;This is an incomplete entry
-boolean;b;true;;;Description for b

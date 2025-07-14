@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Change Log | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor"></a>Change Log</h2></div></div></div>
+    <p>
+    </p>
+    <div class="toc">
+        <dl>
+        <dt><span class="section"><a href="change_log.gen.html#anchor">Change Log</a></span></dt>
+        <dd><dl>
+        <dt><span class="section"><a href="change_log.gen.html#anchor3">Development Snapshot</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor15">Release 0.5</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor24">Release 0.4</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor33">Release 0.3.0.96</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor42">Release 0.2.0.67</a></span></dt>
+        <dt><span class="section"><a href="change_log.gen.html#anchor55">Release 0.1.0.40</a></span></dt>
+        </dl></dd>
+        </dl>
+     </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor3"></a>Development Snapshot</h3></div></div></div>
+    <p>
+    This is a development snapshot.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Excel CSV-saver add-in has been extended by the method SaveActiveWorkbookToCsvFilesUtf8 that allows to save tables with UTF-8 encoding.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Excel CSV-saver add-in now saves the line endings correctly when cells contain line breaks.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>The CSV parser now skips over byte order marks &#40;BOM&#41;. BOMs have otherwise the effect that first column or row is not found when generating. This condition is hard to identify, because BOMs are usually not visible.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed an issue where a CSV-file failed to load when then last cell was empty and not terminated by a new line character.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added TO_SIZE conversion tag. This tag can be used for determinating the size of text entries.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added TO_CSV conversion tag. This can be used for putting text items in quotes correctly when creating CSV tables.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed an issue that could cause to paths to not be determined correctly on Unix based operating systems. Furthermore absolute paths are now normalized instead of using the provided path directly.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added process-instant-template command line option for processing an instant template file &#40;extension itpl&#41;. An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Renamed command file parameter csv-delimiter to csv-delimiter-chars. Multiple delimiters can be supplied.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Replaced  command file parameter csv-ignore-quotes with csv-quote-chars. You can pass an empty string to ignore quotes.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added CALC conversion tag for computing arithmetic expressions.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed an issue where multiple of either PAD_LEFT, PAD_RIGHT or BLOCK_FORMAT tags failed to work as expected.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor15"></a>Release 0.5 (2019-12-07)</h3></div></div></div>
+    <p>
+    Adds TABLE and PART tags. Minor fixes.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Improved the documentation for INCLUDE</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed an issue where filename and line was not reported correctly at the end of a template file.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed documentation of SET_MARKUP.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added TABLE_BEGIN, TABLE_END, TABLE_LOAD, TABLE_REMOVE for providing tables directly from templates. Tables can be provided beyond the scope of the template if enabled by switch can-change-table-list.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added PART, PART_BEGIN, PART_END, PART_REMOVE, PART_LAZY and PART_PADDING for defining fragments of a template or macro. This allows to write better readable template files by avoiding large macros and repetition.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Examples use the Visual Studio 2010 solution format instead of the Visual Studio 2005 solution format. User of later Visual Studio versions can use the studio&#39;s auto conversion feature to convert the example solution.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed issue in processing of BLOCK_FORMAT.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed an issue in tag parsing that could cause processing invalid tag combinations.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor24"></a>Release 0.4 (2015-11-08)</h3></div></div></div>
+    <p>
+    This release adds a few tags and fixes a few bugs. The code-creation-kit can now be build under linux.</p><p></p><p>The code-creation-kit has proven itself to be a very helpful and stable tool for a class of programming tasks that involve a lot repetition. Furthermore it allows to solve programming problems that could otherwise not be solved without introducing a lot of maintenance overhead.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Updated documentation.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed TRIM_LEFT.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added TRIM_RIGHT.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added BLOCK_FORMAT conversion.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td>4</td>
+                <td>Fixed bug #4: TRIM breaks multi line macro .</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added PAD_RIGHT conversion.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added PAD_LEFT conversion.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added HTML_ESCAPE conversion.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor33"></a>Release 0.3.0.96 (2012-10-30)</h3></div></div></div>
+    <p>
+    This release adds in-place generation using inline templates, logging for debugging support, and more CSV-file handling features.</p><p></p><p>Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>An empty string can be passed for option --csv-delimiter when no delimiter is desired.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added option --csv-ignore-quotes. Double quotes in table entries are treated as normal character when on.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added --recycle option. This option can be used when processing inline templates. If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. </td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added logging for debugging of  templates.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added support for in-place generation using inline templates.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added option --pad-rows for auto padding of CSV-file rows with empty strings. This supports the use of hand-written CSV-files.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed bug that caused option --csv-comment-chars to have no effect.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added option --append-to-file  for creating a file in multiple generation steps.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor42"></a>Release 0.2.0.67 (2011-06-19)</h3></div></div></div>
+    <p>
+    The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.</p><p></p><p>Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Modified the PSPad syntax highlighter example to highlight preprocessor tags with delay marks.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Examples use the Visual Studio 2003 solution format instead of the Visual Studio 2008 solution format. User of later Visual Studio versions can use the studio&#39;s auto conversion feature to convert the example solution.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed handling of NOT for constraints. The parsing was not correct when NOT has been used together with a constraint that is not the first constraint.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td> </td>
+                <td>Fixed wrong error message shown when BEGIN is missing before END inside a macro block.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added TRIM_LEFT tag.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.</td>
+            </tr>
+            <tr>
+                <td>Improvement</td>
+                <td> </td>
+                <td>Added change log to documentation.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added simple command line parser example.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td>3238280</td>
+                <td>Fixed TRIM. and COMMENT. do no work.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td>3238276</td>
+                <td>Fixed TRIM extends line macro to next line.</td>
+            </tr>
+            <tr>
+                <td>Bugfix</td>
+                <td>3208956</td>
+                <td>Fixed IF NOT FIRST_TIME and IF NOT LAST_TIME do not work.</td>
+            </tr>
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Added ERROR tag that can be used to report errors in text compiler input.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor55"></a>Release 0.1.0.40 (2011-03-06)</h3></div></div></div>
+    <p>
+    This is the first release of the code-creation-kit. The main purpose of the kit is to be used as code generator.</p><p>Please note that it is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.
+    </p>
+    <div class="informaltable">
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Change Type</th>
+                <th>Tracker ID</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>New Feature</td>
+                <td> </td>
+                <td>Initial release.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+    </div>
+</body>
+</html>

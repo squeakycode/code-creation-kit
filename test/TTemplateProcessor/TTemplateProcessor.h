@@ -1,30 +1,8 @@
-//  Copyright (c) 2011-2023 Andreas Gau
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//      * Redistributions of source code must retain the above copyright
-//        notice, this list of conditions and the following disclaimer.
-//      * Redistributions in binary form must reproduce the above copyright
-//        notice, this list of conditions and the following disclaimer in the
-//        documentation and/or other materials provided with the distribution.
-//      * Neither the name of the copyright holder nor the
-//        names of contributors may be used to endorse or promote products
-//        derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-//  DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
-//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
-#include "CTemplateProcessor.h"
+#include "TemplateProcessor.h"
 #include <sstream>
 #include <iostream>
 
@@ -152,7 +130,7 @@ void testMacroProcessing()
 {
     typedef std::vector<std::vector<StringT> > TableT;
     typedef std::stringstream StreamT;
-    typedef CTemplateProcessor<TableT, StreamT> ProcessorT;
+    typedef TemplateProcessor<TableT, StreamT> ProcessorT;
     typedef std::shared_ptr<TableT> SharedTableT;
     typedef std::shared_ptr<const TableT> SharedConstTableT;
 
@@ -174,58 +152,58 @@ void testMacroProcessing()
     if (processor.getMaxMacroTextSizeBytes() < 20 * 1024 * 1024)
     {
         StringT largeString(processor.getMaxMacroTextSizeBytes() + 1, 'a');
-        CHECK_THROWS_AS(test(processor, largeString, ""), CParserExceptions::ExMacroTooLarge);
+        CHECK_THROWS_AS(test(processor, largeString, ""), ParserExceptions::ExMacroTooLarge);
     }
 
     processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
 
     //error handling
-    CHECK_THROWS_AS(test(processor, "a[MACRO_BEGIN][END]", ""), CParserExceptions::ExMissingBlockBegin);
-    CHECK_THROWS_AS(test(processor, "a[BEGIN]", ""), CParserExceptions::ExMissingBlockEnd);
-    CHECK_THROWS_AS(test(processor, "a[MACRO_BEGIN]", ""), CParserExceptions::ExMissingMacroEnd);
-    CHECK_THROWS_AS(test(processor, "a[BEGIN][MACRO_END]", ""), CParserExceptions::ExMissingBlockEnd);
-    CHECK_THROWS_AS(test(processor, "a[BEGIN]b[END]c[END]d", ""), CParserExceptions::ExMissingBlockBegin);
-    CHECK_THROWS_AS(test(processor, "a[BEGIN]b[END]c[MACRO_END]d", ""), CParserExceptions::ExMissingMacroBegin);
-    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][NOT]", ""), CParserExceptions::ExConstraintExpectedAfterNot);
+    CHECK_THROWS_AS(test(processor, "a[MACRO_BEGIN][END]", ""), ParserExceptions::ExMissingBlockBegin);
+    CHECK_THROWS_AS(test(processor, "a[BEGIN]", ""), ParserExceptions::ExMissingBlockEnd);
+    CHECK_THROWS_AS(test(processor, "a[MACRO_BEGIN]", ""), ParserExceptions::ExMissingMacroEnd);
+    CHECK_THROWS_AS(test(processor, "a[BEGIN][MACRO_END]", ""), ParserExceptions::ExMissingBlockEnd);
+    CHECK_THROWS_AS(test(processor, "a[BEGIN]b[END]c[END]d", ""), ParserExceptions::ExMissingBlockBegin);
+    CHECK_THROWS_AS(test(processor, "a[BEGIN]b[END]c[MACRO_END]d", ""), ParserExceptions::ExMissingMacroBegin);
+    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][NOT]", ""), ParserExceptions::ExConstraintExpectedAfterNot);
 
-    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][ANY][READ_TOP_DOWN]", ""), CParserExceptions::ExSubstitutionParsingBadOrder);
-    CHECK_THROWS_AS(test(processor, "a[INDEX][READ_TOP_DOWN]", ""), CParserExceptions::ExCannotApplyDirectiveToSubstitution);
-    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][ANY][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConstraint);
-    CHECK_THROWS_AS(test(processor, "a[IF][ENTRY][\"Type\"][TO_UPPER][IGNORE_CASE]", ""), CParserExceptions::ExCannotApplyDirectiveToConversion);
-    CHECK_THROWS_AS(test(processor, "a[IF][INDEX][ANY]", ""), CParserExceptions::ExCannotApplyConstraintToSubstitution);
-    CHECK_THROWS_AS(test(processor, "a[INDEX][TO_UPPER]", ""), CParserExceptions::ExCannotApplyConversionToSubstitution);
-    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), CParserExceptions::ExDirectiveAlreadyApplied);
-    CHECK_THROWS_AS(test(processor, "a[LAST_TIME]b", ""), CParserExceptions::ExSubstitutionRequiresIf);
+    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][ANY][READ_TOP_DOWN]", ""), ParserExceptions::ExSubstitutionParsingBadOrder);
+    CHECK_THROWS_AS(test(processor, "a[INDEX][READ_TOP_DOWN]", ""), ParserExceptions::ExCannotApplyDirectiveToSubstitution);
+    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][ANY][IGNORE_CASE]", ""), ParserExceptions::ExCannotApplyDirectiveToConstraint);
+    CHECK_THROWS_AS(test(processor, "a[IF][ENTRY][\"Type\"][TO_UPPER][IGNORE_CASE]", ""), ParserExceptions::ExCannotApplyDirectiveToConversion);
+    CHECK_THROWS_AS(test(processor, "a[IF][INDEX][ANY]", ""), ParserExceptions::ExCannotApplyConstraintToSubstitution);
+    CHECK_THROWS_AS(test(processor, "a[INDEX][TO_UPPER]", ""), ParserExceptions::ExCannotApplyConversionToSubstitution);
+    CHECK_THROWS_AS(test(processor, "a[ENTRY][\"Type\"][READ_TOP_DOWN][READ_TOP_DOWN]", ""), ParserExceptions::ExDirectiveAlreadyApplied);
+    CHECK_THROWS_AS(test(processor, "a[LAST_TIME]b", ""), ParserExceptions::ExSubstitutionRequiresIf);
 
     //parts
-    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingPartEnd);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_END]b)", ""), CParserExceptions::ExMissingPartBegin);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_PADDING]b)", ""), CParserExceptions::ExUnexpectedPartPadding);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_BEGIN]["l2"]c)", ""), CParserExceptions::ExPartBlocksCannotBeNested);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_BEGIN]["l1"]d[PART_END]e)", ""), CParserExceptions::ExPartAlreadyDefined);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_REMOVE]["l1"]d[PART]["l1"]e)", ""), CParserExceptions::ExPartNotDefined);
-    CHECK_THROWS_AS(test(processor, R"(a[PART]["l1"]b)", ""), CParserExceptions::ExPartNotDefined);
-    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"][PART_LAZY]["l1"][PART_END]c[PART]["l1"]d)", ""), CParserExceptions::ExPossibleInfiniteLoop);
-    CHECK_THROWS_AS(test(processor, R"(a[MACRO_BEGIN]a[PART_BEGIN]["l1"])", ""), CParserExceptions::ExMissingMacroEnd);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l"]b)", ""), ParserExceptions::ExMissingPartEnd);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_END]b)", ""), ParserExceptions::ExMissingPartBegin);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_PADDING]b)", ""), ParserExceptions::ExUnexpectedPartPadding);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_BEGIN]["l2"]c)", ""), ParserExceptions::ExPartBlocksCannotBeNested);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_BEGIN]["l1"]d[PART_END]e)", ""), ParserExceptions::ExPartAlreadyDefined);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"]b[PART_END]c[PART_REMOVE]["l1"]d[PART]["l1"]e)", ""), ParserExceptions::ExPartNotDefined);
+    CHECK_THROWS_AS(test(processor, R"(a[PART]["l1"]b)", ""), ParserExceptions::ExPartNotDefined);
+    CHECK_THROWS_AS(test(processor, R"(a[PART_BEGIN]["l1"][PART_LAZY]["l1"][PART_END]c[PART]["l1"]d)", ""), ParserExceptions::ExPossibleInfiniteLoop);
+    CHECK_THROWS_AS(test(processor, R"(a[MACRO_BEGIN]a[PART_BEGIN]["l1"])", ""), ParserExceptions::ExMissingMacroEnd);
 
     //tables
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","pad-rows;unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CTemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","\n"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadCommentChars);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz","\n",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExBadDelimiter);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;2";5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExUnexpectedQuote);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;"2"a;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CCsvParser::ExRequireDelimitingChar);
-    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["label A"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CMacroProcessorExceptions::ExTableLabelAlreadyDefined);
-    CHECK_THROWS_AS(test(processor, R"(a[TABLE_BEGIN]["l"]b)", ""), CParserExceptions::ExMissingTableEnd);
-    CHECK_THROWS_AS(test(processor, R"(a[TABLE_BEGIN]["l"]b[ENTRY]["c"])", ""), CParserExceptions::ExMissingTableEnd);
-    CHECK_THROWS_AS(test(processor, R"(a[TABLE_END]b)", ""), CParserExceptions::ExMissingTableBegin);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), TemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","pad-rows;unknown-property"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), TemplateProvidedTableLoaderExceptions::ExUnexpectedTableProperty);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","\n"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CsvParser::ExBadCommentChars);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz","\n",";"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CsvParser::ExBadDelimiter);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;2";5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CsvParser::ExUnexpectedQuote);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz"];Numbers;1;"2"a;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CsvParser::ExRequireDelimitingChar);
+    CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["label A"];Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), MacroProcessorExceptions::ExTableLabelAlreadyDefined);
+    CHECK_THROWS_AS(test(processor, R"(a[TABLE_BEGIN]["l"]b)", ""), ParserExceptions::ExMissingTableEnd);
+    CHECK_THROWS_AS(test(processor, R"(a[TABLE_BEGIN]["l"]b[ENTRY]["c"])", ""), ParserExceptions::ExMissingTableEnd);
+    CHECK_THROWS_AS(test(processor, R"(a[TABLE_END]b)", ""), ParserExceptions::ExMissingTableBegin);
     { const char* input =
         R"(#[TABLE_BEGIN]["labelxyz"]m;col1;col2;col3
 row1;1,1;1,2;1,3
 row2;2,1;2,2
 row3;3,1;3,2;3,3
 [TABLE_END]<[ENTRY]["m"]>)";
-    CHECK_THROWS_AS(test(processor, input, "", true), CVerticalTableBuilderExceptions::ExUnderflow);
+    CHECK_THROWS_AS(test(processor, input, "", true), VerticalTableBuilderExceptions::ExUnderflow);
     }
     { const char* input =
         R"(#[TABLE_BEGIN]["labelxyz"]m;col1;col2;col3
@@ -233,29 +211,29 @@ row1;1,1;1,2;1,3
 row2;2,1;2,2;over;flow
 row3;3,1;3,2;3,3
 [TABLE_END]<[ENTRY]["m"]>)";
-    CHECK_THROWS_AS(test(processor, input, "", true), CVerticalTableBuilderExceptions::ExOverflow);
+    CHECK_THROWS_AS(test(processor, input, "", true), VerticalTableBuilderExceptions::ExOverflow);
     }
     {
         processor.setCanChangeNonTemporaryTableList(false);
-        CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","permanent"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), CMacroProcessorExceptions::ExCannotChangeTableList);
-        CHECK_THROWS_AS(test(processor, R"([TABLE_REMOVE]["label A"])", ""), CMacroProcessorExceptions::ExCannotChangeTableList);
+        CHECK_THROWS_AS(test(processor, R"(#[TABLE_BEGIN]["labelxyz",";","#","permanent"]Numbers;1;2;5[TABLE_END]<[ENTRY]["Numbers"]>)", ""), MacroProcessorExceptions::ExCannotChangeTableList);
+        CHECK_THROWS_AS(test(processor, R"([TABLE_REMOVE]["label A"])", ""), MacroProcessorExceptions::ExCannotChangeTableList);
         processor.setCanChangeNonTemporaryTableList(true);
     }
-    CHECK_THROWS_AS(test(processor, R"([TABLE_LOAD]["", "label A"])", ""), CTemplatePreprocessorExceptions::ExTableLoadingNotSupported);
+    CHECK_THROWS_AS(test(processor, R"([TABLE_LOAD]["", "label A"])", ""), TemplatePreprocessorExceptions::ExTableLoadingNotSupported);
 
     //calc
-    CHECK_THROWS_AS(test(processor, "a[INDEX][CALC][\"#\"]", ""), CCalcConversionExceptions::ExArithmeticExpressionSyntaxError);
-    CHECK_THROWS_AS(test(processor, "a[INDEX][CALC][\"a/0\"]", ""), CCalcConversionExceptions::ExDivisionByZero);
+    CHECK_THROWS_AS(test(processor, "a[INDEX][CALC][\"#\"]", ""), CalcConversionExceptions::ExArithmeticExpressionSyntaxError);
+    CHECK_THROWS_AS(test(processor, "a[INDEX][CALC][\"a/0\"]", ""), CalcConversionExceptions::ExDivisionByZero);
 
     //something still in parser
-    CHECK_THROWS_AS(test(processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    CHECK_THROWS_AS(test(processor, "a[SET_RECURSION_LEVEL_LIMIT]b", ""), ProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in line collector
-    CHECK_THROWS_AS(test(processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    CHECK_THROWS_AS(test(processor, "[MACRO_BEGIN][ENTRY][\"Type\"][MACRO_END][SET_RECURSION_LEVEL_LIMIT]b", ""), ProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
     //something still in next level
-    CHECK_THROWS_AS(test(processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), CProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
+    CHECK_THROWS_AS(test(processor, "[MACRO_BEGIN.][ENTRY.][\"Type\"]\n[SET_RECURSION_LEVEL_LIMIT]b", ""), ProcessingLevelControlExceptions::ExCannotSetRecursionLevelLimit);
 
     //to size
-    CHECK_THROWS_AS(test(processor, "<[ENTRY][\"Type\"][TO_SIZE][\"willi\"]>", ""), CToSizeConversionExceptions::ExUnexpectedToSizeProperty);
+    CHECK_THROWS_AS(test(processor, "<[ENTRY][\"Type\"][TO_SIZE][\"willi\"]>", ""), ToSizeConversionExceptions::ExUnexpectedToSizeProperty);
 
     processor.reset();
     processor.connectTable(ptrTable, "label A", true, true, 1, 1, false);
@@ -379,14 +357,14 @@ row3;3,1;3,2;3,3
     CHECK(test(processor, "<[ENTRY][\"Type\"][BEGIN][IF][NOT][INDEX][EQUALS][\"2\"]+[OR][END]>", "<int><double+><bool+><bool+>"));
     //error tag
     CHECK(test(processor, "<[ENTRY][\"Type\"]>[OR][ERROR][\"Error Message 1234.\"]", "<int><double><bool><bool>"));
-    CHECK_THROWS_AS(test(processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), CMacroExpanderExceptions::ExErrorTagExpanded<StringT>);
+    CHECK_THROWS_AS(test(processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", ""), MacroExpanderExceptions::ExErrorTagExpanded<StringT>);
     //html escape
     CHECK(test(processor, "<[ENTRY][\"Description\"][HTML_ESCAPE]>", "<description&amp;more>"));
     try
     {
         test(processor, "<[ENTRY][\"Description\"]>[OR][ERROR][\"Error Message 1234.\"]", "");
     }
-    catch (CMacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
+    catch (MacroExpanderExceptions::ExErrorTagExpanded<StringT>& e)
     {
         CHECK(e.getMessage() == "Error Message 1234.");
     }
@@ -693,8 +671,8 @@ row3;3,1;3,2;3,3
     CHECK( ptrDisconnectedTable == ptrAnotherTableB);
 
     CHECK_NOTHROW( processor.connectTable(ptrTable, "label B", true, true, 7, 5, false));
-    CHECK_THROWS_AS( processor.connectTable(ptrTable, "label C", true, true, 2, 6, false), CMacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds);
-    CHECK_THROWS_AS( processor.connectTable(ptrTable, "label D", true, true, 8, 4, false), CMacroProcessorExceptions::ExRowHeaderIndexOutOfBounds);
+    CHECK_THROWS_AS( processor.connectTable(ptrTable, "label C", true, true, 2, 6, false), MacroProcessorExceptions::ExColumnHeaderIndexOutOfBounds);
+    CHECK_THROWS_AS( processor.connectTable(ptrTable, "label D", true, true, 8, 4, false), MacroProcessorExceptions::ExRowHeaderIndexOutOfBounds);
 }
 
 
@@ -705,7 +683,7 @@ void testTemplateProcessor()
     typedef std::vector<std::vector<StringT> > TableT;
     typedef TStreamHelper<StringT> StreamT;
     typedef TestTemplateLoader<StringT> TemplateLoaderT;
-    typedef CTemplateProcessor<TableT, StreamT, TemplateLoaderT> ProcessorT;
+    typedef TemplateProcessor<TableT, StreamT, TemplateLoaderT> ProcessorT;
     typedef std::shared_ptr<TableT> SharedTableT;
     SharedTableT ptrTable = std::make_shared<TableT>();
 

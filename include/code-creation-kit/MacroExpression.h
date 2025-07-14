@@ -1,0 +1,165 @@
+// Copyright (c) 2011-2025 Andreas Gau
+// SPDX-License-Identifier: BSD-3-Clause
+
+#pragma once
+
+#include <list>
+#include <algorithm>
+
+namespace code_creation_kit
+{
+    ///represents the macro tree structure
+    template <typename StringT>
+    class MacroExpression
+    {
+    public:
+        typedef std::size_t SizeT;
+        typedef SizeT IndexT;
+        typedef std::list<MacroExpression> SubExpressionListT;
+
+        MacroExpression() 
+            : m_ored(false)
+            , m_substitution(false)
+            , m_index(0)
+        {
+        }
+
+        //getters for expression data
+        const SubExpressionListT& getSubExpressions() const { return m_subExpressions; }
+        const StringT& getText() const { return m_macroExpression; }
+        StringT& getText() { return m_macroExpression; }
+        [[nodiscard]] IndexT getIndex() const { return m_index; }
+        [[nodiscard]] bool isOred() const { return m_ored; }
+        [[nodiscard]] bool isSubstitution() const { return m_substitution; }
+
+        ///true if node is leaf of expression tree
+        [[nodiscard]] bool isLeaf() const
+        {
+            return m_subExpressions.empty();
+        }
+
+        ///true if node is a leaf of expression tree that contains text
+        [[nodiscard]] bool isTextLeaf() const
+        {
+            return isLeaf() && !m_substitution;
+        }
+
+        ///true if text only and no text
+        [[nodiscard]] bool isEmpty() const
+        { 
+            return isTextLeaf() && m_macroExpression.empty(); 
+        }
+
+        ///adds a text range to the tree
+        template <typename IteratorT>
+        void add( IteratorT start, IteratorT end)
+        {
+            MacroExpression<StringT> temp;
+            temp.m_macroExpression = StringT( start, end);
+            attach( temp);
+        }
+
+        ///adds a substitution to the tree
+        void add( IndexT index) 
+        {
+            MacroExpression<StringT> temp;
+            temp.m_index = index;
+            temp.m_substitution = true;
+            attach( temp);
+        }
+
+        ///adds a node to the tree, may use swap thus returning an empty node
+        void attach( MacroExpression<StringT>& subExpression)
+        {   
+            //do not add empty nodes as they have no effect
+            if ( subExpression.isEmpty())
+            {
+                return;
+            }
+
+            //if ored expressions add to last alternative
+            if ( isOred())
+            {
+                m_subExpressions.back().attach( subExpression);
+                return;
+            }
+
+            //concatenate text fragments if possible
+            if ( subExpression.isTextLeaf())
+            {
+                if ( isTextLeaf())
+                {
+                    m_macroExpression += subExpression.m_macroExpression;
+                    return;
+                }
+                else if ( !isLeaf() &&  m_subExpressions.back().isTextLeaf())
+                {
+                    m_subExpressions.back().m_macroExpression += subExpression.m_macroExpression;
+                    return;
+                }
+            }
+
+            //if current is empty just replace it, to void useless empty nodes
+            if ( isEmpty())
+            {
+                swap( subExpression);
+                //if added node represents or add empty node to create list
+                if ( isOred())
+                {
+                    //turn into list node
+                    pushThisALevelDown(); 
+                    m_subExpressions.push_back( MacroExpression<StringT>());
+                }
+                return;
+            }
+
+            //turn into list node
+            if ( isLeaf())
+            {
+                pushThisALevelDown();
+            }
+
+            m_subExpressions.push_back( MacroExpression<StringT>());
+            m_subExpressions.back().swap( subExpression);
+        }
+
+        ///sets the current and the next expression as alternatives
+        void ored()
+        {
+            if (!m_ored)
+            {
+                pushThisALevelDown();
+                m_ored = true;
+            }
+            //add expression for adding following expressions
+            m_subExpressions.push_back( MacroExpression<StringT>());
+        }
+
+        ///swap implementation
+        void swap( MacroExpression<StringT>& rhs)
+        {
+            m_subExpressions.swap( rhs.m_subExpressions);
+            m_macroExpression.swap( rhs.m_macroExpression);
+            std::swap( m_ored, rhs.m_ored);
+            std::swap( m_substitution, rhs.m_substitution);
+            std::swap( m_index, rhs.m_index);
+        }
+
+    private:
+        ///creates a new parent node containing this as child by using swap 
+        void pushThisALevelDown()
+        {
+            MacroExpression<StringT> temp;
+            temp.swap( *this);
+            m_subExpressions.push_back( MacroExpression<StringT>());
+            m_subExpressions.back().swap( temp);
+        }
+
+        bool m_ored; ///<expressions are ored
+        bool m_substitution; ///<substitution at position
+        IndexT  m_index; ///<index of substitution
+
+        SubExpressionListT m_subExpressions; ///list of expressions ored or sequential
+        StringT m_macroExpression; ///text when text leaf
+    };
+}
