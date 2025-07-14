@@ -1,0 +1,59 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -V -C ${{env.BUILD_TYPE}}
+
+      - name: Package with CPack
+        run: |
+          cd build
+          cpack
+
+      - name: Upload TGZ package artifact (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: robolina-package-linux-tgz
+          path: build/*.tar.gz
+          if-no-files-found: error
+
+      - name: Upload ZIP package artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: robolina-package-windows-zip
+          path: build/*.zip
+          if-no-files-found: error
+
+      - name: Upload ZIP package artifact (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: robolina-package-darwin-zip
+          path: build/*.zip
+          if-no-files-found: error

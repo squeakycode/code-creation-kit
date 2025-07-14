@@ -1,3 +1,4 @@
 datamodels/version.csv
 -s templates/version.tpl.h -o ../ccktc/version.gen.h -u
 -s templates/version.tpl.ini -o ../setup/windows/version.gen.ini -u
+-s ../CMakeLists.txt --inlined -b #<> -d "#< inline generated" --inline-pad 90 --recycle
