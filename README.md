@@ -10,6 +10,15 @@ The Code Creation Kit (CCK) is a powerful and versatile tool designed to streaml
 
 This project is currently under active development. Features, documentation, and examples are being continuously updated. Please check back regularly for the latest updates and improvements.
 
+- The text compiler ccktc is ready.
+  - New feature package about to implemented.
+- The CSV-Saver Excel add-in has been updates and is ready.
+- Documentation - needs an update.
+- Code Samples - need an update.
+- Build and packaging - needs an update.
+- Refactoring and simplifications are ongoing.
+- Header-only code of CCK - needs an update for simple integration into projects.
+- Auto generation of own code - needs to added to project files again.
 ---
 
 ## Features
