@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Change Log | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+    </div>
+
+[COMMENT] <!-- begin toc -->
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor"></a>[ENTRY.]["heading"]</h2></div></div></div>
+    <p>
+    </p>
+    <div class="toc">
+        <dl>
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor">[ENTRY.]["heading"]</a></span></dt>
+        <dd><dl>
+[MACRO_BEGIN][TRIM]
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Development Snapshot</a></span></dt>
+[OR][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+        <dt><span class="section"><a href="[ENTRY.]["file"]#anchor[INDEX]">Release [BEGIN][ENTRY]["Release Version"][OR][ERROR]["Error missing release version."][END]</a></span></dt>
+[END][TRIM]
+[MACRO_END][TRIM]
+        </dl></dd>
+        </dl>
+     </div>
+[COMMENT] <!-- end toc -->
+[MACRO_BEGIN][TRIM]
+[COMMENT] <!-- begin if first time, is not release -->
+[BEGIN][IF][FIRST_TIME][IF][ENTRY]["Change Type"][IF][NOT][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Development Snapshot</h3></div></div></div>
+    <p>
+    This is a development snapshot.
+    </p>
+[INCLUDE]["change_log_table_header.tpl.html"]
+[COMMENT] <!-- end if first time, development snapshot-->
+[OR][END][TRIM]
+[COMMENT] <!-- start document body, release entry -->
+[BEGIN][IF][ENTRY]["Change Type"][EQUALS]["Release"][TRIM]
+[BEGIN][IF][NOT][FIRST_TIME]
+        </tbody>
+    </table>
+    </div>
+[OR][END][TRIM]    
+    <div class="titlepage"><div><div><h3 class="title" style="clear: both"><a name="anchor[INDEX]"></a>Release [BEGIN][ENTRY]["Release Version"][HTML_ESCAPE] ([ENTRY]["Release Date"][HTML_ESCAPE])[OR][ERROR]["Error missing release version or date."][END]</h3></div></div></div>
+    <p>
+    [ENTRY]["Description"][HTML_ESCAPE][REPLACE]["\n","</p><p>"]
+    </p>
+[INCLUDE]["change_log_table_header.tpl.html"]
+[COMMENT] <!-- document body, bugfix or feature entry -->
+[OR][TRIM]
+            <tr>
+                <td>[ENTRY]["Change Type"][HTML_ESCAPE]</td>
+                <td>[BEGIN][ENTRY]["Tracker ID"][HTML_ESCAPE][OR] [END]</td>
+                <td>[ENTRY]["Description"][HTML_ESCAPE]</td>
+            </tr>
+[COMMENT] <!-- end document body -->
+[END][TRIM]
+[MACRO_END]
+        </tbody>
+    </table>
+    </div>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+    </div>
+</body>
+</html>

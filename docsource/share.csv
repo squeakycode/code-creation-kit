@@ -1,3 +1,0 @@
-Item Type;Text
-heading 2;Share and Reuse 
-paragraph;Once the data table layout and the template file are designed for a repetitive coding problem, e.g. for a command line parser, the design can be used over and over again. That makes template and table files an ideal item for sharing ideas and code with other programmer’s. The only thing that needs to be done to get the required code for anyone using the designed templates is to fill in the relevant data into a table. For instance the single program options of a command line parser. 

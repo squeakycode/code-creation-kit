@@ -1,0 +1,60 @@
+Change Type;Tracker ID;Description;Release Version;Release Date
+;;;;
+Bugfix;;Fixed an issue where a CSV-file failed to load when then last cell was empty and not terminated by a new line character.;;
+New Feature;;Added TO_SIZE conversion tag. This tag can be used for determinating the size of text entries.;;
+New Feature;;Added TO_CSV conversion tag. This can be used for putting text items in quotes correctly when creating CSV tables.;;
+Bugfix;;Fixed an issue that could cause to paths to not be determined correctly on Unix based operating systems. Furthermore absolute paths are now normalized instead of using the provided path directly.;;
+New Feature;;Added process-instant-template command line option for processing an instant template file (extension itpl). An instant template file contains or loads all needed tables. The name of the output file is build by removing the extension. This option can be specified multiple times. The commands are executed in the order they are specified.;;
+Improvement;;Renamed command file parameter csv-delimiter to csv-delimiter-chars. Multiple delimiters can be supplied.;;
+Improvement;;Replaced  command file parameter csv-ignore-quotes with csv-quote-chars. You can pass an empty string to ignore quotes.;;
+New Feature;;Added CALC conversion tag for computing arithmetic expressions.;;
+Bugfix;;Fixed an issue where multiple of either PAD_LEFT, PAD_RIGHT or BLOCK_FORMAT tags failed to work as expected.;;
+Release;;Adds TABLE and PART tags. Minor fixes.;0.5;2019-12-07
+Improvement;;Improved the documentation for INCLUDE;;
+Bugfix;;Fixed an issue where filename and line was not reported correctly at the end of a template file.;;
+Bugfix;;Fixed documentation of SET_MARKUP.;;
+New Feature;;Added TABLE_BEGIN, TABLE_END, TABLE_LOAD, TABLE_REMOVE for providing tables directly from templates. Tables can be provided beyond the scope of the template if enabled by switch can-change-table-list.;;
+New Feature;;Added PART, PART_BEGIN, PART_END, PART_REMOVE, PART_LAZY and PART_PADDING for defining fragments of a template or macro. This allows to write better readable template files by avoiding large macros and repetition.;;
+Improvement;;Examples use the Visual Studio 2010 solution format instead of the Visual Studio 2005 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
+Bugfix;;Fixed issue in processing of BLOCK_FORMAT.;;
+Bugfix;;Fixed an issue in tag parsing that could cause processing invalid tag combinations.;;
+Release;;"This release adds a few tags and fixes a few bugs. The code-creation-kit can now be build under linux.
+
+The code-creation-kit has proven itself to be a very helpful and stable tool for a class of programming tasks that involve a lot repetition. Furthermore it allows to solve programming problems that could otherwise not be solved without introducing a lot of maintenance overhead.";0.4;2015-11-08
+Improvement;;Updated documentation.;;
+Bugfix;;Fixed TRIM_LEFT.;;
+New Feature;;Added TRIM_RIGHT.;;
+New Feature;;Added BLOCK_FORMAT conversion.;;
+Bugfix;4;Fixed bug #4: TRIM breaks multi line macro .;;
+New Feature;;Added PAD_RIGHT conversion.;;
+New Feature;;Added PAD_LEFT conversion.;;
+New Feature;;Added HTML_ESCAPE conversion.;;
+Release;;"This release adds in-place generation using inline templates, logging for debugging support, and more CSV-file handling features.
+
+Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.3.0.96;2012-10-30
+New Feature;;An empty string can be passed for option --csv-delimiter when no delimiter is desired.;;
+New Feature;;Added option --csv-ignore-quotes. Double quotes in table entries are treated as normal character when on.;;
+New Feature;;Added --recycle option. This option can be used when processing inline templates. If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. ;;
+New Feature;;Added logging for debugging of  templates.;;
+New Feature;;Added support for in-place generation using inline templates.;;
+New Feature;;Added option --pad-rows for auto padding of CSV-file rows with empty strings. This supports the use of hand-written CSV-files.;;
+Bugfix;;Fixed bug that caused option --csv-comment-chars to have no effect.;;
+New Feature;;Added option --append-to-file  for creating a file in multiple generation steps.;;
+Release;;"The main points of this release are the SET_RECURSION_LEVEL_LIMIT tag that helps debugging multistage macro expressions and the command line parser example.
+
+Please note that this is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.2.0.67;2011-06-19
+Improvement;;Modified the PSPad syntax highlighter example to highlight preprocessor tags with delay marks.;;
+Improvement;;Examples use the Visual Studio 2003 solution format instead of the Visual Studio 2008 solution format. User of later Visual Studio versions can use the studio's auto conversion feature to convert the example solution.;;
+Bugfix;;Fixed handling of NOT for constraints. The parsing was not correct when NOT has been used together with a constraint that is not the first constraint.;;
+Bugfix;;Fixed wrong error message shown when BEGIN is missing before END inside a macro block.;;
+New Feature;;Added TRIM_LEFT tag.;;
+New Feature;;Added directive SET_RECURSION_LEVEL_LIMIT which can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging.;;
+Improvement;;Added change log to documentation.;;
+New Feature;;Added simple command line parser example.;;
+Bugfix;3238280;Fixed TRIM. and COMMENT. do no work.;;
+Bugfix;3238276;Fixed TRIM extends line macro to next line.;;
+Bugfix;3208956;Fixed IF NOT FIRST_TIME and IF NOT LAST_TIME do not work.;;
+New Feature;;Added ERROR tag that can be used to report errors in text compiler input.;;
+Release;;"This is the first release of the code-creation-kit. The main purpose of the kit is to be used as code generator.
+Please note that it is a new tool and it is still missing some features. Despite of this it can be already used to produce some remarkable results.";0.1.0.40;2011-03-06
+New Feature;;Initial release.;;

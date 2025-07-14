@@ -1,0 +1,23 @@
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Tag Name</th>
+          <th>Type</th>
+          <th>Parameter</th>
+          <th>Example</th>
+          <th>Description</th>
+        </tr>
+        [SET_MARKUP]["$","$"]
+        $MACRO_BEGIN$$TRIM$
+        <tr>
+          <td>$ENTRY$["Tag Name"]$HTML_ESCAPE$</td>
+          <td>$ENTRY$["Type"]$HTML_ESCAPE$</td>
+          <td>$BEGIN$$ENTRY$["Parameter"]$HTML_ESCAPE$$OR$ $END$</td>
+          <td><pre>$ENTRY$["Syntax Example"]$HTML_ESCAPE$</pre></td>
+          <td>$ENTRY$["Description"]$MERGE$[" "]$HTML_ESCAPE$</td>
+        </tr>
+        $MACRO_END$$TRIM$    
+      </tbody>
+    </table>
+    </div>

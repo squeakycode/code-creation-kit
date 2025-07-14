@@ -1,0 +1,1131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Getting Started | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="index.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="table_creation.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h1 class="title" style="clear: both"><a name="anchor2"></a>Getting Started </h1></div></div></div>
+    <p>
+     
+    </p>
+    <div class="toc">
+    
+    <dl>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor2">Getting Started </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor5">How the Text Compiler Works </a></span></dt>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor12"> </a></span></dt>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor13">A Simple Example </a></span></dt>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor34">The Simple Example Extended </a></span></dt>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor69">An Advanced Example – Generating a State Machine with Graph </a></span></dt>
+    <dt><span class="section"><a href="getting_started.gen.html#anchor81">In-Place Code Generation Using Inline Templates </a></span></dt>
+    </dl></dd>
+    </dl>
+    </div>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor5"></a>How the Text Compiler Works </h2></div></div></div>
+    <p>
+     
+    </p>
+    <p>
+    The text compiler can be used to generate any form of text output. To accomplish this it first loads a data model represented as one or more tables, which could be for instance a list of parameters of an application. 
+    </p>
+    <p>
+     In a second step a template file is processed. On the one hand it contains from the viewpoint of the text compiler simply text, maybe the statements of the target language to produce. This text is passed unchanged to the produced output file. On the other hand the template file contains special tags that form macro expressions. These macro expressions instruct the compiler on how to insert the text fragments from the data tables into the output text stream. 
+    </p>
+    <p>
+    To accomplish various generation tasks it is possible to generate macro expressions while processing a template file. It works as if the text compiler would process a template file, generate another template file as output, and process this output file again and again until no macro expressions are contained in the output anymore. The only difference to the described processing is that this is done recursively. 
+    </p>
+    <p>
+    A command file is used to collect all the commands needed for generating, e.g. the instruction to load or unload a table. 
+    </p>
+    <p>
+      <span class="inlinemediaobject"><img src="overview.png" alt="overview.png"></span>
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor12"></a> </h2></div></div></div>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor13"></a>A Simple Example </h2></div></div></div>
+    <p>
+    This section gives an example of the file types processed by the text compiler.  Furthermore it shows how the macro expressions look like and how the table data is inserted into the text stream that is written to the output file. 
+    </p>
+    <p>
+    The table data loaded by the text compiler is stored in the CSV-file format. 
+    </p>
+    <pre class="synopsis">
+Type;Name;Default;Description
+int;i;10;Description for i
+double;d;23.4;
+std::string;s;"""x34""";Description for s
+int;;6;This is an incomplete entry
+bool;b;true;Description for b
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    CSV-files can be easily created using a spreadsheet application. This example uses a list of parameters to generate a C++ data class. 
+    </p>
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>int</td>
+          <td>i</td>
+          <td>10</td>
+          <td>Description for i</td>
+        </tr>
+        <tr>
+          <td>double</td>
+          <td>d</td>
+          <td>23.4</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>std::string</td>
+          <td>s</td>
+          <td>&quotx34&quot</td>
+          <td>Description for s</td>
+        </tr>
+        <tr>
+          <td>int</td>
+          <td></td>
+          <td>6</td>
+          <td>This is an incomplete entry</td>
+        </tr>
+        <tr>
+          <td>bool</td>
+          <td>b</td>
+          <td>true</td>
+          <td>Description for b</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>    <p>
+    The template file below contains two macros. The first one is located in the declaration section. It consists of the line containing three ENTRY tags and one ANY tag. A tag is surrounded by additional markup characters to avoid name clashes with the target language. The default markup uses box brackets to improve the readability of the template files. The Parameter following the entry tags denotes the heading of the column to read. 
+    </p>
+    <p>
+    In this case the text compiler finds a line containing tags. It takes the full line including the new line character and processes it as a macro. Then it looks for loaded tables containing the given column headings. A table containing the headings is read row by row, the ENTRY tags are substituted with content the corresponding table entries and the produced line is written to the output file. It is also possible to read a table from left to right passing the row headings as parameter. 
+    </p>
+    <p>
+    The substitution fails if a table entry is empty. That’s why the incomplete table entry produces no output. This default behavior can be changed by inserting additional tags after the ENTRY tag. This is  done for the parameter description using the ANY tag which causes the entry to be substituted successfully no matter what the content of the table looks like. 
+    </p>
+    <p>
+    The second macro uses the macro marking tags MACRO_BEGIN and MACRO_END to define the position of the macro. They are used to create macros that span multiple lines or for macros that are inserted into a single line as in this example. 
+    </p>
+    <p>
+    Additionally the block marking tags BEGIN and END are used. Block marking tags can be nested. They form an inner block using the OR tag to define multiple alternatives. The text compiler inserts the first alternative that is expandable. In this example alternatives are used together with the FIRST_TIME tag that can only be substituted successfully with an empty string the first time the macro expands. This way it is possible to create the syntax for the C++ class initializer list.  
+    </p>
+    <p>
+     
+    </p>
+    <pre class="synopsis">
+#include &lt;string&gt;
+
+class CDataClass
+{
+public:
+    //declaration
+    <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Type&quot;] m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;]; //<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>
+    
+    //constructor
+    CDataClass()
+        <span style="color:#000000; font-weight:bold">[MACRO_BEGIN][BEGIN][IF][FIRST_TIME]</span>: <span style="color:#000000; font-weight:bold">[OR]</span>, <span style="color:#000000; font-weight:bold">[END]</span>m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;](<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Default&quot;])<span style="color:#000000; font-weight:bold">[MACRO_END]</span>
+    {
+    }
+};
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    The output file contains the compilation of the text fragments from the table and the template file. 
+    </p>
+    <pre class="synopsis">
+<span style="color:#0000ff">#include &lt;string&gt;</span>
+
+<span style="color:#2b91af">class</span> CDataClass
+<span style="color:#000000">{</span>
+<span style="color:#2b91af">public</span><span style="color:#000000">:</span>
+    <span style="color:#008000">//declaration</span>
+    <span style="color:#0000ff">int</span> m_i<span style="color:#000000">;</span> <span style="color:#008000">//Description for i</span>
+    <span style="color:#0000ff">double</span> m_d<span style="color:#000000">;</span> <span style="color:#008000">//</span>
+    std<span style="color:#000000">::</span>string m_s<span style="color:#000000">;</span> <span style="color:#008000">//Description for s</span>
+    <span style="color:#0000ff">bool</span> m_b<span style="color:#000000">;</span> <span style="color:#008000">//Description for b</span>
+    
+    <span style="color:#008000">//constructor</span>
+    <span style="color:#000000">CDataClass</span><span style="color:#000000">()</span>
+        <span style="color:#000000">:</span> <span style="color:#000000">m_i</span><span style="color:#000000">(</span><span style="color:#000000">10</span><span style="color:#000000">),</span> <span style="color:#000000">m_d</span><span style="color:#000000">(</span><span style="color:#000000">23.4</span><span style="color:#000000">),</span> <span style="color:#000000">m_s</span><span style="color:#000000">(</span><span style="color:#a31515">&quot;x34&quot;</span><span style="color:#000000">),</span> <span style="color:#000000">m_b</span><span style="color:#000000">(</span><span style="color:#0000ff">true</span><span style="color:#000000">)</span>
+    <span style="color:#000000">{</span>
+    <span style="color:#000000">}</span>
+<span style="color:#000000">};</span>
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    The command file is processed line by line. Every line contains a command for the text compiler using command line style syntax. 
+    </p>
+    <pre class="synopsis">
+<span style="color:#000000; font-weight:bold">--load-table</span> simple.csv
+<span style="color:#000000; font-weight:bold">--template-source-file</span> CDataClass.tpl.h <span style="color:#000000; font-weight:bold">--output-file</span> CDataClass.gen.h
+    </pre>
+    <p>
+     
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor34"></a>The Simple Example Extended </h2></div></div></div>
+    <p>
+     
+    </p>
+    <p>
+    This example extends the previous one by the use of multiple data tables, recursive macro processing, the use of multi line macros and the use of additional parameters from the command file to generate a C++ and a Visual Basic .NET data class. 
+    </p>
+    <p>
+    The list of parameters from the previous example is extended by minimum and maximum values to generate a method for clipping the class data members. 
+    </p>
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Default</th>
+          <th>Min</th>
+          <th>Max</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>integer</td>
+          <td>i</td>
+          <td>10</td>
+          <td>2</td>
+          <td>100</td>
+          <td>Description for i</td>
+        </tr>
+        <tr>
+          <td>double</td>
+          <td>d</td>
+          <td>23.4</td>
+          <td>-234.5</td>
+          <td>300</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>string</td>
+          <td>s</td>
+          <td>&quotx34&quot</td>
+          <td></td>
+          <td></td>
+          <td>Description for s</td>
+        </tr>
+        <tr>
+          <td>integer</td>
+          <td></td>
+          <td>6</td>
+          <td></td>
+          <td></td>
+          <td>This is an incomplete entry</td>
+        </tr>
+        <tr>
+          <td>boolean</td>
+          <td>b</td>
+          <td>true</td>
+          <td></td>
+          <td></td>
+          <td>Description for b</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>    <p>
+    Two additional tables are added to map the listed general types to the corresponding types of the generated language. 
+    </p>
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>integer</th>
+          <th>double</th>
+          <th>string</th>
+          <th>boolean</th>
+        </tr>
+        <tr>
+          <td>int</td>
+          <td>double</td>
+          <td>std::string</td>
+          <td>bool</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>integer</th>
+          <th>double</th>
+          <th>string</th>
+          <th>boolean</th>
+        </tr>
+        <tr>
+          <td>Integer</td>
+          <td>Double</td>
+          <td>String</td>
+          <td>Boolean</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>    <p>
+    The template from the previous example is extended by using a parameter passed from the command file that is used for the class name, the mapping of the general type to the corresponding C++ type, and a clipping method using multi line macros. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    For customizing a template it is possible to pass additional parameters from the command files. The parameters are collected in another table so that they can be accessed like loaded tables using the ENTRY tags. This allows using the shown template to generate several different classes. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    The declaration section shows a tag with a dot as infix. This dot denotes a delayed processing of the tag.  When the macro is processed the first time the marked ENTRY tag is treated as normal text. The macro is expanded and afterwards the dot is removed activating the tag. This will cause the generated line to be detected as macro and it will be processed. Since the general type has been entered by the previous generation step as column heading the C++ type can be looked up in a second step. It is possible to add as many delay dots as needed to a tag. In every processing step one dot is removed allowing cascading of multiple macros. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    The clip method shows the use of multi line macros. There are two different ways of using the MACRO_BEGIN and MACRO_END tags. The if-statement for checking the maximum shows one possibility. All enclosed text and new line characters are reproduced each time the macro is expanded. But using this style makes it hard to keep track of the indentation. The second possibility uses the build in preprocessor to achieve the same result making it easier to produce the correct indentation. The preprocessor trims all surrounding white space including the new line character from a line if it finds a trailing TRIM tag. 
+    </p>
+    <p>
+     
+    </p>
+    <pre class="synopsis">
+#include &lt;string&gt;
+
+class <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Class Name&quot;]
+{
+public:
+    //declaration
+    <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Type&quot;]&quot;] m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;]; //<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>
+    
+    //constructor
+    <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Class Name&quot;]()
+        <span style="color:#000000; font-weight:bold">[BEGIN][BEGIN][IF][FIRST_TIME]</span>: <span style="color:#000000; font-weight:bold">[OR]</span>, <span style="color:#000000; font-weight:bold">[END]</span>m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;](<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Default&quot;])<span style="color:#000000; font-weight:bold">[END]</span>
+    {
+    }
+    
+    unsigned int Clip()
+    {
+        unsigned int clipCounter = <span style="color:#000000">0</span>;
+
+        //clip max
+<span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span>        if ( m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] &gt; <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Max&quot;] )
+        {
+            m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] = <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Max&quot;];
+            ++clipCounter;        
+        }
+<span style="color:#000000; font-weight:bold">[MACRO_END]</span>
+ 
+         //clip min
+        <span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+        if ( m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] &lt; <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Min&quot;] )
+        {
+            m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] = <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Min&quot;];
+            ++clipCounter;        
+        }
+        <span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+
+        return clipCounter;
+    }
+};
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    This is the generated C++ data class. 
+    </p>
+    <pre class="synopsis">
+<span style="color:#0000ff">#include &lt;string&gt;</span>
+
+<span style="color:#2b91af">class</span> CMyData
+<span style="color:#000000">{</span>
+<span style="color:#2b91af">public</span><span style="color:#000000">:</span>
+    <span style="color:#008000">//declaration</span>
+    <span style="color:#0000ff">int</span> m_i<span style="color:#000000">;</span> <span style="color:#008000">//Description for i</span>
+    <span style="color:#0000ff">double</span> m_d<span style="color:#000000">;</span> <span style="color:#008000">//</span>
+    std<span style="color:#000000">::</span>string m_s<span style="color:#000000">;</span> <span style="color:#008000">//Description for s</span>
+    <span style="color:#0000ff">bool</span> m_b<span style="color:#000000">;</span> <span style="color:#008000">//Description for b</span>
+    
+    <span style="color:#008000">//constructor</span>
+    <span style="color:#000000">CMyData</span><span style="color:#000000">()</span>
+        <span style="color:#000000">:</span> <span style="color:#000000">m_i</span><span style="color:#000000">(</span><span style="color:#000000">10</span><span style="color:#000000">)</span>
+        <span style="color:#000000">,</span> <span style="color:#000000">m_d</span><span style="color:#000000">(</span><span style="color:#000000">23.4</span><span style="color:#000000">)</span>
+        <span style="color:#000000">,</span> <span style="color:#000000">m_s</span><span style="color:#000000">(</span><span style="color:#a31515">&quot;x34&quot;</span><span style="color:#000000">)</span>
+        <span style="color:#000000">,</span> <span style="color:#000000">m_b</span><span style="color:#000000">(</span><span style="color:#0000ff">true</span><span style="color:#000000">)</span>
+    <span style="color:#000000">{</span>
+    <span style="color:#000000">}</span>
+    
+    <span style="color:#0000ff">unsigned int</span> <span style="color:#000000">Clip</span><span style="color:#000000">()</span>
+    <span style="color:#000000">{</span>
+        <span style="color:#0000ff">unsigned int</span> clipCounter <span style="color:#000000">=</span> <span style="color:#000000">0</span><span style="color:#000000">;</span>
+
+        <span style="color:#008000">//clip max</span>
+        <span style="color:#0000ff">if</span> <span style="color:#000000">(</span> m_i <span style="color:#000000">&gt;</span> <span style="color:#000000">100</span> <span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            m_i <span style="color:#000000">=</span> <span style="color:#000000">100</span><span style="color:#000000">;</span>
+            <span style="color:#000000">++</span>clipCounter<span style="color:#000000">;</span>        
+        <span style="color:#000000">}</span>
+        <span style="color:#0000ff">if</span> <span style="color:#000000">(</span> m_d <span style="color:#000000">&gt;</span> <span style="color:#000000">300</span> <span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            m_d <span style="color:#000000">=</span> <span style="color:#000000">300</span><span style="color:#000000">;</span>
+            <span style="color:#000000">++</span>clipCounter<span style="color:#000000">;</span>        
+        <span style="color:#000000">}</span>
+
+ 
+         <span style="color:#008000">//clip min</span>
+        <span style="color:#0000ff">if</span> <span style="color:#000000">(</span> m_i <span style="color:#000000">&lt;</span> <span style="color:#000000">2</span> <span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            m_i <span style="color:#000000">=</span> <span style="color:#000000">2</span><span style="color:#000000">;</span>
+            <span style="color:#000000">++</span>clipCounter<span style="color:#000000">;</span>        
+        <span style="color:#000000">}</span>
+        <span style="color:#0000ff">if</span> <span style="color:#000000">(</span> m_d <span style="color:#000000">&lt; -</span><span style="color:#000000">234.5</span> <span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            m_d <span style="color:#000000">= -</span><span style="color:#000000">234.5</span><span style="color:#000000">;</span>
+            <span style="color:#000000">++</span>clipCounter<span style="color:#000000">;</span>        
+        <span style="color:#000000">}</span>
+
+        <span style="color:#0000ff">return</span> clipCounter<span style="color:#000000">;</span>
+    <span style="color:#000000">}</span>
+<span style="color:#000000">};</span>
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    This is the template for the Visual Basic .NET data class. 
+    </p>
+    <pre class="synopsis">
+Imports System
+
+Class <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Class Name&quot;]
+
+    'declaration
+    Public m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] As <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Type&quot;]&quot;] = <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Default&quot;] '<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>
+    
+    Public Function Clip() As UInteger
+
+        'clip max
+<span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span>        If m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] &gt; <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Max&quot;] Then
+            m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] = <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Max&quot;]
+            Clip += <span style="color:#000000">1</span>
+        End If
+<span style="color:#000000; font-weight:bold">[MACRO_END]</span>
+
+        'clip min
+        <span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+        If m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] &lt; <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Min&quot;] Then
+            m_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Name&quot;] = <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Min&quot;]
+            Clip += <span style="color:#000000">1</span>
+        End If
+        <span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+        
+    End Function
+
+End Class
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    This is the generated Visual Basic .NET data class. 
+    </p>
+    <pre class="synopsis">
+<span style="color:#0000ff">Imports</span> System
+
+<span style="color:#0000ff">Class</span> MyData
+
+    <span style="color:#008000">'declaration</span>
+    <span style="color:#0000ff">Public</span> m_i <span style="color:#0000ff">As</span> <span style="color:#0000ff">Integer</span> <span style="color:#000000">=</span> <span style="color:#000000">10</span> <span style="color:#008000">'Description for i</span>
+    <span style="color:#0000ff">Public</span> m_d <span style="color:#0000ff">As</span> <span style="color:#0000ff">Double</span> <span style="color:#000000">=</span> <span style="color:#000000">23.4</span> <span style="color:#008000">'</span>
+    <span style="color:#0000ff">Public</span> m_s <span style="color:#0000ff">As</span> <span style="color:#0000ff">String</span> <span style="color:#000000">=</span> <span style="color:#a31515">&quot;x34&quot;</span> <span style="color:#008000">'Description for s</span>
+    <span style="color:#0000ff">Public</span> m_b <span style="color:#0000ff">As</span> <span style="color:#0000ff">Boolean</span> <span style="color:#000000">=</span> <span style="color:#0000ff">true</span> <span style="color:#008000">'Description for b</span>
+    
+    <span style="color:#0000ff">Public Function</span> <span style="color:#000000">Clip</span><span style="color:#000000">()</span> <span style="color:#0000ff">As</span> UInteger
+
+        <span style="color:#008000">'clip max</span>
+        <span style="color:#0000ff">If</span> m_i <span style="color:#000000">&gt;</span> <span style="color:#000000">100</span> <span style="color:#0000ff">Then</span>
+            m_i <span style="color:#000000">=</span> <span style="color:#000000">100</span>
+            Clip <span style="color:#000000">+=</span> <span style="color:#000000">1</span>
+        <span style="color:#0000ff">End If</span>
+        <span style="color:#0000ff">If</span> m_d <span style="color:#000000">&gt;</span> <span style="color:#000000">300</span> <span style="color:#0000ff">Then</span>
+            m_d <span style="color:#000000">=</span> <span style="color:#000000">300</span>
+            Clip <span style="color:#000000">+=</span> <span style="color:#000000">1</span>
+        <span style="color:#0000ff">End If</span>
+
+
+        <span style="color:#008000">'clip min</span>
+        <span style="color:#0000ff">If</span> m_i <span style="color:#000000">&lt;</span> <span style="color:#000000">2</span> <span style="color:#0000ff">Then</span>
+            m_i <span style="color:#000000">=</span> <span style="color:#000000">2</span>
+            Clip <span style="color:#000000">+=</span> <span style="color:#000000">1</span>
+        <span style="color:#0000ff">End If</span>
+        <span style="color:#0000ff">If</span> m_d <span style="color:#000000">&lt; -</span><span style="color:#000000">234.5</span> <span style="color:#0000ff">Then</span>
+            m_d <span style="color:#000000">= -</span><span style="color:#000000">234.5</span>
+            Clip <span style="color:#000000">+=</span> <span style="color:#000000">1</span>
+        <span style="color:#0000ff">End If</span>
+        
+    <span style="color:#0000ff">End Function</span>
+
+<span style="color:#0000ff">End Class</span>
+    </pre>
+    <p>
+     
+    </p>
+    <p>
+    The command file shows the usage of the option for specifying the reading direction of a table to top down. This is used to avoid reading the tables from left to right because only one ENTRY tag is used to map the types and can be found as row heading in multiple places making it impossible for the text compiler to automatically find the correct table to read. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    The template processing command is written using short option names in this command file. The parameter option p is used to pass the class names. It is possible to pass multiple strings using the first equal sign as delimiter to separate column header from table entry. Multiple table entries are entered in a column if parameters with the same column name are provided. This is done in the order they are listed in the command. 
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    After the C++ data class is generated the C++ mapping table is unloaded and the Visual Basic mapping table is loaded to generate the Visual Basic class.  
+    </p>
+    <p>
+     
+    </p>
+    <pre class="synopsis">
+<span style="color:#000000; font-weight:bold">--load-table</span> simple_extended.csv <span style="color:#000000; font-weight:bold">--top-down</span>
+<span style="color:#000000; font-weight:bold">--load-table</span> simple_extended.map_cpp.csv <span style="color:#000000; font-weight:bold">--top-down</span>
+
+<span style="color:#000000; font-weight:bold">-s</span> CDataClass.tpl.h <span style="color:#000000; font-weight:bold">-o</span> CMyData.gen.h <span style="color:#000000; font-weight:bold">-p</span> &quot;Class Name=CMyData&quot;
+
+<span style="color:#000000; font-weight:bold">--unload-table</span> simple_extended.map_cpp.csv
+<span style="color:#000000; font-weight:bold">--load-table</span> simple_extended.map_vbnet.csv <span style="color:#000000; font-weight:bold">--top-down</span>
+
+<span style="color:#000000; font-weight:bold">-s</span> CDataClass.tpl.vb <span style="color:#000000; font-weight:bold">-o</span> MyData.gen.vb <span style="color:#000000; font-weight:bold">-p</span> &quot;Class Name=MyData&quot;
+    </pre>
+    <p>
+     
+    </p>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor69"></a>An Advanced Example – Generating a State Machine with Graph </h2></div></div></div>
+    <p>
+     
+    </p>
+    <p>
+    This example shows how to describe a state machine using a matrix. The matrix is used to generate a C++ state machine class. The state machine class is designed to derive another class from it that reacts to the state changes. 
+    </p>
+    <p>
+    The <a href="http://www.doxygen.org">doxygen</a> documentation tool is used together with the <a href="http://www.graphviz.org">graphviz dot</a> graph visualization software to create the documentation for the state machine including a graph of the states. The dot graph description that is generated causes doxygen to produce a graph of the states and transitions when it is run. The example folder contains a template to generate code for a console application used for testing the state machine. 
+    </p>
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Actions\States</th>
+          <th>Action Name</th>
+          <th>Action Description</th>
+          <th>State 1</th>
+          <th>State 2</th>
+          <th>State 3</th>
+        </tr>
+        <tr>
+          <th>State Name</th>
+          <td></td>
+          <td></td>
+          <td>Stopped</td>
+          <td>Playing</td>
+          <td>Paused</td>
+        </tr>
+        <tr>
+          <th>State Description</th>
+          <td></td>
+          <td></td>
+          <td>The player is stopped.</td>
+          <td>The player is playing.</td>
+          <td>The player is paused.</td>
+        </tr>
+        <tr>
+          <th>Initial State</th>
+          <td></td>
+          <td></td>
+          <td>yes</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <th>Action 1</th>
+          <td>Play</td>
+          <td>The user pressed the play button.</td>
+          <td>Playing</td>
+          <td></td>
+          <td>Playing</td>
+        </tr>
+        <tr>
+          <th>Action 2</th>
+          <td>Stop</td>
+          <td>The user pressed the stop button.</td>
+          <td></td>
+          <td>Stopped</td>
+          <td>Stopped</td>
+        </tr>
+        <tr>
+          <th>Action 3</th>
+          <td>Pause</td>
+          <td>The user pressed the pause button.</td>
+          <td></td>
+          <td>Paused</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p>
+    This is the produced graph showing the states and transitions. 
+    </p>
+    <p>
+      <span class="inlinemediaobject"><img src="state_graph.png" alt="state_graph.png"></span>
+    </p>
+    <p>
+     
+    </p>
+    <p>
+    This is the template for creating a C++ state machine. The macros are commented in the code using the COMMENT tag.  
+    </p>
+    <pre class="synopsis">
+<span style="color:#008000">[COMMENT] Produces a switch/case state machine class </span>
+<span style="color:#008000">[COMMENT] Includes a dot graph description</span>
+<span style="color:#008000">[COMMENT] The graph is produced using Doxygen and Graphviz Dot</span>
+<span style="color:#008000">[COMMENT] see www.doxygen.org and www.graphviz.org </span>
+<span style="color:#008000">[COMMENT] Required Parameters:</span>
+<span style="color:#008000">[COMMENT] &quot;Machine Name&quot; - the name of the class, e.g. CStateMachine</span>
+//--------------------------------------------------------------------
+/**
+\file
+\brief  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!
+*/
+//--------------------------------------------------------------------
+
+#ifndef INCLUDED_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]<span style="color:#000000; font-weight:bold">[TO_UPPER]</span>_TPL_H
+#define INCLUDED_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]<span style="color:#000000; font-weight:bold">[TO_UPPER]</span>_TPL_H
+
+#if !defined (COMPILER_LACKS_PRAGMA_ONCE)
+#pragma once
+#endif
+
+<span style="color:#008000">[COMMENT] The SET_RECURSION_LEVEL_LIMIT directive can be used to view and</span>
+<span style="color:#008000">[COMMENT] debug intermediate generation steps.</span>
+<span style="color:#008000">[COMMENT] Remove the trailing _OFF in the following directive to see</span>
+<span style="color:#008000">[COMMENT] the first level of processing after the generation is run again.</span>
+<span style="color:#0000a0; font-weight:bold">[SET_RECURSION_LEVEL_LIMIT_OFF][TRIM]</span>
+
+//--------------------------------------------------------------------
+/**
+\class <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]
+\brief State machine '<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]' with dot graph as 
+        documentation generated from a table.
+
+Derive from this class to handle the state transitions. 
+ 
+\dot
+digraph <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]
+{
+    start_state_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;] [shape=diamond,label=&quot;start&quot;];
+    start_state_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;] -&gt; <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;];<span style="color:#a00000; font-weight:bold">[IF.][ENTRY.]</span>[&quot;Initial State&quot;]
+    <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;];
+    <span style="color:#008000">[COMMENT] first go top down through all actions, </span>
+    <span style="color:#008000">[COMMENT] then go from left to right through states</span>
+    <span style="color:#008000">[COMMENT] expanding if transition is entered</span>
+    <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;] -&gt; <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;][label=<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]];
+}
+\enddot
+*/
+//--------------------------------------------------------------------
+
+class <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]
+{
+public:
+    ///Lists all possible states
+    enum EState
+    {
+        e<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;], ///&lt;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>
+        eNumberOfStates ///&lt;Can be used for iterating over the states
+    };
+    
+    <span style="color:#008000">[COMMENT] set initial state marked with yes (or anything else), </span>
+    <span style="color:#008000">[COMMENT] build fails if not exactly one state is marked</span>
+    ///Initializes the state machine
+    <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]()
+        : <span style="color:#000000; font-weight:bold">[BEGIN]</span>m_currentState(e<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]<span style="color:#000000; font-weight:bold">[IF][ENTRY]</span>[&quot;Initial State&quot;])<span style="color:#000000; font-weight:bold">[OR][IF][LAST_TIME]</span> ---initial state not set--- <span style="color:#000000; font-weight:bold">[END]</span>
+    {
+    }
+    
+    ///-
+    virtual ~<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]() {}
+
+    <span style="color:#008000">[COMMENT] expand an action function for </span>
+    <span style="color:#008000">[COMMENT] all entries in column &quot;Action Name&quot; as first step    </span>
+    <span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    ///Handle action <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]: <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>
+    virtual void action<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]()
+    {
+        switch ( m_currentState)
+        {
+            <span style="color:#008000">[COMMENT] go from left to right through all states </span>
+            <span style="color:#008000">[COMMENT] and add a transition case handler </span>
+            <span style="color:#008000">[COMMENT] if a transition target state is entered</span>
+            <span style="color:#a00000; font-weight:bold">[MACRO_BEGIN.]</span>[TRIM.]
+            case e<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;]:
+                exit<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;]();
+                <span style="color:#008000">[COMMENT] [ENTRY][&quot;Actions\\States&quot;] expands to </span>
+                <span style="color:#008000">[COMMENT] the row name of the action</span>
+                enter<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;]();
+                m_currentState = e<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;];                
+                break;
+            <span style="color:#a00000; font-weight:bold">[MACRO_END.]</span>[TRIM.]
+
+            default:
+            actionIgnored();
+        }        
+    }
+
+    <span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+
+    <span style="color:#008000">[COMMENT] List enter and exit for all states     </span>
+    <span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    ///Called when state <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;] is entered
+    virtual void enter<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]() {}
+    ///Called when state <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;] is exited
+    virtual void exit<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]() {}
+
+    <span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    
+    ///Called when an action does not trigger a transition
+    virtual void actionIgnored() {}
+    
+    ///Returns the current state
+    EState getCurrentState()
+    {
+        return m_currentState;
+    }
+private:
+    EState m_currentState; ///&lt; holds the current state of the machine
+};
+
+#endif /* INCLUDED_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;]<span style="color:#000000; font-weight:bold">[TO_UPPER]</span>_TPL_H */
+    </pre>
+    <p>
+    This is the generated C++ state machine code. It contains only a few states to not get to large for an example, but it can be extended to any size by extending the matrix. The example folder contains another matrix having more states.  
+    </p>
+    <pre class="synopsis">
+<span style="color:#008000">//--------------------------------------------------------------------</span>
+<span style="color:#008000">/**</span>
+<span style="color:#008000">\file</span>
+<span style="color:#008000">\brief  WARNING CONTAINS GENERATED CODE! ALL CHANGES WILL BE LOST!</span>
+<span style="color:#008000">*/</span>
+<span style="color:#008000">//--------------------------------------------------------------------</span>
+
+<span style="color:#0000ff">#ifndef INCLUDED_CDPLAYERSTATEMACHINE_TPL_H</span>
+<span style="color:#0000ff">#define INCLUDED_CDPLAYERSTATEMACHINE_TPL_H</span>
+
+<span style="color:#0000ff">#if !defined (COMPILER_LACKS_PRAGMA_ONCE)</span>
+<span style="color:#0000ff">#pragma once</span>
+<span style="color:#0000ff">#endif</span>
+
+
+<span style="color:#008000">//--------------------------------------------------------------------</span>
+<span style="color:#008000">/**</span>
+<span style="color:#008000">\class CDPlayerStateMachine</span>
+<span style="color:#008000">\brief State machine 'CDPlayerStateMachine' with dot graph as </span>
+<span style="color:#008000">        documentation generated from a table.</span>
+<span style="color:#008000"></span>
+<span style="color:#008000">Derive from this class to handle the state transitions. </span>
+<span style="color:#008000"> </span>
+<span style="color:#008000">\dot</span>
+<span style="color:#008000">digraph CDPlayerStateMachine</span>
+<span style="color:#008000">{</span>
+<span style="color:#008000">    start_state_CDPlayerStateMachine [shape=diamond,label=&quot;start&quot;];</span>
+<span style="color:#008000">    start_state_CDPlayerStateMachine -&gt; Stopped;</span>
+<span style="color:#008000">    Stopped;</span>
+<span style="color:#008000">    Playing;</span>
+<span style="color:#008000">    Paused;</span>
+<span style="color:#008000">    Stopped -&gt; Playing[label=Play];</span>
+<span style="color:#008000">    Paused -&gt; Playing[label=Play];</span>
+<span style="color:#008000">    Playing -&gt; Stopped[label=Stop];</span>
+<span style="color:#008000">    Paused -&gt; Stopped[label=Stop];</span>
+<span style="color:#008000">    Playing -&gt; Paused[label=Pause];</span>
+<span style="color:#008000">}</span>
+<span style="color:#008000">\enddot</span>
+<span style="color:#008000">*/</span>
+<span style="color:#008000">//--------------------------------------------------------------------</span>
+
+<span style="color:#2b91af">class</span> CDPlayerStateMachine
+<span style="color:#000000">{</span>
+<span style="color:#2b91af">public</span><span style="color:#000000">:</span>
+    <span style="color:#008000">///Lists all possible states</span>
+    <span style="color:#0000ff">enum</span> EState
+    <span style="color:#000000">{</span>
+        eStopped<span style="color:#000000">,</span> <span style="color:#008000">///&lt;The player is stopped.</span>
+        ePlaying<span style="color:#000000">,</span> <span style="color:#008000">///&lt;The player is playing.</span>
+        ePaused<span style="color:#000000">,</span> <span style="color:#008000">///&lt;The player is paused.</span>
+        eNumberOfStates <span style="color:#008000">///&lt;Can be used for iterating over the states</span>
+    <span style="color:#000000">};</span>
+    
+    <span style="color:#008000">///Initializes the state machine</span>
+    <span style="color:#000000">CDPlayerStateMachine</span><span style="color:#000000">()</span>
+        <span style="color:#000000">:</span> <span style="color:#000000">m_currentState</span><span style="color:#000000">(</span>eStopped<span style="color:#000000">)</span>
+    <span style="color:#000000">{</span>
+    <span style="color:#000000">}</span>
+    
+    <span style="color:#008000">///-</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#000000">~</span><span style="color:#000000">CDPlayerStateMachine</span><span style="color:#000000">() {}</span>
+
+    <span style="color:#008000">///Handle action Play: The user pressed the play button.</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">actionPlay</span><span style="color:#000000">()</span>
+    <span style="color:#000000">{</span>
+        <span style="color:#0000ff">switch</span> <span style="color:#000000">(</span> m_currentState<span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            <span style="color:#0000ff">case</span> eStopped<span style="color:#000000">:</span>
+                <span style="color:#000000">exitStopped</span><span style="color:#000000">();</span>
+                <span style="color:#000000">enterPlaying</span><span style="color:#000000">();</span>
+                m_currentState <span style="color:#000000">=</span> ePlaying<span style="color:#000000">;</span>                
+                <span style="color:#0000ff">break</span><span style="color:#000000">;</span>
+            <span style="color:#0000ff">case</span> ePaused<span style="color:#000000">:</span>
+                <span style="color:#000000">exitPaused</span><span style="color:#000000">();</span>
+                <span style="color:#000000">enterPlaying</span><span style="color:#000000">();</span>
+                m_currentState <span style="color:#000000">=</span> ePlaying<span style="color:#000000">;</span>                
+                <span style="color:#0000ff">break</span><span style="color:#000000">;</span>
+
+            <span style="color:#0000ff">default</span><span style="color:#000000">:</span>
+            <span style="color:#000000">actionIgnored</span><span style="color:#000000">();</span>
+        <span style="color:#000000">}</span>        
+    <span style="color:#000000">}</span>
+
+    <span style="color:#008000">///Handle action Stop: The user pressed the stop button.</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">actionStop</span><span style="color:#000000">()</span>
+    <span style="color:#000000">{</span>
+        <span style="color:#0000ff">switch</span> <span style="color:#000000">(</span> m_currentState<span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            <span style="color:#0000ff">case</span> ePlaying<span style="color:#000000">:</span>
+                <span style="color:#000000">exitPlaying</span><span style="color:#000000">();</span>
+                <span style="color:#000000">enterStopped</span><span style="color:#000000">();</span>
+                m_currentState <span style="color:#000000">=</span> eStopped<span style="color:#000000">;</span>                
+                <span style="color:#0000ff">break</span><span style="color:#000000">;</span>
+            <span style="color:#0000ff">case</span> ePaused<span style="color:#000000">:</span>
+                <span style="color:#000000">exitPaused</span><span style="color:#000000">();</span>
+                <span style="color:#000000">enterStopped</span><span style="color:#000000">();</span>
+                m_currentState <span style="color:#000000">=</span> eStopped<span style="color:#000000">;</span>                
+                <span style="color:#0000ff">break</span><span style="color:#000000">;</span>
+
+            <span style="color:#0000ff">default</span><span style="color:#000000">:</span>
+            <span style="color:#000000">actionIgnored</span><span style="color:#000000">();</span>
+        <span style="color:#000000">}</span>        
+    <span style="color:#000000">}</span>
+
+    <span style="color:#008000">///Handle action Pause: The user pressed the pause button.</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">actionPause</span><span style="color:#000000">()</span>
+    <span style="color:#000000">{</span>
+        <span style="color:#0000ff">switch</span> <span style="color:#000000">(</span> m_currentState<span style="color:#000000">)</span>
+        <span style="color:#000000">{</span>
+            <span style="color:#0000ff">case</span> ePlaying<span style="color:#000000">:</span>
+                <span style="color:#000000">exitPlaying</span><span style="color:#000000">();</span>
+                <span style="color:#000000">enterPaused</span><span style="color:#000000">();</span>
+                m_currentState <span style="color:#000000">=</span> ePaused<span style="color:#000000">;</span>                
+                <span style="color:#0000ff">break</span><span style="color:#000000">;</span>
+
+            <span style="color:#0000ff">default</span><span style="color:#000000">:</span>
+            <span style="color:#000000">actionIgnored</span><span style="color:#000000">();</span>
+        <span style="color:#000000">}</span>        
+    <span style="color:#000000">}</span>
+
+
+    <span style="color:#008000">///Called when state Stopped is entered</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">enterStopped</span><span style="color:#000000">() {}</span>
+    <span style="color:#008000">///Called when state Stopped is exited</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">exitStopped</span><span style="color:#000000">() {}</span>
+
+    <span style="color:#008000">///Called when state Playing is entered</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">enterPlaying</span><span style="color:#000000">() {}</span>
+    <span style="color:#008000">///Called when state Playing is exited</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">exitPlaying</span><span style="color:#000000">() {}</span>
+
+    <span style="color:#008000">///Called when state Paused is entered</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">enterPaused</span><span style="color:#000000">() {}</span>
+    <span style="color:#008000">///Called when state Paused is exited</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">exitPaused</span><span style="color:#000000">() {}</span>
+
+    
+    <span style="color:#008000">///Called when an action does not trigger a transition</span>
+    <span style="color:#2b91af">virtual</span> <span style="color:#0000ff">void</span> <span style="color:#000000">actionIgnored</span><span style="color:#000000">() {}</span>
+    
+    <span style="color:#008000">///Returns the current state</span>
+    EState <span style="color:#000000">getCurrentState</span><span style="color:#000000">()</span>
+    <span style="color:#000000">{</span>
+        <span style="color:#0000ff">return</span> m_currentState<span style="color:#000000">;</span>
+    <span style="color:#000000">}</span>
+<span style="color:#2b91af">private</span><span style="color:#000000">:</span>
+    EState m_currentState<span style="color:#000000">;</span> <span style="color:#008000">///&lt; holds the current state of the machine</span>
+<span style="color:#000000">};</span>
+
+<span style="color:#0000ff">#endif</span> <span style="color:#008000">/* INCLUDED_CDPLAYERSTATEMACHINE_TPL_H */</span><span style="color:#0000ff"></span>
+    </pre>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor81"></a>In-Place Code Generation Using Inline Templates </h2></div></div></div>
+    <p>
+    Inline templates are placed into a code file for in-place code generation. This works line based using the comment syntax of the source language. The lines of an inline template are marked with a prefix and an optional postfix as template lines. The following C++ example uses the prefix //<> for this purpose.  The inline template lines are ignored by the C++ compiler because they form C++ line comments. Prefix and postfix are removed by the text compiler before processing. Generated code lines are marked with an is-generated-postfix. This allows removing old generated code lines when running the code generation again. The following C++ example uses //$ as is-generated-postfix. Only lines marked as inline template are processed by the text compiler. All other lines are directly passed to the output file. 
+    </p>
+    <p>
+    WARNING: Use this feature carefully to prevent data loss. Any line ending with the is-generated-postfix is removed by the text compiler. Backup your code before using in-place code generation. 
+    </p>
+    <pre class="synopsis">
+//--------------------------------------------------------------------
+/**
+\file
+\brief  CDPlayerStateMachine with inline templates
+*/
+//--------------------------------------------------------------------
+
+#ifndef INCLUDED_CDPLAYERSTATEMACHINEINLINE_H_5742456
+#define INCLUDED_CDPLAYERSTATEMACHINEINLINE_H_5742456
+
+//--------------------------------------------------------------------
+/**
+\class CDPlayerStatemachine
+\brief State machine CDPlayerStatemachine with dot graph as 
+       documentation generated from a table.
+
+Derive from this class to handle the state transitions. 
+ 
+\dot
+digraph CDPlayerStatemachine
+{
+    //&lt;&gt;start_state_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;] [shape=diamond,label=&quot;start&quot;];
+    //&lt;&gt;start_state_<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Machine Name&quot;] -&gt; <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;];<span style="color:#a00000; font-weight:bold">[IF.][ENTRY.]</span>[&quot;Initial State&quot;]
+    //&lt;&gt;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;];
+    Stopped;                                                                              //$
+    Playing;                                                                              //$
+    Paused;                                                                               //$
+    //&lt;&gt;<span style="color:#008000">[COMMENT] first go top down through all actions, </span>
+    //&lt;&gt;<span style="color:#008000">[COMMENT] then go from left to right through states</span>
+    //&lt;&gt;<span style="color:#008000">[COMMENT] expanding if transition is entered</span>
+    //&lt;&gt;<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;] -&gt; <span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;][label=<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]];
+    Stopped -&gt; Playing[label=Play];                                                       //$
+    Paused -&gt; Playing[label=Play];                                                        //$
+    Playing -&gt; Stopped[label=Stop];                                                       //$
+    Paused -&gt; Stopped[label=Stop];                                                        //$
+    Playing -&gt; Paused[label=Pause];                                                       //$
+}
+\enddot
+*/
+//--------------------------------------------------------------------
+class CDPlayerStatemachine
+{
+public:
+    /** \brief Lists all possible states.*/
+    enum EState
+    {
+        //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+        //&lt;&gt;/** \brief <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>*/
+        //&lt;&gt;e<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;],
+        //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+        /** \brief The player is stopped.*/                                               //$
+        eStopped,                                                                         //$
+        /** \brief The player is playing.*/                                               //$
+        ePlaying,                                                                         //$
+        /** \brief The player is paused.*/                                                //$
+        ePaused,                                                                          //$
+        /** \brief Can be used for iterating over the states.*/
+        eNumberOfStates 
+    };
+    
+    //&lt;&gt;<span style="color:#008000">[COMMENT] set initial state marked with yes (or anything else), </span>
+    //&lt;&gt;<span style="color:#008000">[COMMENT] build fails if not exactly one state is marked</span>
+    /** \brief Initializes the state machine.*/
+    CDPlayerStatemachine()
+        //&lt;&gt;: <span style="color:#000000; font-weight:bold">[BEGIN]</span>m_currentState(e<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]<span style="color:#000000; font-weight:bold">[IF][ENTRY]</span>[&quot;Initial State&quot;])<span style="color:#000000; font-weight:bold">[OR][IF][LAST_TIME]</span> ---initial state not set--- <span style="color:#000000; font-weight:bold">[END]</span>
+        : m_currentState(eStopped)                                                        //$
+    {
+    }
+    
+    /** \brief Make the destructor virtual.*/
+    virtual ~CDPlayerStatemachine()
+    {
+    }
+
+    //&lt;&gt;<span style="color:#008000">[COMMENT] expand an action function for </span>
+    //&lt;&gt;<span style="color:#008000">[COMMENT] all entries in column &quot;Action Name&quot; as first step</span>
+    //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    //&lt;&gt;/** \brief Handle action <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]: <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Description&quot;]<span style="color:#000000; font-weight:bold">[ANY]</span>*/
+    //&lt;&gt;virtual void action<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Action Name&quot;]()
+    //&lt;&gt;{
+    //&lt;&gt;    switch ( m_currentState)
+    //&lt;&gt;    {
+    //&lt;&gt;        <span style="color:#008000">[COMMENT] go from left to right through all states </span>
+    //&lt;&gt;        <span style="color:#008000">[COMMENT] and add a transition case handler </span>
+    //&lt;&gt;        <span style="color:#008000">[COMMENT] if a transition target state is entered</span>
+    //&lt;&gt;        <span style="color:#a00000; font-weight:bold">[MACRO_BEGIN.]</span>[TRIM.]
+    //&lt;&gt;        case e<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;]:
+    //&lt;&gt;            exit<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;State Name&quot;]();
+    //&lt;&gt;            <span style="color:#008000">[COMMENT] [ENTRY][&quot;Actions\\States&quot;] expands to </span>
+    //&lt;&gt;            <span style="color:#008000">[COMMENT] the row name of the action</span>
+    //&lt;&gt;            enter<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;]();
+    //&lt;&gt;            m_currentState = e<span style="color:#a00000; font-weight:bold">[ENTRY.]</span>[&quot;<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;Actions\\States&quot;]&quot;];
+    //&lt;&gt;            break;
+    //&lt;&gt;        <span style="color:#a00000; font-weight:bold">[MACRO_END.]</span>[TRIM.]
+    //&lt;&gt;        
+    //&lt;&gt;        default:
+    //&lt;&gt;        actionIgnored();
+    //&lt;&gt;    }
+    //&lt;&gt;}
+    //&lt;&gt;
+    //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    /** \brief Handle action Play: The user pressed the play button.*/                    //$
+    virtual void actionPlay()                                                             //$
+    {                                                                                     //$
+        switch ( m_currentState)                                                          //$
+        {                                                                                 //$
+            case eStopped:                                                                //$
+                exitStopped();                                                            //$
+                enterPlaying();                                                           //$
+                m_currentState = ePlaying;                                                //$
+                break;                                                                    //$
+            case ePaused:                                                                 //$
+                exitPaused();                                                             //$
+                enterPlaying();                                                           //$
+                m_currentState = ePlaying;                                                //$
+                break;                                                                    //$
+                                                                                          //$
+            default:                                                                      //$
+            actionIgnored();                                                              //$
+        }                                                                                 //$
+    }                                                                                     //$
+                                                                                          //$
+    /** \brief Handle action Stop: The user pressed the stop button.*/                    //$
+    virtual void actionStop()                                                             //$
+    {                                                                                     //$
+        switch ( m_currentState)                                                          //$
+        {                                                                                 //$
+            case ePlaying:                                                                //$
+                exitPlaying();                                                            //$
+                enterStopped();                                                           //$
+                m_currentState = eStopped;                                                //$
+                break;                                                                    //$
+            case ePaused:                                                                 //$
+                exitPaused();                                                             //$
+                enterStopped();                                                           //$
+                m_currentState = eStopped;                                                //$
+                break;                                                                    //$
+                                                                                          //$
+            default:                                                                      //$
+            actionIgnored();                                                              //$
+        }                                                                                 //$
+    }                                                                                     //$
+                                                                                          //$
+    /** \brief Handle action Pause: The user pressed the pause button.*/                  //$
+    virtual void actionPause()                                                            //$
+    {                                                                                     //$
+        switch ( m_currentState)                                                          //$
+        {                                                                                 //$
+            case ePlaying:                                                                //$
+                exitPlaying();                                                            //$
+                enterPaused();                                                            //$
+                m_currentState = ePaused;                                                 //$
+                break;                                                                    //$
+                                                                                          //$
+            default:                                                                      //$
+            actionIgnored();                                                              //$
+        }                                                                                 //$
+    }                                                                                     //$
+                                                                                          //$
+
+    //&lt;&gt;<span style="color:#008000">[COMMENT] List enter and exit for all states</span>
+    //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_BEGIN]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    //&lt;&gt;/** \brief Called when state <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;] is entered.*/
+    //&lt;&gt;virtual void enter<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]() {}
+    //&lt;&gt;/** \brief Called when state <span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;] is exited.*/
+    //&lt;&gt;virtual void exit<span style="color:#000000; font-weight:bold">[ENTRY]</span>[&quot;State Name&quot;]() {}
+    //&lt;&gt;                                                  
+    //&lt;&gt;<span style="color:#000000; font-weight:bold">[MACRO_END]</span><span style="color:#0000a0; font-weight:bold">[TRIM]</span>
+    /** \brief Called when state Stopped is entered.*/                                    //$
+    virtual void enterStopped() {}                                                        //$
+    /** \brief Called when state Stopped is exited.*/                                     //$
+    virtual void exitStopped() {}                                                         //$
+                                                                                          //$
+    /** \brief Called when state Playing is entered.*/                                    //$
+    virtual void enterPlaying() {}                                                        //$
+    /** \brief Called when state Playing is exited.*/                                     //$
+    virtual void exitPlaying() {}                                                         //$
+                                                                                          //$
+    /** \brief Called when state Paused is entered.*/                                     //$
+    virtual void enterPaused() {}                                                         //$
+    /** \brief Called when state Paused is exited.*/                                      //$
+    virtual void exitPaused() {}                                                          //$
+                                                                                          //$
+    
+    /** \brief Called when an action does not trigger a transition.*/
+    virtual void actionIgnored() {}
+    
+    /** \brief Returns the current state.*/
+    EState getCurrentState()
+    {
+        return m_currentState;
+    }
+private:
+    /** \brief holds the current state of the machine.*/
+    EState m_currentState; 
+};
+
+#endif /* INCLUDED_CDPLAYERSTATEMACHINEINLINE_H_5742456 */
+    </pre>
+    <p>
+    This is the used command file: 
+    </p>
+    <pre class="synopsis">
+<span style="color:#000000; font-weight:bold">--load-table</span> advanced.csv
+<span style="color:#008000"># The recycle option tries put the processed file into the recycle bin</span>
+<span style="color:#008000"># of the system each time the processing replaces it to prevent data loss. </span>
+<span style="color:#000000; font-weight:bold">-s</span> CDPlayerStatemachine.h <span style="color:#000000; font-weight:bold">--inlined -b</span> //&lt;&gt; <span style="color:#000000; font-weight:bold">-d</span> //$ <span style="color:#000000; font-weight:bold">--inline-pad</span> <span style="color:#000000">90</span> <span style="color:#000000; font-weight:bold">--recycle</span>
+<span style="color:#000000; font-weight:bold">-s</span> main.cpp <span style="color:#000000; font-weight:bold">--inlined -b</span> //&lt;&gt; <span style="color:#000000; font-weight:bold">-d</span> //$ <span style="color:#000000; font-weight:bold">--inline-pad</span> <span style="color:#000000">90</span> <span style="color:#000000; font-weight:bold">--recycle</span>
+    </pre>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="index.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="table_creation.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+</body>
+</html>

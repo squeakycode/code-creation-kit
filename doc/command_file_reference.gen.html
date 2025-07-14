@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Command File Reference | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="command_file.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="ide_integration.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h1 class="title" style="clear: both"><a name="anchor2"></a>Command File Reference </h1></div></div></div>
+    <p>
+    The following table shows all available commands. 
+    </p>
+
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Option Group</th>    
+          <th>Option Name</th>
+          <th>Short</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <th>Load Table</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>load-table</td>
+          <td> </td>
+          <td>Name of the table file to load. Default when the option name is omitted.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>label</td>
+          <td>a</td>
+          <td>Specifies the label used for identifying the table when unloading. The label defaults to the name of the table passed.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>top-down</td>
+          <td>t</td>
+          <td>Indicates that the table is to be read top down. If no direction is explicitly specified all directions will be read by default.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>left-to-right</td>
+          <td>l</td>
+          <td>Indicates that the table is to be read from left to right. If no direction is explicitly specified all directions will be read by default.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>row-header-index</td>
+          <td>w</td>
+          <td>Specifies the one based index of the column containing the row names. If zero is passed the one based index of the row is used as row name.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>column-header-index</td>
+          <td>n</td>
+          <td>Specifies the one based index of the row containing the column names. If zero is passed the one based index of the column is used as column name.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>pad-rows</td>
+          <td> </td>
+          <td>Automatically fills missing row items at the end of a row with an empty string.</td>
+        </tr>
+        <tr>
+          <th>Unload Table</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>unload-table</td>
+          <td>x</td>
+          <td>Unload table file identified by its label. This option accepts multiple parameters for unloading more than one table. Tables having the same label are unloaded in the reverse order they are loaded.</td>
+        </tr>
+        <tr>
+          <th>Generate File</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>template-source-file</td>
+          <td>s</td>
+          <td>Specifies the file containing the template.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>output-file</td>
+          <td>o</td>
+          <td>Specifies the file to output to.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>parameter</td>
+          <td>p</td>
+          <td>Optional parameters used by the template forming an additional table. This option accepts multiple parameters. Therefore it must be provided last.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>use-intermediate-output-file</td>
+          <td>u</td>
+          <td>Indicates that the output shall be written to an intermediate file first. This file replaces the primary output file when the generation succeeded and the intermediate and the primary output files are different otherwise it is being removed.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>intermediate-file-extension</td>
+          <td>e</td>
+          <td>The name of the intermediate file is produced by adding the given extension to the name of the output file. The extension defaults to &#39;.intermediate&#39; when omitted.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>markup-prefix</td>
+          <td> </td>
+          <td>Sets the initial tag markup prefix.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>markup-postfix</td>
+          <td> </td>
+          <td>Sets the initial tag markup postfix.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>markup</td>
+          <td>m</td>
+          <td>Sets the initial tag markup prefix and postfix. This switch overrides the switches markup-prefix and markup-postfix.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>append-to-file</td>
+          <td> </td>
+          <td>The output is appended to the target file. This option is ignored when used together with the use-intermediate-output-file option.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>inlined</td>
+          <td> </td>
+          <td>Indicates that a file with inline templates is processed. An intermediate file is automatically used when processing files with inline templates if no output file is provided. Use this option carefully to prevent data loss. Consider using the recycle option.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>inline-prefix</td>
+          <td>b</td>
+          <td>A prefix that marks a line of an inline template file as template content. This string must not be empty.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>inline-postfix</td>
+          <td>c</td>
+          <td>A postfix that marks a line of an inline template file as template content. This string can be empty.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>inline-generated-postfix</td>
+          <td>d</td>
+          <td>A postfix that marks a line of an inline template file as generated content. This string must not be empty.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>inline-pad</td>
+          <td> </td>
+          <td>The number of characters a generated line is padded up to with spaces before the generated postfix is appended.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>recycle</td>
+          <td>y</td>
+          <td>Used together with inlined option.  If possible the target file is moved to the recycle bin of the system before it is replaced by the intermediate file. </td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>can-change-table-list</td>
+          <td> </td>
+          <td>Allows a template to change the table list provided to the generator, e.g. by adding or removing tables. The default setting is off. A template can always use temporary tables during processing.</td>
+        </tr>
+        <tr>
+          <th>Reset Generator</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>reset</td>
+          <td>r</td>
+          <td>Reset the generator to defaults.</td>
+        </tr>
+        <tr>
+          <th>Add Include Directories</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>add-include-directory</td>
+          <td>i</td>
+          <td>Adds an include directory. This option accepts multiple parameters.</td>
+        </tr>
+        <tr>
+          <th>CSV Table Properties</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>csv-delimiter-chars</td>
+          <td> </td>
+          <td>Specifies a list of delimiter characters for the next CSV-files to load. Use &quot\t&quot for tab separated items. Use an empty string for no delimiter.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>csv-comment-chars</td>
+          <td> </td>
+          <td>Specifies a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line. The default is no commenting characters used.</td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>csv-quote-chars</td>
+          <td> </td>
+          <td>Specifies a list of characters as string  that are used for quoting text items in CSV-files. The default is the double quote character.</td>
+        </tr>
+        <tr>
+          <th>Logging</th>    
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>    
+          <td>log-file</td>
+          <td> </td>
+          <td>Sets up logging as follows: &#39;none&#39; is off, &#39;-&#39; is log to stdout, and any other parameter value is the name of a log file.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="command_file.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="ide_integration.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+</body>
+</html>

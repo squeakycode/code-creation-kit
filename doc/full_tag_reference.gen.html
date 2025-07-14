@@ -1,0 +1,655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Full Tag Reference | code-creation-kit</title>
+  <link rel="stylesheet" href="boost/boostbook.css" type="text/css">
+  <style>
+      a.versionlink
+      {
+        text-decoration:underline;
+        color:black;
+      }
+      a.versionlink:visited
+      {
+        color:black;
+      }
+  </style>
+</head>
+
+<body>
+    <table style="border-collapse: collapse;font: bold 140%;" border="0" cellpadding="5" cellspacing="0">
+      <tbody>
+        <tr>
+          <td width="580"> <a href="index.html"> <img src="logo.png" alt="logo.png" align="middle" border="0" height="73"  width="580"></a></td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="template_creation.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="command_line_reference.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+
+    <div class="titlepage"><div><div><h1 class="title" style="clear: both"><a name="anchor2"></a>Tag Reference </h1></div></div></div>
+    <p>
+     
+    </p>
+    <div class="toc">
+    
+    <dl>
+    <dt><span class="section"><a href="full_tag_reference.gen.html#anchor2">Tag Reference </a></span></dt>
+    <dd><dl>
+    <dt><span class="section"><a href="full_tag_reference.gen.html#anchor5">List of Tags </a></span></dt>
+    <dt><span class="section"><a href="full_tag_reference.gen.html#anchor8"> </a></span></dt>
+    <dt><span class="section"><a href="full_tag_reference.gen.html#anchor9">Tag Combinations </a></span></dt>
+    </dl></dd>
+    </dl>
+    </div>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor5"></a>List of Tags </h2></div></div></div>
+    <p>
+    The following table shows all available tags. 
+    </p>
+
+    <div class="informaltable">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Tag Name</th>
+          <th>Type</th>
+          <th>Parameter</th>
+          <th>Example</th>
+          <th>Description</th>
+        </tr>
+        
+        <tr>
+          <td>COMMENT</td>
+          <td>preprocessor directive</td>
+          <td> </td>
+          <td><pre>&#91;COMMENT&#93; This can be used for commenting templates.</pre></td>
+          <td>A line starting with this tag is suppressed and can be used to comment the template without affecting the output. Any whitespace surrounding the statement is ignored.</td>
+        </tr>
+        <tr>
+          <td>INCLUDE</td>
+          <td>preprocessor directive</td>
+          <td>Path and name of the file to include</td>
+          <td><pre>&#91;INCLUDE&#93;&#91;&quotfile.h&quot&#93;&#91;TRIM&#93;</pre></td>
+          <td>A line starting with this tag causes the intermediate processing of the file specified by the parameter. The include tag can be placed anywhere in the template file. If a relative path is provided it is relative to the template file containing the INCLUDE tag. If the file is not found there the include directories are searched for a file with the relative path.</td>
+        </tr>
+        <tr>
+          <td>SET_MARKUP</td>
+          <td>preprocessor directive</td>
+          <td>Prefix, Postfix</td>
+          <td><pre>&#91;SET_MARKUP&#93;&#91;&quot&lt&lt&quot,&quot&gt&gt&quot&#93;</pre></td>
+          <td>Changes the markup prefix and postfix used for the next lines of the template file after the line containing the statement and for subsequently included files. Leading whitespace for a prefix  and trailing whitespace for a postfix is not allowed. The markup is only changed for the scope of the current file and subsequently included files. It has no effect on a template file that included a file changing the markup.</td>
+        </tr>
+        <tr>
+          <td>TRIM</td>
+          <td>preprocessor directive</td>
+          <td> </td>
+          <td><pre>    &#91;BEGIN&#93;&#91;TRIM&#93;</pre></td>
+          <td>Leading and trailing white space characters &#40;including the new line character&#41; and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file. A single line macro is not extended to the next line when using trim.</td>
+        </tr>
+        <tr>
+          <td>TRIM_LEFT</td>
+          <td>preprocessor directive</td>
+          <td> </td>
+          <td><pre>    &#91;ENTRY&#93;&#91;&quotList&quot&#93;&#91;TRIM_LEFT&#93;</pre></td>
+          <td>Leading white space characters and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file.</td>
+        </tr>
+        <tr>
+          <td>TRIM_RIGHT</td>
+          <td>preprocessor directive</td>
+          <td> </td>
+          <td><pre>    &#91;ENTRY&#93;&#91;&quotList&quot&#93;&#91;TRIM_RIGHT&#93;     </pre></td>
+          <td>Trailing white space characters &#40;including the new line character&#41; and the tag itself are removed from a line ending with the tag. The main purpose is to allow a better readable formatting of the macros in the template file. A single line macro is not extended to the next line when using trim left.</td>
+        </tr>
+        <tr>
+          <td>PART</td>
+          <td>preprocessor directive</td>
+          <td>The label of the part to expand. Optional: The left padding characters and the total count of characters to pad.</td>
+          <td><pre>    &#91;ENTRY&#93;&#91;&quotList&quot&#93;&#91;PART&#93;&#91;&quotLengthyAdditionalTagsAndText&quot&#93;</pre></td>
+          <td>PART expands to a previously defined fragment of a template, e.g. a fragment of a macro. This useful if macros get very large, parts of a macro need to be repeated often or if you need to inject parameters into a macro. You can use PART_BEGIN and PART_END to define a part.
+
+Additional padding can be inserted after new line character padding the beginning of a line. If more than one character is provided, the rightmost character is used for padding. All additional characters are always added leftmost. The characters passed for padding must not contain characters with ASCII code less than 32, e.g. new line or tab. If the count is ommited the passed string is used for padding left as is.  If the character count is zero nothing is added at all.</td>
+        </tr>
+        <tr>
+          <td>PART_BEGIN</td>
+          <td>processing directive</td>
+          <td>The label of the part to add.</td>
+          <td><pre>&#91;PART_BEGIN&#93;&#91;&quotmyLabel&quot&#93;&#91;CONTAINS&#93;&#91;&quotxyz&quot&#93;more&#91;PART_END&#93;</pre></td>
+          <td>The PART_BEGIN and PART_END tags are used to declare a fragment of a template can span multiple lines or is located inside a single line. The part identified by its label can be inserted later using the PART tag. Part blocks cannot be nested. Part blocks cannot be defined inside macro blocks defined by MACRO_BEGIN and MACRO_END. You can use delay dots  together with PART_BEGIN and PART_END to define parts with data from one table, e.g. parameters, and use the parts for processing another table. Redefining a part with the same label  is not allowed. You can use PART_REMOVE to delete a previous definition. If PART_BEGIN is encountered the previous content of the line is processed and can form a macro. Parts are available from definition to the end of processing of the main  file, unless the are removed by using PART_REMOVE. Parts can be defined in include files &#40;see INCLUDE tag&#41; and are available in subsequently included files.</td>
+        </tr>
+        <tr>
+          <td>PART_END</td>
+          <td>processing directive</td>
+          <td> </td>
+          <td><pre>&#91;PART_BEGIN&#93;&#91;&quotmyLabel&quot&#93;&#91;CONTAINS&#93;&#91;&quotxyz&quot&#93;more&#91;PART_END&#93;</pre></td>
+          <td>Closes a part block.</td>
+        </tr>
+        <tr>
+          <td>PART_LAZY</td>
+          <td>processing directive</td>
+          <td>The label of the part to expand. Optional: The left padding characters and the total count of characters to pad.</td>
+          <td><pre>&#91;PART_BEGIN&#93;&#91;&quotL1&quot&#93;&#91;CONTAINS&#93;&#91;&quotxyz&quot&#93;&#91;PART_LAZY&#93;&#91;&quotL2&quot&#93;&#91;PART_END&#93;</pre></td>
+          <td>Behaves exactly like the part tag. The difference is the time the PART_LAZY tag is evaluated when located in another part block. A PART tag is expanded immediately into the enclosing part block. PART_LAZY is expanded when the enclosing PART block is expanded.</td>
+        </tr>
+        <tr>
+          <td>PART_PADDING</td>
+          <td>processing directive</td>
+          <td> </td>
+          <td><pre>&#91;PART_BEGIN&#93;&#91;&quotL1&quot&#93;...&#91;PART_PADDING&#93;...&#91;PART_END&#93;</pre></td>
+          <td>PART_PADDING is replaced by the padding text applied when expanding a PART or PART_LAZY tag.</td>
+        </tr>
+        <tr>
+          <td>PART_REMOVE</td>
+          <td>processing directive</td>
+          <td>The label of the part to remove.</td>
+          <td><pre>&#91;PART_REMOVE&#93;&#91;&quotLengthyAdditionalTagsAndText&quot&#93;</pre></td>
+          <td>Removes a part identified by its label that has been defined previously. If the part does not exist or already has been removed nothing is done.</td>
+        </tr>
+        <tr>
+          <td>SET_RECURSION_LEVEL_LIMIT</td>
+          <td>processing directive</td>
+          <td> </td>
+          <td><pre>&#91;SET_RECURSION_LEVEL_LIMIT.&#93;&#91;TRIM&#93;</pre></td>
+          <td>This directive can be used to limit the recursion level when using multistage macro expressions. This is useful when debugging. Insert zero or more delay dots to indicate the last level to process. The set recursion level limit directive can only be used at the beginning of a line and outside of a macro. This tag is always processed.</td>
+        </tr>
+        <tr>
+          <td>SET_RECURSION_LEVEL_LIMIT_OFF</td>
+          <td>processing directive</td>
+          <td> </td>
+          <td><pre>&#91;SET_RECURSION_LEVEL_LIMIT_OFF&#93;&#91;TRIM&#93;</pre></td>
+          <td>This directive can be used to remove a recursion level limit. This tag is always processed. Delay dots have no effect.</td>
+        </tr>
+        <tr>
+          <td>TABLE_BEGIN</td>
+          <td>processing directive</td>
+          <td>The label of the table to add. Optional: The delimiting characters. Characters used for commenting. Properties of the table. Characters for text item quote.</td>
+          <td><pre>&#91;TABLE_BEGIN&#93;&#91;&quotmyTable&quot,&quot;&quot,&quot#&quot,&quotpad-rows&quot&#93;Numbers;1;2;5&#91;TABLE_END&#93;</pre></td>
+          <td>Can be used to define a table block that contains a comma-separated-values table using a single character as delimiter to separate the items of a table. Parameter 1 is label of the table. Optional parameter 2 defines the delimiter. The default delimiter is &#39;;&#39;. Optional parameter 3 define  a list of characters as string that mark commented lines in CSV-files when found at the beginning of a line. Per default no comment chars are used. Optional parameter 4 can be used to pass additional directions. Possible values are top-down, left-to-right, pad-rows, csv-ignore-quotes and permanent, separated by a semicolon. &#39;top-down&#39; and &#39;left-to-right&#39; limit the allowed reading direction of the table. The default is reading both directions. If &#39;permanent&#39; is provided the table will be exported by the template file. The default behaviour is removing tables defined by a template file at the end of processing of the main  file. If &#39;pad-rows&#39; is provided. Optional parameter 4 can be used to pass characters that are used for putting text items in quotes. The default is the double quote character.
+the loader automatically fills missing row items at the end of a row with an empty string. In the default behaviour this causes an error otherwise. Table blocks cannot be nested. Table blocks can only contain text. This includes tags containing a delay dot. </td>
+        </tr>
+        <tr>
+          <td>TABLE_END</td>
+          <td>processing directive</td>
+          <td> </td>
+          <td><pre>&#91;TABLE_BEGIN&#93;&#91;&quotmyTable&quot&#93;Numbers;1;2;5&#91;TABLE_END&#93;</pre></td>
+          <td>Closes a table block.</td>
+        </tr>
+        <tr>
+          <td>TABLE_LOAD</td>
+          <td>processing directive</td>
+          <td>The filename. The label of the table to add. Optional: The delimiting characters. Characters used for commenting. Properties of the table.  Characters for text item quote.</td>
+          <td><pre>&#91;TABLE_LOAD&#93;&#91;&quotdir/file.csv&quot,&quotmyTable&quot,&quot;&quot,&quot#&quot,&quotpad-rows&quot&#93;</pre></td>
+          <td>Loads a table from a csv file. Otherwise TABLE_LOAD behaves like a table block. The parameters 2-5 match exactly like the TABLE_BEGIN parameters 1-4. See TABLE_BEGIN for more information. If a relative path is provided it is relative to the template file containing the TABLE_LOAD tag. If the file is not found there the include directories are searched for a file with the relative path.</td>
+        </tr>
+        <tr>
+          <td>TABLE_REMOVE</td>
+          <td>processing directive</td>
+          <td>The label of the table to remove.</td>
+          <td><pre>&#91;TABLE_REMOVE&#93;&#91;&quotmyTable&quot&#93;</pre></td>
+          <td>Removes a table identified by its label that has been defined previously. If the table does not exist or already has been removed nothing is done.</td>
+        </tr>
+        <tr>
+          <td>ANY</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotDescription&quot&#93;&#91;ANY&#93;</pre></td>
+          <td>The substitution succeeds in any case if the row or column is contained in the table.</td>
+        </tr>
+        <tr>
+          <td>AS_VOLATILE</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotDescription&quot&#93;&#91;AS_VOLATILE&#93;</pre></td>
+          <td>It indicates that the row or column can be missing in the table. The entry heading is therefore not used for determining the reading direction for the macro and for determining which table to read.</td>
+        </tr>
+        <tr>
+          <td>BEGIN</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>foo&#40;&#91;BEGIN&#93;&quot&#91;ENTRY&#93;&#91;&quotParameter Name&quot&#93;&quot&#91;OR&#93;&quotdefault&quot&#91;END&#93;&#41;;</pre></td>
+          <td>The BEGIN and END tags mark a macro block. A macro block is used conjunction with the OR keyword. Macro blocks can be nested.</td>
+        </tr>
+        <tr>
+          <td>BLOCK_FORMAT</td>
+          <td>macro keyword</td>
+          <td>The block width.</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;BLOCK_FORMAT&#93;&#91;20&#93;</pre></td>
+          <td>Formats the expanded item text into a text block of the given width by inserting new line characters.</td>
+        </tr>
+        <tr>
+          <td>CALC</td>
+          <td>macro keyword</td>
+          <td>The arithmetic expression.</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotNumber&quot&#93;&#91;CALC&#93;&#91;&quota&#43;1&quot&#93;</pre></td>
+          <td>Supports integer calculation supporting the operators &#43;-/*&#37;, parentheses &#40;&#41; and the unary sign operators &#43;-. The computation is performed using 64 Bit signed integer values. Supports the variable a. The variable a is replaced with the epression from the ENTRY, COUNT or INDEX tag. Overflow is not explicitly handled and must be avoided.</td>
+        </tr>
+        <tr>
+          <td>CONTAINS</td>
+          <td>macro keyword</td>
+          <td>Text to match</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;CONTAINS&#93;&#91;&quot.tpl.&quot&#93;</pre></td>
+          <td>The substitution succeeds if the entry contains the specified text.</td>
+        </tr>
+        <tr>
+          <td>COUNT</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;COUNT&#93;</pre></td>
+          <td>The tag is substituted with the count of successful substitutions of the current macro.</td>
+        </tr>
+        <tr>
+          <td>END</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>foo&#40;&#91;BEGIN&#93;&quot&#91;ENTRY&#93;&#91;&quotParameter Name&quot&#93;&quot&#91;OR&#93;&quotdefault&quot&#91;END&#93;&#41;;</pre></td>
+          <td>The tag ends a macro block.</td>
+        </tr>
+        <tr>
+          <td>ENDS_WITH</td>
+          <td>macro keyword</td>
+          <td>Text to match</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;ENDS_WITH&#93;&#91;&quot.exe&quot&#93;</pre></td>
+          <td>The substitution succeeds if the entry ends with the specified text.</td>
+        </tr>
+        <tr>
+          <td>ENTRY</td>
+          <td>macro keyword</td>
+          <td>Column or row name</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;</pre></td>
+          <td>Is substituted successfully with the text of current entry in the specified row or column, if the entry is not empty. Multiple columns or rows having the same name are substituted in the order they appear in the table. This default behavior can be overridden by applying constraints. The default constraint is &#91;NOT&#93;&#91;EQUALS&#93;&#91;&quot&quot&#93;.</td>
+        </tr>
+        <tr>
+          <td>EQUALS</td>
+          <td>macro keyword</td>
+          <td>Text to match</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;EQUALS&#93;&#91;&quotMachine&quot&#93;</pre></td>
+          <td>The substitution succeeds if the specified text matches.</td>
+        </tr>
+        <tr>
+          <td>ERROR</td>
+          <td>macro keyword</td>
+          <td>Error message</td>
+          <td><pre>&#91;BEGIN&#93;&#91;ENTRY&#93;&#91;&quotParam&quot&#93;&#91;OR&#93;&#91;ERROR&#93;&#91;&quotMissing Parameter.&quot&#93;&#91;END&#93;</pre></td>
+          <td>The processing aborts with error when this tag is expanded.</td>
+        </tr>
+        <tr>
+          <td>FIRST_TIME</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>MyClass&#40;&#41; &#91;BEGIN&#93;&#91;IF&#93;&#91;FIRST_TIME&#93;:&#91;OR&#93;,&#91;END&#93;&#91;ENTRY&#93;&#91;&quotInitializer&quot&#93;</pre></td>
+          <td>A macro block or alternative containing this tag can only be expanded successfully for the first time.</td>
+        </tr>
+        <tr>
+          <td>FLUSH</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;FLUSH&#93;</pre></td>
+          <td>The substitution succeeds if one column or row of multiple columns or rows can be substituted successfully, causing output for all columns or rows.</td>
+        </tr>
+        <tr>
+          <td>FOR_ALL</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;FOR_ALL&#93;</pre></td>
+          <td>The substitution succeeds if all entries of multiple columns or rows with same name can be substituted successfully.</td>
+        </tr>
+        <tr>
+          <td>HTML_ESCAPE</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;HTML_ESCAPE&#93;</pre></td>
+          <td>Escapes the following list of characters: &lt&amp;&quot&#39;&#96;&#40;&#41;&#123;&#125;&#91;&#93;&#33;&#64;&#36;&#37;&#61;&#43;&gt</td>
+        </tr>
+        <tr>
+          <td>IF</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;IF&#93;&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;IF&#93;&#91;NOT&#93;&#91;ENTRY&#93;&#91;&quotState 2&quot&#93;</pre></td>
+          <td>Used for checking if a substitution can be expanded successfully.</td>
+        </tr>
+        <tr>
+          <td>IGNORE_CASE</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;REPLACE&#93;&#91;&quot.tpl.&quot, &quot.gen.&quot&#93;&#91;IGNORE_CASE&#93;</pre></td>
+          <td>Causes replace operations to be performed ignoring case.</td>
+        </tr>
+        <tr>
+          <td>INDEX</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;INDEX&#93;</pre></td>
+          <td>The tag is substituted with the one based index of the current row or column being read.</td>
+        </tr>
+        <tr>
+          <td>LAST_TIME</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;LAST_TIME&#93;</pre></td>
+          <td>A macro block containing this keyword can only be expanded successfully for the last time.</td>
+        </tr>
+        <tr>
+          <td>MACRO_BEGIN</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>foo&#40;&#91;BEGIN&#93;&quot&#91;ENTRY&#93;&#91;&quotParameter Name&quot&#93;&quot&#91;OR&#93;&quotdefault&quot&#91;END&#93;&#41;;</pre></td>
+          <td>The MACRO_BEGIN and MACRO_END tags are used to declare a macro that spans multiple lines or to declare a macro that is expanded inside a single line. </td>
+        </tr>
+        <tr>
+          <td>MACRO_END</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>foo&#40;&#91;BEGIN&#93;&quot&#91;ENTRY&#93;&#91;&quotParameter Name&quot&#93;&quot&#91;OR&#93;&quotdefault&quot&#91;END&#93;&#41;;</pre></td>
+          <td>The tag ends a macro.</td>
+        </tr>
+        <tr>
+          <td>MATCHES_REGEX</td>
+          <td>macro keyword</td>
+          <td>Regular expression to match</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;MATCHES_REGEX&#93;&#91;&#39;&#40;.*&#41;\.exe&#39;&#93;</pre></td>
+          <td>The substitution succeeds if the specified regular expression matches.</td>
+        </tr>
+        <tr>
+          <td>MERGE</td>
+          <td>macro keyword</td>
+          <td>Separator text</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;MERGE&#93;&#91;&quot, &quot&#93;</pre></td>
+          <td>The separator text is inserted between the entries of multiple columns or rows with the same name.</td>
+        </tr>
+        <tr>
+          <td>NOT</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotMachine&quot&#93;&#91;NOT&#93;&#91;EQUALS&#93;&#91;&quotState machine&quot&#93;</pre></td>
+          <td>This tag negates the meaning of the next modifier.</td>
+        </tr>
+        <tr>
+          <td>OR</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;OR&#93;&#91;ENTRY&#93;&#91;&quotState 2&quot&#93;</pre></td>
+          <td>This tag splits a macro block into multiple alternatives. Only the first successfully expanded alternative is used.</td>
+        </tr>
+        <tr>
+          <td>PAD_LEFT</td>
+          <td>macro keyword</td>
+          <td>The padding characters and the count&#40;s&#41; of characters to pad</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;PAD_LEFT&#93;&#91;&quot &quot, 40&#93;</pre></td>
+          <td>Pads the left side of the expanded item text according to given number of characters if needed. The character count can be provided more than once when padding multiple lines. The first provided number of characters is used for padding the first line, then next for the next line and so on. The last given number of characters is used for all following lines. If the character count starts with a plus sign the number of characters is prepended otherwise the line is padded until the number of given characters has been reached. If more than one character is provided, the rightmost character is used for padding. M26 Additional characters are included in the given padding width.  If the character count is zero nothing is added at all. The characters passed for padding must not contain characters with ASCII code less than 32, e.g. new line or tab.</td>
+        </tr>
+        <tr>
+          <td>PAD_RIGHT</td>
+          <td>macro keyword</td>
+          <td>The padding characters and the count&#40;s&#41; of characters to pad</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotData&quot&#93;&#91;PAD_RIGHT&#93;&#91;&quot &quot, 40&#93;</pre></td>
+          <td>Pads the right side of the expanded item text according to given number of characters if needed. The character count can be provided more than once when padding multiple lines. The first provided number of characters is used for padding the first line, then next for the next line and so on. The last given number of characters is used for all following lines. If the character count starts with a plus sign the number of characters is appended otherwise the line is padded until the number of given characters has been reached. If more than one character is provided, the leftmost character is used for padding. All additional characters are always added rightmost. Additional characters are included in the given padding width. If the character count is zero nothing is added at all. The characters passed for padding must not contain characters with ASCII code less than 32, e.g. new line or tab.</td>
+        </tr>
+        <tr>
+          <td>READ_LEFT_TO_RIGHT</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotName&quot&#93;&#91;READ_LEFT_TO_RIGHT&#93;</pre></td>
+          <td>Specifies that the table is to be read from left to right for this entry.</td>
+        </tr>
+        <tr>
+          <td>READ_TOP_DOWN</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotName&quot&#93;&#91;READ_TOP_DOWN&#93;</pre></td>
+          <td>It specifies that the table is to be read from top down for this entry.</td>
+        </tr>
+        <tr>
+          <td>REGEX_REPLACE</td>
+          <td>macro keyword</td>
+          <td>Regular expression to match, Format expression</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;REGEX_REPLACE&#93;&#91;&#39;&#40;.*&#41;\.txt&#39;, &#39;&#36;1\.log&#39;&#93;</pre></td>
+          <td>Before the entry is substituted the replace operation is performed on the text from the table entry.</td>
+        </tr>
+        <tr>
+          <td>REPLACE</td>
+          <td>macro keyword</td>
+          <td>Text to match, Text replacing the matched text</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;REPLACE&#93;&#91;&quot.tpl.&quot, &quot.gen.&quot&#93;</pre></td>
+          <td>Before the entry is substituted the replace operation is performed on the text from the table entry.</td>
+        </tr>
+        <tr>
+          <td>STARTS_WITH</td>
+          <td>macro keyword</td>
+          <td>Text to match</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotFile&quot&#93;&#91;STARTS_WITH&#93;&#91;&quotReadme&quot&#93;</pre></td>
+          <td>The substitution succeeds if the entry starts with the specified text.</td>
+        </tr>
+        <tr>
+          <td>TO_CSTRING</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotParameter Value&quot&#93;&#91;TO_CSTRING&#93;</pre></td>
+          <td>Before the entry is substituted all special characters are converted to the correct escape sequences for c\c&#43;&#43; string literals, e.g. the new line character is converted to \n.</td>
+        </tr>
+        <tr>
+          <td>TO_CSV</td>
+          <td>macro keyword</td>
+          <td>The delimiters used and the  char used for putting text items in quotes.</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;TO_CSV&#93;&#91;&quot\t&quot,&quot\&quot&quot&#93;</pre></td>
+          <td>Before the entry is substituted the text content is put in quotes if it contains any of the delimiter characters or a new line character. The second parameter is optional. The default parameter for putting text items in quotes is the double quote character. If multiple quote chars are provided only the first character is used, but the text item is put in quotes if any one of the quote characters is found.</td>
+        </tr>
+        <tr>
+          <td>TO_LOWER</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;TO_LOWER&#93;</pre></td>
+          <td>Before the entry is substituted all characters are converted to lower case.</td>
+        </tr>
+        <tr>
+          <td>TO_SIZE</td>
+          <td>macro keyword</td>
+          <td>Additional properties needed for the determining the size value.</td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;TO_SIZE&#93;&#91;&quotarray-elements&quot&#93;</pre></td>
+          <td>Before the entry is substituted the text content is replaced by a size value. Currently only the property array-elements is supported. All characters are considered as Extended ASCII encoding. This will change in later versions. The text size is reported without a terminating zero. You can use the CALC tag to modify the value if needed.</td>
+        </tr>
+        <tr>
+          <td>TO_UPPER</td>
+          <td>macro keyword</td>
+          <td> </td>
+          <td><pre>&#91;ENTRY&#93;&#91;&quotState 1&quot&#93;&#91;TO_UPPER&#93;</pre></td>
+          <td>Before the entry is substituted all characters are converted to upper case.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor8"></a> </h2></div></div></div>
+    <div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="anchor9"></a>Tag Combinations </h2></div></div></div>
+    <p>
+     
+    </p>
+    <p>
+    The following table shows how tags can be combined. 
+    </p>
+
+    <div class="informaltable">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th>Tag Name</th>
+              <th>Directive</th>
+              <th>Constraint</th>
+              <th>Conversion</th>
+            </tr>
+            <tr>
+              <th>Remarks:</th>
+              <td>Aditional directives that can be placed behind the listed tag.</td>
+              <td>Constraints for a successful substitution that can be placed behind the listed tag and it's additional directives. If multiple constraints are used then they are treated as if combined by an &#39;or&#39;. To create an &#39;and&#39; condition the substituted tag, e.g. ENTRY, has to be added multiple times to a macro preceded by an IF tag. Constraints can be prefixed with the NOT tag. The default constraint is [NOT][EQUALS][""].</td>
+              <td>One or multiple conversions can be applied to the substituted text. The conversions are performed in the order they appear. These tags can be placed behind the listed tag after additional directives or constraints.</td>
+            </tr>
+            <tr>
+              <td>CONTAINS</td>
+              <td>
+                FLUSH<br>
+                FOR_ALL<br>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>COUNT</td>
+              <td>
+              </td>
+              <td>
+                CONTAINS<br>
+                ENDS_WITH<br>
+                EQUALS<br>
+                MATCHES_REGEX<br>
+                STARTS_WITH<br>
+              </td>
+              <td>
+                CALC<br>
+                PAD_LEFT<br>
+                PAD_RIGHT<br>
+                REGEX_REPLACE<br>
+                REPLACE<br>
+              </td>
+            </tr>
+            <tr>
+              <td>ENDS_WITH</td>
+              <td>
+                FLUSH<br>
+                FOR_ALL<br>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>ENTRY</td>
+              <td>
+                AS_VOLATILE<br>
+                READ_LEFT_TO_RIGHT<br>
+                READ_TOP_DOWN<br>
+              </td>
+              <td>
+                ANY<br>
+                CONTAINS<br>
+                ENDS_WITH<br>
+                EQUALS<br>
+                MATCHES_REGEX<br>
+                STARTS_WITH<br>
+              </td>
+              <td>
+                BLOCK_FORMAT<br>
+                CALC<br>
+                HTML_ESCAPE<br>
+                MERGE<br>
+                PAD_LEFT<br>
+                PAD_RIGHT<br>
+                REGEX_REPLACE<br>
+                REPLACE<br>
+                TO_CSTRING<br>
+                TO_CSV<br>
+                TO_LOWER<br>
+                TO_SIZE<br>
+                TO_UPPER<br>
+              </td>
+            </tr>
+            <tr>
+              <td>EQUALS</td>
+              <td>
+                FLUSH<br>
+                FOR_ALL<br>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>INDEX</td>
+              <td>
+              </td>
+              <td>
+                CONTAINS<br>
+                ENDS_WITH<br>
+                EQUALS<br>
+                MATCHES_REGEX<br>
+                STARTS_WITH<br>
+              </td>
+              <td>
+                CALC<br>
+                PAD_LEFT<br>
+                PAD_RIGHT<br>
+                REGEX_REPLACE<br>
+                REPLACE<br>
+              </td>
+            </tr>
+            <tr>
+              <td>MATCHES_REGEX</td>
+              <td>
+                FLUSH<br>
+                FOR_ALL<br>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>REGEX_REPLACE</td>
+              <td>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>REPLACE</td>
+              <td>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+            <tr>
+              <td>STARTS_WITH</td>
+              <td>
+                FLUSH<br>
+                FOR_ALL<br>
+                IGNORE_CASE<br>
+              </td>
+              <td>
+              </td>
+              <td>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+    <p>
+     
+    </p>
+
+    <hr>
+    <div class="spirit-nav">
+        <a accesskey="p" href="template_creation.gen.html"><img src="boost/prev.png" alt="Prev"></a>
+        <a accesskey="h" href="index.html"><img src="boost/home.png" alt="Home"></a>
+        <a accesskey="n" href="command_line_reference.gen.html"><img src="boost/next.png" alt="Next"></a>
+    </div>
+</body>
+</html>

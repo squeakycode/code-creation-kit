@@ -1,4 +1,0 @@
-Item Type;Text
-heading 2;Command Reference 
-paragraph;The following table shows all available commands. 
-include;command_reference.table.gen.html
