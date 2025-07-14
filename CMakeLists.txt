@@ -14,19 +14,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(cck CXX)
 
 #if the code creation kit is installed use it for building, otherwise use pre generated files, that are checked in
-if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
-    if(WIN32) # Windows
-        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc.exe")
-            message(STATUS "Found installed ccktc executable. It will be used for building.")
-            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc.exe")
-        endif()
-    else()
-        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc")
-            message(STATUS "Found installed ccktc executable. It will be used for building.")
-            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc")
-        endif()
-    endif()
-endif()
+#if (DEFINED ENV{CCK_ROOT} AND CCK_BUILD_WITH_INSTALLED_CCKTC)
+#    if(WIN32) # Windows
+#        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc.exe")
+#            message(STATUS "Found installed ccktc executable. It will be used for building.")
+#            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc.exe")
+#        endif()
+#    else()
+#        if(EXISTS "$ENV{CCK_ROOT}/bin/ccktc")
+#            message(STATUS "Found installed ccktc executable. It will be used for building.")
+#            set (CCK_TCCMD_EXECUTABLE "$ENV{CCK_ROOT}/bin/ccktc")
+#        endif()
+#    endif()
+#endif()
 
 #use highest warning levels
 macro(custom_target_use_highest_warning_level TargetName)
