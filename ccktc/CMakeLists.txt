@@ -52,6 +52,21 @@ add_executable(ccktc
     ccktc.cpp
 )
 
+target_compile_features(ccktc PRIVATE cxx_std_17)
+set_target_properties(ccktc PROPERTIES CXX_EXTENSIONS OFF)
+
+if(CCK_RUNTIME_OUTPUT_DIRECTORY)
+    set_target_properties(ccktc PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CCK_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+    foreach(config Debug Release)
+        string(TOUPPER ${config} CONFIG_UPPER)
+        set_target_properties(ccktc PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CCK_RUNTIME_OUTPUT_DIRECTORY}"
+        )
+    endforeach()
+endif()
+
 target_include_directories(ccktc
     PRIVATE
     ../include/code-creation-kit

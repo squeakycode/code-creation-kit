@@ -1,15 +1,29 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0092 NEW) # no default /W3 flag for MSVC
 
-#we only need debug and release configurations
-set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+#detect whether this project is built standalone or used as a subdirectory/submodule
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(CCK_IS_TOP_LEVEL ON)
+else()
+    set(CCK_IS_TOP_LEVEL OFF)
+endif()
+
+#only touch global settings when built standalone, so a parent project is not affected
+if(CCK_IS_TOP_LEVEL)
+    #we only need debug and release configurations
+    set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING INTERNAL FORCE )
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+endif()
 
 #we are building code creation kit
 project(cck CXX)
+
+#location of the build output (ccktc executable). A parent project can set this variable or the cache entry to control it.
+#if empty the default CMake location is used.
+set(CCK_RUNTIME_OUTPUT_DIRECTORY "" CACHE PATH "Directory the ccktc executable is placed in after build. Empty uses the default location.")
 
 #set(CCK_BUILD_WITH_INSTALLED_CCKTC ON CACHE BOOL "Use installed ccktc executable to generate code while building otherwise pregenerated code is used.")
 
@@ -40,7 +54,18 @@ endmacro(custom_target_use_highest_warning_level)
 #add the sub directories to build
 add_subdirectory(ccktc)
 
-option(CCK_BUILD_TESTS "Determines whether to build tests." ON)
+option(CCK_GENERATE_DOCUMENTATION "Add a target 'cck_documentation' that runs ccktc to generate the documentation (codegen/Documentation.tccmd)." OFF)
+if(CCK_GENERATE_DOCUMENTATION)
+    add_custom_target(cck_documentation
+        COMMAND ccktc -f Documentation.tccmd
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/codegen
+        COMMENT "Generating documentation with ccktc"
+        VERBATIM
+    )
+    add_dependencies(cck_documentation ccktc)
+endif()
+
+option(CCK_BUILD_TESTS "Determines whether to build tests." ${CCK_IS_TOP_LEVEL})
 if(CCK_BUILD_TESTS)
     message("Building tests.")
     include(CTest)
@@ -66,6 +91,7 @@ if(CCK_BUILD_TESTS)
     add_subdirectory(test/TVerticalTableBuilder)
 endif()
 
+if(CCK_IS_TOP_LEVEL)
 # Packaging support
 set(CPACK_PACKAGE_VENDOR "squeakycode")
 #<>[COMMENT] The version information is injected here from codegen/Version.tccmd
@@ -84,8 +110,8 @@ set(CPACK_PACKAGE_VERSION_MAJOR "0")                                            
 set(CPACK_PACKAGE_VERSION_MINOR "7")                                                      #< inline generated
 set(CPACK_PACKAGE_VERSION_PATCH "0")                                                      #< inline generated
 set(CPACK_PACKAGE_CONTACT "andreas.gau@gmx.org")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 # Set package type defaults
 if(APPLE)
@@ -97,3 +123,4 @@ elseif(WIN32)
 endif()
 
 include(CPack)
+endif()
