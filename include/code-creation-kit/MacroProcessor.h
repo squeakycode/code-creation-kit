@@ -108,6 +108,18 @@ namespace code_creation_kit
                 return isTemporaryFlag;
             }
 
+            SharedConstTableT& getConnectedTable()
+            {
+                if (ptrTable)
+                {
+                    return ptrTable;
+                }
+                else
+                {
+                    return ptrSourceTable;
+                }
+            }
+
             SharedConstTableT ptrTable;
             SharedTableRotatorT ptrRotatedTable;
             TableIndexT tableIndex;
@@ -195,7 +207,7 @@ namespace code_creation_kit
                     throw ExCannotChangeTableList();
                 }
 
-                ptrDisconnectedTable = pos->ptrTable;
+                ptrDisconnectedTable = pos->getConnectedTable();
                 m_tableList.erase( --pos.base());
                 result = true;
             }

@@ -29,6 +29,10 @@ TEST_CASE( "TGenerator", "[TGenerator]")
         generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TGenerator.xls.csv", "LabelB", true, true, 1, 1, false);
         generator.unloadTable( "LabelB");
 
+        //test unload feature
+        generator.loadTable(CCK_TEST_INPUT_FILE_PREFIX "TGenerator.xls.csv", "LabelC", false, true, 1, 1, false);
+        generator.unloadTable( "LabelC");
+
         //create parameter list
         std::vector<std::string> parameterList;
         parameterList.push_back("a=4");
